@@ -1,0 +1,16 @@
+[
+{
+  "modid": "SpecialMobs",
+  "name": "Special Mobs",
+  "description": "Adds variants to the vanilla mobs to make them more interesting and challenging.",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "http://www.minecraftforum.net/topic/1153874-/",
+  "updateUrl": "",
+  "authorList": ["FatherToast"],
+  "credits": "",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]

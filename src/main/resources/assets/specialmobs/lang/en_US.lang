@@ -1,0 +1,129 @@
+potion.potency.-10=-X
+potion.potency.-9=-IX
+potion.potency.-8=-VIII
+potion.potency.-7=-VII
+potion.potency.-6=-VI
+potion.potency.-5=-V
+potion.potency.-4=-IV
+potion.potency.-3=-III
+potion.potency.-2=-II
+potion.potency.-1=-I
+potion.potency.4=V
+potion.potency.5=VI
+potion.potency.6=VII
+potion.potency.7=VIII
+potion.potency.8=IX
+potion.potency.9=X
+
+entity.SpecialMobs.SMFireball.name=Fireball
+entity.SpecialMobs.SMFishHook.name=Fish Hook
+
+entity.SpecialMobs.SpecialBlaze.name=Blaze
+entity.SpecialMobs.CinderBlaze.name=Cinder
+entity.SpecialMobs.ConflagrationBlaze.name=Conflagration
+entity.SpecialMobs.EmberBlaze.name=Ember
+entity.SpecialMobs.HellfireBlaze.name=Hellfire
+entity.SpecialMobs.InfernoBlaze.name=Inferno
+entity.SpecialMobs.JoltBlaze.name=Jolt
+entity.SpecialMobs.SmolderBlaze.name=Smolder
+entity.SpecialMobs.WildfireBlaze.name=Wildfire
+
+entity.SpecialMobs.SpecialCaveSpider.name=Cave Spider
+entity.SpecialMobs.BabyCaveSpider.name=Baby Cave Spider
+entity.SpecialMobs.FlyingCaveSpider.name=Flying Cave Spider
+entity.SpecialMobs.MotherCaveSpider.name=Mother Cave Spider
+entity.SpecialMobs.ToughCaveSpider.name=Tough Cave Spider
+entity.SpecialMobs.WebCaveSpider.name=Web Cave Spider
+entity.SpecialMobs.WitchCaveSpider.name=Witch Cave Spider
+
+entity.SpecialMobs.SpecialCreeper.name=Creeper
+entity.SpecialMobs.ArmorCreeper.name=Armor Creeper
+entity.SpecialMobs.DarkCreeper.name=Dark Creeper
+entity.SpecialMobs.DeathCreeper.name=Death Creeper
+entity.SpecialMobs.DirtCreeper.name=Dirt Creeper
+entity.SpecialMobs.DoomCreeper.name=Doom Creeper
+entity.SpecialMobs.DrowningCreeper.name=Drowning Creeper
+entity.SpecialMobs.EnderCreeper.name=Ender Creeper
+entity.SpecialMobs.FireCreeper.name=Fire Creeper
+entity.SpecialMobs.GravelCreeper.name=Gravel Creeper
+entity.SpecialMobs.GravityCreeper.name=Gravity Creeper
+entity.SpecialMobs.JumpingCreeper.name=Jumping Creeper
+entity.SpecialMobs.LightningCreeper.name=Lightning Creeper
+entity.SpecialMobs.MiniCreeper.name=Mini Creeper
+entity.SpecialMobs.SplittingCreeper.name=Splitting Creeper
+
+entity.SpecialMobs.SpecialEnderman.name=Enderman
+entity.SpecialMobs.BlindingEnderman.name=Blinding Enderman
+entity.SpecialMobs.CursedEnderman.name=Cursed Enderman
+entity.SpecialMobs.IcyEnderman.name=Icy Enderman
+entity.SpecialMobs.LightningEnderman.name=Lightning Enderman
+entity.SpecialMobs.MiniEnderman.name=Mini Enderman
+entity.SpecialMobs.MirageEnderman.name=Mirage Enderman
+entity.SpecialMobs.ThiefEnderman.name=Thief Enderman
+
+entity.SpecialMobs.SpecialGhast.name=Ghast
+entity.SpecialMobs.BabyGhast.name=Baby Ghast
+entity.SpecialMobs.FaintGhast.name=Faint Ghast
+entity.SpecialMobs.FighterGhast.name=Fighter Ghast
+entity.SpecialMobs.KingGhast.name=King Ghast
+entity.SpecialMobs.MiniGhast.name=Mini Ghast
+entity.SpecialMobs.QueenGhast.name=Queen Ghast
+entity.SpecialMobs.UnholyGhast.name=Unholy Ghast
+
+entity.SpecialMobs.SpecialPigZombie.name=Zombie Pigman
+entity.SpecialMobs.BrutishPigZombie.name=Brutish Zombie Pigman
+entity.SpecialMobs.FishingPigZombie.name=Fishing Zombie Pigman
+entity.SpecialMobs.GiantPigZombie.name=Giant Zombie Pigman
+entity.SpecialMobs.HungryPigZombie.name=Hungry Zombie Pigman
+entity.SpecialMobs.PlaguePigZombie.name=Plague Zombie Pigman
+entity.SpecialMobs.VampirePigZombie.name=Vampire Pigman
+
+entity.SpecialMobs.SpecialSilverfish.name=Silverfish
+entity.SpecialMobs.BlindingSilverfish.name=Blinding Silverfish
+entity.SpecialMobs.FishingSilverfish.name=Fishing Silverfish
+entity.SpecialMobs.FlyingSilverfish.name=Flying Silverfish
+entity.SpecialMobs.PoisonSilverfish.name=Poison Silverfish
+entity.SpecialMobs.ToughSilverfish.name=Tough Silverfish
+
+entity.SpecialMobs.SpecialSkeleton.name=Skeleton
+entity.SpecialMobs.BrutishSkeleton.name=Brutish Skeleton
+entity.SpecialMobs.FireSkeleton.name=Fire Skeleton
+entity.SpecialMobs.GatlingSkeleton.name=Gatling Skeleton
+entity.SpecialMobs.GiantSkeleton.name=Giant Skeleton
+entity.SpecialMobs.NinjaSkeleton.name=Ninja Skeleton
+entity.SpecialMobs.PoisonSkeleton.name=Poison Skeleton
+entity.SpecialMobs.SniperSkeleton.name=Sniper Skeleton
+entity.SpecialMobs.SpitfireSkeleton.name=Spitfire Skeleton
+entity.SpecialMobs.ThiefSkeleton.name=Thief Skeleton
+
+entity.SpecialMobs.SpecialSlime.name=Slime
+entity.SpecialMobs.BlackberrySlime.name=Blackberry Slime
+entity.SpecialMobs.BlueberrySlime.name=Blueberry Slime
+entity.SpecialMobs.CaramelSlime.name=Caramel Slime
+entity.SpecialMobs.GrapeSlime.name=Grape Slime
+entity.SpecialMobs.LemonSlime.name=Lemon Slime
+entity.SpecialMobs.StrawberrySlime.name=Strawberry Slime
+entity.SpecialMobs.WatermelonSlime.name=Watermelon Slime
+
+entity.SpecialMobs.SpecialSpider.name=Spider
+entity.SpecialMobs.BabySpider.name=Baby Spider
+entity.SpecialMobs.DesertSpider.name=Desert Spider
+entity.SpecialMobs.FlyingSpider.name=Flying Spider
+entity.SpecialMobs.GhostSpider.name=Ghost Spider
+entity.SpecialMobs.GiantSpider.name=Giant Spider
+entity.SpecialMobs.HungrySpider.name=Hungry Spider
+entity.SpecialMobs.MotherSpider.name=Mother Spider
+entity.SpecialMobs.PaleSpider.name=Pale Spider
+entity.SpecialMobs.PoisonSpider.name=Poison Spider
+entity.SpecialMobs.SmallSpider.name=Small Spider
+entity.SpecialMobs.ToughSpider.name=Tough Spider
+entity.SpecialMobs.WebSpider.name=Web Spider
+entity.SpecialMobs.WitchSpider.name=Witch Spider
+
+entity.SpecialMobs.SpecialZombie.name=Zombie
+entity.SpecialMobs.BrutishZombie.name=Brutish Zombie
+entity.SpecialMobs.FireZombie.name=Fire Zombie
+entity.SpecialMobs.FishingZombie.name=Fishing Zombie
+entity.SpecialMobs.GiantZombie.name=Giant Zombie
+entity.SpecialMobs.HungryZombie.name=Hungry Zombie
+entity.SpecialMobs.PlagueZombie.name=Plague Zombie
