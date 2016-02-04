@@ -12,6 +12,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import toast.specialMobs._SpecialMobs;
+import toast.specialMobs.entity.SpecialMobData;
 
 public class EntityWebCaveSpider extends Entity_SpecialCaveSpider
 {
@@ -65,14 +66,19 @@ public class EntityWebCaveSpider extends Entity_SpecialCaveSpider
     @Override
     public void writeEntityToNBT(NBTTagCompound tag) {
         super.writeEntityToNBT(tag);
-        tag.setByte("WebCount", this.webCount);
+        NBTTagCompound saveTag = SpecialMobData.getSaveLocation(tag);
+        saveTag.setByte("WebCount", this.webCount);
     }
 
     /// Reads this entity from NBT.
     @Override
     public void readEntityFromNBT(NBTTagCompound tag) {
         super.readEntityFromNBT(tag);
-        if (tag.hasKey("WebCount")) {
+        NBTTagCompound saveTag = SpecialMobData.getSaveLocation(tag);
+        if (saveTag.hasKey("WebCount")) {
+            this.webCount = saveTag.getByte("WebCount");
+        }
+        else if (tag.hasKey("WebCount")) {
             this.webCount = tag.getByte("WebCount");
         }
     }

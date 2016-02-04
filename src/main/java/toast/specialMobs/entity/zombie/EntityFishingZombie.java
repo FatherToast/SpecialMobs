@@ -4,14 +4,19 @@ import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.init.Items;
+import net.minecraft.item.ItemFishingRod;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
+import toast.specialMobs.DataWatcherHelper;
 import toast.specialMobs._SpecialMobs;
 import toast.specialMobs.entity.EntitySpecialFishHook;
 import toast.specialMobs.entity.IAngler;
 
 public class EntityFishingZombie extends Entity_SpecialZombie implements IAngler
 {
+	/// The position of hasFishingRod within the data watcher.
+    private static final byte DW_FISHING_ROD = DataWatcherHelper.instance.ZOMBIE_FISHING.nextKey();
+
     /// Ticks until this fishing zombie can cast its lure again.
     public int rodTime = 0;
     /// This fishing zombie's lure entity.
@@ -26,8 +31,7 @@ public class EntityFishingZombie extends Entity_SpecialZombie implements IAngler
     @Override
     protected void entityInit() {
         super.entityInit();
-        /// heldItem; (boolean) If this is is not true, the heldItem is rendered as a stick.
-        this.dataWatcher.addObject(20, Byte.valueOf((byte)1));
+        this.dataWatcher.addObject(EntityFishingZombie.DW_FISHING_ROD, Byte.valueOf((byte) 1));
     }
 
     /// Overridden to modify inherited attributes.
@@ -63,18 +67,19 @@ public class EntityFishingZombie extends Entity_SpecialZombie implements IAngler
 
     /// Get/set functions for heldItem. fishing rod == true, stick == false.
     public void setFishingRod(boolean rod) {
-        this.dataWatcher.updateObject(20, Byte.valueOf((byte)(rod ? 1 : 0)));
+        this.dataWatcher.updateObject(EntityFishingZombie.DW_FISHING_ROD, Byte.valueOf((byte)(rod ? 1 : 0)));
     }
     public boolean getFishingRod() {
-        return this.dataWatcher.getWatchableObjectByte(20) == 1;
+        return this.dataWatcher.getWatchableObjectByte(EntityFishingZombie.DW_FISHING_ROD) == 1;
     }
 
     /// Returns the heldItem.
     @Override
     public ItemStack getHeldItem() {
-        if (this.worldObj.isRemote && !this.getFishingRod())
+    	ItemStack held = super.getHeldItem();
+        if (this.worldObj.isRemote && held != null && held.getItem() instanceof ItemFishingRod && !this.getFishingRod())
             return new ItemStack(Items.stick);
-        return super.getHeldItem();
+        return held;
     }
 
     /// Called every tick while this entity is alive.

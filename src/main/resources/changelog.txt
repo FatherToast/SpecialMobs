@@ -1,6 +1,10 @@
 3.2.2
+    - Added special witches.
     - All additional special mob data is now stored in the SMData compound in ForgeData to better support spawning vanilla mobs with nbt.
     - Fixed wither skeletons not being immune to fire.
+    - Jolt blazes no longer teleport or strike lightning from a killing blow.
+    - Blinding endermen and silverfish now remove night vision.
+    - Data Watcher indexes are now automatically generated.
 3.2.1
     - Fixed hungry spiders crashing when hitting a player with no items.
     - Fixed Advanced Genetics support crashing.

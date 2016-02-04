@@ -35,7 +35,6 @@ public class _SpecialMobs
     /* TO DO *\
     >> CURRENT
      * Magma cubes
-     * Witches?
      * Water guardians (1.8)
      * Shulker (1.9)
      * Check into biome mod compatibility for added spawns
@@ -59,12 +58,14 @@ public class _SpecialMobs
     /** The network channel for this mod. */
     public static SimpleNetworkWrapper CHANNEL;
 
+    /** The namespace used by this mod. */
+    public static final String NAMESPACE = _SpecialMobs.MODID.toLowerCase() + ":";
     /** The path to the textures folder. */
-    public static final String TEXTURE_PATH = _SpecialMobs.MODID + ":textures/models/";
+    public static final String TEXTURE_PATH = _SpecialMobs.NAMESPACE + "textures/entity/";
 
     /** Monster "species" array. */
     public static final String[] MONSTER_KEY = {
-        "Blaze", "CaveSpider", "Creeper", "Enderman", "Ghast", /*"LavaSlime",*/ "PigZombie", "Silverfish", "Skeleton", "Slime", "Spider", "Zombie"
+        "Blaze", "CaveSpider", "Creeper", "Enderman", "Ghast", /*"LavaSlime",*/ "PigZombie", "Silverfish", "Skeleton", "Slime", "Spider", "Witch", "Zombie"
     };
     /** Monster "sub-species" array. First dimension is the MONSTER_KEY[]. */
     public static final String[][] MONSTER_TYPES = {
@@ -98,6 +99,9 @@ public class _SpecialMobs
         { // Spider
             "Baby", "Desert", "Flying", "Ghost", "Giant", "Hungry", "Mother", "Pale", "Poison", "Small", "Tough", "Web", "Witch"
         },
+        { // Witch
+        	"Domination", "Rage", "Shadows", "Undead", "Wilds", "Wind"
+        },
         { // Zombie
             "Brutish", "Fire", "Fishing", "Giant", "Hungry", "Plague"
         }
@@ -106,10 +110,10 @@ public class _SpecialMobs
     /** Monster "species" color array. Used for spawn eggs. */
     public static final int[] MONSTER_KEY_COLORS = {
         /* Eventual
-        "Blaze", "CaveSpider", "Creeper", "Enderman", "Ghast", "LavaSlime" (0x340000, 0xfcfc00), "PigZombie", "Silverfish", "Skeleton", "Slime", "Spider", "Zombie" */
+        "Blaze", "CaveSpider", "Creeper", "Enderman", "Ghast", "LavaSlime" (0x340000, 0xfcfc00), "PigZombie", "Silverfish", "Skeleton", "Slime", "Spider", "Witch", "Zombie" */
         /*
-        "Blaze",  "CaveSpider", "Creeper", "Enderman", "Ghast",  "PigZombie", "Silverfish", "Skeleton", "Slime",  "Spider", "Zombie" */
-        0xf6b201, 0x0c424e,     0x0da70b,  0x161616,   0xf9f9f9, 0xea9393,    0x6e6e6e,     0xc1c1c1,   0x51a03e, 0x342d27, 0x00afaf
+        "Blaze",  "CaveSpider", "Creeper", "Enderman", "Ghast",  "PigZombie", "Silverfish", "Skeleton", "Slime",  "Spider", "Witch",  "Zombie" */
+        0xf6b201, 0x0c424e,     0x0da70b,  0x161616,   0xf9f9f9, 0xea9393,    0x6e6e6e,     0xc1c1c1,   0x51a03e, 0x342d27, 0x340000, 0x00afaf
     };
     /** Monster "sub-species" color array. Used for spawn eggs. First dimension is the MONSTER_KEY[]. */
     public static final int[][] MONSTER_TYPE_COLORS = {
@@ -153,6 +157,10 @@ public class _SpecialMobs
             "Baby",   "Desert", "Flying", "Ghost",  "Giant",  "Hungry", "Mother", "Pale",   "Poison", "Small",  "Tough",  "Web",    "Witch" */
             0xffc0cb, 0xe6ddac, 0x6388b2, 0x82c873, 0xa80e0e, 0x799c65, 0xb300b3, 0xded4c6, 0x0c424e, 0xa80e0e, 0x8ea80e, 0xe7e7e7, 0xdd0e0e
         },
+        { /* Witch (0x51a03e)
+        	"Domination", "Rage",   "Shadows", "Undead", "Wilds",  "Wind" */
+        	0xfff87e,     0x932423, 0x000000,  0x799c65, 0xa80e0e, 0x6388b2
+        },
         { /* Zombie (0x799c65)
             "Brutish", "Fire",   "Fishing", "Giant",  "Hungry", "Plague" */
             0xfff87e,  0xdc1a00, 0x2d41f4,  0x799c65, 0xab1518, 0x8aa838
@@ -161,6 +169,8 @@ public class _SpecialMobs
 
     /** Registers the entities in this mod and adds mob spawns. */
     private void registerMobs() {
+    	DataWatcherHelper.init();
+
         int id = 0; // Mod-specific mob id
 
         // Initialize everything needed to make new spawn eggs
@@ -216,7 +226,7 @@ public class _SpecialMobs
                         // Spider
                         { "climb" },
                         // Witch
-                        //{ "potionthrower" },
+                        { "potionthrower" },
                         // Zombie
                         { "resistance" }
                 };
@@ -304,6 +314,8 @@ public class _SpecialMobs
         EntityRegistry.registerModEntity(EntitySpecialSpitball.class, "SMSpitball", id++, this, 64, 5, true);
 
         //EntityRegistry.registerModEntity(EntitySpecialFireball.class, "SMFireball", id++, this, 64, 10, true);
+
+    	DataWatcherHelper.verify();
 
         // Register extra mob spawns
         int spawnWeight;

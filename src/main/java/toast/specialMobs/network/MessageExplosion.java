@@ -89,13 +89,16 @@ public class MessageExplosion implements IMessage {
     }
 
     public MessageExplosion(Entity exploder, float size, String type) {
+        this(exploder.posX, exploder.posY, exploder.posZ, size, type);
+    }
+    public MessageExplosion(double posX, double posY, double posZ, float size, String type) {
         if ("lightning".equalsIgnoreCase(type)) {
             this.type = ExplosionType.LIGHTNING;
         }
         this.size = size;
-        this.posX = (float)exploder.posX;
-        this.posY = (float)exploder.posY;
-        this.posZ = (float)exploder.posZ;
+        this.posX = (float) posX;
+        this.posY = (float) posY;
+        this.posZ = (float) posZ;
     }
 
     /*

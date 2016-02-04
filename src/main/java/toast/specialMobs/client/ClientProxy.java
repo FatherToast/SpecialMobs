@@ -14,6 +14,7 @@ import toast.specialMobs.entity.silverfish.Entity_SpecialSilverfish;
 import toast.specialMobs.entity.skeleton.Entity_SpecialSkeleton;
 import toast.specialMobs.entity.slime.Entity_SpecialSlime;
 import toast.specialMobs.entity.spider.Entity_SpecialSpider;
+import toast.specialMobs.entity.witch.Entity_SpecialWitch;
 import toast.specialMobs.entity.zombie.Entity_SpecialZombie;
 import cpw.mods.fml.client.registry.RenderingRegistry;
 import cpw.mods.fml.relauncher.Side;
@@ -38,6 +39,7 @@ public class ClientProxy extends CommonProxy
         RenderingRegistry.registerEntityRenderingHandler(Entity_SpecialSkeleton.class, new RenderSpecialSkeleton());
         RenderingRegistry.registerEntityRenderingHandler(Entity_SpecialSlime.class, new RenderSpecialSlime());
         RenderingRegistry.registerEntityRenderingHandler(Entity_SpecialSpider.class, new RenderSpecialSpider());
+        RenderingRegistry.registerEntityRenderingHandler(Entity_SpecialWitch.class, new RenderSpecialWitch());
         RenderingRegistry.registerEntityRenderingHandler(Entity_SpecialZombie.class, new RenderSpecialZombie());
 
         RenderingRegistry.registerEntityRenderingHandler(EntitySpecialFishHook.class, new RenderSpecialFishHook());

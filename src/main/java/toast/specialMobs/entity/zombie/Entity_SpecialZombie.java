@@ -45,7 +45,7 @@ public class Entity_SpecialZombie extends EntityZombie implements ISpecialMob, I
 
     public Entity_SpecialZombie(World world) {
         super(world);
-        MobHelper.clearZombieAttackAI(this);
+        MobHelper.clearMeleeAttackAI(this);
         if (world != null && !world.isRemote) {
             this.setCombatTask();
         }

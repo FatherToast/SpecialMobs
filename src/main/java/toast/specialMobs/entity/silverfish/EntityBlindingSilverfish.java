@@ -41,6 +41,7 @@ public class EntityBlindingSilverfish extends Entity_SpecialSilverfish
             }
             time *= 20;
             ((EntityLivingBase)target).addPotionEffect(new PotionEffect(Potion.blindness.id, time, 0));
+            ((EntityLivingBase)target).removePotionEffect(Potion.nightVision.id);
         }
     }
 

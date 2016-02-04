@@ -12,6 +12,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
+import toast.specialMobs.DataWatcherHelper;
 import toast.specialMobs.EffectHelper;
 import toast.specialMobs.EnchantmentSpecial;
 import toast.specialMobs._SpecialMobs;
@@ -20,14 +21,14 @@ import toast.specialMobs.entity.INinja;
 
 public class EntityNinjaSkeleton extends Entity_SpecialSkeleton implements INinja
 {
+    // The data watcher key for whether this entity is frozen in place (hiding).
+    public static final byte DW_FROZEN = DataWatcherHelper.instance.SKELETON_NINJA.nextKey();
     // The data watcher key for the block this is hiding as.
-    public static final byte DW_FROZEN = 22;
-    // The data watcher key for the block this is hiding as.
-    public static final byte DW_HIDING_BLOCK = 23;
-    // The data watcher key for the block this is hiding as.
-    public static final byte DW_HIDING_DATA = 24;
+    public static final byte DW_HIDING_BLOCK = DataWatcherHelper.instance.SKELETON_NINJA.nextKey();
+    // The data watcher key for the metadata of the block this is hiding as.
+    public static final byte DW_HIDING_DATA = DataWatcherHelper.instance.SKELETON_NINJA.nextKey();
 
-    // The data watcher key for the block this is hiding as.
+    // The entity state id for reveal particle effect.
     public static final byte HU_REVEAL_FX = 11;
 
     @SuppressWarnings("hiding")

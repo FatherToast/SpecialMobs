@@ -22,6 +22,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
+import toast.specialMobs.DataWatcherHelper;
 import toast.specialMobs.Properties;
 import toast.specialMobs._SpecialMobs;
 import toast.specialMobs.entity.ISpecialMob;
@@ -37,7 +38,7 @@ public class Entity_SpecialSkeleton extends EntitySkeleton implements ISpecialMo
     private static final UUID babySpeedBoostUUID = UUID.fromString("B9766B59-9566-4402-BC1F-2EE2A276D836");
     private static final AttributeModifier babySpeedBoostModifier = new AttributeModifier(Entity_SpecialSkeleton.babySpeedBoostUUID, "Baby speed boost", 0.5, 1);
     /// The position of isBaby within the data watcher.
-    private static final byte DW_IS_BABY = 12;
+    private static final byte DW_IS_BABY = DataWatcherHelper.instance.SKELETON.nextKey();
 
     public static final ResourceLocation[] TEXTURES = new ResourceLocation[] {
         new ResourceLocation("textures/entity/skeleton/skeleton.png"),

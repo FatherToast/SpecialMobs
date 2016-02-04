@@ -6,12 +6,16 @@ import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
+import toast.specialMobs.DataWatcherHelper;
 import toast.specialMobs._SpecialMobs;
 import toast.specialMobs.entity.EntitySpecialFishHook;
 import toast.specialMobs.entity.IAngler;
 
 public class EntityFishingPigZombie extends Entity_SpecialPigZombie implements IAngler
 {
+	/// The position of hasFishingRod within the data watcher.
+    private static final byte DW_FISHING_ROD = DataWatcherHelper.instance.PIG_ZOMBIE_FISHING.nextKey();
+
     /// Ticks until this fishing zombie can cast its lure again.
     public int rodTime = 0;
     /// This fishing zombie's lure entity.
@@ -27,7 +31,7 @@ public class EntityFishingPigZombie extends Entity_SpecialPigZombie implements I
     protected void entityInit() {
         super.entityInit();
         /// heldItem; (boolean) If this is is not true, the heldItem is rendered as a stick.
-        this.dataWatcher.addObject(20, Byte.valueOf((byte) 1));
+        this.dataWatcher.addObject(EntityFishingPigZombie.DW_FISHING_ROD, Byte.valueOf((byte) 1));
     }
 
     /// Overridden to modify inherited attributes.
@@ -63,10 +67,10 @@ public class EntityFishingPigZombie extends Entity_SpecialPigZombie implements I
 
     /// Get/set functions for heldItem. fishing rod == true, stick == false.
     public void setFishingRod(boolean rod) {
-        this.dataWatcher.updateObject(20, Byte.valueOf(rod ? (byte)1 : (byte)0));
+        this.dataWatcher.updateObject(EntityFishingPigZombie.DW_FISHING_ROD, Byte.valueOf(rod ? (byte)1 : (byte)0));
     }
     public boolean getFishingRod() {
-        return this.dataWatcher.getWatchableObjectByte(20) == 1;
+        return this.dataWatcher.getWatchableObjectByte(EntityFishingPigZombie.DW_FISHING_ROD) == 1;
     }
 
     /// Returns the heldItem.

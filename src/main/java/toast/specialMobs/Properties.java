@@ -119,6 +119,9 @@ public abstract class Properties {
             if (key[i] == "Enderman") {
                 pluralKey = "endermen";
             }
+            else if (key[i] == "Witch") {
+                pluralKey = "witches";
+            }
             else {
                 pluralKey = pluralKey + "s";
             }

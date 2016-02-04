@@ -1,5 +1,6 @@
 package toast.specialMobs;
 
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.monster.IMob;
@@ -32,17 +33,22 @@ public class ReplacementEntry
         NBTTagCompound entityData = new NBTTagCompound();
         this.entity.writeToNBT(entityData);
         replacement.readFromNBT(entityData);
+        replacement.getEntityData().setByte("smi", (byte) 1);
+        replacement.copyLocationAndAnglesFrom(this.entity);
+        if (this.entity.ridingEntity != null) {
+        	Entity riding = this.entity.ridingEntity;
+        	this.entity.mountEntity(null);
+        	replacement.mountEntity(riding);
+        }
+        if (this.entity.riddenByEntity != null) {
+        	Entity rider = this.entity.riddenByEntity;
+        	rider.mountEntity(null);
+        	rider.mountEntity(replacement);
+        }
+
         if (replacement instanceof ISpecialMob) {
             ((ISpecialMob) replacement).adjustEntityAttributes();
         }
-        replacement.getEntityData().setByte("smi", (byte) 1);
-        replacement.copyLocationAndAnglesFrom(this.entity);
-
-        if (this.entity.riddenByEntity != null) {
-            this.entity.riddenByEntity.setPosition(replacement.posX, replacement.posY, replacement.posZ);
-            this.entity.riddenByEntity.mountEntity(replacement);
-        }
-        replacement.mountEntity(this.entity.ridingEntity);
         replacement.worldObj.spawnEntityInWorld(replacement);
         this.entity.setDead();
     }

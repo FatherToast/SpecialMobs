@@ -13,6 +13,7 @@ import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.ResourceLocation;
+import toast.specialMobs.DataWatcherHelper;
 import toast.specialMobs.Properties;
 import toast.specialMobs._SpecialMobs;
 import toast.specialMobs.network.MessageTexture;
@@ -24,10 +25,15 @@ public class SpecialMobData
 {
     // Useful properties for this class.
     /** The maximum multiple of difference between differently sized mobs. */
-    private static final float RANDOM_SCALING = (float)Properties.getDouble(Properties.GENERAL, "random_scaling");
+    private static final float RANDOM_SCALING = (float) Properties.getDouble(Properties.GENERAL, "random_scaling");
 
     /** The index for the scale variable in the data watcher. */
-    private static final byte SCALE = 21;
+    private static final byte SCALE = DataWatcherHelper.instance.GENERIC.nextKey();
+
+	/** Called to force static fields to be initialized. */
+	public static void init() {
+		// Do nothing
+	}
 
     /** @param tag The mob's base nbt tag
      * @return The nbt tag to save special mob data to. */

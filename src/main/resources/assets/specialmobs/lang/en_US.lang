@@ -120,6 +120,14 @@ entity.SpecialMobs.ToughSpider.name=Tough Spider
 entity.SpecialMobs.WebSpider.name=Web Spider
 entity.SpecialMobs.WitchSpider.name=Witch Spider
 
+entity.SpecialMobs.SpecialWitch.name=Witch
+entity.SpecialMobs.DominationWitch.name=Witch of Domination
+entity.SpecialMobs.RageWitch.name=Witch of Rage
+entity.SpecialMobs.ShadowsWitch.name=Witch of Shadows
+entity.SpecialMobs.UndeadWitch.name=Witch of the Undead
+entity.SpecialMobs.WildsWitch.name=Witch of the Wilds
+entity.SpecialMobs.WindWitch.name=Witch of the Wind
+
 entity.SpecialMobs.SpecialZombie.name=Zombie
 entity.SpecialMobs.BrutishZombie.name=Brutish Zombie
 entity.SpecialMobs.FireZombie.name=Fire Zombie

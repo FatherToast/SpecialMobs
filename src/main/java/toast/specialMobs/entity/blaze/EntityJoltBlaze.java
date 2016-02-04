@@ -46,15 +46,28 @@ public class EntityJoltBlaze extends Entity_SpecialBlaze
     /// Damages this entity from the damageSource by the given amount. Returns true if this entity is damaged.
     @Override
     public boolean attackEntityFrom(DamageSource damageSource, float damage) {
-    	boolean hit = damageSource instanceof EntityDamageSourceIndirect ? true : super.attackEntityFrom(damageSource, damage);
-    	if (!this.worldObj.isRemote && !DamageSource.drown.damageType.equals(damageSource.damageType) && this.getHealth() > 0.0F) {
-			for (int i = 0; i < 64; i++) {
+    	if (!this.worldObj.isRemote && !DamageSource.drown.damageType.equals(damageSource.damageType)) {
+            double xI = this.posX;
+            double yI = this.posY;
+            double zI = this.posZ;
+
+            for (int i = 0; i < 64; i++) {
 			    if (this.teleportRandomly()) {
-			        break;
+			    	if (damageSource instanceof EntityDamageSourceIndirect)
+			    		return true;
+		    		boolean hit = super.attackEntityFrom(damageSource, damage);
+
+			    	if (this.getHealth() > 0.0F) {
+			        	MobHelper.lightningExplode(this, xI, yI, zI, 0);
+			    	}
+			    	else {
+			    		this.setPosition(xI, yI, zI);
+			    	}
+			        return hit;
 			    }
 			}
 		}
-        return hit;
+        return super.attackEntityFrom(damageSource, damage);
     }
 
     /// Teleports this enderman to a random nearby location. Returns true if this entity teleports.
@@ -95,11 +108,6 @@ public class EntityJoltBlaze extends Entity_SpecialBlaze
         }
         if (strikeDestination) {
         	MobHelper.lightningExplode(this, 0);
-        }
-        else {
-        	this.setPosition(xI, yI, zI);
-        	MobHelper.lightningExplode(this, 0);
-        	this.setPosition(x, y, z);
         }
         return true;
     }

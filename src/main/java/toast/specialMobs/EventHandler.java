@@ -4,6 +4,8 @@ import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.EnumCreatureAttribute;
+import net.minecraft.entity.monster.EntitySkeleton;
 import net.minecraft.entity.projectile.EntityArrow;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.Potion;
@@ -11,10 +13,12 @@ import net.minecraft.potion.PotionEffect;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
+import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import toast.specialMobs.entity.blaze.EntitySmolderBlaze;
 import toast.specialMobs.entity.pigzombie.EntityPlaguePigZombie;
 import toast.specialMobs.entity.skeleton.EntityPoisonSkeleton;
+import toast.specialMobs.entity.witch.EntityUndeadWitch;
 import toast.specialMobs.entity.zombie.EntityPlagueZombie;
 import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
@@ -145,5 +149,23 @@ public class EventHandler
         if (MobHelper.canReplace(entity)) {
             TickHandler.markEntityToBeReplaced(entity);
         }
+    }
+
+    /**
+     * Called by EntityLivingBase.onDeath().
+     * EntityLivingBase entityLiving = the entity being killed.
+     * DamageSource source = the source of the fatal damage.
+     *
+     * @param event the event being triggered.
+     */
+    @SubscribeEvent(priority = EventPriority.NORMAL)
+    public void onLivingDeath(LivingDeathEvent event) {
+    	if (event.entityLiving.getCreatureAttribute() == EnumCreatureAttribute.UNDEAD && !(event.entityLiving instanceof EntitySkeleton) && event.entityLiving.getRNG().nextInt(6) != 0) {
+    		for (Object entity : event.entityLiving.worldObj.getEntitiesWithinAABBExcludingEntity(event.entityLiving, event.entityLiving.boundingBox.expand(16.0, 8.0, 16.0))) {
+    			if (entity instanceof EntityUndeadWitch) {
+    				((EntityUndeadWitch) entity).skeletonCount++;
+    			}
+    		}
+    	}
     }
 }

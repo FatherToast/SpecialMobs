@@ -8,6 +8,7 @@ import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
+import toast.specialMobs.DataWatcherHelper;
 import toast.specialMobs.Properties;
 import toast.specialMobs._SpecialMobs;
 import toast.specialMobs.entity.ISpecialMob;
@@ -21,7 +22,7 @@ public class Entity_SpecialCreeper extends EntityCreeper implements ISpecialMob 
     private static final double CHARGED_CHANCE = Properties.getDouble(Properties.STATS, "creeper_charge_chance");
 
     // The data watcher key for the different exploding properties.
-    public static final byte DW_EXPLODE_STATS = 24;
+    public static final byte DW_EXPLODE_STATS = DataWatcherHelper.instance.CREEPER.nextKey();
     // The shift to get the bit for "can explode in water".
     public static final byte DW_CAN_EXPLODE_IN_WATER = 0;
     // The shift to get the bit for "explodes when burning".

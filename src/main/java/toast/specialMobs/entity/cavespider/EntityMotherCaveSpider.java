@@ -13,6 +13,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import toast.specialMobs.EffectHelper;
 import toast.specialMobs._SpecialMobs;
+import toast.specialMobs.entity.SpecialMobData;
 
 public class EntityMotherCaveSpider extends Entity_SpecialCaveSpider
 {
@@ -116,14 +117,19 @@ public class EntityMotherCaveSpider extends Entity_SpecialCaveSpider
     @Override
     public void writeEntityToNBT(NBTTagCompound tag) {
         super.writeEntityToNBT(tag);
-        tag.setByte("Babies", this.babies);
+        NBTTagCompound saveTag = SpecialMobData.getSaveLocation(tag);
+        saveTag.setByte("Babies", this.babies);
     }
 
     /// Reads this entity from NBT.
     @Override
     public void readEntityFromNBT(NBTTagCompound tag) {
         super.readEntityFromNBT(tag);
-        if (tag.hasKey("Babies")) {
+        NBTTagCompound saveTag = SpecialMobData.getSaveLocation(tag);
+        if (saveTag.hasKey("Babies")) {
+            this.babies = saveTag.getByte("Babies");
+        }
+        else if (tag.hasKey("Babies")) {
             this.babies = tag.getByte("Babies");
         }
     }

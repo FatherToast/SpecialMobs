@@ -11,7 +11,6 @@ import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.ai.EntityAIArrowAttack;
 import net.minecraft.entity.ai.EntityAIAttackOnCollide;
-import net.minecraft.entity.ai.EntityAINearestAttackableTarget;
 import net.minecraft.entity.ai.EntityAITasks.EntityAITaskEntry;
 import net.minecraft.entity.effect.EntityLightningBolt;
 import net.minecraft.entity.item.EntityFallingBlock;
@@ -31,16 +30,16 @@ import toast.specialMobs.network.MessageExplosion;
 
 public abstract class MobHelper
 {
-    // Clears the zombie's attack AI.
-    public static void clearZombieAttackAI(EntityLiving entity) {
+    // Clears all melee attack AIs.
+    public static void clearMeleeAttackAI(EntityLiving entity) {
         for (EntityAITaskEntry entry : (EntityAITaskEntry[])entity.tasks.taskEntries.toArray(new EntityAITaskEntry[0])) if (entry.action.getClass().equals(EntityAIAttackOnCollide.class)) {
             entity.tasks.removeTask(entry.action);
         }
     }
-    // Clears the zombie's attack AI.
-    public static void clearZombieTargetAI(EntityLiving entity) {
-        for (EntityAITaskEntry entry : (EntityAITaskEntry[])entity.targetTasks.taskEntries.toArray(new EntityAITaskEntry[0])) if (entry.action.getClass().equals(EntityAINearestAttackableTarget.class)) {
-            entity.targetTasks.removeTask(entry.action);
+    // Clears all ranged attack AIs.
+    public static void clearRangedAttackAI(EntityLiving entity) {
+        for (EntityAITaskEntry entry : (EntityAITaskEntry[])entity.tasks.taskEntries.toArray(new EntityAITaskEntry[0])) if (entry.action.getClass().equals(EntityAIArrowAttack.class)) {
+            entity.tasks.removeTask(entry.action);
         }
     }
 
@@ -182,13 +181,16 @@ public abstract class MobHelper
 
     // Causes a creeper explosion that spawns lightning.
     public static void lightningExplode(Entity exploder, int radius) {
+    	MobHelper.lightningExplode(exploder, exploder.posX, exploder.posY, exploder.posZ, radius);
+    }
+    public static void lightningExplode(Entity exploder, double posX, double posY, double posZ, int radius) {
         radius /= 3;
         for (int x = -radius; x <= radius; x++) {
             for (int z = -radius; z <= radius; z++) {
-                exploder.worldObj.spawnEntityInWorld(new EntityLightningBolt(exploder.worldObj, exploder.posX + x, exploder.posY, exploder.posZ + z));
+                exploder.worldObj.spawnEntityInWorld(new EntityLightningBolt(exploder.worldObj, posX + x, posY, posZ + z));
             }
         }
-        _SpecialMobs.CHANNEL.sendToDimension(new MessageExplosion(exploder, radius, "lightning"), exploder.dimension);
+        _SpecialMobs.CHANNEL.sendToDimension(new MessageExplosion(posX, posY, posZ, radius, "lightning"), exploder.dimension);
     }
 
     // Removes the player's currently held item and returns it.

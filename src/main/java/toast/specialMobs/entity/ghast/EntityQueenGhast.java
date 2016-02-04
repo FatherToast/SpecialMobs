@@ -11,6 +11,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import toast.specialMobs._SpecialMobs;
+import toast.specialMobs.entity.SpecialMobData;
 
 public class EntityQueenGhast extends Entity_SpecialGhast
 {
@@ -96,18 +97,26 @@ public class EntityQueenGhast extends Entity_SpecialGhast
     @Override
     public void writeEntityToNBT(NBTTagCompound tag) {
         super.writeEntityToNBT(tag);
-        tag.setByte("BabyCount", this.babyCount);
-        tag.setByte("Babies", this.babies);
+        NBTTagCompound saveTag = SpecialMobData.getSaveLocation(tag);
+        saveTag.setByte("BabyCount", this.babyCount);
+        saveTag.setByte("Babies", this.babies);
     }
 
     /// Reads this entity from NBT.
     @Override
     public void readEntityFromNBT(NBTTagCompound tag) {
         super.readEntityFromNBT(tag);
-        if (tag.hasKey("BabyCount")) {
+        NBTTagCompound saveTag = SpecialMobData.getSaveLocation(tag);
+        if (saveTag.hasKey("BabyCount")) {
+            this.babyCount = saveTag.getByte("BabyCount");
+        }
+        else if (tag.hasKey("BabyCount")) {
             this.babyCount = tag.getByte("BabyCount");
         }
-        if (tag.hasKey("Babies")) {
+        if (saveTag.hasKey("Babies")) {
+            this.babies = saveTag.getByte("Babies");
+        }
+        else if (tag.hasKey("Babies")) {
             this.babies = tag.getByte("Babies");
         }
     }

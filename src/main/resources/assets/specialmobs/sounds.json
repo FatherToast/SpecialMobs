@@ -1,0 +1,24 @@
+{
+  "mob.witch.idle": {
+    "sounds": [
+      "entity/witch/ambient1",
+      "entity/witch/ambient2",
+      "entity/witch/ambient3",
+      "entity/witch/ambient4"
+    ]
+  },
+  "mob.witch.death": {
+    "sounds": [
+      "entity/witch/death1",
+      "entity/witch/death2",
+      "entity/witch/death3"
+    ]
+  },
+  "mob.witch.hurt": {
+    "sounds": [
+      "entity/witch/hurt1",
+      "entity/witch/hurt2",
+      "entity/witch/hurt3"
+    ]
+  }
+}

@@ -28,6 +28,7 @@ public class EntityBlindingEnderman extends Entity_SpecialEnderman
         if (this.entityToAttack != null && this.entityToAttack instanceof EntityLivingBase && this.getDistanceSqToEntity(this.entityToAttack) < 256.0) {
             try {
                 ((EntityLivingBase) this.entityToAttack).addPotionEffect(new PotionEffect(Potion.blindness.id, 30, 0));
+                ((EntityLivingBase) this.entityToAttack).removePotionEffect(Potion.nightVision.id);
             }
             catch (Exception ex) {
                 _SpecialMobs.console("[ERROR] Caught exception applying blindness to " + this.entityToAttack.toString());

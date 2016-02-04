@@ -12,6 +12,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import toast.specialMobs.EffectHelper;
 import toast.specialMobs._SpecialMobs;
+import toast.specialMobs.entity.SpecialMobData;
 
 public class EntityMirageEnderman extends Entity_SpecialEnderman
 {
@@ -133,14 +134,19 @@ public class EntityMirageEnderman extends Entity_SpecialEnderman
     @Override
     public void writeEntityToNBT(NBTTagCompound tag) {
         super.writeEntityToNBT(tag);
-        tag.setBoolean("IsFake", this.isFake);
+        NBTTagCompound saveTag = SpecialMobData.getSaveLocation(tag);
+        saveTag.setBoolean("IsFake", this.isFake);
     }
 
     /// Loads the entity from NBT.
     @Override
     public void readEntityFromNBT(NBTTagCompound tag) {
         super.readEntityFromNBT(tag);
-        if (tag.getBoolean("IsFake")) {
+        NBTTagCompound saveTag = SpecialMobData.getSaveLocation(tag);
+        if (saveTag.getBoolean("IsFake")) {
+            this.setFake();
+        }
+        else if (tag.getBoolean("IsFake")) {
             this.setFake();
         }
     }
