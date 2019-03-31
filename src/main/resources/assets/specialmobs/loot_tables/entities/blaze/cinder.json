@@ -1,0 +1,33 @@
+{
+  "pools": [
+    {
+      "name": "common",
+      "entries": [
+        {
+          "entryName": "Blaze powder",
+          "weight": 1,
+          "quality": 0,
+          "type": "item",
+          "functions": [
+            {
+              "count": {
+                "min": 0.0,
+                "max": 1.0
+              },
+              "function": "minecraft:set_count"
+            },
+            {
+              "count": {
+                "min": 0.0,
+                "max": 1.0
+              },
+              "function": "minecraft:looting_enchant"
+            }
+          ],
+          "name": "minecraft:blaze_powder"
+        }
+      ],
+      "rolls": 1.0
+    }
+  ]
+}

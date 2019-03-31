@@ -1,0 +1,36 @@
+{
+  "pools": [
+    {
+      "name": "main",
+      "entries": [
+        {
+          "entryName": "Base loot",
+          "weight": 1,
+          "quality": 0,
+          "type": "loot_table",
+          "name": "minecraft:entities/enderman"
+        }
+      ],
+      "rolls": 1.0
+    },
+    {
+      "name": "base",
+      "entries": [
+        {
+          "entryName": "Ender pearl",
+          "weight": 1,
+          "quality": 0,
+          "type": "item",
+          "functions": [
+            {
+              "count": 1.0,
+              "function": "minecraft:set_count"
+            }
+          ],
+          "name": "minecraft:ender_pearl"
+        }
+      ],
+      "rolls": 1.0
+    }
+  ]
+}

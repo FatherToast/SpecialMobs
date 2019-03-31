@@ -1,0 +1,41 @@
+{
+  "pools": [
+    {
+      "name": "main",
+      "entries": [
+        {
+          "entryName": "Base loot",
+          "weight": 1,
+          "quality": 0,
+          "type": "loot_table",
+          "name": "minecraft:entities/spider"
+        }
+      ],
+      "rolls": 1.0
+    },
+    {
+      "name": "uncommon",
+      "entries": [
+        {
+          "entryName": "Cobwebs 1",
+          "weight": 1,
+          "quality": 0,
+          "type": "item",
+          "name": "minecraft:web"
+        }
+      ],
+      "rolls": 1.0,
+      "conditions": [
+        {
+          "chance": 0.25,
+          "looting_multiplier": 0.1,
+          "condition": "minecraft:random_chance_with_looting"
+        },
+        {
+          "inverse": false,
+          "condition": "minecraft:killed_by_player"
+        }
+      ]
+    }
+  ]
+}

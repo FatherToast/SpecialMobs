@@ -1,0 +1,81 @@
+{
+  "pools": [
+    {
+      "name": "main",
+      "entries": [
+        {
+          "entryName": "Base loot",
+          "weight": 1,
+          "quality": 0,
+          "type": "loot_table",
+          "name": "minecraft:entities/enderman"
+        }
+      ],
+      "rolls": 1.0
+    },
+    {
+      "name": "common",
+      "entries": [
+        {
+          "entryName": "Snowballs",
+          "weight": 1,
+          "quality": 0,
+          "type": "item",
+          "functions": [
+            {
+              "count": {
+                "min": 1.0,
+                "max": 8.0
+              },
+              "function": "minecraft:set_count"
+            },
+            {
+              "count": {
+                "min": 0.0,
+                "max": 2.0
+              },
+              "function": "minecraft:looting_enchant"
+            }
+          ],
+          "name": "minecraft:snowball"
+        }
+      ],
+      "rolls": 1.0,
+      "conditions": [
+        {
+          "chance": 0.25,
+          "looting_multiplier": 0.1,
+          "condition": "minecraft:random_chance_with_looting"
+        },
+        {
+          "inverse": false,
+          "condition": "minecraft:killed_by_player"
+        }
+      ]
+    },
+    {
+      "name": "uncommon",
+      "entries": [
+        {
+          "entryName": "Ice block 1",
+          "weight": 1,
+          "quality": 0,
+          "type": "item",
+          "name": "minecraft:ice"
+        }
+      ],
+      "rolls": 1.0,
+      "conditions": [
+        {
+          "chance": 0.25,
+          "looting_multiplier": 0.1,
+          "condition": "minecraft:random_chance_with_looting"
+        },
+        {
+          "inverse": false,
+          "condition": "minecraft:killed_by_player"
+        }
+      ]
+    }
+  ]
+}

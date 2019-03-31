@@ -1,0 +1,36 @@
+{
+  "pools": [
+    {
+      "name": "main",
+      "entries": [
+        {
+          "entryName": "Base loot",
+          "weight": 1,
+          "quality": 0,
+          "type": "loot_table",
+          "name": "minecraft:entities/wither_skeleton"
+        }
+      ],
+      "rolls": 1.0
+    },
+    {
+      "name": "base",
+      "entries": [
+        {
+          "entryName": "Bones",
+          "weight": 1,
+          "quality": 0,
+          "type": "item",
+          "functions": [
+            {
+              "count": 2.0,
+              "function": "minecraft:set_count"
+            }
+          ],
+          "name": "minecraft:bone"
+        }
+      ],
+      "rolls": 1.0
+    }
+  ]
+}

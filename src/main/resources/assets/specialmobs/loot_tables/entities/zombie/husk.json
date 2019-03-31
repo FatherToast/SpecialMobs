@@ -1,0 +1,17 @@
+{
+  "pools": [
+    {
+      "name": "main",
+      "entries": [
+        {
+          "entryName": "Base loot",
+          "weight": 1,
+          "quality": 0,
+          "type": "loot_table",
+          "name": "minecraft:entities/husk"
+        }
+      ],
+      "rolls": 1.0
+    }
+  ]
+}

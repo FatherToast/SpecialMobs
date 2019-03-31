@@ -1,0 +1,69 @@
+{
+  "pools": [
+    {
+      "name": "main",
+      "entries": [
+        {
+          "entryName": "Base loot",
+          "weight": 1,
+          "quality": 0,
+          "type": "loot_table",
+          "name": "minecraft:entities/zombie"
+        }
+      ],
+      "rolls": 1.0
+    },
+    {
+      "name": "uncommon",
+      "entries": [
+        {
+          "entryName": "Gross stuff 1",
+          "weight": 1,
+          "quality": 0,
+          "type": "item",
+          "name": "minecraft:poisonous_potato"
+        },
+        {
+          "entryName": "Gross stuff 2",
+          "weight": 1,
+          "quality": 0,
+          "type": "item",
+          "name": "minecraft:spider_eye"
+        },
+        {
+          "entryName": "Gross stuff 3",
+          "weight": 1,
+          "quality": 0,
+          "type": "item",
+          "name": "minecraft:fermented_spider_eye"
+        },
+        {
+          "entryName": "Gross stuff 4",
+          "weight": 1,
+          "quality": 0,
+          "type": "item",
+          "name": "minecraft:red_mushroom"
+        },
+        {
+          "entryName": "Gross stuff 5",
+          "weight": 1,
+          "quality": 0,
+          "type": "item",
+          "name": "minecraft:brown_mushroom"
+        }
+      ],
+      "rolls": 1.0,
+      "conditions": [
+        {
+          "chance": 0.25,
+          "looting_multiplier": 0.1,
+          "condition": "minecraft:random_chance_with_looting"
+        },
+        {
+          "inverse": false,
+          "condition": "minecraft:killed_by_player"
+        }
+      ]
+    }
+  ]
+}

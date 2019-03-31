@@ -1,0 +1,70 @@
+{
+  "pools": [
+    {
+      "name": "main",
+      "entries": [
+        {
+          "entryName": "Base loot",
+          "weight": 1,
+          "quality": 0,
+          "type": "loot_table",
+          "name": "minecraft:entities/silverfish"
+        }
+      ],
+      "rolls": 1.0
+    },
+    {
+      "name": "common",
+      "entries": [
+        {
+          "entryName": "Flint",
+          "weight": 1,
+          "quality": 0,
+          "type": "item",
+          "functions": [
+            {
+              "count": {
+                "min": 0.0,
+                "max": 1.0
+              },
+              "function": "minecraft:set_count"
+            },
+            {
+              "count": {
+                "min": 0.0,
+                "max": 1.0
+              },
+              "function": "minecraft:looting_enchant"
+            }
+          ],
+          "name": "minecraft:flint"
+        }
+      ],
+      "rolls": 1.0
+    },
+    {
+      "name": "rare",
+      "entries": [
+        {
+          "entryName": "Iron ingot 1",
+          "weight": 1,
+          "quality": 0,
+          "type": "item",
+          "name": "minecraft:iron_ingot"
+        }
+      ],
+      "rolls": 1.0,
+      "conditions": [
+        {
+          "chance": 0.025,
+          "looting_multiplier": 0.01,
+          "condition": "minecraft:random_chance_with_looting"
+        },
+        {
+          "inverse": false,
+          "condition": "minecraft:killed_by_player"
+        }
+      ]
+    }
+  ]
+}

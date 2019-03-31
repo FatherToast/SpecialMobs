@@ -1,0 +1,112 @@
+{
+  "pools": [
+    {
+      "name": "main",
+      "entries": [
+        {
+          "entryName": "Base loot",
+          "weight": 1,
+          "quality": 0,
+          "type": "loot_table",
+          "name": "minecraft:entities/creeper"
+        }
+      ],
+      "rolls": 1.0
+    },
+    {
+      "name": "common",
+      "entries": [
+        {
+          "entryName": "Dirt",
+          "weight": 1,
+          "quality": 0,
+          "type": "item",
+          "functions": [
+            {
+              "count": {
+                "min": 0.0,
+                "max": 2.0
+              },
+              "function": "minecraft:set_count"
+            },
+            {
+              "count": {
+                "min": 0.0,
+                "max": 1.0
+              },
+              "function": "minecraft:looting_enchant"
+            }
+          ],
+          "name": "minecraft:dirt"
+        }
+      ],
+      "rolls": 1.0
+    },
+    {
+      "name": "semicommon",
+      "entries": [
+        {
+          "entryName": "Bread",
+          "weight": 1,
+          "quality": 0,
+          "type": "item",
+          "functions": [
+            {
+              "count": {
+                "min": -1.0,
+                "max": 1.0
+              },
+              "function": "minecraft:set_count"
+            },
+            {
+              "count": {
+                "min": 0.0,
+                "max": 1.0
+              },
+              "function": "minecraft:looting_enchant"
+            }
+          ],
+          "name": "minecraft:bread"
+        }
+      ],
+      "rolls": 1.0,
+      "conditions": [
+        {
+          "inverse": false,
+          "condition": "minecraft:killed_by_player"
+        }
+      ]
+    },
+    {
+      "name": "rare",
+      "entries": [
+        {
+          "entryName": "Root veggie 1",
+          "weight": 1,
+          "quality": 0,
+          "type": "item",
+          "name": "minecraft:carrot"
+        },
+        {
+          "entryName": "Root veggie 2",
+          "weight": 1,
+          "quality": 0,
+          "type": "item",
+          "name": "minecraft:potato"
+        }
+      ],
+      "rolls": 1.0,
+      "conditions": [
+        {
+          "chance": 0.025,
+          "looting_multiplier": 0.01,
+          "condition": "minecraft:random_chance_with_looting"
+        },
+        {
+          "inverse": false,
+          "condition": "minecraft:killed_by_player"
+        }
+      ]
+    }
+  ]
+}

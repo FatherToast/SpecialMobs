@@ -1,14 +1,14 @@
 [
 {
-  "modid": "SpecialMobs",
+  "modid": "specialmobs",
   "name": "Special Mobs",
-  "description": "Adds variants to the vanilla mobs to make them more interesting and challenging.",
+  "description": "Adds variety to vanilla monsters to make enemies more interesting, without breaking the 'Minecraft' feel.",
   "version": "${version}",
   "mcversion": "${mcversion}",
-  "url": "http://www.minecraftforum.net/topic/1153874-/",
+  "url": "",
   "updateUrl": "",
-  "authorList": ["FatherToast"],
-  "credits": "",
+  "authorList": ["Father Toast"],
+  "credits": "Mother Toast, for dealing with my shit",
   "logoFile": "",
   "screenshots": [],
   "dependencies": []

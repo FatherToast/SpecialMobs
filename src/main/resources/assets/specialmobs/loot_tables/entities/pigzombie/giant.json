@@ -1,0 +1,36 @@
+{
+  "pools": [
+    {
+      "name": "main",
+      "entries": [
+        {
+          "entryName": "Base loot",
+          "weight": 1,
+          "quality": 0,
+          "type": "loot_table",
+          "name": "minecraft:entities/zombie_pigman"
+        }
+      ],
+      "rolls": 1.0
+    },
+    {
+      "name": "base",
+      "entries": [
+        {
+          "entryName": "Rotten flesh",
+          "weight": 1,
+          "quality": 0,
+          "type": "item",
+          "functions": [
+            {
+              "count": 2.0,
+              "function": "minecraft:set_count"
+            }
+          ],
+          "name": "minecraft:rotten_flesh"
+        }
+      ],
+      "rolls": 1.0
+    }
+  ]
+}
