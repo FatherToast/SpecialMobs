@@ -70,9 +70,7 @@ class EntityBruteWitherSkeleton extends Entity_SpecialWitherSkeleton
 	protected
 	void onTypeAttack( Entity target )
 	{
-		if( target instanceof EntityLivingBase ) {
-			((EntityLivingBase) target).setHealth( ((EntityLivingBase) target).getHealth( ) - 2.0F );
-		}
+		target.attackEntityFrom(DamageSource.causeMobDamage(this).setDamageBypassesArmor(), 2.0F);
 	}
 	
 	@Nonnull
