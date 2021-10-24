@@ -80,10 +80,8 @@ class EntityUnholyGhast extends Entity_SpecialGhast
 	protected
 	void onTypeAttack( Entity target )
 	{
-		if( target instanceof EntityLivingBase ) {
-			((EntityLivingBase) target).setHealth( ((EntityLivingBase) target).getHealth( ) - 1.0F );
-			heal( 1.0F );
-		}
+		target.attackEntityFrom(DamageSource.causeMobDamage(this).setDamageBypassesArmor(), 1.0F);
+		heal( 1.0F );
 	}
 	
 	@Override
