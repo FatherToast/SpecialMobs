@@ -1,4 +1,0 @@
-
-version = "1.0.2_for_mc1.12.2"
-group = "fathertoast.specialmobs"
-archivesBaseName = "specialmobs"
