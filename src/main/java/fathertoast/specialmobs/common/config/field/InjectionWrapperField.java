@@ -12,7 +12,7 @@ import java.util.function.Consumer;
 public class InjectionWrapperField<T extends AbstractConfigField> extends AbstractConfigField {
     /** The wrapped field. */
     private final T wrappedField;
-    /** The wrapped field. */
+    /** The callback used any time the wrapped field value is (re)loaded. */
     private final Consumer<T> injectionCallback;
     
     /** Creates a new injection wrapper field that performs a generic load callback function to auto-inject the value. */
