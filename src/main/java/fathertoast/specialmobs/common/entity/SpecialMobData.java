@@ -251,12 +251,8 @@ public class SpecialMobData<T extends LivingEntity & ISpecialMob<T>> {
      */
     private void setTextures( ResourceLocation[] textures ) {
         texture = textures[0];
-        if( textures.length > 1 ) {
-            textureEyes = textures[1];
-        }
-        if( textures.length > 2 ) {
-            textureOverlay = textures[2];
-        }
+        textureEyes = textures.length > 1 ? textures[1] : null;
+        textureOverlay = textures.length > 2 ? textures[2] : null;
     }
     
     /**

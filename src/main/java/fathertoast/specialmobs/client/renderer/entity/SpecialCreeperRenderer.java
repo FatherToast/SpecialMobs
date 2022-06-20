@@ -2,6 +2,7 @@ package fathertoast.specialmobs.client.renderer.entity;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import fathertoast.specialmobs.client.renderer.entity.layers.SpecialMobEyesLayer;
+import fathertoast.specialmobs.client.renderer.entity.layers.SpecialMobOverlayLayer;
 import fathertoast.specialmobs.common.entity.ISpecialMob;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.client.renderer.entity.CreeperRenderer;
@@ -25,7 +26,7 @@ public class SpecialCreeperRenderer extends CreeperRenderer {
         super( rendererManager );
         baseShadowRadius = shadowRadius;
         //        addLayer( new SpecialMobEyesLayer<>( this ) );TODO
-        //        addLayer( new SpecialMobOverlayLayer<>( this, new CreeperModel<>( 0.25F ) ) );
+        addLayer( new SpecialMobOverlayLayer<>( this, new CreeperModel<>( 0.25F ) ) );
     }
     
     @Override
