@@ -142,7 +142,7 @@ public class SpecialMobData<T extends LivingEntity & ISpecialMob<T>> {
         
         familyScale = baseScale = familyBaseScale;
         
-        //setTextures( entity.getDefaultTextures() ); TODO
+        setTextures( entity.getDefaultTextures() );
         
         entity.getEntityData().define( renderScale, nextScale() );
     }
@@ -462,7 +462,7 @@ public class SpecialMobData<T extends LivingEntity & ISpecialMob<T>> {
         tag.putInt( TAG_EXPERIENCE, theEntity.getExperience() );
         tag.putByte( TAG_REGENERATION, (byte) healTimeMax );
         
-        //tag.putString( TAG_TEXTURE, texture.toString() );TODO textures
+        tag.putString( TAG_TEXTURE, texture.toString() );
         tag.putString( TAG_TEXTURE_EYES, textureEyes == null ? "" : textureEyes.toString() );
         tag.putString( TAG_TEXTURE_OVER, textureOverlay == null ? "" : textureOverlay.toString() );
         

@@ -17,6 +17,7 @@ import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.Effects;
 import net.minecraft.potion.PotionUtils;
 import net.minecraft.potion.Potions;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.EntityExplosionContext;
 import net.minecraft.world.Explosion;
@@ -134,4 +135,13 @@ public class DarkCreeperEntity extends _SpecialCreeperEntity {
     protected void modifyVariantLingeringCloudEffects( List<EffectInstance> potions ) {
         potions.add( new EffectInstance( Effects.BLINDNESS, 100 ) );
     }
+    
+    private static final ResourceLocation[] TEXTURES = {
+            new ResourceLocation( GET_TEXTURE_PATH( "dark" ) ),
+            new ResourceLocation( GET_TEXTURE_PATH( "dark_eyes" ) )
+    };
+    
+    /** @return All default textures for this entity. */
+    @Override
+    public ResourceLocation[] getDefaultTextures() { return TEXTURES; }
 }

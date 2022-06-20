@@ -2,17 +2,21 @@ package fathertoast.specialmobs.common.entity;
 
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.pathfinding.PathNodeType;
+import net.minecraft.util.ResourceLocation;
 
 public interface ISpecialMob<T extends LivingEntity & ISpecialMob<T>> {
     /** @return This mob's special data. */
     SpecialMobData<T> getSpecialData();
     
-    /** @return The experience that should be dropped by the entity. */
+    /** @return The experience that should be dropped by this entity. */
     int getExperience();
     
-    /** Sets the experience that should be dropped by the entity. */
+    /** Sets the experience that should be dropped by this entity. */
     void setExperience( int xp );
     
     /** Sets the entity's pathfinding malus for a particular node type; negative value is un-walkable. */
     void setPathfindingMalus( PathNodeType nodeType, float malus );
+    
+    /** @return All default textures for this entity. */
+    ResourceLocation[] getDefaultTextures();
 }

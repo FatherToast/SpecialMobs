@@ -277,15 +277,13 @@ public class _SpecialCreeperEntity extends CreeperEntity implements ISpecialMob<
     @Override
     public final void setExperience( int xp ) { xpReward = xp; }
     
+    static String GET_TEXTURE_PATH( String type ) { return SpecialMobs.TEXTURE_PATH + "creeper/" + type + ".png"; }
+    
     private static final ResourceLocation[] TEXTURES = { new ResourceLocation( "textures/entity/creeper/creeper.png" ) };
     
-    static String GET_TEXTURE_PATH( String type ) {
-        return SpecialMobs.TEXTURE_PATH + "creeper/" + type + ".png";
-    }
-    
-    //    /** @return This entity's default textures. */
-    //    @Override
-    //    public ResourceLocation[] getDefaultTextures() { return TEXTURES; }
+    /** @return All default textures for this entity. */
+    @Override
+    public ResourceLocation[] getDefaultTextures() { return TEXTURES; }
     
     
     //TODO--------------- SpecialMobData Hooks ----------------

@@ -1,6 +1,7 @@
 package fathertoast.specialmobs.client.renderer.entity;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
+import fathertoast.specialmobs.client.renderer.entity.layers.SpecialMobEyesLayer;
 import fathertoast.specialmobs.common.entity.ISpecialMob;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.client.renderer.entity.CreeperRenderer;
@@ -23,14 +24,13 @@ public class SpecialCreeperRenderer extends CreeperRenderer {
     public SpecialCreeperRenderer( EntityRendererManager rendererManager ) {
         super( rendererManager );
         baseShadowRadius = shadowRadius;
-        //        addLayer( new LayerSpecialMobEyes<>( this ) ); TODO render layer impl
-        //        addLayer( new LayerSpecialMobOverlay<>( this, new CreeperModel<>( 0.25F ) ) );
+        //        addLayer( new SpecialMobEyesLayer<>( this ) );TODO
+        //        addLayer( new SpecialMobOverlayLayer<>( this, new CreeperModel<>( 0.25F ) ) );
     }
     
     @Override
     public ResourceLocation getTextureLocation( CreeperEntity entity ) {
-        return super.getTextureLocation( entity );
-        //return ((ISpecialMob<?>) entity).getSpecialData().getTexture();TODO textures
+        return ((ISpecialMob<?>) entity).getSpecialData().getTexture();
     }
     
     @Override
