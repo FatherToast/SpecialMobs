@@ -2,6 +2,7 @@ package fathertoast.specialmobs.common.entity.creeper;
 
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
+import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.block.BlockState;
@@ -9,7 +10,6 @@ import net.minecraft.block.Blocks;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.AttributeModifierMap;
-import net.minecraft.entity.monster.CreeperEntity;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -44,6 +44,12 @@ public class DarkCreeperEntity extends _SpecialCreeperEntity {
         return _SpecialCreeperEntity.createAttributes();
     }
     
+    @SpecialMob.LanguageProvider
+    public static String[] getTranslations( String langKey ) {
+        return References.translations( langKey, "Dark Creeper",
+                "", "", "", "", "", "" );//TODO
+    }
+    
     @SpecialMob.LootTableProvider
     public static void buildLootTable( LootTableBuilder loot ) {
         addBaseLoot( loot );
@@ -74,6 +80,7 @@ public class DarkCreeperEntity extends _SpecialCreeperEntity {
         
         // Add unaffected light sources to the explosion's affected area
         // Note that this does NOT simulate another explosion, instead just directly searches for and targets lights
+        //TODO this doesn't seem to work; figure out new method
         final BlockPos center = new BlockPos( getX(), getY(), getZ() );
         final int radius = explosionRadius * 4 * (isPowered() ? 2 : 1);
         final BlockPos.Mutable pos = new BlockPos.Mutable();

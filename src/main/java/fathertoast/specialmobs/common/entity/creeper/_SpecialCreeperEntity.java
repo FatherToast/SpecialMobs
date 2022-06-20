@@ -49,6 +49,12 @@ public class _SpecialCreeperEntity extends CreeperEntity implements ISpecialMob<
         return CreeperEntity.createAttributes();
     }
     
+    @SpecialMob.LanguageProvider
+    public static String[] getTranslations( String langKey ) {
+        return References.translations( langKey, "Creeper",
+                "", "", "", "", "", "" );//TODO
+    }
+    
     @SpecialMob.LootTableProvider
     public static void addBaseLoot( LootTableBuilder loot ) {
         loot.addLootTable( "main", EntityType.CREEPER.getDefaultLootTable() );

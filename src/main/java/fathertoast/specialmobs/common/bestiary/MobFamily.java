@@ -6,7 +6,8 @@ import fathertoast.specialmobs.common.util.AnnotationHelper;
 import fathertoast.specialmobs.common.util.References;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.block.Block;
-import net.minecraft.entity.*;
+import net.minecraft.entity.EntityType;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.monster.CreeperEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -39,7 +40,8 @@ public class MobFamily<T extends LivingEntity> {
     
     public static final MobFamily<CreeperEntity> CREEPER = new MobFamily<>(
             "Creeper", "creepers", 0x0da70b, new EntityType[] { EntityType.CREEPER },
-            "Dark"//, "Death", "Dirt", "Doom", "Drowning", "Ender", "Fire", "Gravel", "Jumping", "Lightning", "Mini", "Splitting"
+            "Dark"//, "Death", "Dirt", "Doom", "Drowning", "Ender", "Fire", "Gravel", "Jumping", "Lightning",
+            // "Mini", "Scope", "Splitting"
     );
     
     //    public static final MobFamily<ZombieEntity> ZOMBIE = new MobFamily<>(

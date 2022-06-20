@@ -100,7 +100,7 @@ public class SpecialMobs {
         
         //packetHandler.registerMessages();
         
-        //MinecraftForge.EVENT_BUS.register( new NAEventListener() );
+        //MinecraftForge.EVENT_BUS.register( new SMEventListener() );
         
         IEventBus eventBus = FMLJavaModLoadingContext.get().getModEventBus();
         

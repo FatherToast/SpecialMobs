@@ -1,9 +1,14 @@
 package fathertoast.specialmobs.datagen;
 
+import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.core.SpecialMobs;
+import fathertoast.specialmobs.common.util.AnnotationHelper;
+import fathertoast.specialmobs.common.util.References;
 import net.minecraft.data.DataGenerator;
 import net.minecraftforge.common.data.LanguageProvider;
 
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class SMLanguageProvider extends LanguageProvider {
@@ -18,29 +23,6 @@ public class SMLanguageProvider extends LanguageProvider {
         TranslationKey( String id ) { code = id; }
     }
     
-    /** This method provides helper tags to make linking translations up easier, and also enforces the correct array length. */
-    private static String[] translations( String key, String en, String es, String pt, String fr, String it, String de, String pir ) {
-        // Note that this must match up EXACTLY to the TranslationKey enum above
-        String[] translation = { key, en, es, pt, fr, it, de, pir };
-        
-        // Fix the encoding to allow us to use accented characters in the translation string literals
-        // Note: If a translation uses any non-ASCII characters, make sure they are all in this matrix! (case-sensitive)
-        final String[][] utf8ToUnicode = {
-                { "à", "\u00E0" }, { "á", "\u00E1" }, { "ã", "\u00E3" }, { "ä", "\u00E4" },
-                { "ç", "\u00E7" },
-                { "è", "\u00E8" }, { "é", "\u00E9" }, { "ê", "\u00EA" },
-                { "í", "\u00ED" },
-                { "ó", "\u00F3" }, { "õ", "\u00F5" }, { "ö", "\u00F6" },
-                { "ù", "\u00F9" }, { "û", "\u00FB" }, { "ü", "\u00FC" },
-                { "œ", "\u0153" }
-        };
-        for( int i = 1; i < translation.length; i++ ) {
-            for( String[] fix : utf8ToUnicode )
-                translation[i] = translation[i].replace( fix[0], fix[1] ); // Note: This is kinda dumb, but it works so idc
-        }
-        return translation;
-    }
-    
     /**
      * Matrix linking the actual translations to their lang key.
      * <p>
@@ -50,15 +32,29 @@ public class SMLanguageProvider extends LanguageProvider {
      *
      * @see #addTranslations()
      */
-    @SuppressWarnings( "SpellCheckingInspection" )
-    private static final String[][] TRANSLATIONS = {
-            // NYI
-    };
+    private static final String[][] TRANSLATIONS;
     
     /** Maps which translation key each lang code uses, allowing multiple lang codes to use the same translations. */
     public static final HashMap<String, TranslationKey> LANG_CODE_MAP = new HashMap<>();
     
     static {
+        final ArrayList<String[]> translationList = new ArrayList<>();
+        
+        final String[] spawnEggTranslationPattern = References.translations( "%s", "%s Spawn Egg",
+                "%s", "%s", "%s", "%s", "%s", "%s" ); //TODO
+        
+        // Bestiary-generated translations
+        for( MobFamily.Species<?> species : MobFamily.getAllSpecies() ) {
+            final String[] speciesTranslations = getTranslations( species );
+            String[] spawnEggTranslations = format( spawnEggTranslationPattern, speciesTranslations );
+            spawnEggTranslations[0] = species.spawnEgg.get().getDescriptionId();
+            
+            translationList.add( speciesTranslations );
+            translationList.add( spawnEggTranslations );
+        }
+        
+        TRANSLATIONS = translationList.toArray( new String[0][0] );
+        
         // Assign all specific locales to the translation we want to use
         mapAll( TranslationKey.ENGLISH, "us" ); // We can ignore other English locales, en_us is the fallback for all languages
         mapAll( TranslationKey.SPANISH, "es", "ar", "cl", "ec", "mx", "uy", "ve" );
@@ -83,6 +79,25 @@ public class SMLanguageProvider extends LanguageProvider {
             }
         }
         SpecialMobs.LOG.info( "Translation key verification complete!" );
+    }
+    
+    /** Gets the translations for a specific entity species. */
+    private static String[] getTranslations( MobFamily.Species<?> species ) {
+        try {
+            return AnnotationHelper.getTranslations( species );
+        }
+        catch( NoSuchMethodException | InvocationTargetException | IllegalAccessException ex ) {
+            throw new RuntimeException( "Entity class for " + species.name + " has invalid language provider method", ex );
+        }
+    }
+    
+    /** Applies single argument string formats 1:1 given an array of formats and an array of arguments. */
+    private static String[] format( String[] formats, String[] args ) {
+        final String[] formatted = new String[formats.length];
+        for( int i = 0; i < formatted.length; i++ ) {
+            formatted[i] = String.format( formats[i], args[i] );
+        }
+        return formatted;
     }
     
     /** Maps any number of locale codes to a single translation. */

@@ -43,7 +43,15 @@ public final class AnnotationHelper {
     /** Creates an attribute modifier map from a special mob species. Throws an exception if anything goes wrong. */
     public static AttributeModifierMap createAttributes( MobFamily.Species<?> species )
             throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        return ((AttributeModifierMap.MutableAttribute) getMethod( species.entityClass, SpecialMob.AttributeCreator.class ).invoke( null )).build();
+        return ((AttributeModifierMap.MutableAttribute) getMethod( species.entityClass, SpecialMob.AttributeCreator.class )
+                .invoke( null )).build();
+    }
+    
+    /** Gets the translations from a special mob species. Throws an exception if anything goes wrong. */
+    public static String[] getTranslations( MobFamily.Species<?> species )
+            throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        return (String[]) getMethod( species.entityClass, SpecialMob.LanguageProvider.class )
+                .invoke( null, species.entityType.get().getDescriptionId() );
     }
     
     /** Builds a loot table from a special mob species. Throws an exception if anything goes wrong. */

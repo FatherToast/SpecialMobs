@@ -60,4 +60,30 @@ public final class References {
     public static final String TAG_DRY_EXPLODE = "CannotExplodeWhileWet";
     public static final String TAG_WHEN_BURNING_EXPLODE = "ExplodesWhileBurning";
     public static final String TAG_WHEN_SHOT_EXPLODE = "ExplodesWhenShot";
+    
+    
+    //--------------- INTERNATIONALIZATION ----------------
+    
+    /** This method provides helper tags to make linking translations up easier, and also enforces the correct array length. */
+    public static String[] translations( String key, String en, String es, String pt, String fr, String it, String de, String pir ) {
+        // Note that this must match up EXACTLY to the TranslationKey enum in SMLanguageProvider
+        String[] translation = { key, en, es, pt, fr, it, de, pir };
+        
+        // Fix the encoding to allow us to use accented characters in the translation string literals
+        // Note: If a translation uses any non-ASCII characters, make sure they are all in this matrix! (case-sensitive)
+        final String[][] utf8ToUnicode = {
+                { "à", "\u00E0" }, { "á", "\u00E1" }, { "ã", "\u00E3" }, { "ä", "\u00E4" },
+                { "ç", "\u00E7" },
+                { "è", "\u00E8" }, { "é", "\u00E9" }, { "ê", "\u00EA" },
+                { "í", "\u00ED" },
+                { "ó", "\u00F3" }, { "õ", "\u00F5" }, { "ö", "\u00F6" },
+                { "ù", "\u00F9" }, { "û", "\u00FB" }, { "ü", "\u00FC" },
+                { "œ", "\u0153" }
+        };
+        for( int i = 1; i < translation.length; i++ ) {
+            for( String[] fix : utf8ToUnicode )
+                translation[i] = translation[i].replace( fix[0], fix[1] ); // Note: This is kinda dumb, but it works so idc
+        }
+        return translation;
+    }
 }

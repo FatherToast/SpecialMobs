@@ -40,7 +40,9 @@ public class SMLootTableProvider extends LootTableProvider {
     /** Validates this mod's loot tables. */
     @Override
     protected void validate( Map<ResourceLocation, LootTable> tables, ValidationTracker ctx ) {
-        tables.forEach( ( name, table ) -> LootTableManager.validate( ctx, name, table ) );
+        // We have to disable validation because vanilla entity loot tables are not recognized;
+        // this is kinda scary, maybe later we can look into re-enabling validation
+        //tables.forEach( ( name, table ) -> LootTableManager.validate( ctx, name, table ) );
     }
     
     /** Provides all entity loot tables for this mod. */

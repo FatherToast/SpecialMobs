@@ -58,6 +58,22 @@ public @interface SpecialMob {
     @interface AttributeCreator { }
     
     /**
+     * REQUIRED. This is called during data generation to build the mod's default lang files.
+     * <p>
+     * The annotated method must have a signature that follows the pattern:
+     * <p>
+     * public static String[] METHOD_NAME( String langKey )
+     * <p>
+     * The returned string array should be created by References#translations using the given lang key as the first
+     * argument. Always be sure that any non-ASCII characters used are properly handled by the translations method.
+     *
+     * @see fathertoast.specialmobs.common.util.References#translations(String, String, String, String, String, String, String, String)
+     */
+    @Retention( RetentionPolicy.RUNTIME )
+    @Target( ElementType.METHOD )
+    @interface LanguageProvider { }
+    
+    /**
      * REQUIRED. This is called during data generation to build the mob's default loot table. Special variants will
      * typically start this method by calling their vanilla replacement's implementation of this method.
      * <p>
