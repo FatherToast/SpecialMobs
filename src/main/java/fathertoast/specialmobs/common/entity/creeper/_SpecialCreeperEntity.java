@@ -6,6 +6,7 @@ import fathertoast.specialmobs.common.core.SpecialMobs;
 import fathertoast.specialmobs.common.entity.ISpecialMob;
 import fathertoast.specialmobs.common.entity.SpecialMobData;
 import fathertoast.specialmobs.common.util.References;
+import fathertoast.specialmobs.common.util.ExplosionHelper;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.block.BlockState;
@@ -24,7 +25,6 @@ import net.minecraft.potion.EffectInstance;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.Explosion;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 
@@ -83,11 +83,8 @@ public class _SpecialCreeperEntity extends CreeperEntity implements ISpecialMob<
     @Override
     protected void explodeCreeper() {
         if( !level.isClientSide ) {
-            final Explosion.Mode explosionMode = net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent( level, this ) ?
-                    Explosion.Mode.DESTROY : Explosion.Mode.NONE;
-            final float explosionPower = getVariantExplosionPower();
             dead = true;
-            makeVariantExplosion( explosionPower, explosionMode );
+            makeVariantExplosion( (float) explosionRadius * getVariantExplosionPower() );
             remove();
             spawnLingeringCloud();
         }
@@ -97,8 +94,8 @@ public class _SpecialCreeperEntity extends CreeperEntity implements ISpecialMob<
     protected float getVariantExplosionPower() { return isPowered() ? 2.0F : 1.0F; }
     
     /** Override to change this creeper's explosion. */
-    protected void makeVariantExplosion( float explosionPower, Explosion.Mode explosionMode ) {
-        level.explode( this, getX(), getY(), getZ(), (float) explosionRadius * explosionPower, explosionMode );
+    protected void makeVariantExplosion( float explosionPower ) {
+        ExplosionHelper.explode( this, explosionPower, true, false );
     }
     
     /** Called to create a lingering effect cloud as part of this creeper's explosion 'attack'. */
