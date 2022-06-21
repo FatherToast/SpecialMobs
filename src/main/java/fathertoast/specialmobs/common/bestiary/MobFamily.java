@@ -39,22 +39,22 @@ public class MobFamily<T extends LivingEntity> {
     // NOTE: When adding a new mob family, do not forget to also register its renderer in the client register!
     
     public static final MobFamily<CreeperEntity> CREEPER = new MobFamily<>(
-            "Creeper", "creepers", 0x0da70b, new EntityType[] { EntityType.CREEPER },
-            "Dark"//, "Death", "Dirt", "Doom", "Drowning", "Ender", "Fire", "Gravel", "Jumping", "Lightning",
-            // "Mini", "Scope", "Splitting"
+            "Creeper", "creepers", 0x0DA70B, new EntityType[] { EntityType.CREEPER },
+            "Dark", "Death", "Dirt", "Doom", "Drowning", /*"Ender",*/ "Fire", "Gravel"//, "Jumping", "Lightning",
+            //"Mini", "Scope", "Splitting"
     );
     
     //    public static final MobFamily<ZombieEntity> ZOMBIE = new MobFamily<>(
-    //            "Zombie", "zombies", 0x00afaf, new EntityType[] { EntityType.ZOMBIE, EntityType.HUSK },
+    //            "Zombie", "zombies", 0x00AFAF, new EntityType[] { EntityType.ZOMBIE, EntityType.HUSK },
     //            "Brute", "Fire", "Fishing", "Giant", "Hungry", "Husk", "Plague"
     //    );
     //    public static final MobFamily<ZombieEntity> ZOMBIFIED_PIGLIN = new MobFamily<>(
-    //            "ZombifiedPiglin", "zombie pigmen", 0xea9393, new EntityType[] { EntityType.ZOMBIFIED_PIGLIN },
+    //            "ZombifiedPiglin", "zombie pigmen", 0xEA9393, new EntityType[] { EntityType.ZOMBIFIED_PIGLIN },
     //            "Brute", "Fishing", "Giant", "Hungry", "Knight", "Plague", "Vampire"
     //    );
     
     //    public static final MobFamily<AbstractSkeletonEntity> SKELETON = new MobFamily<>(
-    //            "Skeleton", "skeletons", 0xc1c1c1, new EntityType[] { EntityType.SKELETON, EntityType.STRAY },
+    //            "Skeleton", "skeletons", 0xC1C1C1, new EntityType[] { EntityType.SKELETON, EntityType.STRAY },
     //            "Brute", "Fire", "Gatling", "Giant", "Knight", "Ninja", "Poison", "Sniper", "Spitfire", "Stray"
     //    );
     //    public static final MobFamily<AbstractSkeletonEntity> WITHER_SKELETON = new MobFamily<>(
@@ -63,7 +63,7 @@ public class MobFamily<T extends LivingEntity> {
     //    );
     
     //    public static final MobFamily<SlimeEntity> SLIME = new MobFamily<>(
-    //            "Slime", "slimes", 0x51a03e, new EntityType[] { EntityType.SLIME },
+    //            "Slime", "slimes", 0x51A03E, new EntityType[] { EntityType.SLIME },
     //            "Blackberry", "Blueberry", "Caramel", "Grape", "Lemon", "Strawberry", "Watermelon"
     //    );
     //    public static final MobFamily<MagmaCubeEntity> MAGMA_CUBE = new MobFamily<>(
@@ -72,16 +72,16 @@ public class MobFamily<T extends LivingEntity> {
     //    );
     
     //    public static final MobFamily<SpiderEntity> SPIDER = new MobFamily<>(
-    //            "Spider", "spiders", 0x342d27, new EntityType[] { EntityType.SPIDER },
+    //            "Spider", "spiders", 0x342D27, new EntityType[] { EntityType.SPIDER },
     //            "Baby", "Desert", "Flying", "Giant", "Hungry", "Mother", "Pale", "Poison", "Web", "Witch"
     //    );
     //    public static final MobFamily<CaveSpiderEntity> CAVE_SPIDER = new MobFamily<>(
-    //            "CaveSpider", "cave spiders", 0x0c424e, new EntityType[] { EntityType.CAVE_SPIDER },
+    //            "CaveSpider", "cave spiders", 0x0C424E, new EntityType[] { EntityType.CAVE_SPIDER },
     //            "Baby", "Flying", "Mother", "Web", "Witch"
     //    );
     
     //    public static final MobFamily<SilverfishEntity> SILVERFISH = new MobFamily<>(
-    //            "Silverfish", "silverfish", 0x6e6e6e, new EntityType[] { EntityType.SILVERFISH },
+    //            "Silverfish", "silverfish", 0x6E6E6E, new EntityType[] { EntityType.SILVERFISH },
     //            "Blinding", "Fishing", "Flying", "Poison", "Tough"
     //    );
     
@@ -96,12 +96,12 @@ public class MobFamily<T extends LivingEntity> {
     //    );
     
     //    public static final MobFamily<GhastEntity> GHAST = new MobFamily<>(
-    //            "Ghast", "ghasts", 0xf9f9f9, new EntityType[] { EntityType.GHAST },
+    //            "Ghast", "ghasts", 0xF9F9F9, new EntityType[] { EntityType.GHAST },
     //            "Baby", "Fighter", "King", "Queen", "Unholy"
     //    );
     
     //    public static final MobFamily<BlazeEntity> BLAZE = new MobFamily<>(
-    //            "Blaze", "blazes", 0xf6b201, new EntityType[] { EntityType.BLAZE },
+    //            "Blaze", "blazes", 0xF6B201, new EntityType[] { EntityType.BLAZE },
     //            "Cinder", "Conflagration", "Ember", "Hellfire", "Inferno", "Jolt", "Wildfire"
     //    );
     

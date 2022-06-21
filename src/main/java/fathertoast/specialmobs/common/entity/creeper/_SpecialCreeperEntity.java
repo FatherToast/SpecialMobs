@@ -84,14 +84,14 @@ public class _SpecialCreeperEntity extends CreeperEntity implements ISpecialMob<
     protected void explodeCreeper() {
         if( !level.isClientSide ) {
             dead = true;
-            makeVariantExplosion( (float) explosionRadius * getVariantExplosionPower() );
+            makeVariantExplosion( getVariantExplosionPower( explosionRadius ) );
             remove();
             spawnLingeringCloud();
         }
     }
     
     /** Override to change this creeper's explosion power multiplier. */
-    protected float getVariantExplosionPower() { return isPowered() ? 2.0F : 1.0F; }
+    protected float getVariantExplosionPower( float radius ) { return radius * (isPowered() ? 2.0F : 1.0F); }
     
     /** Override to change this creeper's explosion. */
     protected void makeVariantExplosion( float explosionPower ) {
@@ -106,7 +106,7 @@ public class _SpecialCreeperEntity extends CreeperEntity implements ISpecialMob<
         
         if( !effects.isEmpty() ) {
             final AreaEffectCloudEntity potionCloud = new AreaEffectCloudEntity( level, getX(), getY(), getZ() );
-            potionCloud.setRadius( (explosionRadius - 0.5F) * getVariantExplosionPower() );
+            potionCloud.setRadius( getVariantExplosionPower( explosionRadius - 0.5F ) );
             potionCloud.setRadiusOnUse( -0.5F );
             potionCloud.setWaitTime( 10 );
             potionCloud.setDuration( potionCloud.getDuration() / 2 );
@@ -274,7 +274,9 @@ public class _SpecialCreeperEntity extends CreeperEntity implements ISpecialMob<
     @Override
     public final void setExperience( int xp ) { xpReward = xp; }
     
-    static String GET_TEXTURE_PATH( String type ) { return SpecialMobs.TEXTURE_PATH + "creeper/" + type + ".png"; }
+    static ResourceLocation GET_TEXTURE_PATH( String type ) {
+        return SpecialMobs.resourceLoc( SpecialMobs.TEXTURE_PATH + "creeper/" + type + ".png" );
+    }
     
     private static final ResourceLocation[] TEXTURES = { new ResourceLocation( "textures/entity/creeper/creeper.png" ) };
     

@@ -2,8 +2,8 @@ package fathertoast.specialmobs.common.entity.creeper;
 
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
-import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.common.util.ExplosionHelper;
+import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.block.BlockState;
@@ -34,7 +34,7 @@ public class DarkCreeperEntity extends _SpecialCreeperEntity {
     
     @SpecialMob.BestiaryInfoSupplier
     public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
-        return new BestiaryInfo( 0xf9ff3a );
+        return new BestiaryInfo( 0xF9FF3A );
     }
     
     @SpecialMob.AttributeCreator
@@ -58,13 +58,14 @@ public class DarkCreeperEntity extends _SpecialCreeperEntity {
     @SpecialMob.Constructor
     public DarkCreeperEntity( EntityType<? extends _SpecialCreeperEntity> entityType, World world ) {
         super( entityType, world );
+        xpReward += 1;
     }
     
     
     //--------------- Variant-Specific Implementations ----------------
     
     /** Override to change this creeper's explosion power multiplier. */
-    protected float getVariantExplosionPower() { return super.getVariantExplosionPower() / 2.0F; }
+    protected float getVariantExplosionPower( float radius ) { return super.getVariantExplosionPower( radius / 2.0F ); }
     
     /** Override to change this creeper's explosion. */
     @Override
@@ -74,7 +75,7 @@ public class DarkCreeperEntity extends _SpecialCreeperEntity {
         
         // Add unaffected light sources to the explosion's affected area
         // Note that this does NOT simulate another explosion, instead just directly searches for and targets lights
-        final BlockPos center = new BlockPos( getX(), getY(), getZ() );
+        final BlockPos center = new BlockPos( explosion.getPos() );
         final int radius = explosionRadius * 4 * (isPowered() ? 2 : 1);
         for( int y = -radius; y <= radius; y++ ) {
             for( int x = -radius; x <= radius; x++ ) {
@@ -122,8 +123,8 @@ public class DarkCreeperEntity extends _SpecialCreeperEntity {
     }
     
     private static final ResourceLocation[] TEXTURES = {
-            new ResourceLocation( GET_TEXTURE_PATH( "dark" ) ),
-            new ResourceLocation( GET_TEXTURE_PATH( "dark_eyes" ) )
+            GET_TEXTURE_PATH( "dark" ),
+            GET_TEXTURE_PATH( "dark_eyes" )
     };
     
     /** @return All default textures for this entity. */

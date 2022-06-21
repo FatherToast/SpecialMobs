@@ -84,7 +84,7 @@ public class SpecialMobs {
     public static final String MOD_ID = "specialmobs";
     
     /** The path to the textures folder. */
-    public static final String TEXTURE_PATH = MOD_ID + ":textures/entity/";
+    public static final String TEXTURE_PATH = "textures/entity/";
     /** The path to the loot tables folder. */
     public static final String LOOT_TABLE_PATH = MOD_ID + ":entities/";
     

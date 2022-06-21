@@ -64,6 +64,19 @@ public class ExplosionHelper {
     }
     
     /**
+     * Creates an explosion for a source entity at that source's current position. Instantiating this class allows a
+     * little more control over the explosion (vs. the static explode methods), such as modifying affected blocks.
+     * <p>
+     * To fully execute the explosion, you must manually call initializeExplosion() and then finalizeExplosion().
+     *
+     * @see #initializeExplosion()
+     * @see #finalizeExplosion()
+     */
+    public ExplosionHelper( Entity entity, float power, Explosion.Mode explosionMode, boolean fiery ) {
+        this( entity, entity.getX(), entity.getY(), entity.getZ(), power, explosionMode, fiery );
+    }
+    
+    /**
      * Creates an explosion for a source entity at a specified position. Instantiating this class allows a little more
      * control over the explosion (vs. the static explode methods), such as modifying affected blocks.
      * <p>
@@ -73,13 +86,26 @@ public class ExplosionHelper {
      * @see #finalizeExplosion()
      */
     public ExplosionHelper( Entity entity, double x, double y, double z, float power, boolean damageBlocks, boolean fiery ) {
+        this( entity, x, y, z, power, damageBlocks ? getMode( entity ) : Explosion.Mode.NONE, fiery );
+    }
+    
+    /**
+     * Creates an explosion for a source entity at a specified position. Instantiating this class allows a little more
+     * control over the explosion (vs. the static explode methods), such as modifying affected blocks.
+     * <p>
+     * To fully execute the explosion, you must manually call initializeExplosion() and then finalizeExplosion().
+     *
+     * @see #initializeExplosion()
+     * @see #finalizeExplosion()
+     */
+    public ExplosionHelper( Entity entity, double x, double y, double z, float power, Explosion.Mode explosionMode, boolean fiery ) {
         source = entity;
         level = entity.level;
         radius = power;
         
-        mode = damageBlocks ? getMode( entity ) : Explosion.Mode.NONE;
+        mode = explosionMode;
         damageCalculator = new EntityExplosionContext( entity );
-        explosion = new Explosion( level, entity, null, damageCalculator, x, y, z, power, fiery, mode );
+        explosion = new Explosion( level, entity, null, damageCalculator, x, y, z, power, fiery, explosionMode );
     }
     
     /** @return This explosion's position vector. */

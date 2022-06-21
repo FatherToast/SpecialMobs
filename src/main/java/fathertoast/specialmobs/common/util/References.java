@@ -21,6 +21,8 @@ public final class References {
     public static final int AI_BIT_FACE = 0b00000010;
     public static final int AI_BIT_SWIM = 0b00000100;
     
+    public static final int SET_BLOCK_FLAGS = 0b00000011;
+    
     
     //--------------- NBT STUFF ----------------
     

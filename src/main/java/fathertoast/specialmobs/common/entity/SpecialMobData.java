@@ -192,36 +192,6 @@ public class SpecialMobData<T extends LivingEntity & ISpecialMob<T>> {
     }
     
     /**
-     * Alters the entity's base attribute by adding an amount to it.
-     * Do NOT use this for move speed, instead use {@link SpecialMobData#multAttribute(Attribute, double)}
-     *
-     * @param attribute the attribute to modify
-     * @param amount    the amount to add to the attribute
-     */
-    public void addAttribute( Attribute attribute, double amount ) {
-        final ModifiableAttributeInstance attributeInstance = theEntity.getAttribute( attribute );
-        if( attributeInstance == null )
-            throw new IllegalStateException( "Special mob '" + theEntity + "' does not have registered attribute " +
-                    attribute.getDescriptionId() );
-        attributeInstance.setBaseValue( attributeInstance.getBaseValue() + amount );
-    }
-    
-    /**
-     * Alters the entity's base attribute by multiplying it by an amount.
-     * Only use this for move speed, for other attributes use {@link SpecialMobData#addAttribute(Attribute, double)}
-     *
-     * @param attribute the attribute to modify
-     * @param amount    the amount to multiply the attribute by
-     */
-    public void multAttribute( Attribute attribute, double amount ) {
-        final ModifiableAttributeInstance attributeInstance = theEntity.getAttribute( attribute );
-        if( attributeInstance == null )
-            throw new IllegalStateException( "Special mob '" + theEntity + "' does not have registered attribute " +
-                    attribute.getDescriptionId() );
-        attributeInstance.setBaseValue( attributeInstance.getBaseValue() * amount );
-    }
-    
-    /**
      * @return Whether this entity has a glowing eyes texture.
      */
     public boolean hasEyesTexture() { return textureEyes != null; }
