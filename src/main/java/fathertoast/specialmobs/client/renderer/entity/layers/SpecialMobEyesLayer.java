@@ -6,6 +6,7 @@ import fathertoast.specialmobs.common.core.SpecialMobs;
 import fathertoast.specialmobs.common.entity.ISpecialMob;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
+import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.IEntityRenderer;
 import net.minecraft.client.renderer.entity.layers.AbstractEyesLayer;
@@ -27,17 +28,16 @@ public class SpecialMobEyesLayer<T extends Entity, M extends EntityModel<T>> ext
     public SpecialMobEyesLayer( IEntityRenderer<T, M> renderer ) {
         super( renderer );
     }
-    
-    // I have no clue what all these floats mean, but also I don't really care right now.  Would be nice to know eventually.
+
     @Override
-    public void render( MatrixStack matrixStack, IRenderTypeBuffer buffer, int layer, T entity,
-                        float a, float b, float c, float d, float e, float f ) {
+    public void render( MatrixStack matrixStack, IRenderTypeBuffer buffer, int packedLight, T entity, float limbSwing,
+                        float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch ) {
         final ResourceLocation eyesTexture = ((ISpecialMob<?>) entity).getSpecialData().getTextureEyes();
         if( eyesTexture == null ) return;
         
         //TODO does not work; for some reason, all the transparency renders as white
-        IVertexBuilder ivertexbuilder = buffer.getBuffer( RenderType.eyes( eyesTexture ) );
-        this.getParentModel().renderToBuffer( matrixStack, ivertexbuilder, 15728640, OverlayTexture.NO_OVERLAY,
+        IVertexBuilder vertexBuilder = buffer.getBuffer( RenderType.eyes(eyesTexture) );
+        this.getParentModel().renderToBuffer( matrixStack, vertexBuilder, LightTexture.pack(15, 15), OverlayTexture.NO_OVERLAY,
                 1.0F, 1.0F, 1.0F, 1.0F );
     }
     

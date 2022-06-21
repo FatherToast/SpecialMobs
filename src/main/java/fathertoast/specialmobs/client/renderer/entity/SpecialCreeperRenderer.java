@@ -25,7 +25,7 @@ public class SpecialCreeperRenderer extends CreeperRenderer {
     public SpecialCreeperRenderer( EntityRendererManager rendererManager ) {
         super( rendererManager );
         baseShadowRadius = shadowRadius;
-        //        addLayer( new SpecialMobEyesLayer<>( this ) );TODO
+        addLayer( new SpecialMobEyesLayer<>( this ) );
         addLayer( new SpecialMobOverlayLayer<>( this, new CreeperModel<>( 0.25F ) ) );
     }
     
