@@ -16,6 +16,17 @@ import java.lang.annotation.Target;
 public @interface SpecialMob {
     
     /**
+     * OPTIONAL. This is injected with the species's entity type during registration so you may access it later, as needed.
+     * <p>
+     * The annotated field must have a signature that follows the pattern:
+     * <p>
+     * public static RegistryObject<EntityType<T>> FIELD_NAME;
+     */
+    @Retention( RetentionPolicy.RUNTIME )
+    @Target( ElementType.FIELD )
+    @interface TypeHolder { }
+    
+    /**
      * REQUIRED. This is grabbed during registration to be used as a mob 'factory'; the needed constructor will probably
      * already be needed by the entity's superclass, so it's just a matter of applying the annotation in that case.
      * <p>

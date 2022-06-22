@@ -3,6 +3,8 @@ package fathertoast.specialmobs.common.util;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityType;
+import net.minecraft.entity.effect.LightningBoltEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.network.play.server.SExplosionPacket;
@@ -40,6 +42,15 @@ public class ExplosionHelper {
     /** Creates and fully executes an explosion for a source entity at a specified position. */
     public static Explosion explode( Entity entity, double x, double y, double z, float power, boolean damageBlocks, boolean fiery ) {
         return entity.level.explode( entity, x, y, z, power, fiery, damageBlocks ? getMode( entity ) : Explosion.Mode.NONE );
+    }
+    
+    /** Helper method to simplify spawning lightning. */
+    public static void spawnLightning( World world, double x, double y, double z ) {
+        final LightningBoltEntity lightning = EntityType.LIGHTNING_BOLT.create( world );
+        if( lightning != null ) {
+            lightning.moveTo( x, y, z );
+            world.addFreshEntity( lightning );
+        }
     }
     
     public final Entity source;

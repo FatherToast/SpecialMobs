@@ -5,8 +5,8 @@ import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.core.SpecialMobs;
 import fathertoast.specialmobs.common.entity.ISpecialMob;
 import fathertoast.specialmobs.common.entity.SpecialMobData;
-import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.common.util.ExplosionHelper;
+import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.block.BlockState;
@@ -16,6 +16,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.AttributeModifierMap;
 import net.minecraft.entity.effect.LightningBoltEntity;
 import net.minecraft.entity.monster.CreeperEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
@@ -127,6 +128,12 @@ public class _SpecialCreeperEntity extends CreeperEntity implements ISpecialMob<
     
     /** Override to change stats of the lingering cloud left by this creeper's explosion. */
     protected void modifyVariantLingeringCloud( AreaEffectCloudEntity potionCloud ) { }
+    
+    /** Override to save data to this entity's NBT data. */
+    public void addVariantSaveData( CompoundNBT saveTag ) { }
+    
+    /** Override to load data from this entity's  NBT data. */
+    public void readVariantSaveData( CompoundNBT saveTag ) { }
     
     
     //--------------- Family-Specific Implementations ----------------
@@ -248,23 +255,13 @@ public class _SpecialCreeperEntity extends CreeperEntity implements ISpecialMob<
     }
     
     
-    //TODO--------------- ISpecialMob Implementation ----------------
+    //--------------- ISpecialMob Implementation ----------------
     
     private SpecialMobData<_SpecialCreeperEntity> specialData;
     
     /** @return This mob's special data. */
     @Override
     public SpecialMobData<_SpecialCreeperEntity> getSpecialData() { return specialData; }
-    
-    //    /**
-    //     * Applies changes to this entity's attributes, applied on creation and after copying replacement data.
-    //     */
-    //    @Override
-    //    public final void applyAttributeAdjustments() {
-    //        float prevMax = getMaxHealth();
-    //        adjustTypeAttributes();
-    //        setHealth( getMaxHealth() + getHealth() - prevMax );
-    //    }
     
     /** @return The experience that should be dropped by this entity. */
     @Override
@@ -317,8 +314,9 @@ public class _SpecialCreeperEntity extends CreeperEntity implements ISpecialMob<
         if( !getSpecialData().isImmuneToBurning() ) super.setRemainingFireTicks( ticks );
     }
     
-    //    @Override
-    //    public boolean canBeLeashedTo( EntityPlayer player ) { return !getLeashed() && getSpecialData().allowLeashing(); }
+    /** @return True if this entity can be leashed. */
+    @Override
+    public boolean canBeLeashed( PlayerEntity player ) { return !isLeashed() && getSpecialData().allowLeashing(); }
     
     /** Sets this entity 'stuck' inside a block, such as a cobweb or sweet berry bush. Mod blocks could use this as a speed boost. */
     @Override
@@ -326,13 +324,15 @@ public class _SpecialCreeperEntity extends CreeperEntity implements ISpecialMob<
         if( specialData.canBeStuckIn( block ) ) super.makeStuckInBlock( block, speedMulti );
     }
     
-    //    // Called when this mob falls. Calculates and applies fall damage.
-    //    @Override
-    //    public void fall( float distance, float damageMultiplier ) { super.fall( distance, damageMultiplier * getSpecialData().getFallDamageMultiplier() ); }
+    /** @return Called when this mob falls. Calculates and applies fall damage. Returns false if canceled. */
+    @Override
+    public boolean causeFallDamage( float distance, float damageMultiplier ) {
+        return super.causeFallDamage( distance, damageMultiplier * getSpecialData().getFallDamageMultiplier() );
+    }
     
-    //    // Return whether this entity should NOT trigger a pressure plate or a tripwire.
-    //    @Override
-    //    public boolean doesEntityNotTriggerPressurePlate() { return getSpecialData().ignorePressurePlates(); }
+    /** @return True if this entity should NOT trigger pressure plates or tripwires. */
+    @Override
+    public boolean isIgnoringBlockTriggers() { return getSpecialData().ignorePressurePlates(); }
     
     /** @return True if this entity can breathe underwater. */
     @Override
@@ -362,6 +362,7 @@ public class _SpecialCreeperEntity extends CreeperEntity implements ISpecialMob<
         saveTag.putBoolean( References.TAG_WHEN_SHOT_EXPLODE, explodesWhenShot() );
         
         getSpecialData().writeToNBT( saveTag );
+        addVariantSaveData( saveTag );
     }
     
     /** Loads data from this entity's base NBT compound that is specific to its subclass. */
@@ -379,5 +380,6 @@ public class _SpecialCreeperEntity extends CreeperEntity implements ISpecialMob<
             setExplodesWhenShot( saveTag.getBoolean( References.TAG_WHEN_SHOT_EXPLODE ) );
         
         getSpecialData().readFromNBT( saveTag );
+        readVariantSaveData( saveTag );
     }
 }

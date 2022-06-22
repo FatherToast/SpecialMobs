@@ -10,15 +10,18 @@ import net.minecraft.entity.ai.attributes.AttributeModifierMap;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
+import java.lang.reflect.*;
 
 @ParametersAreNonnullByDefault
 public final class AnnotationHelper {
     
     //--------------- PRETTY HELPER METHODS ----------------
+    
+    /** Creates an entity factory from a special mob species. Throws an exception if anything goes wrong. */
+    public static void injectEntityTypeHolder( MobFamily.Species<?> species ) throws IllegalAccessException {
+        final Field field = getFieldOptional( species.entityClass, SpecialMob.TypeHolder.class );
+        if( field != null ) field.set( null, species.entityType );
+    }
     
     /** Creates an entity factory from a special mob species. Throws an exception if anything goes wrong. */
     public static <T extends LivingEntity> EntityType.IFactory<T> getEntityFactory( MobFamily.Species<T> species )
@@ -64,6 +67,30 @@ public final class AnnotationHelper {
     
     
     //--------------- RAW ANNOTATION METHODS ----------------
+    
+    /**
+     * @return Pulls a static field with a specific annotation from a class.
+     * @throws NoSuchFieldException if the field does not exist.
+     */
+    private static Field getField( Class<?> type, Class<? extends Annotation> annotation ) throws NoSuchFieldException {
+        final Field field = getFieldOptional( type, annotation );
+        if( field == null ) {
+            throw new NoSuchFieldException( String.format( "Could not find static @%s annotated field in %s",
+                    annotation.getSimpleName(), type.getName() ) );
+        }
+        return field;
+    }
+    
+    /**
+     * @return Pulls a static field with a specific annotation from a class, or null if the field does not exist.
+     */
+    private static Field getFieldOptional( Class<?> type, Class<? extends Annotation> annotation ) {
+        for( Field field : type.getFields() ) {
+            if( Modifier.isStatic( field.getModifiers() ) && field.isAnnotationPresent( annotation ) )
+                return field;
+        }
+        return null;
+    }
     
     /**
      * @return Pulls a static method with a specific annotation from a class.

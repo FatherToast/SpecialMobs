@@ -14,12 +14,7 @@ public final class References {
     public static final String SPECIAL_VARIANT_FORMAT = "%s%sEntity";
     
     
-    //--------------- AI STUFF ----------------
-    
-    public static final int AI_BIT_NONE = 0b00000000;
-    public static final int AI_BIT_MOVE = 0b00000001;
-    public static final int AI_BIT_FACE = 0b00000010;
-    public static final int AI_BIT_SWIM = 0b00000100;
+    //--------------- BIT FLAGS ----------------
     
     public static final int SET_BLOCK_FLAGS = 0b00000011;
     
@@ -62,6 +57,9 @@ public final class References {
     public static final String TAG_DRY_EXPLODE = "CannotExplodeWhileWet";
     public static final String TAG_WHEN_BURNING_EXPLODE = "ExplodesWhileBurning";
     public static final String TAG_WHEN_SHOT_EXPLODE = "ExplodesWhenShot";
+    
+    // Splitting Creepers
+    public static final String TAG_EXTRA_BABIES = "ExtraBabies";
     
     
     //--------------- INTERNATIONALIZATION ----------------

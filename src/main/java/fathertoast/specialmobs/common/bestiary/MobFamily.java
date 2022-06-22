@@ -40,8 +40,8 @@ public class MobFamily<T extends LivingEntity> {
     
     public static final MobFamily<CreeperEntity> CREEPER = new MobFamily<>(
             "Creeper", "creepers", 0x0DA70B, new EntityType[] { EntityType.CREEPER },
-            "Dark", "Death", "Dirt", "Doom", "Drowning", /*"Ender",*/ "Fire", "Gravel"//, "Jumping", "Lightning",
-            //"Mini", "Scope", "Splitting"
+            "Dark", "Death", "Dirt", "Doom", "Drowning", /*"Ender",*/ "Fire", "Gravel", "Jumping", "Lightning",
+            "Mini", /*"Scope",*/ "Splitting"
     );
     
     //    public static final MobFamily<ZombieEntity> ZOMBIE = new MobFamily<>(
@@ -258,6 +258,7 @@ public class MobFamily<T extends LivingEntity> {
             // Initialize deferred registry objects
             entityType = SMEntities.register( name.toLowerCase( Locale.ROOT ), entityTypeBuilder );
             spawnEgg = SMItems.registerSpawnEgg( entityType, parentFamily.eggBaseColor, bestiaryInfo.eggSpotsColor );
+            injectEntityType();
         }
         
         /** Finds the entity class based on a standard format. */
@@ -305,6 +306,16 @@ public class MobFamily<T extends LivingEntity> {
                     //          - this is okay for us because we only replace vanilla mobs
                     .clientTrackingRange( original.clientTrackingRange() ).updateInterval( original.updateInterval() )
                     .setShouldReceiveVelocityUpdates( original.trackDeltas() );
+        }
+        
+        /** Calls on this species' entity class to generate its bestiary info. */
+        private void injectEntityType() {
+            try {
+                AnnotationHelper.injectEntityTypeHolder( this );
+            }
+            catch( IllegalAccessException ex ) {
+                throw new RuntimeException( "Entity class for " + name + " has invalid entity type holder", ex );
+            }
         }
     }
 }
