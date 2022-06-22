@@ -18,6 +18,7 @@ import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.passive.fish.PufferfishEntity;
 import net.minecraft.item.Items;
 import net.minecraft.state.properties.BlockStateProperties;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -104,8 +105,9 @@ public class DrowningCreeperEntity extends _SpecialCreeperEntity {
 
                     if( distSq <= radius * radius ) {
                         final BlockPos pos = center.offset( x, y, z );
+                        final BlockState stateAtPos = level.getBlockState( pos );
 
-                        if( level.getBlockState( pos ).getMaterial().isReplaceable() ) {
+                        if( stateAtPos.getMaterial().isReplaceable() || stateAtPos.is( BlockTags.LEAVES )) {
                             if( distSq > rMinusOneSq ) {
                                 // Cobblestone casing
                                 level.setBlock( pos, random.nextFloat() < 0.25F ? brainCoral : hornCoral, References.SET_BLOCK_FLAGS );
