@@ -15,11 +15,15 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.AttributeModifierMap;
 import net.minecraft.entity.ai.attributes.Attributes;
+import net.minecraft.entity.passive.fish.PufferfishEntity;
 import net.minecraft.item.Items;
+import net.minecraft.state.properties.BlockStateProperties;
+import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.World;
+import net.minecraft.world.spawner.WorldEntitySpawner;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
@@ -84,9 +88,11 @@ public class DrowningCreeperEntity extends _SpecialCreeperEntity {
         
         if( explosionMode == Explosion.Mode.NONE ) return;
         
-        final BlockState cobblestone = Blocks.COBBLESTONE.defaultBlockState();
-        final BlockState silverfish = Blocks.INFESTED_COBBLESTONE.defaultBlockState();
+        final BlockState brainCoral = Blocks.BRAIN_CORAL_BLOCK.defaultBlockState();
+        final BlockState hornCoral = Blocks.HORN_CORAL_BLOCK.defaultBlockState();
         final BlockState water = Blocks.WATER.defaultBlockState();
+        final BlockState seaPickle = Blocks.SEA_PICKLE.defaultBlockState().setValue( BlockStateProperties.WATERLOGGED, true );
+        final BlockState seaGrass = Blocks.SEAGRASS.defaultBlockState();
         final int radius = (int) Math.floor( explosionPower );
         final int rMinusOneSq = (radius - 1) * (radius - 1);
         final BlockPos center = new BlockPos( explosion.getPos() );
@@ -95,16 +101,34 @@ public class DrowningCreeperEntity extends _SpecialCreeperEntity {
             for( int x = -radius; x <= radius; x++ ) {
                 for( int z = -radius; z <= radius; z++ ) {
                     final int distSq = x * x + y * y + z * z;
+
                     if( distSq <= radius * radius ) {
                         final BlockPos pos = center.offset( x, y, z );
+
                         if( level.getBlockState( pos ).getMaterial().isReplaceable() ) {
                             if( distSq > rMinusOneSq ) {
                                 // Cobblestone casing
-                                level.setBlock( pos, random.nextFloat() < 0.25F ? silverfish : cobblestone, References.SET_BLOCK_FLAGS );
+                                level.setBlock( pos, random.nextFloat() < 0.25F ? brainCoral : hornCoral, References.SET_BLOCK_FLAGS );
                             }
                             else {
-                                // Water fill
-                                level.setBlock( pos, water, References.SET_BLOCK_FLAGS );
+                                float f = random.nextFloat();
+
+                                if ( f > 0.9F && seaPickle.canSurvive( level, pos )) {
+                                    level.setBlock( pos, seaPickle, References.SET_BLOCK_FLAGS );
+                                }
+                                else if ( f > 0.7F && seaGrass.canSurvive( level, pos )) {
+                                    level.setBlock( pos, seaGrass, References.SET_BLOCK_FLAGS );
+                                }
+                                else {
+                                    // Water fill
+                                    level.setBlock(pos, water, References.SET_BLOCK_FLAGS);
+
+                                    if (random.nextDouble() > 0.97D) {
+                                        PufferfishEntity pufferfish = EntityType.PUFFERFISH.create(level);
+                                        pufferfish.setPos(pos.getX(), pos.getY(), pos.getZ());
+                                        level.addFreshEntity(pufferfish);
+                                    }
+                                }
                             }
                         }
                     }
