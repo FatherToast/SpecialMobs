@@ -1,6 +1,7 @@
 package fathertoast.specialmobs.client;
 
 import fathertoast.specialmobs.client.renderer.entity.SpecialCreeperRenderer;
+import fathertoast.specialmobs.client.renderer.entity.SpecialSkeletonRenderer;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.core.SpecialMobs;
 import mcp.MethodsReturnNonnullByDefault;
@@ -27,6 +28,7 @@ public class ClientRegister {
     private static void registerEntityRenderers() {
         // Family-based renderers
         registerFamilyRenderers( MobFamily.CREEPER, SpecialCreeperRenderer::new );
+        //registerFamilyRenderers( MobFamily.SKELETON, SpecialSkeletonRenderer::new );
     }
     
     private static <T extends LivingEntity> void registerFamilyRenderers( MobFamily<T> family, IRenderFactory<? super T> renderFactory ) {

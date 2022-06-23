@@ -58,8 +58,11 @@ public final class References {
     public static final String TAG_WHEN_BURNING_EXPLODE = "ExplodesWhileBurning";
     public static final String TAG_WHEN_SHOT_EXPLODE = "ExplodesWhenShot";
     
-    // Splitting Creepers
-    public static final String TAG_EXTRA_BABIES = "ExtraBabies";
+    // Baby-able families - Skeletons, Wither Skeletons
+    public static final String TAG_IS_BABY = "IsBaby";
+    
+    // Spawner mobs TODO drowning creeper pufferfish cap?
+    public static final String TAG_EXTRA_BABIES = "ExtraBabies"; // Splitting Creepers
     
     
     //--------------- INTERNATIONALIZATION ----------------
