@@ -97,43 +97,42 @@ public class DrowningCreeperEntity extends _SpecialCreeperEntity {
         final int radius = (int) Math.floor( explosionPower );
         final int rMinusOneSq = (radius - 1) * (radius - 1);
         final BlockPos center = new BlockPos( explosion.getPos() );
-
+        
         // Track how many pufferfish have been spawned
-        int pufferCount = 0;
-
+        spawnPufferfish( center.above( 1 ) );
+        int pufferCount = 1;
+        
         for( int y = -radius; y <= radius; y++ ) {
             for( int x = -radius; x <= radius; x++ ) {
                 for( int z = -radius; z <= radius; z++ ) {
                     final int distSq = x * x + y * y + z * z;
-
+                    
                     if( distSq <= radius * radius ) {
                         final BlockPos pos = center.offset( x, y, z );
                         final BlockState stateAtPos = level.getBlockState( pos );
-
-                        if( stateAtPos.getMaterial().isReplaceable() || stateAtPos.is( BlockTags.LEAVES )) {
+                        
+                        if( stateAtPos.getMaterial().isReplaceable() || stateAtPos.is( BlockTags.LEAVES ) ) {
                             if( distSq > rMinusOneSq ) {
-                                // Cobblestone casing
+                                // "Coral" casing
                                 level.setBlock( pos, random.nextFloat() < 0.25F ? brainCoral : hornCoral, References.SET_BLOCK_FLAGS );
                             }
                             else {
-                                float f = random.nextFloat();
-
-                                if ( f > 0.9F && seaPickle.canSurvive( level, pos )) {
+                                final float fillChoice = random.nextFloat();
+                                
+                                if( fillChoice < 0.1F && seaPickle.canSurvive( level, pos ) ) {
                                     level.setBlock( pos, seaPickle, References.SET_BLOCK_FLAGS );
                                 }
-                                else if ( f > 0.7F && seaGrass.canSurvive( level, pos )) {
+                                else if( fillChoice < 0.3F && seaGrass.canSurvive( level, pos ) ) {
                                     level.setBlock( pos, seaGrass, References.SET_BLOCK_FLAGS );
                                 }
                                 else {
                                     // Water fill
-                                    level.setBlock(pos, water, References.SET_BLOCK_FLAGS);
-
+                                    level.setBlock( pos, water, References.SET_BLOCK_FLAGS );
+                                    
                                     // Prevent greater radiuses from spawning a bazillion pufferfish
-                                    if (random.nextDouble() > 0.97D && pufferCount < 50) {
-                                        PufferfishEntity pufferfish = EntityType.PUFFERFISH.create(level);
-                                        pufferfish.setPos(pos.getX(), pos.getY(), pos.getZ());
-                                        level.addFreshEntity(pufferfish);
-                                        ++pufferCount;
+                                    if( random.nextFloat() < 0.01F && pufferCount < 10 ) {
+                                        spawnPufferfish( pos );
+                                        pufferCount++;
                                     }
                                 }
                             }
@@ -141,6 +140,16 @@ public class DrowningCreeperEntity extends _SpecialCreeperEntity {
                     }
                 }
             }
+        }
+    }
+    
+    
+    /** Helper method to simplify spawning pufferfish. */
+    private void spawnPufferfish( BlockPos pos ) {
+        final PufferfishEntity lePuffPuff = EntityType.PUFFERFISH.create( level );
+        if( lePuffPuff != null ) {
+            lePuffPuff.setPos( pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5 );
+            level.addFreshEntity( lePuffPuff );
         }
     }
     
