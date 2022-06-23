@@ -11,12 +11,14 @@ import net.minecraft.data.DataGenerator;
 import net.minecraft.data.LootTableProvider;
 import net.minecraft.data.loot.EntityLootTables;
 import net.minecraft.entity.EntityType;
-import net.minecraft.loot.*;
+import net.minecraft.loot.LootParameterSet;
+import net.minecraft.loot.LootParameterSets;
+import net.minecraft.loot.LootTable;
+import net.minecraft.loot.ValidationTracker;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.RegistryObject;
 
 import javax.annotation.ParametersAreNonnullByDefault;
-import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
@@ -54,17 +56,8 @@ public class SMLootTableProvider extends LootTableProvider {
         @Override
         protected void addTables() {
             // Bestiary-generated tables
-            for( MobFamily.Species<?> variant : MobFamily.getAllSpecies() ) addTable( variant );
-        }
-        
-        /** Builds the loot table for a specific entity species. */
-        private void addTable( MobFamily.Species<?> species ) {
-            try {
+            for( MobFamily.Species<?> species : MobFamily.getAllSpecies() )
                 add( species.entityType.get(), AnnotationHelper.buildLootTable( species ).toLootTable() );
-            }
-            catch( NoSuchMethodException | InvocationTargetException | IllegalAccessException ex ) {
-                throw new RuntimeException( "Entity class for " + species.name + " has invalid loot table builder method", ex );
-            }
         }
         
         /** Supplies the entity types this loot table provider will be used for. */

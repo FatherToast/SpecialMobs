@@ -7,7 +7,6 @@ import fathertoast.specialmobs.common.util.References;
 import net.minecraft.data.DataGenerator;
 import net.minecraftforge.common.data.LanguageProvider;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -45,7 +44,7 @@ public class SMLanguageProvider extends LanguageProvider {
         
         // Bestiary-generated translations
         for( MobFamily.Species<?> species : MobFamily.getAllSpecies() ) {
-            final String[] speciesTranslations = getTranslations( species );
+            final String[] speciesTranslations = AnnotationHelper.getTranslations( species );
             String[] spawnEggTranslations = format( spawnEggTranslationPattern, speciesTranslations );
             spawnEggTranslations[0] = species.spawnEgg.get().getDescriptionId();
             
@@ -79,16 +78,6 @@ public class SMLanguageProvider extends LanguageProvider {
             }
         }
         SpecialMobs.LOG.info( "Translation key verification complete!" );
-    }
-    
-    /** Gets the translations for a specific entity species. */
-    private static String[] getTranslations( MobFamily.Species<?> species ) {
-        try {
-            return AnnotationHelper.getTranslations( species );
-        }
-        catch( NoSuchMethodException | InvocationTargetException | IllegalAccessException ex ) {
-            throw new RuntimeException( "Entity class for " + species.name + " has invalid language provider method", ex );
-        }
     }
     
     /** Applies single argument string formats 1:1 given an array of formats and an array of arguments. */

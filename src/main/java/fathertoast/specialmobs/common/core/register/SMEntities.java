@@ -10,8 +10,6 @@ import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 
-import java.lang.reflect.InvocationTargetException;
-
 public class SMEntities {
     
     public static final DeferredRegister<EntityType<?>> REGISTRY = DeferredRegister.create( ForgeRegistries.ENTITIES, SpecialMobs.MOD_ID );
@@ -24,18 +22,8 @@ public class SMEntities {
     /** Sets the default attributes for entity types, such as max health, attack damage etc. */
     public static void createAttributes( EntityAttributeCreationEvent event ) {
         // Bestiary-generated entities
-        for( MobFamily.Species<?> variant : MobFamily.getAllSpecies() )
-            createSpeciesAttributes( event, variant );
-    }
-    
-    /** Builds the attributes for a specific entity species. */
-    private static void createSpeciesAttributes( EntityAttributeCreationEvent event, MobFamily.Species<?> species ) {
-        try {
+        for( MobFamily.Species<?> species : MobFamily.getAllSpecies() )
             event.put( species.entityType.get(), AnnotationHelper.createAttributes( species ) );
-        }
-        catch( NoSuchMethodException | InvocationTargetException | IllegalAccessException ex ) {
-            throw new RuntimeException( "Entity class for " + species.name + " has invalid attribute creation method", ex );
-        }
     }
     
     /** Sets the natural spawn placement rules for entity types. */

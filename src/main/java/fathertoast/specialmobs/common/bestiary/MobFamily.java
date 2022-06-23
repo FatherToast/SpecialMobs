@@ -16,7 +16,6 @@ import net.minecraftforge.fml.RegistryObject;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
-import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 /**
@@ -253,12 +252,12 @@ public class MobFamily<T extends LivingEntity> {
             
             // Below require variant class to be defined
             final EntityType.Builder<T> entityTypeBuilder = makeEntityTypeBuilder( parentFamily.replaceableTypes[0] );
-            bestiaryInfo = makeBestiaryInfo( entityTypeBuilder );
+            bestiaryInfo = AnnotationHelper.getBestiaryInfo( this, entityTypeBuilder );
             
             // Initialize deferred registry objects
             entityType = SMEntities.register( name.toLowerCase( Locale.ROOT ), entityTypeBuilder );
             spawnEgg = SMItems.registerSpawnEgg( entityType, parentFamily.eggBaseColor, bestiaryInfo.eggSpotsColor );
-            injectEntityType();
+            AnnotationHelper.injectEntityTypeHolder( this );
         }
         
         /** Finds the entity class based on a standard format. */
@@ -272,28 +271,12 @@ public class MobFamily<T extends LivingEntity> {
             }
         }
         
-        /** Calls on this species' entity class to generate its bestiary info. */
-        private BestiaryInfo makeBestiaryInfo( EntityType.Builder<T> entityTypeBuilder ) {
-            try {
-                return AnnotationHelper.getBestiaryInfo( this, entityTypeBuilder );
-            }
-            catch( IllegalAccessException | NoSuchMethodException | InvocationTargetException ex ) {
-                throw new RuntimeException( "Entity class for " + name + " has invalid bestiary info method", ex );
-            }
-        }
-        
         /**
          * Builds a deep copy of an entity type with a different entity constructor.
          * Leaves the new entity type "un-built" so it can be further modified, if needed.
          */
         private EntityType.Builder<T> makeEntityTypeBuilder( EntityType<?> original ) {
-            final EntityType.IFactory<T> factory;
-            try {
-                factory = AnnotationHelper.getEntityFactory( this );
-            }
-            catch( NoSuchMethodException ex ) {
-                throw new RuntimeException( "Entity class for " + name + " has no valid constructors", ex );
-            }
+            final EntityType.IFactory<T> factory = AnnotationHelper.getEntityFactory( this );
             final EntityType.Builder<T> clone = EntityType.Builder.of( factory, original.getCategory() );
             
             if( !original.canSummon() ) clone.noSummon();
@@ -306,16 +289,6 @@ public class MobFamily<T extends LivingEntity> {
                     //          - this is okay for us because we only replace vanilla mobs
                     .clientTrackingRange( original.clientTrackingRange() ).updateInterval( original.updateInterval() )
                     .setShouldReceiveVelocityUpdates( original.trackDeltas() );
-        }
-        
-        /** Calls on this species' entity class to generate its bestiary info. */
-        private void injectEntityType() {
-            try {
-                AnnotationHelper.injectEntityTypeHolder( this );
-            }
-            catch( IllegalAccessException ex ) {
-                throw new RuntimeException( "Entity class for " + name + " has invalid entity type holder", ex );
-            }
         }
     }
 }
