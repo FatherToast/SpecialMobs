@@ -10,9 +10,7 @@ import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.block.BlockState;
-import net.minecraft.entity.AreaEffectCloudEntity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.*;
 import net.minecraft.entity.ai.attributes.AttributeModifierMap;
 import net.minecraft.entity.effect.LightningBoltEntity;
 import net.minecraft.entity.monster.CreeperEntity;
@@ -26,9 +24,12 @@ import net.minecraft.potion.EffectInstance;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.world.DifficultyInstance;
+import net.minecraft.world.IServerWorld;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.List;
@@ -168,10 +169,10 @@ public class _SpecialCreeperEntity extends CreeperEntity implements ISpecialMob<
     
     /** @return Attempts to damage this entity; returns true if the hit was successful. */
     @Override
-    public boolean hurt( DamageSource damageSource, float damage ) {
-        if( super.hurt( damageSource, damage ) ) {
+    public boolean hurt( DamageSource source, float damage ) {
+        if( super.hurt( source, damage ) ) {
             // Implement "explodes when shot" property
-            if( damageSource.getDirectEntity() != damageSource.getEntity() && explodesWhenShot() ) ignite();
+            if( source.getDirectEntity() != source.getEntity() && explodesWhenShot() ) ignite();
             return true;
         }
         return false;
@@ -186,18 +187,15 @@ public class _SpecialCreeperEntity extends CreeperEntity implements ISpecialMob<
         if( explodesWhileBurning() ) clearFire();
     }
     
-    // Called when this entity is first spawned to initialize it. TODO chance to be charged on spawn
-    //    @Override
-    //    @Nullable
-    //    public IEntityLivingData onInitialSpawn( DifficultyInstance difficulty, @Nullable IEntityLivingData data ) {
-    //        data = super.onInitialSpawn( difficulty, data );
-    //
-    //        if( Entity_SpecialCreeper.POWERED != null && world.isThundering() && rand.nextDouble() < Config.get().CREEPERS.CHARGED_CHANCE ) {
-    //            dataManager.set( Entity_SpecialCreeper.POWERED, true );
-    //        }
-    //
-    //        return data;
-    //    }
+    @Nullable
+    public ILivingEntityData finalizeSpawn( IServerWorld world, DifficultyInstance difficulty, SpawnReason spawnReason,
+                                            @Nullable ILivingEntityData groupData, @Nullable CompoundNBT eggTag ) {
+        groupData = super.finalizeSpawn( world, difficulty, spawnReason, groupData, eggTag );
+        if( world.getLevelData().isThundering() && random.nextDouble() < 0.01 ) { //TODO config
+            getEntityData().set( DATA_IS_POWERED, true );
+        }
+        return groupData;
+    }
     
     
     //--------------- Creeper Explosion Property Setters/Getters ----------------
@@ -301,8 +299,11 @@ public class _SpecialCreeperEntity extends CreeperEntity implements ISpecialMob<
     //        return false;
     //    }
     
-    //    @Override
-    //    public float getEyeHeight() { return super.getEyeHeight(); } // Uses boundingbox-scaled eye height
+    /** @return The eye height of this entity when standing. */
+    @Override
+    protected float getStandingEyeHeight( Pose pose, EntitySize size ) {
+        return super.getStandingEyeHeight( pose, size ) * getSpecialData().getBaseScale() * (isBaby() ? 0.53448F : 1.0F);
+    }
     
     /** @return Whether this entity is immune to fire damage. */
     @Override
