@@ -2,6 +2,7 @@ package fathertoast.specialmobs.common.entity.creeper;
 
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
+import fathertoast.specialmobs.common.entity.ai.AIHelper;
 import fathertoast.specialmobs.common.entity.ai.SpecialLeapAtTargetGoal;
 import fathertoast.specialmobs.common.util.AttributeHelper;
 import fathertoast.specialmobs.common.util.References;
@@ -62,7 +63,7 @@ public class JumpingCreeperEntity extends _SpecialCreeperEntity {
     /** Override to change this entity's AI goals. */
     @Override
     protected void registerVariantGoals() {
-        goalSelector.addGoal( 3, new SpecialLeapAtTargetGoal(
+        AIHelper.insertGoal( goalSelector, 4, new SpecialLeapAtTargetGoal(
                 this, 10, 6.0F, 10.0F, 1.3F, 2.0F ) );
     }
     
