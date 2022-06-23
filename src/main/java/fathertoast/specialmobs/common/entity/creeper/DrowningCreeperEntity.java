@@ -97,7 +97,10 @@ public class DrowningCreeperEntity extends _SpecialCreeperEntity {
         final int radius = (int) Math.floor( explosionPower );
         final int rMinusOneSq = (radius - 1) * (radius - 1);
         final BlockPos center = new BlockPos( explosion.getPos() );
-        
+
+        // Track how many pufferfish have been spawned
+        int pufferCount = 0;
+
         for( int y = -radius; y <= radius; y++ ) {
             for( int x = -radius; x <= radius; x++ ) {
                 for( int z = -radius; z <= radius; z++ ) {
@@ -125,10 +128,12 @@ public class DrowningCreeperEntity extends _SpecialCreeperEntity {
                                     // Water fill
                                     level.setBlock(pos, water, References.SET_BLOCK_FLAGS);
 
-                                    if (random.nextDouble() > 0.97D) {
+                                    // Prevent greater radiuses from spawning a bazillion pufferfish
+                                    if (random.nextDouble() > 0.97D && pufferCount < 50) {
                                         PufferfishEntity pufferfish = EntityType.PUFFERFISH.create(level);
                                         pufferfish.setPos(pos.getX(), pos.getY(), pos.getZ());
                                         level.addFreshEntity(pufferfish);
+                                        ++pufferCount;
                                     }
                                 }
                             }
