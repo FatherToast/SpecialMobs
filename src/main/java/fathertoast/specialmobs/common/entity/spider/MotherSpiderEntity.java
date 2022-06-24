@@ -40,8 +40,8 @@ public class MotherSpiderEntity extends _SpecialSpiderEntity {
     public static AttributeModifierMap.MutableAttribute createAttributes() {
         return AttributeHelper.of( _SpecialSpiderEntity.createAttributes() )
                 .addAttribute( Attributes.MAX_HEALTH, 16.0 )
-                .addAttribute( Attributes.ATTACK_DAMAGE, 3.0 )
                 .addAttribute( Attributes.ARMOR, 6.0 )
+                .addAttribute( Attributes.ATTACK_DAMAGE, 3.0 )
                 .build();
     }
     

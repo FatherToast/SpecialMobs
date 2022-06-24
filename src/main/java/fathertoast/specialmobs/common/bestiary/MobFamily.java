@@ -8,10 +8,7 @@ import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.block.Block;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.monster.AbstractSkeletonEntity;
-import net.minecraft.entity.monster.CaveSpiderEntity;
-import net.minecraft.entity.monster.CreeperEntity;
-import net.minecraft.entity.monster.SpiderEntity;
+import net.minecraft.entity.monster.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeSpawnEggItem;
@@ -82,10 +79,10 @@ public class MobFamily<T extends LivingEntity> {
             "Baby", "Flying", "Mother", "Web", "Witch"
     );
     
-    //    public static final MobFamily<SilverfishEntity> SILVERFISH = new MobFamily<>(
-    //            "Silverfish", "silverfish", 0x6E6E6E, new EntityType[] { EntityType.SILVERFISH },
-    //            "Blinding", "Fishing", "Flying", "Poison", "Tough"
-    //    );
+    public static final MobFamily<SilverfishEntity> SILVERFISH = new MobFamily<>(
+            "Silverfish", "silverfish", 0x6E6E6E, new EntityType[] { EntityType.SILVERFISH },
+            "Blinding", /*"Fishing",*/ "Flying", "Poison", /*"Puffer",*/ "Tough"
+    );
     
     //    public static final MobFamily<EndermanEntity> ENDERMAN = new MobFamily<>(
     //            "Enderman", "endermen", 0x161616, new EntityType[] { EntityType.ENDERMAN },
