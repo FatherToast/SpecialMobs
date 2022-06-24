@@ -116,16 +116,6 @@ public class SpecialMobData<T extends LivingEntity & ISpecialMob<T>> {
     
     /**
      * Constructs a SpecialMobData to store generic data about a mob.
-     *
-     * @param entity The entity to store data for.
-     * @param scale  Data parameter for storing the render scale.
-     */
-    public SpecialMobData( T entity, DataParameter<Float> scale ) {
-        this( entity, scale, 1.0F );
-    }
-    
-    /**
-     * Constructs a SpecialMobData to store generic data about a mob.
      * <p>
      * This constructor should be called during data watcher definitions, and defining the 'render scale' data watcher
      * parameter is the only thing actually done while constructing.

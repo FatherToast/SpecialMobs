@@ -39,7 +39,7 @@ public class MobFamily<T extends LivingEntity> {
     
     public static final MobFamily<CreeperEntity> CREEPER = new MobFamily<>(
             "Creeper", "creepers", 0x0DA70B, new EntityType[] { EntityType.CREEPER },
-            "Dark", "Death", "Dirt", "Doom", "Drowning", /*"Ender",*/ "Fire", "Gravel", "Jumping", "Lightning",
+            "Dark", "Death", "Dirt", "Doom", "Drowning", "Ender", "Fire", "Gravel", "Jumping", "Lightning",
             "Mini", /*"Scope",*/ "Splitting"
     );
     
@@ -84,10 +84,10 @@ public class MobFamily<T extends LivingEntity> {
             "Blinding", /*"Fishing",*/ "Flying", "Poison", /*"Puffer",*/ "Tough"
     );
     
-    //    public static final MobFamily<EndermanEntity> ENDERMAN = new MobFamily<>(
-    //            "Enderman", "endermen", 0x161616, new EntityType[] { EntityType.ENDERMAN },
-    //            "Blinding", "Icy", "Lightning", "Mini", "Mirage", "Thief"
-    //    );
+    public static final MobFamily<EndermanEntity> ENDERMAN = new MobFamily<>(
+            "Enderman", "endermen", 0x161616, new EntityType[] { EntityType.ENDERMAN },
+            "Blinding", "Icy", "Lightning", "Mini", "Mirage", "Thief"
+    );
     
     //    public static final MobFamily<WitchEntity> WITCH = new MobFamily<>(
     //            "Witch", "witches", 0x340000, new EntityType[] { EntityType.WITCH },

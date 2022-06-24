@@ -71,6 +71,7 @@ public final class References {
     
     // Misc.
     public static final String TAG_AMMO = "Ammo"; // Web (Cave) Spider
+    public static final String TAG_IS_FAKE = "IsFake"; // Mirage Enderman
     
     
     //--------------- INTERNATIONALIZATION ----------------

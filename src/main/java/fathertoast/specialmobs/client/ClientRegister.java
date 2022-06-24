@@ -5,6 +5,7 @@ import fathertoast.specialmobs.client.renderer.entity.SpecialSilverfishRenderer;
 import fathertoast.specialmobs.client.renderer.entity.SpecialSkeletonRenderer;
 import fathertoast.specialmobs.client.renderer.entity.SpecialSpiderRenderer;
 import fathertoast.specialmobs.client.renderer.entity.SpecialZombieRenderer;
+import fathertoast.specialmobs.client.renderer.entity.*;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.core.SpecialMobs;
 import mcp.MethodsReturnNonnullByDefault;
@@ -36,6 +37,7 @@ public class ClientRegister {
         registerFamilyRenderers( MobFamily.SPIDER, SpecialSpiderRenderer::new );
         registerFamilyRenderers( MobFamily.CAVE_SPIDER, SpecialSpiderRenderer::new );
         registerFamilyRenderers( MobFamily.SILVERFISH, SpecialSilverfishRenderer::new );
+        registerFamilyRenderers( MobFamily.ENDERMAN, SpecialEndermanRenderer::new );
     }
     
     private static <T extends LivingEntity> void registerFamilyRenderers( MobFamily<T> family, IRenderFactory<? super T> renderFactory ) {

@@ -149,6 +149,19 @@ public final class MobHelper {
         }
     }
     
+    /** @return The base debuff duration for effects that should be shorter than normal. */
+    public static int getShortDebuffDuration( Difficulty difficulty ) {
+        switch( difficulty ) {
+            case PEACEFUL:
+            case EASY:
+                return 40;
+            case NORMAL:
+                return 60;
+            default:
+                return 80;
+        }
+    }
+    
     /**
      * Makes a random potion effect for a plague-type mob to apply on hit.
      *
