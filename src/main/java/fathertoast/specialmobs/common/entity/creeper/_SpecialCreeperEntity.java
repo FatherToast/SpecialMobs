@@ -81,6 +81,19 @@ public class _SpecialCreeperEntity extends CreeperEntity implements ISpecialMob<
     /** Override to change this entity's AI goals. */
     protected void registerVariantGoals() { }
     
+    /** Called to melee attack the target. */
+    @Override
+    public boolean doHurtTarget( Entity target ) {
+        if( super.doHurtTarget( target ) ) {
+            onVariantAttack( target );
+            return true;
+        }
+        return false;
+    }
+    
+    /** Override to apply effects when this entity hits a target with a melee attack. */
+    protected void onVariantAttack( Entity target ) { }
+    
     /** Called to perform this creeper's explosion 'attack'. */
     @Override
     protected void explodeCreeper() {
@@ -133,7 +146,7 @@ public class _SpecialCreeperEntity extends CreeperEntity implements ISpecialMob<
     /** Override to save data to this entity's NBT data. */
     public void addVariantSaveData( CompoundNBT saveTag ) { }
     
-    /** Override to load data from this entity's  NBT data. */
+    /** Override to load data from this entity's NBT data. */
     public void readVariantSaveData( CompoundNBT saveTag ) { }
     
     
@@ -187,6 +200,7 @@ public class _SpecialCreeperEntity extends CreeperEntity implements ISpecialMob<
         if( explodesWhileBurning() ) clearFire();
     }
     
+    /** Called on spawn to initialize properties based on the world, difficulty, and the group it spawns with. */
     @Nullable
     public ILivingEntityData finalizeSpawn( IServerWorld world, DifficultyInstance difficulty, SpawnReason spawnReason,
                                             @Nullable ILivingEntityData groupData, @Nullable CompoundNBT eggTag ) {
@@ -288,16 +302,6 @@ public class _SpecialCreeperEntity extends CreeperEntity implements ISpecialMob<
         super.aiStep();
         getSpecialData().tick();
     }
-    
-    //    // Called to attack the target.
-    //    @Override
-    //    public boolean attackEntityAsMob( Entity target ) {
-    //        if( super.attackEntityAsMob( target ) ) {
-    //            onTypeAttack( target );
-    //            return true;
-    //        }
-    //        return false;
-    //    }
     
     /** @return The eye height of this entity when standing. */
     @Override

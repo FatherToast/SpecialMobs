@@ -62,7 +62,15 @@ public final class References {
     public static final String TAG_IS_BABY = "IsBaby";
     
     // Spawner mobs TODO drowning creeper pufferfish cap?
-    public static final String TAG_EXTRA_BABIES = "ExtraBabies"; // Splitting Creepers
+    public static final String TAG_BABIES = "Babies"; // Mother Spd
+    public static final String TAG_EXTRA_BABIES = "ExtraBabies"; // Splitting Crp, Mother Spd
+    
+    // Growing mobs
+    public static final String TAG_GROWTH_LEVEL = "GrowthLevel"; // Hungry Spd
+    public static final String TAG_HEALTH_STACKS = "HealthStacks"; // Hungry Spd
+    
+    // Misc.
+    public static final String TAG_AMMO = "Ammo"; // Web Spd
     
     
     //--------------- INTERNATIONALIZATION ----------------

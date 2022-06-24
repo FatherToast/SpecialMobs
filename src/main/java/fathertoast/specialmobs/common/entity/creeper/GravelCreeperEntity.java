@@ -71,7 +71,7 @@ public class GravelCreeperEntity extends _SpecialCreeperEntity {
         if( !explosion.initializeExplosion() ) return;
         explosion.finalizeExplosion();
         
-        if( explosionMode == Explosion.Mode.NONE ) return;
+        if( explosionMode == Explosion.Mode.NONE || level.isClientSide() ) return;
         
         final float throwPower = explosionPower + 4.0F;
         final int count = (int) Math.ceil( throwPower * throwPower * 3.5F );
@@ -94,14 +94,6 @@ public class GravelCreeperEntity extends _SpecialCreeperEntity {
         }
     }
     
-    private static final ResourceLocation[] TEXTURES = {
-            GET_TEXTURE_PATH( "gravel" )
-    };
-    
-    /** @return All default textures for this entity. */
-    @Override
-    public ResourceLocation[] getDefaultTextures() { return TEXTURES; }
-    
     /** @return Attempts to damage this entity; returns true if the hit was successful. */
     @Override
     public boolean hurt( DamageSource source, float amount ) {
@@ -111,4 +103,12 @@ public class GravelCreeperEntity extends _SpecialCreeperEntity {
         }
         return super.hurt( source, amount );
     }
+    
+    private static final ResourceLocation[] TEXTURES = {
+            GET_TEXTURE_PATH( "gravel" )
+    };
+    
+    /** @return All default textures for this entity. */
+    @Override
+    public ResourceLocation[] getDefaultTextures() { return TEXTURES; }
 }

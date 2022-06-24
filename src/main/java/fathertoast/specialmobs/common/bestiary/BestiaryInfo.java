@@ -1,22 +1,14 @@
 package fathertoast.specialmobs.common.bestiary;
 
-//import net.minecraft.init.Biomes;
-
-import net.minecraft.world.DimensionType;
-
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
 public class BestiaryInfo {
     
     public enum BaseWeight {
         DEFAULT( 600 ),
-        HIGHEST( DEFAULT.value * 8 ),
-        HIGH( DEFAULT.value * 4 ),
+        DISABLED( 0 ),
+        LOWEST( DEFAULT.value / 8 ),
         LOW( DEFAULT.value / 4 ),
-        LOWEST( DEFAULT.value / 8 );
+        HIGH( DEFAULT.value * 4 ),
+        HIGHEST( DEFAULT.value * 8 );
         
         public final int value;
         
@@ -24,6 +16,7 @@ public class BestiaryInfo {
     }
     
     //TODO default themes
+    
     //	public static final EnvironmentListConfig DEFAULT_THEME_FIRE = new EnvironmentListConfig(
     //		new TargetEnvironment.TargetBiomeGroup( "desert", BestiaryInfo.BASE_WEIGHT_COMMON ),
     //		new TargetEnvironment.TargetBiomeGroup( "savanna", BestiaryInfo.BASE_WEIGHT_COMMON ),

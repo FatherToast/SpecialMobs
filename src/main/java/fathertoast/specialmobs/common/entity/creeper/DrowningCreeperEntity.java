@@ -23,6 +23,7 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.Explosion;
+import net.minecraft.world.IServerWorld;
 import net.minecraft.world.World;
 import net.minecraft.world.spawner.WorldEntitySpawner;
 
@@ -146,6 +147,7 @@ public class DrowningCreeperEntity extends _SpecialCreeperEntity {
     
     /** Helper method to simplify spawning pufferfish. */
     private void spawnPufferfish( BlockPos pos ) {
+        if( !(level instanceof IServerWorld) ) return;
         final PufferfishEntity lePuffPuff = EntityType.PUFFERFISH.create( level );
         if( lePuffPuff != null ) {
             lePuffPuff.setPos( pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5 );

@@ -6,7 +6,7 @@ issueTrackerURL = "https://github.com/FatherToast/SpecialMobs/issues/"
 [[mods]]
 logoFile = "banner.png"
 authors = "Father Toast"
-credits = "Sarinsa, Mother Toast & Baby Toast"
+credits = "Sarinsa.instance().getCredits().toString(), Tutta (glorious textures), Mother Toast & Baby Toast"
 version = "${file.jarVersion}"
 displayName = "Special Mobs"
 modId = "specialmobs"
@@ -21,7 +21,7 @@ Download: https://www.curseforge.com/members/fathertoast/projects/
 
 Source: https://github.com/FatherToast/
 
-Discussion: https://discord.gg/GFTzTdX/
+Discussion: https://discord.gg/GFTzTdX
 '''
 
 [[dependencies.deadlyworld]]

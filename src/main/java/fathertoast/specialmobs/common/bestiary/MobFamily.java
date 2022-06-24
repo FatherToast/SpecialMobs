@@ -10,6 +10,7 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.monster.AbstractSkeletonEntity;
 import net.minecraft.entity.monster.CreeperEntity;
+import net.minecraft.entity.monster.SpiderEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeSpawnEggItem;
@@ -71,10 +72,10 @@ public class MobFamily<T extends LivingEntity> {
     //            "Flying", "Hardened", "Sticky", "Volatile"
     //    );
     
-    //    public static final MobFamily<SpiderEntity> SPIDER = new MobFamily<>(
-    //            "Spider", "spiders", 0x342D27, new EntityType[] { EntityType.SPIDER },
-    //            "Baby", "Desert", "Flying", "Giant", "Hungry", "Mother", "Pale", "Poison", "Web", "Witch"
-    //    );
+    public static final MobFamily<SpiderEntity> SPIDER = new MobFamily<>(
+            "Spider", "spiders", 0x342D27, new EntityType[] { EntityType.SPIDER },
+            "Baby", "Desert", "Flying", "Giant", "Hungry", "Mother", "Pale", "Poison", "Web", "Witch"
+    );
     //    public static final MobFamily<CaveSpiderEntity> CAVE_SPIDER = new MobFamily<>(
     //            "CaveSpider", "cave spiders", 0x0C424E, new EntityType[] { EntityType.CAVE_SPIDER },
     //            "Baby", "Flying", "Mother", "Web", "Witch"
