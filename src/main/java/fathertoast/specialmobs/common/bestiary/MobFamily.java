@@ -79,10 +79,10 @@ public class MobFamily<T extends LivingEntity> {
             "Baby", "Flying", "Mother", "Web", "Witch"
     );
     
-    //    public static final MobFamily<SilverfishEntity> SILVERFISH = new MobFamily<>(
-    //            "Silverfish", "silverfish", 0x6E6E6E, new EntityType[] { EntityType.SILVERFISH },
-    //            "Blinding", "Fishing", "Flying", "Poison", "Tough"
-    //    );
+    public static final MobFamily<SilverfishEntity> SILVERFISH = new MobFamily<>(
+            "Silverfish", "silverfish", 0x6E6E6E, new EntityType[] { EntityType.SILVERFISH },
+            "Blinding", /*"Fishing",*/ "Flying", "Poison", /*"Puffer",*/ "Tough"
+    );
     
     //    public static final MobFamily<EndermanEntity> ENDERMAN = new MobFamily<>(
     //            "Enderman", "endermen", 0x161616, new EntityType[] { EntityType.ENDERMAN },
