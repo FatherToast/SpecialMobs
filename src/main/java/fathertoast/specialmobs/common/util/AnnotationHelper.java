@@ -41,7 +41,7 @@ public final class AnnotationHelper {
                     return constructor.newInstance( entityType, world );
                 }
                 catch( InstantiationException | IllegalAccessException | InvocationTargetException ex ) {
-                    throw new RuntimeException( "Class for " + constructor.getDeclaringClass().getName() + " has invalid constructor", ex );
+                    throw new RuntimeException( "Caught exception during instantiation of " + constructor.getDeclaringClass().getName(), ex );
                 }
             };
         }
@@ -81,9 +81,9 @@ public final class AnnotationHelper {
             throw new RuntimeException( "Entity class for " + species.name + " has invalid language provider method", ex );
         }
     }
-
+    
     /** Gets the translations from a mod item. Throws an exception if anything goes wrong. */
-    public static String[] getTranslations(Item item) {
+    public static String[] getTranslations( Item item ) {
         try {
             return (String[]) getMethod( item.getClass(), SpecialMob.LanguageProvider.class )
                     .invoke( null, item.getDescriptionId() );
@@ -92,7 +92,7 @@ public final class AnnotationHelper {
             throw new RuntimeException( "Item class for " + item.getRegistryName() + " has invalid language provider method", ex );
         }
     }
-
+    
     /** Builds a loot table from a special mob species. Throws an exception if anything goes wrong. */
     public static LootTableBuilder buildLootTable( MobFamily.Species<?> species ) {
         try {

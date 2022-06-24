@@ -4,9 +4,8 @@ import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.core.register.SMItems;
 import fathertoast.specialmobs.common.entity.MobHelper;
+import fathertoast.specialmobs.common.entity.ai.AIHelper;
 import fathertoast.specialmobs.common.entity.ai.SpecialInjectCreeperGoal;
-import fathertoast.specialmobs.common.entity.ai.SpecialLeapAtTargetGoal;
-import fathertoast.specialmobs.common.entity.spider._SpecialSpiderEntity;
 import fathertoast.specialmobs.common.util.AttributeHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
@@ -16,13 +15,10 @@ import net.minecraft.entity.ai.attributes.AttributeModifierMap;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.Effects;
-import net.minecraft.util.Hand;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.Difficulty;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.IServerWorld;
 import net.minecraft.world.World;
@@ -45,8 +41,8 @@ public class MadScientistZombieEntity extends _SpecialZombieEntity {
     
     @SpecialMob.AttributeCreator
     public static AttributeModifierMap.MutableAttribute createAttributes() {
-        return AttributeHelper.of( _SpecialSpiderEntity.createAttributes() )
-                .addAttribute( Attributes.MOVEMENT_SPEED, 1.1 )
+        return AttributeHelper.of( _SpecialZombieEntity.createAttributes() )
+                .multAttribute( Attributes.MOVEMENT_SPEED, 1.1 )
                 .build();
     }
     
@@ -74,7 +70,7 @@ public class MadScientistZombieEntity extends _SpecialZombieEntity {
     /** Override to change this entity's AI goals. */
     @Override
     protected void registerVariantGoals() {
-        goalSelector.addGoal( 3, new SpecialInjectCreeperGoal<>(
+        AIHelper.insertGoal( goalSelector, 2, new SpecialInjectCreeperGoal<>(
                 this, 1.0D, 20.0D,
                 ( madman, creeper ) -> creeper.isAlive() && !creeper.isPowered() && madman.getSensing().canSee( creeper ) ) );
     }

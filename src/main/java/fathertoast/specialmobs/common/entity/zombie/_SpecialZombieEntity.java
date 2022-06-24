@@ -5,7 +5,6 @@ import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.core.SpecialMobs;
 import fathertoast.specialmobs.common.entity.ISpecialMob;
 import fathertoast.specialmobs.common.entity.SpecialMobData;
-import fathertoast.specialmobs.common.entity.spider._SpecialSpiderEntity;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import mcp.MethodsReturnNonnullByDefault;
@@ -98,7 +97,7 @@ public class _SpecialZombieEntity extends ZombieEntity implements ISpecialMob<_S
     //--------------- Family-Specific Implementations ----------------
     
     /** The parameter for special mob render scale. */
-    private static final DataParameter<Float> SCALE = EntityDataManager.defineId( _SpecialSpiderEntity.class, DataSerializers.FLOAT );
+    private static final DataParameter<Float> SCALE = EntityDataManager.defineId( _SpecialZombieEntity.class, DataSerializers.FLOAT );
     
     /** Called from the Entity.class constructor to define data watcher variables. */
     @Override
