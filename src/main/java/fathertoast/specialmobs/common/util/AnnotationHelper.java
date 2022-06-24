@@ -7,6 +7,7 @@ import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.AttributeModifierMap;
+import net.minecraft.item.Item;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.lang.annotation.Annotation;
@@ -80,7 +81,18 @@ public final class AnnotationHelper {
             throw new RuntimeException( "Entity class for " + species.name + " has invalid language provider method", ex );
         }
     }
-    
+
+    /** Gets the translations from a mod item. Throws an exception if anything goes wrong. */
+    public static String[] getTranslations(Item item) {
+        try {
+            return (String[]) getMethod( item.getClass(), SpecialMob.LanguageProvider.class )
+                    .invoke( null, item.getDescriptionId() );
+        }
+        catch( NoSuchMethodException | InvocationTargetException | IllegalAccessException ex ) {
+            throw new RuntimeException( "Item class for " + item.getRegistryName() + " has invalid language provider method", ex );
+        }
+    }
+
     /** Builds a loot table from a special mob species. Throws an exception if anything goes wrong. */
     public static LootTableBuilder buildLootTable( MobFamily.Species<?> species ) {
         try {

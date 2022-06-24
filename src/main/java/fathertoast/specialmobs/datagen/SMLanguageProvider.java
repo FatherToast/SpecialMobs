@@ -2,10 +2,14 @@ package fathertoast.specialmobs.datagen;
 
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.core.SpecialMobs;
+import fathertoast.specialmobs.common.core.register.SMItems;
 import fathertoast.specialmobs.common.util.AnnotationHelper;
 import fathertoast.specialmobs.common.util.References;
 import net.minecraft.data.DataGenerator;
+import net.minecraft.item.Item;
+import net.minecraftforge.common.ForgeSpawnEggItem;
 import net.minecraftforge.common.data.LanguageProvider;
+import net.minecraftforge.fml.RegistryObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -51,7 +55,19 @@ public class SMLanguageProvider extends LanguageProvider {
             translationList.add( speciesTranslations );
             translationList.add( spawnEggTranslations );
         }
-        
+
+        // Items
+        for (RegistryObject<Item> regObject : SMItems.REGISTRY.getEntries()) {
+            Item item = regObject.get();
+
+            // Lazy method of avoiding duplicate entries for now
+            if (item instanceof ForgeSpawnEggItem) {
+                continue;
+            }
+            final String[] itemTranslations = AnnotationHelper.getTranslations(regObject.get());
+            translationList.add(itemTranslations);
+        }
+
         TRANSLATIONS = translationList.toArray( new String[0][0] );
         
         // Assign all specific locales to the translation we want to use
