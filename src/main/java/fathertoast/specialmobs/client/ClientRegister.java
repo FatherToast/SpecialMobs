@@ -3,6 +3,7 @@ package fathertoast.specialmobs.client;
 import fathertoast.specialmobs.client.renderer.entity.SpecialCreeperRenderer;
 import fathertoast.specialmobs.client.renderer.entity.SpecialSkeletonRenderer;
 import fathertoast.specialmobs.client.renderer.entity.SpecialSpiderRenderer;
+import fathertoast.specialmobs.client.renderer.entity.SpecialZombieRenderer;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.core.SpecialMobs;
 import mcp.MethodsReturnNonnullByDefault;
@@ -29,6 +30,7 @@ public class ClientRegister {
     private static void registerEntityRenderers() {
         // Family-based renderers
         registerFamilyRenderers( MobFamily.CREEPER, SpecialCreeperRenderer::new );
+        registerFamilyRenderers( MobFamily.ZOMBIE, SpecialZombieRenderer::new );
         //registerFamilyRenderers( MobFamily.SKELETON, SpecialSkeletonRenderer::new );
         registerFamilyRenderers( MobFamily.SPIDER, SpecialSpiderRenderer::new );
         registerFamilyRenderers( MobFamily.CAVE_SPIDER, SpecialSpiderRenderer::new );

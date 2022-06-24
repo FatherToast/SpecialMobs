@@ -8,10 +8,7 @@ import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.block.Block;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.monster.AbstractSkeletonEntity;
-import net.minecraft.entity.monster.CaveSpiderEntity;
-import net.minecraft.entity.monster.CreeperEntity;
-import net.minecraft.entity.monster.SpiderEntity;
+import net.minecraft.entity.monster.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeSpawnEggItem;
@@ -46,10 +43,10 @@ public class MobFamily<T extends LivingEntity> {
             "Mini", /*"Scope",*/ "Splitting"
     );
     
-    //    public static final MobFamily<ZombieEntity> ZOMBIE = new MobFamily<>(
-    //            "Zombie", "zombies", 0x00AFAF, new EntityType[] { EntityType.ZOMBIE, EntityType.HUSK },
-    //            "Brute", "Fire", "Fishing", "Giant", "Hungry", "Husk", "Plague"
-    //    );
+    public static final MobFamily<ZombieEntity> ZOMBIE = new MobFamily<>(
+               "Zombie", "zombies", 0x00AFAF, new EntityType[] { EntityType.ZOMBIE, EntityType.HUSK },
+                /*"Brute", "Fire", "Fishing", "Giant", "Hungry", "Husk", "Plague",*/ "Mad Scientist"
+    );
     //    public static final MobFamily<ZombieEntity> ZOMBIFIED_PIGLIN = new MobFamily<>(
     //            "ZombifiedPiglin", "zombie pigmen", 0xEA9393, new EntityType[] { EntityType.ZOMBIFIED_PIGLIN },
     //            "Brute", "Fishing", "Giant", "Hungry", "Knight", "Plague", "Vampire"
