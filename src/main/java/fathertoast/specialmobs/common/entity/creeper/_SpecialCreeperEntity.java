@@ -294,7 +294,7 @@ public class _SpecialCreeperEntity extends CreeperEntity implements ISpecialMob<
     public ResourceLocation[] getDefaultTextures() { return TEXTURES; }
     
     
-    //TODO--------------- SpecialMobData Hooks ----------------
+    //--------------- SpecialMobData Hooks ----------------
     
     /** Called each tick to update this entity's movement. */
     @Override

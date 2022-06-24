@@ -104,6 +104,7 @@ public class HungrySpiderEntity extends _SpecialSpiderEntity {
         }
     }
     
+    /** Recalculates the modifiers associated with this entity's feeding level counters. */
     private void updateFeedingLevels() {
         if( level != null && !level.isClientSide ) {
             final ModifiableAttributeInstance health = getAttribute( Attributes.MAX_HEALTH );
