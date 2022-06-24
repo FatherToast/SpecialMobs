@@ -146,7 +146,7 @@ public class _SpecialSpiderEntity extends SpiderEntity implements ISpecialMob<_S
     public ResourceLocation[] getDefaultTextures() { return TEXTURES; }
     
     
-    //TODO--------------- SpecialMobData Hooks ----------------
+    //--------------- SpecialMobData Hooks ----------------
     
     /** Called each tick to update this entity's movement. */
     @Override

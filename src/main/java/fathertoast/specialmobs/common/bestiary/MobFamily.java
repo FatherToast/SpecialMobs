@@ -9,6 +9,7 @@ import net.minecraft.block.Block;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.monster.AbstractSkeletonEntity;
+import net.minecraft.entity.monster.CaveSpiderEntity;
 import net.minecraft.entity.monster.CreeperEntity;
 import net.minecraft.entity.monster.SpiderEntity;
 import net.minecraft.util.math.BlockPos;
@@ -76,10 +77,10 @@ public class MobFamily<T extends LivingEntity> {
             "Spider", "spiders", 0x342D27, new EntityType[] { EntityType.SPIDER },
             "Baby", "Desert", "Flying", "Giant", "Hungry", "Mother", "Pale", "Poison", "Web", "Witch"
     );
-    //    public static final MobFamily<CaveSpiderEntity> CAVE_SPIDER = new MobFamily<>(
-    //            "CaveSpider", "cave spiders", 0x0C424E, new EntityType[] { EntityType.CAVE_SPIDER },
-    //            "Baby", "Flying", "Mother", "Web", "Witch"
-    //    );
+    public static final MobFamily<CaveSpiderEntity> CAVE_SPIDER = new MobFamily<>(
+            "CaveSpider", "cave spiders", 0x0C424E, new EntityType[] { EntityType.CAVE_SPIDER },
+            "Baby", "Flying", "Mother", "Web", "Witch"
+    );
     
     //    public static final MobFamily<SilverfishEntity> SILVERFISH = new MobFamily<>(
     //            "Silverfish", "silverfish", 0x6E6E6E, new EntityType[] { EntityType.SILVERFISH },

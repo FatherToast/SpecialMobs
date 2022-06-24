@@ -31,7 +31,7 @@ public class ClientRegister {
         registerFamilyRenderers( MobFamily.CREEPER, SpecialCreeperRenderer::new );
         //registerFamilyRenderers( MobFamily.SKELETON, SpecialSkeletonRenderer::new );
         registerFamilyRenderers( MobFamily.SPIDER, SpecialSpiderRenderer::new );
-        //registerFamilyRenderers( MobFamily.CAVE_SPIDER, SpecialSpiderRenderer::new );
+        registerFamilyRenderers( MobFamily.CAVE_SPIDER, SpecialSpiderRenderer::new );
     }
     
     private static <T extends LivingEntity> void registerFamilyRenderers( MobFamily<T> family, IRenderFactory<? super T> renderFactory ) {
