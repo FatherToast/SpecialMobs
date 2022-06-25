@@ -1,4 +1,4 @@
-package fathertoast.specialmobs.common.entity.skeleton;
+package fathertoast.specialmobs.common.entity.witherskeleton;
 
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
@@ -21,7 +21,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 @SpecialMob
-public class KnightSkeletonEntity extends _SpecialSkeletonEntity {
+public class KnightWitherSkeletonEntity extends _SpecialWitherSkeletonEntity {
     
     //--------------- Static Special Mob Hooks ----------------
     
@@ -32,8 +32,9 @@ public class KnightSkeletonEntity extends _SpecialSkeletonEntity {
     
     @SpecialMob.AttributeCreator
     public static AttributeModifierMap.MutableAttribute createAttributes() {
-        return AttributeHelper.of( _SpecialSkeletonEntity.createAttributes() )
+        return AttributeHelper.of( _SpecialWitherSkeletonEntity.createAttributes() )
                 .addAttribute( Attributes.MAX_HEALTH, 10.0 )
+                .addAttribute( Attributes.ARMOR, 10.0 )
                 .addAttribute( Attributes.ATTACK_DAMAGE, 4.0 )
                 .multAttribute( Attributes.MOVEMENT_SPEED, 0.8 )
                 .build();
@@ -41,7 +42,7 @@ public class KnightSkeletonEntity extends _SpecialSkeletonEntity {
     
     @SpecialMob.LanguageProvider
     public static String[] getTranslations( String langKey ) {
-        return References.translations( langKey, "Skeleton Knight",
+        return References.translations( langKey, "Wither Skeleton Knight",
                 "", "", "", "", "", "" );//TODO
     }
     
@@ -52,7 +53,7 @@ public class KnightSkeletonEntity extends _SpecialSkeletonEntity {
     }
     
     @SpecialMob.Constructor
-    public KnightSkeletonEntity( EntityType<? extends _SpecialSkeletonEntity> entityType, World world ) {
+    public KnightWitherSkeletonEntity( EntityType<? extends _SpecialWitherSkeletonEntity> entityType, World world ) {
         super( entityType, world );
         xpReward += 2;
     }
@@ -75,13 +76,13 @@ public class KnightSkeletonEntity extends _SpecialSkeletonEntity {
             setItemSlot( EquipmentSlotType.MAINHAND, new ItemStack( Items.IRON_SWORD ) );
             setItemSlot( EquipmentSlotType.OFFHAND, new ItemStack( Items.SHIELD ) );
         }
-        setItemSlot( EquipmentSlotType.HEAD, new ItemStack( Items.IRON_HELMET ) );
-        setItemSlot( EquipmentSlotType.CHEST, new ItemStack( Items.IRON_CHESTPLATE ) );
-        setItemSlot( EquipmentSlotType.LEGS, new ItemStack( Items.IRON_LEGGINGS ) );
-        setItemSlot( EquipmentSlotType.FEET, new ItemStack( Items.IRON_BOOTS ) );
+        setItemSlot( EquipmentSlotType.HEAD, new ItemStack( Items.CHAINMAIL_HELMET ) );
+        setItemSlot( EquipmentSlotType.CHEST, new ItemStack( Items.CHAINMAIL_CHESTPLATE ) );
+        setItemSlot( EquipmentSlotType.LEGS, new ItemStack( Items.CHAINMAIL_LEGGINGS ) );
+        setItemSlot( EquipmentSlotType.FEET, new ItemStack( Items.CHAINMAIL_BOOTS ) );
     }
     
-    /** Override to change this entity's chance to spawn with a melee weapon. */
+    /** Override to change this entity's chance to spawn with a bow. */
     @Override
-    protected double getVariantMeleeChance() { return 0.0; }
+    protected double getVariantBowChance() { return 1.0; }
 }

@@ -1,4 +1,4 @@
-package fathertoast.specialmobs.common.entity.skeleton;
+package fathertoast.specialmobs.common.entity.witherskeleton;
 
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
@@ -18,19 +18,19 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 @SpecialMob
-public class GiantSkeletonEntity extends _SpecialSkeletonEntity {
+public class GiantWitherSkeletonEntity extends _SpecialWitherSkeletonEntity {
     
     //--------------- Static Special Mob Hooks ----------------
     
     @SpecialMob.BestiaryInfoSupplier
     public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
-        entityType.sized( 0.9F, 2.7F );
-        return new BestiaryInfo( 0x494949 );
+        entityType.sized( 0.95F, 3.24F );
+        return new BestiaryInfo( 0x474D4D );
     }
     
     @SpecialMob.AttributeCreator
     public static AttributeModifierMap.MutableAttribute createAttributes() {
-        return AttributeHelper.of( _SpecialSkeletonEntity.createAttributes() )
+        return AttributeHelper.of( _SpecialWitherSkeletonEntity.createAttributes() )
                 .addAttribute( Attributes.MAX_HEALTH, 20.0 )
                 .addAttribute( Attributes.ATTACK_DAMAGE, 2.0 )
                 .build();
@@ -38,7 +38,7 @@ public class GiantSkeletonEntity extends _SpecialSkeletonEntity {
     
     @SpecialMob.LanguageProvider
     public static String[] getTranslations( String langKey ) {
-        return References.translations( langKey, "Giant Skeleton",
+        return References.translations( langKey, "Giant Wither Skeleton",
                 "", "", "", "", "", "" );//TODO
     }
     
@@ -49,9 +49,9 @@ public class GiantSkeletonEntity extends _SpecialSkeletonEntity {
     }
     
     @SpecialMob.Constructor
-    public GiantSkeletonEntity( EntityType<? extends _SpecialSkeletonEntity> entityType, World world ) {
+    public GiantWitherSkeletonEntity( EntityType<? extends _SpecialWitherSkeletonEntity> entityType, World world ) {
         super( entityType, world );
-        getSpecialData().setBaseScale( 1.5F );
+        getSpecialData().setBaseScale( 1.8F );
         maxUpStep = 1.0F;
         xpReward += 1;
     }
