@@ -68,6 +68,7 @@ public class SpecialMobs {
      *          o ranged attack AI
      *      - silverfish
      *          ? ranged attack AI
+     *          + puffer
      *      - endermen
      *      o witches
      *          o ability to equip held items
