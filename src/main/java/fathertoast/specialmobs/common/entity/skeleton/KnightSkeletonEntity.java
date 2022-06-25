@@ -1,4 +1,4 @@
-package fathertoast.specialmobs.common.entity.silverfish;
+package fathertoast.specialmobs.common.entity.skeleton;
 
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
@@ -10,8 +10,10 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.AttributeModifierMap;
 import net.minecraft.entity.ai.attributes.Attributes;
+import net.minecraft.inventory.EquipmentSlotType;
+import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.World;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -19,43 +21,39 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 @SpecialMob
-public class ToughSilverfishEntity extends _SpecialSilverfishEntity {
+public class KnightSkeletonEntity extends _SpecialSkeletonEntity {
     
     //--------------- Static Special Mob Hooks ----------------
     
     @SpecialMob.BestiaryInfoSupplier
     public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
-        entityType.sized( 0.6F, 0.9F );
-        return new BestiaryInfo( 0xDD0E0E, BestiaryInfo.BaseWeight.LOW );
+        return new BestiaryInfo( 0xDDDDDD );
     }
     
     @SpecialMob.AttributeCreator
     public static AttributeModifierMap.MutableAttribute createAttributes() {
-        return AttributeHelper.of( _SpecialSilverfishEntity.createAttributes() )
-                .addAttribute( Attributes.MAX_HEALTH, 16.0 )
-                .addAttribute( Attributes.ARMOR, 15.0 )
-                .addAttribute( Attributes.ATTACK_DAMAGE, 2.0 )
+        return AttributeHelper.of( _SpecialSkeletonEntity.createAttributes() )
+                .addAttribute( Attributes.MAX_HEALTH, 10.0 )
+                .addAttribute( Attributes.ATTACK_DAMAGE, 4.0 )
                 .multAttribute( Attributes.MOVEMENT_SPEED, 0.7 )
                 .build();
     }
     
     @SpecialMob.LanguageProvider
     public static String[] getTranslations( String langKey ) {
-        return References.translations( langKey, "Tough Silverfish",
+        return References.translations( langKey, "Skeleton Knight",
                 "", "", "", "", "", "" );//TODO
     }
     
     @SpecialMob.LootTableProvider
     public static void buildLootTable( LootTableBuilder loot ) {
         addBaseLoot( loot );
-        loot.addCommonDrop( "common", Items.FLINT, 1 );
-        loot.addRareDrop( "rare", Items.IRON_INGOT );
+        loot.addCommonDrop( "common", Items.IRON_NUGGET );
     }
     
     @SpecialMob.Constructor
-    public ToughSilverfishEntity( EntityType<? extends _SpecialSilverfishEntity> entityType, World world ) {
+    public KnightSkeletonEntity( EntityType<? extends _SpecialSkeletonEntity> entityType, World world ) {
         super( entityType, world );
-        getSpecialData().setBaseScale( 1.5F );
         xpReward += 2;
     }
     
@@ -65,14 +63,24 @@ public class ToughSilverfishEntity extends _SpecialSilverfishEntity {
     /** Override to change this entity's AI goals. */
     @Override
     protected void registerVariantGoals() {
-        getSpecialData().rangedAttackDamage += 1.0F;
+        getSpecialData().rangedAttackDamage += 4.0F;
+        getSpecialData().rangedAttackSpread *= 1.2F;
     }
     
-    private static final ResourceLocation[] TEXTURES = {
-            GET_TEXTURE_PATH( "tough" )
-    };
-    
-    /** @return All default textures for this entity. */
+    /** Called during spawn finalization to set starting equipment. */
     @Override
-    public ResourceLocation[] getDefaultTextures() { return TEXTURES; }
+    protected void populateDefaultEquipmentSlots( DifficultyInstance difficulty ) {
+        super.populateDefaultEquipmentSlots( difficulty );
+        if( random.nextDouble() < 0.95 ) {
+            setItemSlot( EquipmentSlotType.MAINHAND, new ItemStack( Items.IRON_SWORD ) );
+            setItemSlot( EquipmentSlotType.OFFHAND, new ItemStack( Items.SHIELD ) );
+        }
+        setItemSlot( EquipmentSlotType.HEAD, new ItemStack( Items.IRON_HELMET ) );
+        setItemSlot( EquipmentSlotType.CHEST, new ItemStack( Items.IRON_CHESTPLATE ) );
+        setItemSlot( EquipmentSlotType.LEGS, new ItemStack( Items.IRON_LEGGINGS ) );
+        setItemSlot( EquipmentSlotType.FEET, new ItemStack( Items.IRON_BOOTS ) );
+    }
+    
+    /** Override to change this entity's chance to spawn with a melee weapon. */
+    protected double getVariantMeleeChance() { return 0.0; }
 }

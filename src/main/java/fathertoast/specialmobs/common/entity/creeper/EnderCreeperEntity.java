@@ -141,6 +141,7 @@ public class EnderCreeperEntity extends _SpecialCreeperEntity implements IAngera
     private int lastStareSound = Integer.MIN_VALUE;
     private int targetChangeTime;
     
+    /** Called from the Entity.class constructor to define data watcher variables. */
     @Override
     protected void defineSynchedData() {
         super.defineSynchedData();
@@ -152,6 +153,7 @@ public class EnderCreeperEntity extends _SpecialCreeperEntity implements IAngera
     
     private void setBeingStaredAt() { entityData.set( DATA_STARED_AT, true ); }
     
+    /** Sets this entity's target. */
     @Override
     public void setTarget( @Nullable LivingEntity target ) {
         if( target == null ) {
@@ -176,6 +178,7 @@ public class EnderCreeperEntity extends _SpecialCreeperEntity implements IAngera
         }
     }
     
+    /** Called when a data watcher parameter is changed. */
     @Override
     public void onSyncedDataUpdated( DataParameter<?> parameter ) {
         if( DATA_CREEPY.equals( parameter ) && hasBeenStaredAt() && level.isClientSide ) {
@@ -206,6 +209,7 @@ public class EnderCreeperEntity extends _SpecialCreeperEntity implements IAngera
         return viewProjection > 1.0 - 0.025 / distance && player.canSee( this );
     }
     
+    /** Called each tick to update this entity's movement. */
     @Override
     public void aiStep() {
         if( level.isClientSide ) {
@@ -232,6 +236,25 @@ public class EnderCreeperEntity extends _SpecialCreeperEntity implements IAngera
             }
         }
         super.customServerAiStep();
+    }
+    
+    /** @return Attempts to damage this entity; returns true if the hit was successful. */
+    @Override
+    public boolean hurt( DamageSource source, float amount ) {
+        if( isInvulnerableTo( source ) ) return false;
+        
+        if( source instanceof IndirectEntityDamageSource ) {
+            for( int i = 0; i < 64; ++i ) {
+                if( teleport() ) return true;
+            }
+            return false;
+        }
+        
+        boolean success = super.hurt( source, amount );
+        if( !level.isClientSide() && !(source.getEntity() instanceof LivingEntity) && random.nextInt( 10 ) != 0 ) {
+            teleport();
+        }
+        return success;
     }
     
     /** @return Teleports this "enderman" to a random nearby position; returns true if successful. */

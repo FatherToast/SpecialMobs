@@ -15,6 +15,7 @@ import net.minecraft.entity.ai.attributes.AttributeModifierMap;
 import net.minecraft.entity.effect.LightningBoltEntity;
 import net.minecraft.entity.monster.CreeperEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.projectile.SnowballEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
@@ -180,17 +181,6 @@ public class _SpecialCreeperEntity extends CreeperEntity implements ISpecialMob<
         super.tick();
     }
     
-    /** @return Attempts to damage this entity; returns true if the hit was successful. */
-    @Override
-    public boolean hurt( DamageSource source, float damage ) {
-        if( super.hurt( source, damage ) ) {
-            // Implement "explodes when shot" property
-            if( source.getDirectEntity() != source.getEntity() && explodesWhenShot() ) ignite();
-            return true;
-        }
-        return false;
-    }
-    
     /** Called when this entity is struck by lightning. */
     @Override
     public void thunderHit( ServerWorld world, LightningBoltEntity lightningBolt ) {
@@ -350,6 +340,20 @@ public class _SpecialCreeperEntity extends CreeperEntity implements ISpecialMob<
     /** @return True if this entity takes damage while wet. */
     @Override
     public boolean isSensitiveToWater() { return getSpecialData().isDamagedByWater(); }
+    
+    /** @return Attempts to damage this entity; returns true if the hit was successful. */
+    @Override
+    public boolean hurt( DamageSource source, float amount ) {
+        if( isSensitiveToWater() && source.getDirectEntity() instanceof SnowballEntity ) {
+            amount = Math.max( 3.0F, amount );
+        }
+        if( super.hurt( source, amount ) ) {
+            // Implement "explodes when shot" property
+            if( source.getDirectEntity() != source.getEntity() && explodesWhenShot() ) ignite();
+            return true;
+        }
+        return false;
+    }
     
     /** @return True if the effect can be applied to this entity. */
     @Override

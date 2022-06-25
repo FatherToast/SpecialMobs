@@ -52,10 +52,10 @@ public class MobFamily<T extends LivingEntity> {
     //            "Brute", "Fishing", "Giant", "Hungry", "Knight", "Plague", "Vampire"
     //    );
     
-    //    public static final MobFamily<AbstractSkeletonEntity> SKELETON = new MobFamily<>(
-    //            "Skeleton", "skeletons", 0xC1C1C1, new EntityType[] { EntityType.SKELETON, EntityType.STRAY },
-    //            "Brute", "Fire", "Gatling", "Giant", "Knight", "Ninja", "Poison", "Sniper", "Spitfire", "Stray"
-    //    );
+    public static final MobFamily<AbstractSkeletonEntity> SKELETON = new MobFamily<>(
+            "Skeleton", "skeletons", 0xC1C1C1, new EntityType[] { EntityType.SKELETON, EntityType.STRAY },
+            "Brute", "Fire", "Gatling", "Giant", "Knight", /*"Ninja",*/ "Poison", "Sniper", /*"Spitfire",*/ "Stray"
+    );
     //    public static final MobFamily<AbstractSkeletonEntity> WITHER_SKELETON = new MobFamily<>(
     //            "WitherSkeleton", "wither skeletons", 0x141414, new EntityType[] { EntityType.WITHER_SKELETON },
     //            "Brute", "Gatling", "Giant", "Knight", "Ninja", "Sniper", "Spitfire"

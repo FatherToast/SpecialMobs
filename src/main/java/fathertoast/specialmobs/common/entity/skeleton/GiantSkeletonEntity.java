@@ -1,4 +1,4 @@
-package fathertoast.specialmobs.common.entity.spider;
+package fathertoast.specialmobs.common.entity.skeleton;
 
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
@@ -18,41 +18,42 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 @SpecialMob
-public class GiantSpiderEntity extends _SpecialSpiderEntity {
+public class GiantSkeletonEntity extends _SpecialSkeletonEntity {
     
     //--------------- Static Special Mob Hooks ----------------
     
     @SpecialMob.BestiaryInfoSupplier
     public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
-        entityType.sized( 1.9F, 1.3F );
-        return new BestiaryInfo( 0xA80E0E );
+        entityType.sized( 0.9F, 2.7F );
+        return new BestiaryInfo( 0x494949 );
     }
     
     @SpecialMob.AttributeCreator
     public static AttributeModifierMap.MutableAttribute createAttributes() {
-        return AttributeHelper.of( _SpecialSpiderEntity.createAttributes() )
-                .addAttribute( Attributes.MAX_HEALTH, 16.0 )
+        return AttributeHelper.of( _SpecialSkeletonEntity.createAttributes() )
+                .addAttribute( Attributes.MAX_HEALTH, 20.0 )
                 .addAttribute( Attributes.ATTACK_DAMAGE, 2.0 )
                 .build();
     }
     
     @SpecialMob.LanguageProvider
     public static String[] getTranslations( String langKey ) {
-        return References.translations( langKey, "Giant Spider",
+        return References.translations( langKey, "Giant Skeleton",
                 "", "", "", "", "", "" );//TODO
     }
     
     @SpecialMob.LootTableProvider
     public static void buildLootTable( LootTableBuilder loot ) {
         addBaseLoot( loot );
-        loot.addGuaranteedDrop( "base", Items.STRING, 2 );
+        loot.addGuaranteedDrop( "base", Items.BONE, 2 );
     }
     
     @SpecialMob.Constructor
-    public GiantSpiderEntity( EntityType<? extends _SpecialSpiderEntity> entityType, World world ) {
+    public GiantSkeletonEntity( EntityType<? extends _SpecialSkeletonEntity> entityType, World world ) {
         super( entityType, world );
         getSpecialData().setBaseScale( 1.5F );
-        xpReward += 1;
+        maxUpStep = 1.0F;
+        xpReward += 2;
     }
     
     
@@ -61,6 +62,14 @@ public class GiantSpiderEntity extends _SpecialSpiderEntity {
     /** Override to change this entity's AI goals. */
     @Override
     protected void registerVariantGoals() {
-        getSpecialData().rangedAttackDamage += 1.0F;
+        getSpecialData().rangedAttackDamage += 2.0F;
     }
+    
+    /** Sets this entity as a baby. */
+    @Override
+    public void setBaby( boolean value ) { }
+    
+    /** @return True if this entity is a baby. */
+    @Override
+    public boolean isBaby() { return false; }
 }

@@ -1,16 +1,23 @@
-package fathertoast.specialmobs.common.entity.silverfish;
+package fathertoast.specialmobs.common.entity.skeleton;
 
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
+import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.util.AttributeHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import mcp.MethodsReturnNonnullByDefault;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.AttributeModifierMap;
 import net.minecraft.entity.ai.attributes.Attributes;
+import net.minecraft.entity.projectile.AbstractArrowEntity;
+import net.minecraft.entity.projectile.ArrowEntity;
+import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.potion.EffectInstance;
+import net.minecraft.potion.Effects;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 
@@ -19,29 +26,26 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 @SpecialMob
-public class ToughSilverfishEntity extends _SpecialSilverfishEntity {
+public class BruteSkeletonEntity extends _SpecialSkeletonEntity {
     
     //--------------- Static Special Mob Hooks ----------------
     
     @SpecialMob.BestiaryInfoSupplier
     public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
-        entityType.sized( 0.6F, 0.9F );
-        return new BestiaryInfo( 0xDD0E0E, BestiaryInfo.BaseWeight.LOW );
+        return new BestiaryInfo( 0xFFF87E );
     }
     
     @SpecialMob.AttributeCreator
     public static AttributeModifierMap.MutableAttribute createAttributes() {
-        return AttributeHelper.of( _SpecialSilverfishEntity.createAttributes() )
-                .addAttribute( Attributes.MAX_HEALTH, 16.0 )
-                .addAttribute( Attributes.ARMOR, 15.0 )
-                .addAttribute( Attributes.ATTACK_DAMAGE, 2.0 )
-                .multAttribute( Attributes.MOVEMENT_SPEED, 0.7 )
+        return AttributeHelper.of( _SpecialSkeletonEntity.createAttributes() )
+                .addAttribute( Attributes.MAX_HEALTH, 10.0 )
+                .addAttribute( Attributes.ARMOR, 10.0 )
                 .build();
     }
     
     @SpecialMob.LanguageProvider
     public static String[] getTranslations( String langKey ) {
-        return References.translations( langKey, "Tough Silverfish",
+        return References.translations( langKey, "Skeleton Brute",
                 "", "", "", "", "", "" );//TODO
     }
     
@@ -53,23 +57,35 @@ public class ToughSilverfishEntity extends _SpecialSilverfishEntity {
     }
     
     @SpecialMob.Constructor
-    public ToughSilverfishEntity( EntityType<? extends _SpecialSilverfishEntity> entityType, World world ) {
+    public BruteSkeletonEntity( EntityType<? extends _SpecialSkeletonEntity> entityType, World world ) {
         super( entityType, world );
-        getSpecialData().setBaseScale( 1.5F );
         xpReward += 2;
     }
     
     
     //--------------- Variant-Specific Implementations ----------------
     
-    /** Override to change this entity's AI goals. */
+    /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override
-    protected void registerVariantGoals() {
-        getSpecialData().rangedAttackDamage += 1.0F;
+    protected void onVariantAttack( Entity target ) {
+        if( target instanceof LivingEntity ) {
+            MobHelper.causeLifeLoss( (LivingEntity) target, 2.0F );
+        }
+    }
+    
+    /** Override to modify this entity's ranged attack projectile. */
+    @Override
+    protected AbstractArrowEntity getVariantArrow( AbstractArrowEntity arrow, ItemStack arrowItem, float damageMulti ) {
+        if( arrow instanceof ArrowEntity ) {
+            ((ArrowEntity) arrow).addEffect( new EffectInstance( Effects.HARM, 1 ) );
+        }
+        return arrow;
     }
     
     private static final ResourceLocation[] TEXTURES = {
-            GET_TEXTURE_PATH( "tough" )
+            GET_TEXTURE_PATH( "brute" ),
+            null,
+            GET_TEXTURE_PATH( "brute_overlay" )
     };
     
     /** @return All default textures for this entity. */

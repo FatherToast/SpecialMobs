@@ -62,6 +62,8 @@ public class FlyingCaveSpiderEntity extends _SpecialCaveSpiderEntity {
     /** Override to change this entity's AI goals. */
     @Override
     protected void registerVariantGoals() {
+        getSpecialData().rangedAttackMaxRange = 0.0F;
+        
         goalSelector.addGoal( 3, new SpecialLeapAtTargetGoal(
                 this, 10, 6.0F, 12.0F, 2.0F, 2.0F ) );
     }

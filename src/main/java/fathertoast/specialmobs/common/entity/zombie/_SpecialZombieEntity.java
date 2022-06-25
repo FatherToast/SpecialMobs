@@ -4,6 +4,7 @@ import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.core.SpecialMobs;
 import fathertoast.specialmobs.common.entity.ISpecialMob;
+import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.entity.SpecialMobData;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
@@ -13,11 +14,13 @@ import net.minecraft.entity.*;
 import net.minecraft.entity.ai.attributes.AttributeModifierMap;
 import net.minecraft.entity.monster.ZombieEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.projectile.SnowballEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.potion.EffectInstance;
+import net.minecraft.util.DamageSource;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.DifficultyInstance;
@@ -68,6 +71,12 @@ public class _SpecialZombieEntity extends ZombieEntity implements ISpecialMob<_S
     @Override
     protected void registerGoals() {
         super.registerGoals();
+        
+        getSpecialData().rangedAttackDamage = 2.0F;
+        getSpecialData().rangedAttackSpread = 18.0F;
+        getSpecialData().rangedAttackCooldown = 30;
+        getSpecialData().rangedAttackMaxCooldown = getSpecialData().rangedAttackCooldown;
+        getSpecialData().rangedAttackMaxRange = 12.0F;
         registerVariantGoals();
     }
     
@@ -199,6 +208,19 @@ public class _SpecialZombieEntity extends ZombieEntity implements ISpecialMob<_S
     /** @return True if this entity takes damage while wet. */
     @Override
     public boolean isSensitiveToWater() { return getSpecialData().isDamagedByWater(); }
+    
+    /** @return Attempts to damage this entity; returns true if the hit was successful. */
+    @Override
+    public boolean hurt( DamageSource source, float amount ) {
+        final Entity entity = source.getDirectEntity();
+        if( isSensitiveToWater() && entity instanceof SnowballEntity ) {
+            amount = Math.max( 3.0F, amount );
+        }
+        
+        // Shield blocking logic
+        if( amount > 0.0F && MobHelper.tryBlock( this, source, true ) ) return false;
+        return super.hurt( source, amount );
+    }
     
     /** @return True if the effect can be applied to this entity. */
     @Override

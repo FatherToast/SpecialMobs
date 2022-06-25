@@ -1,4 +1,4 @@
-package fathertoast.specialmobs.common.entity.spider;
+package fathertoast.specialmobs.common.entity.skeleton;
 
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
@@ -11,6 +11,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.AttributeModifierMap;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.item.Items;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -18,41 +19,40 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 @SpecialMob
-public class GiantSpiderEntity extends _SpecialSpiderEntity {
+public class GatlingSkeletonEntity extends _SpecialSkeletonEntity {
     
     //--------------- Static Special Mob Hooks ----------------
     
     @SpecialMob.BestiaryInfoSupplier
     public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
-        entityType.sized( 1.9F, 1.3F );
-        return new BestiaryInfo( 0xA80E0E );
+        return new BestiaryInfo( 0xFFFF0B );
     }
     
     @SpecialMob.AttributeCreator
     public static AttributeModifierMap.MutableAttribute createAttributes() {
-        return AttributeHelper.of( _SpecialSpiderEntity.createAttributes() )
-                .addAttribute( Attributes.MAX_HEALTH, 16.0 )
+        return AttributeHelper.of( _SpecialSkeletonEntity.createAttributes() )
+                .addAttribute( Attributes.MAX_HEALTH, 10.0 )
                 .addAttribute( Attributes.ATTACK_DAMAGE, 2.0 )
                 .build();
     }
     
     @SpecialMob.LanguageProvider
     public static String[] getTranslations( String langKey ) {
-        return References.translations( langKey, "Giant Spider",
+        return References.translations( langKey, "Gatling Skeleton",
                 "", "", "", "", "", "" );//TODO
     }
     
     @SpecialMob.LootTableProvider
     public static void buildLootTable( LootTableBuilder loot ) {
         addBaseLoot( loot );
-        loot.addGuaranteedDrop( "base", Items.STRING, 2 );
+        loot.addGuaranteedDrop( "base", Items.ARROW, 1 );
+        loot.addCommonDrop( "common", Items.GUNPOWDER );
     }
     
     @SpecialMob.Constructor
-    public GiantSpiderEntity( EntityType<? extends _SpecialSpiderEntity> entityType, World world ) {
+    public GatlingSkeletonEntity( EntityType<? extends _SpecialSkeletonEntity> entityType, World world ) {
         super( entityType, world );
-        getSpecialData().setBaseScale( 1.5F );
-        xpReward += 1;
+        xpReward += 2;
     }
     
     
@@ -61,6 +61,21 @@ public class GiantSpiderEntity extends _SpecialSpiderEntity {
     /** Override to change this entity's AI goals. */
     @Override
     protected void registerVariantGoals() {
-        getSpecialData().rangedAttackDamage += 1.0F;
+        setRangedAI( 0.3, 1 );
+        getSpecialData().rangedAttackSpread *= 2.0F;
     }
+    
+    /** Override to change this entity's chance to spawn with a melee weapon. */
+    @Override
+    protected double getVariantMeleeChance() { return 0.0; }
+    
+    private static final ResourceLocation[] TEXTURES = {
+            new ResourceLocation( "textures/entity/skeleton/skeleton.png" ),
+            null,
+            GET_TEXTURE_PATH( "gatling_overlay" )
+    };
+    
+    /** @return All default textures for this entity. */
+    @Override
+    public ResourceLocation[] getDefaultTextures() { return TEXTURES; }
 }

@@ -56,13 +56,16 @@ public class BabySpiderEntity extends _SpecialSpiderEntity {
     public BabySpiderEntity( EntityType<? extends _SpecialSpiderEntity> entityType, World world ) {
         super( entityType, world );
         getSpecialData().setBaseScale( 0.4F );
-        getSpecialData().rangedAttackDamage -= 1.0F;
-        getSpecialData().rangedAttackMaxRange = 0.0F;
         xpReward = 1;
     }
     
     
     //--------------- Variant-Specific Implementations ----------------
     
-    // None
+    /** Override to change this entity's AI goals. */
+    @Override
+    protected void registerVariantGoals() {
+        getSpecialData().rangedAttackDamage -= 1.0F;
+        getSpecialData().rangedAttackMaxRange = 0.0F;
+    }
 }

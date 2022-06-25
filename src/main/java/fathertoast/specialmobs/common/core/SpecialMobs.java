@@ -33,24 +33,24 @@ public class SpecialMobs {
      *      o dimension-sensitive configs
      *      o environment-sensitive configs
      *  o entities
-     *      o nbt-driven capabilities (special mob data)
+     *      - nbt-driven capabilities (special mob data)
      *      + bestiary
      *      ? configurable stats
-     *  o monster families (see doc for specifics)
-     *      o creepers
-     *          o chance to spawn charged
+     *  - monster families (see doc for specifics)
+     *      - creepers
+     *          - chance to spawn charged during thunderstorms
      *          + scope
      *      o zombies
      *          o villager infection
      *          o ranged attack AI (using bow)
-     *          o use shields
+     *          - use shields
      *          + drowned
      *      o zombified piglins
      *          o ranged attack AI (using bow)
      *          o use shields
-     *      o skeletons
-     *          o use shields
-     *          o babies
+     *      - skeletons
+     *          - use shields
+     *          - babies
      *      o wither skeletons
      *          o use shields
      *          o babies
@@ -58,13 +58,13 @@ public class SpecialMobs {
      *          o use attack damage attribute
      *      o magma cubes
      *          o use attack damage attribute
-     *      o spiders
+     *      - spiders
      *          o ranged attack AI
-     *      o cave spiders
+     *      - cave spiders
      *          o ranged attack AI
-     *      o silverfish
+     *      - silverfish
      *          ? ranged attack AI
-     *      o endermen
+     *      - endermen
      *      o witches
      *          o ability to equip held items
      *      o ghasts
@@ -104,7 +104,7 @@ public class SpecialMobs {
         
         //MinecraftForge.EVENT_BUS.register( new SMEventListener() );
         MinecraftForge.EVENT_BUS.register( new BiomeEvents() );
-
+        
         IEventBus eventBus = FMLJavaModLoadingContext.get().getModEventBus();
         
         eventBus.addListener( SMEntities::createAttributes );

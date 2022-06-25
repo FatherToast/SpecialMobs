@@ -19,6 +19,13 @@ public final class References {
     public static final int SET_BLOCK_FLAGS = 0b00000011;
     
     
+    //--------------- ENTITY EVENTS ----------------
+    // Used in World#broadcastEntityEvent(Entity, byte) then executed by Entity#handleEntityEvent(byte)
+    
+    public static final byte EVENT_SHIELD_BLOCK_SOUND = 29;
+    public static final byte EVENT_SHIELD_BREAK_SOUND = 30;
+    
+    
     //--------------- NBT STUFF ----------------
     
     public static final int NBT_TYPE_NUMERICAL = 99;

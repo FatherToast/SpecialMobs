@@ -1,15 +1,16 @@
-package fathertoast.specialmobs.common.entity.silverfish;
+package fathertoast.specialmobs.common.entity.skeleton;
 
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
-import fathertoast.specialmobs.common.util.AttributeHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import mcp.MethodsReturnNonnullByDefault;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.AttributeModifierMap;
-import net.minecraft.entity.ai.attributes.Attributes;
+import net.minecraft.entity.projectile.AbstractArrowEntity;
+import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
@@ -19,57 +20,61 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 @SpecialMob
-public class ToughSilverfishEntity extends _SpecialSilverfishEntity {
+public class FireSkeletonEntity extends _SpecialSkeletonEntity {
     
     //--------------- Static Special Mob Hooks ----------------
     
     @SpecialMob.BestiaryInfoSupplier
     public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
-        entityType.sized( 0.6F, 0.9F );
-        return new BestiaryInfo( 0xDD0E0E, BestiaryInfo.BaseWeight.LOW );
+        entityType.fireImmune();
+        return new BestiaryInfo( 0xDC1A00 );
+        //TODO theme - fire
     }
     
     @SpecialMob.AttributeCreator
     public static AttributeModifierMap.MutableAttribute createAttributes() {
-        return AttributeHelper.of( _SpecialSilverfishEntity.createAttributes() )
-                .addAttribute( Attributes.MAX_HEALTH, 16.0 )
-                .addAttribute( Attributes.ARMOR, 15.0 )
-                .addAttribute( Attributes.ATTACK_DAMAGE, 2.0 )
-                .multAttribute( Attributes.MOVEMENT_SPEED, 0.7 )
-                .build();
+        return _SpecialSkeletonEntity.createAttributes();
     }
     
     @SpecialMob.LanguageProvider
     public static String[] getTranslations( String langKey ) {
-        return References.translations( langKey, "Tough Silverfish",
+        return References.translations( langKey, "Fire Skeleton",
                 "", "", "", "", "", "" );//TODO
     }
     
     @SpecialMob.LootTableProvider
     public static void buildLootTable( LootTableBuilder loot ) {
         addBaseLoot( loot );
-        loot.addCommonDrop( "common", Items.FLINT, 1 );
-        loot.addRareDrop( "rare", Items.IRON_INGOT );
+        loot.addCommonDrop( "common", Items.FIRE_CHARGE );
+        loot.addUncommonDrop( "uncommon", Items.COAL );
     }
     
     @SpecialMob.Constructor
-    public ToughSilverfishEntity( EntityType<? extends _SpecialSilverfishEntity> entityType, World world ) {
+    public FireSkeletonEntity( EntityType<? extends _SpecialSkeletonEntity> entityType, World world ) {
         super( entityType, world );
-        getSpecialData().setBaseScale( 1.5F );
-        xpReward += 2;
+        getSpecialData().setImmuneToFire( true );
+        getSpecialData().setDamagedByWater( true );
+        xpReward += 1;
     }
     
     
     //--------------- Variant-Specific Implementations ----------------
     
-    /** Override to change this entity's AI goals. */
+    /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override
-    protected void registerVariantGoals() {
-        getSpecialData().rangedAttackDamage += 1.0F;
+    protected void onVariantAttack( Entity target ) {
+        target.setSecondsOnFire( 10 );
+    }
+    
+    /** Override to modify this entity's ranged attack projectile. */
+    @Override
+    protected AbstractArrowEntity getVariantArrow( AbstractArrowEntity arrow, ItemStack arrowItem, float damageMulti ) {
+        arrow.setSecondsOnFire( 100 );
+        return arrow;
     }
     
     private static final ResourceLocation[] TEXTURES = {
-            GET_TEXTURE_PATH( "tough" )
+            GET_TEXTURE_PATH( "fire" )
     };
     
     /** @return All default textures for this entity. */

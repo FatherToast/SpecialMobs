@@ -66,7 +66,6 @@ public class HungrySpiderEntity extends _SpecialSpiderEntity {
         super( entityType, world );
         getSpecialData().setBaseScale( 1.5F );
         getSpecialData().setRegenerationTime( 40 );
-        getSpecialData().rangedAttackMaxRange = 0.0F;
         xpReward += 2;
     }
     
@@ -84,6 +83,13 @@ public class HungrySpiderEntity extends _SpecialSpiderEntity {
     private int growthLevel;
     /** The level of increased max health gained. */
     private int maxHealthStacks;
+    
+    /** Override to change this entity's AI goals. */
+    @Override
+    protected void registerVariantGoals() {
+        getSpecialData().rangedAttackDamage -= 1.0F;
+        getSpecialData().rangedAttackMaxRange = 0.0F;
+    }
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override

@@ -1,15 +1,19 @@
 package fathertoast.specialmobs.common.entity;
 
+import fathertoast.specialmobs.common.util.References;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.CreatureAttribute;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.projectile.AbstractArrowEntity;
 import net.minecraft.item.*;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.EffectType;
 import net.minecraft.potion.Effects;
 import net.minecraft.util.DamageSource;
+import net.minecraft.util.Hand;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.World;
 
@@ -193,5 +197,72 @@ public final class MobHelper {
         
         EffectInstance potion = WITCH_EFFECTS[random.nextInt( WITCH_EFFECTS.length - (includePoison ? 0 : 1) )];
         return new EffectInstance( potion.getEffect(), duration * potion.getDuration(), potion.getAmplifier() );
+    }
+    
+    /**
+     * Tries to block an incoming damage source on behalf of the blocker, possibly destroying their shield.
+     * Note that the blocker will have to call blockUsingShield() and cancel the damage event themselves if this works.
+     *
+     * @param blocker     The entity that is being attacked.
+     * @param source      The damage source.
+     * @param needsShield If false, allows the blocker to succeed without a shield.
+     * @return True if the block was successful.
+     */
+    public static boolean tryBlock( LivingEntity blocker, DamageSource source, boolean needsShield ) {
+        if( blocker.level.isClientSide() || blocker.isInvulnerableTo( source ) || source.isBypassArmor() ) return false;
+        
+        // Block everything coming from entities at least 6 blocks away, otherwise 33% block chance
+        if( blocker.getRandom().nextFloat() >= 0.33F ) {
+            final Entity attacker = source.getEntity();
+            if( attacker == null || blocker.distanceToSqr( attacker ) < 36.0 ) return false;
+        }
+        
+        // Cannot block piercing arrows
+        final Entity entity = source.getDirectEntity();
+        if( entity instanceof AbstractArrowEntity ) {
+            final AbstractArrowEntity arrow = (AbstractArrowEntity) entity;
+            if( arrow.getPierceLevel() > 0 ) return false;
+        }
+        
+        // Make sure we actually have a shield
+        Hand shieldHand = Hand.OFF_HAND;
+        ItemStack shield = blocker.getItemInHand( shieldHand );
+        if( needsShield && (shield.isEmpty() || !shield.isShield( blocker )) ) {
+            shieldHand = Hand.MAIN_HAND;
+            shield = blocker.getItemInHand( shieldHand );
+            if( shield.isEmpty() || !shield.isShield( blocker ) ) return false;
+        }
+        
+        // Block frontal attacks only
+        final Vector3d sourcePos = source.getSourcePosition();
+        if( sourcePos != null ) {
+            final Vector3d lookVec = blocker.getViewVector( 1.0F );
+            Vector3d targetVec = sourcePos.vectorTo( blocker.position() ).normalize();
+            targetVec = new Vector3d( targetVec.x, 0.0, targetVec.z );
+            if( targetVec.dot( lookVec ) < 0.0 ) {
+                blocker.level.broadcastEntityEvent( blocker, References.EVENT_SHIELD_BLOCK_SOUND );
+                if( needsShield && entity instanceof PlayerEntity ) {
+                    maybeDestroyShield( blocker, shield, shieldHand, ((PlayerEntity) entity).getMainHandItem() );
+                }
+                if( !source.isProjectile() && entity instanceof LivingEntity ) {
+                    // Because the vanilla shield knockback is mega-borked
+                    ((LivingEntity) entity).knockback( 0.5F,
+                            blocker.getX() - entity.getX(), blocker.getZ() - entity.getZ() );
+                    entity.hurtMarked = true;
+                }
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    /** Destroys the blocker's shield based on random chance and conditions. Equivalent to players having their shield set on cooldown. */
+    private static void maybeDestroyShield( LivingEntity blocker, ItemStack shield, Hand shieldHand, ItemStack weapon ) {
+        if( !weapon.isEmpty() && !shield.isEmpty() && weapon.getItem() instanceof AxeItem && shield.getItem() == Items.SHIELD &&
+                blocker.getRandom().nextFloat() < 0.25F - EnchantmentHelper.getBlockEfficiency( blocker ) * 0.05F ) {
+            blocker.level.broadcastEntityEvent( blocker, References.EVENT_SHIELD_BREAK_SOUND );
+            blocker.broadcastBreakEvent( shieldHand );
+            blocker.setItemInHand( shieldHand, ItemStack.EMPTY );
+        }
     }
 }

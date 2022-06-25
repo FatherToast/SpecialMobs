@@ -62,8 +62,8 @@ public class MotherSpiderEntity extends _SpecialSpiderEntity {
         super( entityType, world );
         getSpecialData().setBaseScale( 1.4F );
         getSpecialData().setRegenerationTime( 30 );
-        getSpecialData().rangedAttackDamage += 1.5F;
         xpReward += 1;
+        
         babies = 2 + random.nextInt( 3 );
         extraBabies = 2 + random.nextInt( 3 );
     }
@@ -75,6 +75,12 @@ public class MotherSpiderEntity extends _SpecialSpiderEntity {
     private int babies;
     /** The number of extra babies that can be spawned from hits. */
     private int extraBabies;
+    
+    /** Override to change this entity's AI goals. */
+    @Override
+    protected void registerVariantGoals() {
+        getSpecialData().rangedAttackDamage += 1.5F;
+    }
     
     /** @return Attempts to damage this entity; returns true if the hit was successful. */
     @Override

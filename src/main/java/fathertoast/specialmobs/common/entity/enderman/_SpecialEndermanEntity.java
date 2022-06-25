@@ -204,6 +204,15 @@ public class _SpecialEndermanEntity extends EndermanEntity implements ISpecialMo
     @Override
     public boolean isSensitiveToWater() { return getSpecialData().isDamagedByWater(); }
     
+    //    /** @return Attempts to damage this entity; returns true if the hit was successful. */ - Useless for endermen (immune to projectiles)
+    //    @Override
+    //    public boolean hurt( DamageSource source, float amount ) {
+    //        if( isSensitiveToWater() && source.getDirectEntity() instanceof SnowballEntity ) {
+    //            amount = Math.max( 3.0F, amount );
+    //        }
+    //        return super.hurt( source, amount );
+    //    }
+    
     /** @return True if the effect can be applied to this entity. */
     @Override
     public boolean canBeAffected( EffectInstance effect ) { return getSpecialData().isPotionApplicable( effect ); }

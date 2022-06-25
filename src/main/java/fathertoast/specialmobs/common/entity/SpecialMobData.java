@@ -4,12 +4,8 @@ import fathertoast.specialmobs.common.core.SpecialMobs;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.CreatureAttribute;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.Attribute;
-import net.minecraft.entity.ai.attributes.ModifiableAttributeInstance;
 import net.minecraft.entity.monster.SpiderEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
@@ -69,12 +65,12 @@ public class SpecialMobData<T extends LivingEntity & ISpecialMob<T>> {
     public float rangedAttackDamage;
     /** The spread (inaccuracy) of the entity's ranged attacks. */
     public float rangedAttackSpread;
-    /** The movement speed multiplier the entity uses during its ranged attack ai. Requires an ai reload to take effect. */
+    /** The movement speed multiplier the entity uses during its ranged attack ai. Requires an AI reload to take effect. */
     public float rangedWalkSpeed = 1.0F;
-    /** The delay (in ticks) before a new ranged attack can begin after firing. Requires an ai reload to take effect. */
+    /** The delay (in ticks) before a new ranged attack can begin after firing. Requires an AI reload to take effect. */
     public int rangedAttackCooldown;
     /**
-     * The delay (in ticks) between each ranged attack at maximum delay. Requires an ai reload to take effect.
+     * The delay (in ticks) between each ranged attack at maximum delay. Requires an AI reload to take effect.
      * Unused for bow attacks. For fireball attacks, this is the cooldown + charge time.
      * For all other attacks, this is the cooldown at maximum range (scaled down to the minimum cooldown at point-blank).
      */
@@ -304,14 +300,6 @@ public class SpecialMobData<T extends LivingEntity & ISpecialMob<T>> {
         //            return baseScale * (1.0F + (theEntity.getRNG().nextFloat() - 0.5F) * Config.get().GENERAL.RANDOM_SCALING);
         //        }
         return baseScale;
-    }
-    
-    public double getRangedDamage( float distanceFactor ) {
-        final int powerEnchant = EnchantmentHelper.getEnchantmentLevel( Enchantments.POWER_ARROWS, theEntity );
-        return rangedAttackDamage * (distanceFactor +
-                theEntity.getRandom().nextGaussian() * 0.125 +
-                theEntity.level.getDifficulty().getId() * 0.055F) +
-                (powerEnchant > 0 ? powerEnchant * 0.5 + 0.5 : 0.0);
     }
     
     public void setRegenerationTime( int ticks ) { healTimeMax = ticks; }

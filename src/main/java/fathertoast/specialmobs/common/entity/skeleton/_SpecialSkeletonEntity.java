@@ -4,23 +4,27 @@ import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.core.SpecialMobs;
 import fathertoast.specialmobs.common.entity.ISpecialMob;
+import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.entity.SpecialMobData;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
 import net.minecraft.entity.*;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.ai.attributes.AttributeModifierMap;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.ai.attributes.ModifiableAttributeInstance;
 import net.minecraft.entity.ai.goal.Goal;
+import net.minecraft.entity.ai.goal.MeleeAttackGoal;
+import net.minecraft.entity.ai.goal.RangedBowAttackGoal;
 import net.minecraft.entity.monster.AbstractSkeletonEntity;
 import net.minecraft.entity.monster.CreeperEntity;
 import net.minecraft.entity.monster.SkeletonEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.projectile.AbstractArrowEntity;
 import net.minecraft.entity.projectile.ProjectileHelper;
+import net.minecraft.entity.projectile.SnowballEntity;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.BowItem;
 import net.minecraft.item.ItemStack;
@@ -34,6 +38,7 @@ import net.minecraft.util.DamageSource;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.SoundEvents;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.IServerWorld;
@@ -41,8 +46,6 @@ import net.minecraft.world.World;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
-import java.time.LocalDate;
-import java.time.temporal.ChronoField;
 import java.util.UUID;
 
 @ParametersAreNonnullByDefault
@@ -86,16 +89,80 @@ public class _SpecialSkeletonEntity extends AbstractSkeletonEntity implements IS
     @Override
     protected void registerGoals() {
         super.registerGoals();
+        
+        getSpecialData().rangedAttackDamage = 2.0F;
+        getSpecialData().rangedAttackSpread = 14.0F;
+        getSpecialData().rangedAttackCooldown = 20;
+        getSpecialData().rangedAttackMaxCooldown = getSpecialData().rangedAttackCooldown;
+        getSpecialData().rangedAttackMaxRange = 15.0F;
         registerVariantGoals();
     }
     
     /** Override to change this entity's AI goals. */
     protected void registerVariantGoals() { }
     
+    /** Helper method to set the ranged attack AI more easily. */
+    protected void disableRangedAI() { setRangedAI( 1.0, 20, 0.0F ); }
+    
+    /** Helper method to set the ranged attack AI more easily. */
+    protected void setRangedAI( double walkSpeed, int cooldownTime ) {
+        getSpecialData().rangedWalkSpeed = (float) walkSpeed;
+        getSpecialData().rangedAttackCooldown = cooldownTime;
+        getSpecialData().rangedAttackMaxCooldown = cooldownTime;
+    }
+    
+    /** Helper method to set the ranged attack AI more easily. */
+    protected void setRangedAI( double walkSpeed, int cooldownTime, float range ) {
+        setRangedAI( walkSpeed, cooldownTime );
+        getSpecialData().rangedAttackMaxRange = range;
+    }
+    
     /** Override to change this entity's attack goal priority. */
     protected int getVariantAttackPriority() { return 4; }
     
-    // TODO variant shooting
+    /** Called during spawn finalization to set starting equipment. */
+    @Override
+    protected void populateDefaultEquipmentSlots( DifficultyInstance difficulty ) {
+        super.populateDefaultEquipmentSlots( difficulty );
+        if( random.nextDouble() < getVariantMeleeChance() ) { //TODO config the default 5% chance
+            setItemSlot( EquipmentSlotType.MAINHAND, new ItemStack( Items.IRON_SWORD ) );
+        }
+    }
+    
+    /** Override to change this entity's chance to spawn with a melee weapon. */
+    protected double getVariantMeleeChance() { return getSpecialData().rangedAttackMaxRange > 0.0F ? 0.05 : 1.0; }
+    
+    /** Called to attack the target with a ranged attack. */
+    @Override
+    public void performRangedAttack( LivingEntity target, float damageMulti ) {
+        final ItemStack arrowItem = getProjectile( getItemInHand( ProjectileHelper.getWeaponHoldingHand(
+                this, item -> item instanceof BowItem ) ) );
+        AbstractArrowEntity arrow = getArrow( arrowItem, damageMulti );
+        if( getMainHandItem().getItem() instanceof BowItem )
+            arrow = ((BowItem) getMainHandItem().getItem()).customArrow( arrow );
+        
+        final double dX = target.getX() - getX();
+        final double dY = target.getY( 1.0 / 3.0 ) - arrow.getY();
+        final double dZ = target.getZ() - getZ();
+        final double dH = MathHelper.sqrt( dX * dX + dZ * dZ );
+        arrow.shoot( dX, dY + dH * 0.2, dZ, 1.6F,
+                getSpecialData().rangedAttackSpread * (1.0F - 0.2858F * level.getDifficulty().getId()) );
+        
+        playSound( SoundEvents.SKELETON_SHOOT, 1.0F, 1.0F / (random.nextFloat() * 0.4F + 0.8F) );
+        level.addFreshEntity( arrow );
+    }
+    
+    /** @return The arrow for this skeleton to shoot. */
+    @Override
+    protected AbstractArrowEntity getArrow( ItemStack arrowItem, float damageMulti ) {
+        return getVariantArrow( super.getArrow( arrowItem, damageMulti * getSpecialData().rangedAttackDamage ),
+                arrowItem, damageMulti );
+    }
+    
+    /** Override to modify this entity's ranged attack projectile. */
+    protected AbstractArrowEntity getVariantArrow( AbstractArrowEntity arrow, ItemStack arrowItem, float damageMulti ) {
+        return arrow;
+    }
     
     /** Called to melee attack the target. */
     @Override
@@ -142,15 +209,6 @@ public class _SpecialSkeletonEntity extends AbstractSkeletonEntity implements IS
         return groupData;
     }
     
-    /** Called during spawn finalization to set starting equipment. */
-    @Override
-    protected void populateDefaultEquipmentSlots( DifficultyInstance difficulty ) {
-        super.populateDefaultEquipmentSlots( difficulty );
-        if( random.nextDouble() < 0.05 ) { //TODO config
-            setItemSlot( EquipmentSlotType.MAINHAND, new ItemStack( Items.IRON_SWORD ) );
-        }
-    }
-    
     /** Called to change */
     @Override
     public void reassessWeaponGoal() {
@@ -160,14 +218,12 @@ public class _SpecialSkeletonEntity extends AbstractSkeletonEntity implements IS
             final SpecialMobData<_SpecialSkeletonEntity> data = getSpecialData();
             final ItemStack weapon = getItemInHand( ProjectileHelper.getWeaponHoldingHand(
                     this, item -> item instanceof BowItem ) );
-            if( weapon.getItem() == Items.BOW ) {
-                //                currentAttackAI = new EntityAIAttackRangedBow<>( //TODO
-                //                        this, data.rangedWalkSpeed,
-                //                        data.rangedAttackCooldown, data.rangedAttackMaxRange
-                //                );
+            if( data.rangedAttackMaxRange > 0.0F && weapon.getItem() == Items.BOW ) {
+                currentAttackAI = new RangedBowAttackGoal<>( this, data.rangedWalkSpeed,
+                        data.rangedAttackCooldown, data.rangedAttackMaxRange );
             }
             else {
-                //currentAttackAI = new EntityAISpecialAttackMelee<>( this, 1.2, false ); //TODO
+                currentAttackAI = new MeleeAttackGoal( this, 1.2, false );
             }
             goalSelector.addGoal( getVariantAttackPriority(), currentAttackAI );
         }
@@ -233,9 +289,7 @@ public class _SpecialSkeletonEntity extends AbstractSkeletonEntity implements IS
     
     /** @return True if this entity is a baby. */
     @Override
-    public boolean isBaby() {
-        return this.getEntityData().get( IS_BABY );
-    }
+    public boolean isBaby() { return getEntityData().get( IS_BABY ); }
     
     /** Called when a data watcher parameter is changed. */
     @Override
@@ -343,6 +397,19 @@ public class _SpecialSkeletonEntity extends AbstractSkeletonEntity implements IS
     /** @return True if this entity takes damage while wet. */
     @Override
     public boolean isSensitiveToWater() { return getSpecialData().isDamagedByWater(); }
+    
+    /** @return Attempts to damage this entity; returns true if the hit was successful. */
+    @Override
+    public boolean hurt( DamageSource source, float amount ) {
+        final Entity entity = source.getDirectEntity();
+        if( isSensitiveToWater() && entity instanceof SnowballEntity ) {
+            amount = Math.max( 3.0F, amount );
+        }
+        
+        // Shield blocking logic
+        if( amount > 0.0F && MobHelper.tryBlock( this, source, true ) ) return false;
+        return super.hurt( source, amount );
+    }
     
     /** @return True if the effect can be applied to this entity. */
     @Override

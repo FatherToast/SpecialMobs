@@ -64,5 +64,10 @@ public class BabyCaveSpiderEntity extends _SpecialCaveSpiderEntity {
     
     //--------------- Variant-Specific Implementations ----------------
     
-    // None
+    /** Override to change this entity's AI goals. */
+    @Override
+    protected void registerVariantGoals() {
+        getSpecialData().rangedAttackDamage -= 1.0F;
+        getSpecialData().rangedAttackMaxRange = 0.0F;
+    }
 }

@@ -60,8 +60,8 @@ public class MotherCaveSpiderEntity extends _SpecialCaveSpiderEntity {
     public MotherCaveSpiderEntity( EntityType<? extends _SpecialCaveSpiderEntity> entityType, World world ) {
         super( entityType, world );
         getSpecialData().setRegenerationTime( 30 );
-        getSpecialData().rangedAttackDamage += 1.5F;
         xpReward += 1;
+        
         babies = 2 + random.nextInt( 3 );
         extraBabies = 2 + random.nextInt( 3 );
     }
@@ -73,6 +73,12 @@ public class MotherCaveSpiderEntity extends _SpecialCaveSpiderEntity {
     private int babies;
     /** The number of extra babies that can be spawned from hits. */
     private int extraBabies;
+    
+    /** Override to change this entity's AI goals. */
+    @Override
+    protected void registerVariantGoals() {
+        getSpecialData().rangedAttackDamage += 1.5F;
+    }
     
     /** @return Attempts to damage this entity; returns true if the hit was successful. */
     @Override

@@ -13,11 +13,13 @@ import net.minecraft.entity.*;
 import net.minecraft.entity.ai.attributes.AttributeModifierMap;
 import net.minecraft.entity.monster.CaveSpiderEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.projectile.SnowballEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.potion.EffectInstance;
+import net.minecraft.util.DamageSource;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.DifficultyInstance;
@@ -68,6 +70,12 @@ public class _SpecialCaveSpiderEntity extends CaveSpiderEntity implements ISpeci
     @Override
     protected void registerGoals() {
         super.registerGoals();
+        
+        getSpecialData().rangedAttackDamage = 1.0F;
+        getSpecialData().rangedAttackSpread = 18.0F;
+        getSpecialData().rangedAttackCooldown = 40;
+        getSpecialData().rangedAttackMaxCooldown = getSpecialData().rangedAttackCooldown;
+        getSpecialData().rangedAttackMaxRange = 10.0F;
         registerVariantGoals();
     }
     
@@ -202,6 +210,15 @@ public class _SpecialCaveSpiderEntity extends CaveSpiderEntity implements ISpeci
     /** @return True if this entity takes damage while wet. */
     @Override
     public boolean isSensitiveToWater() { return getSpecialData().isDamagedByWater(); }
+    
+    /** @return Attempts to damage this entity; returns true if the hit was successful. */
+    @Override
+    public boolean hurt( DamageSource source, float amount ) {
+        if( isSensitiveToWater() && source.getDirectEntity() instanceof SnowballEntity ) {
+            amount = Math.max( 3.0F, amount );
+        }
+        return super.hurt( source, amount );
+    }
     
     /** @return True if the effect can be applied to this entity. */
     @Override

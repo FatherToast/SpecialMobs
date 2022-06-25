@@ -14,6 +14,7 @@ import net.minecraft.entity.ai.attributes.AttributeModifierMap;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.monster.SilverfishEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.projectile.SnowballEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
@@ -71,6 +72,12 @@ public class _SpecialSilverfishEntity extends SilverfishEntity implements ISpeci
     @Override
     protected void registerGoals() {
         super.registerGoals();
+        
+        getSpecialData().rangedAttackDamage = 1.0F;
+        getSpecialData().rangedAttackSpread = 14.0F;
+        getSpecialData().rangedAttackCooldown = 40;
+        getSpecialData().rangedAttackMaxCooldown = getSpecialData().rangedAttackCooldown;
+        getSpecialData().rangedAttackMaxRange = 10.0F;
         registerVariantGoals();
     }
     
@@ -223,6 +230,15 @@ public class _SpecialSilverfishEntity extends SilverfishEntity implements ISpeci
     /** @return True if this entity takes damage while wet. */
     @Override
     public boolean isSensitiveToWater() { return getSpecialData().isDamagedByWater(); }
+    
+    /** @return Attempts to damage this entity; returns true if the hit was successful. */
+    @Override
+    public boolean hurt( DamageSource source, float amount ) {
+        if( isSensitiveToWater() && source.getDirectEntity() instanceof SnowballEntity ) {
+            amount = Math.max( 3.0F, amount );
+        }
+        return super.hurt( source, amount );
+    }
     
     /** @return True if the effect can be applied to this entity. */
     @Override
