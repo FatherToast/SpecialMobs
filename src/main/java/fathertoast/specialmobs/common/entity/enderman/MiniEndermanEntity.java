@@ -23,7 +23,7 @@ public class MiniEndermanEntity extends _SpecialEndermanEntity {
     
     @SpecialMob.BestiaryInfoSupplier
     public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
-        entityType.sized( 0.5F, 0.9F );
+        entityType.sized( 0.5F, 0.99F );
         return new BestiaryInfo( 0xFFC0CB, BestiaryInfo.BaseWeight.LOW );
     }
     

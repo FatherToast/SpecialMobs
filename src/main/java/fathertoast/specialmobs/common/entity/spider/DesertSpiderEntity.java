@@ -29,7 +29,7 @@ public class DesertSpiderEntity extends _SpecialSpiderEntity {
     
     @SpecialMob.BestiaryInfoSupplier
     public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
-        entityType.sized( 0.95F, 0.8F );
+        entityType.sized( 0.95F, 0.7F );
         return new BestiaryInfo( 0xE6DDAC );
         //TODO theme - desert
     }

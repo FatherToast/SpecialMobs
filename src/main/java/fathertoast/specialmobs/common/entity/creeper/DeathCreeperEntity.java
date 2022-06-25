@@ -26,6 +26,7 @@ public class DeathCreeperEntity extends _SpecialCreeperEntity {
     
     @SpecialMob.BestiaryInfoSupplier
     public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
+        entityType.sized( 0.9F, 2.6F );
         return new BestiaryInfo( 0xCD0000 );
     }
     
@@ -52,6 +53,7 @@ public class DeathCreeperEntity extends _SpecialCreeperEntity {
     @SpecialMob.Constructor
     public DeathCreeperEntity( EntityType<? extends _SpecialCreeperEntity> entityType, World world ) {
         super( entityType, world );
+        getSpecialData().setBaseScale( 1.5F );
         setExplodesWhileBurning( true );
         xpReward += 2;
     }

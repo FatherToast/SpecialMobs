@@ -32,7 +32,7 @@ public class MotherSpiderEntity extends _SpecialSpiderEntity {
     
     @SpecialMob.BestiaryInfoSupplier
     public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
-        entityType.sized( 1.8F, 1.2F );
+        entityType.sized( 1.7F, 1.0F );
         return new BestiaryInfo( 0xB300B3 );
     }
     
@@ -60,7 +60,7 @@ public class MotherSpiderEntity extends _SpecialSpiderEntity {
     @SpecialMob.Constructor
     public MotherSpiderEntity( EntityType<? extends _SpecialSpiderEntity> entityType, World world ) {
         super( entityType, world );
-        getSpecialData().setBaseScale( 1.4F );
+        getSpecialData().setBaseScale( 1.2F );
         getSpecialData().setRegenerationTime( 30 );
         xpReward += 1;
         

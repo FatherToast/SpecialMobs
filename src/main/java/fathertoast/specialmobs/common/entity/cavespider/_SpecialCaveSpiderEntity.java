@@ -166,7 +166,7 @@ public class _SpecialCaveSpiderEntity extends CaveSpiderEntity implements ISpeci
     /** @return The eye height of this entity when standing. */
     @Override
     protected float getStandingEyeHeight( Pose pose, EntitySize size ) {
-        return super.getStandingEyeHeight( pose, size ) * getSpecialData().getBaseScale() * (isBaby() ? 0.53448F : 1.0F);
+        return 0.65F * getSpecialData().getBaseScale() * (isBaby() ? 0.53448F : 1.0F); // Use base spider scale instead of super
     }
     
     /** @return Whether this entity is immune to fire damage. */

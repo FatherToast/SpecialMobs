@@ -26,7 +26,7 @@ public class SpitfireSkeletonEntity extends _SpecialSkeletonEntity {
     
     @SpecialMob.BestiaryInfoSupplier
     public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
-        entityType.sized( 0.9F, 2.7F ).fireImmune();
+        entityType.sized( 0.9F, 2.99F ).fireImmune();
         return new BestiaryInfo( 0xDC1A00, BestiaryInfo.BaseWeight.LOW );
         //TODO theme - fire
     }

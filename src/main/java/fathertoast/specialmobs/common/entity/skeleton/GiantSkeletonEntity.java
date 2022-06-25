@@ -24,7 +24,7 @@ public class GiantSkeletonEntity extends _SpecialSkeletonEntity {
     
     @SpecialMob.BestiaryInfoSupplier
     public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
-        entityType.sized( 0.9F, 2.7F );
+        entityType.sized( 0.9F, 2.99F );
         return new BestiaryInfo( 0x494949 );
     }
     

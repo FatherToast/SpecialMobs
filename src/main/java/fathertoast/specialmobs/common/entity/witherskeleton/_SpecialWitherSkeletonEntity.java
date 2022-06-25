@@ -315,8 +315,8 @@ public class _SpecialWitherSkeletonEntity extends WitherSkeletonEntity implement
     
     /** @return The eye height of this entity when standing. */
     @Override
-    protected float getStandingEyeHeight( Pose pose, EntitySize size ) {//TODO fix this
-        return super.getStandingEyeHeight( pose, size ) * getSpecialData().getBaseScale() * (isBaby() ? 0.53448F : 1.0F);
+    protected float getStandingEyeHeight( Pose pose, EntitySize size ) {
+        return 1.74F * getSpecialData().getBaseScale() * (isBaby() ? 0.53448F : 1.0F); // Use base skeleton scale instead of super
     }
     
     /** @return Whether this entity is immune to fire damage. */

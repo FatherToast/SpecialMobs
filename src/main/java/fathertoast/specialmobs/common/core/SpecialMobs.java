@@ -52,8 +52,8 @@ public class SpecialMobs {
      *          - use shields
      *          - babies
      *      o wither skeletons
-     *          o use shields
-     *          o babies
+     *          - use shields
+     *          - babies
      *      o slimes
      *          o use attack damage attribute
      *      o magma cubes
