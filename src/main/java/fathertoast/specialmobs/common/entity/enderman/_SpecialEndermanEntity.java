@@ -58,7 +58,7 @@ public class _SpecialEndermanEntity extends EndermanEntity implements ISpecialMo
     @SpecialMob.Constructor
     public _SpecialEndermanEntity( EntityType<? extends _SpecialEndermanEntity> entityType, World world ) {
         super( entityType, world );
-        specialData.initialize();
+        getSpecialData().initialize();
         getSpecialData().setDamagedByWater( true );
     }
     
@@ -164,7 +164,7 @@ public class _SpecialEndermanEntity extends EndermanEntity implements ISpecialMo
     
     /** @return Whether this entity is immune to fire damage. */
     @Override
-    public boolean fireImmune() { return specialData.isImmuneToFire(); }
+    public boolean fireImmune() { return getSpecialData().isImmuneToFire(); }
     
     /** Sets this entity on fire for a specific duration. */
     @Override
@@ -179,7 +179,7 @@ public class _SpecialEndermanEntity extends EndermanEntity implements ISpecialMo
     /** Sets this entity 'stuck' inside a block, such as a cobweb or sweet berry bush. Mod blocks could use this as a speed boost. */
     @Override
     public void makeStuckInBlock( BlockState block, Vector3d speedMulti ) {
-        if( specialData.canBeStuckIn( block ) ) super.makeStuckInBlock( block, speedMulti );
+        if( getSpecialData().canBeStuckIn( block ) ) super.makeStuckInBlock( block, speedMulti );
     }
     
     /** @return Called when this mob falls. Calculates and applies fall damage. Returns false if canceled. */

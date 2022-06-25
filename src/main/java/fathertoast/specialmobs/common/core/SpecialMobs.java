@@ -32,17 +32,21 @@ public class SpecialMobs {
      *      o entity replacer
      *      o dimension-sensitive configs
      *      o environment-sensitive configs
+     *      ? natural spawning
      *  o entities
      *      - nbt-driven capabilities (special mob data)
+     *      o fish hook
+     *      o bug projectile
      *      + bestiary
      *      ? configurable stats
      *  - monster families (see doc for specifics)
      *      - creepers
      *          - chance to spawn charged during thunderstorms
      *          + scope
-     *      o zombies
+     *      - zombies
      *          o villager infection
-     *          o ranged attack AI (using bow)
+     *          + transformations
+     *          - ranged attack AI (using bow)
      *          - use shields
      *          + drowned
      *      o zombified piglins
@@ -51,7 +55,7 @@ public class SpecialMobs {
      *      - skeletons
      *          - use shields
      *          - babies
-     *      o wither skeletons
+     *      - wither skeletons
      *          - use shields
      *          - babies
      *      o slimes
@@ -87,8 +91,6 @@ public class SpecialMobs {
     
     /** The path to the textures folder. */
     public static final String TEXTURE_PATH = "textures/entity/";
-    /** The path to the loot tables folder. */
-    public static final String LOOT_TABLE_PATH = MOD_ID + ":entities/";
     
     /** Logger instance for the mod. */
     public static final Logger LOG = LogManager.getLogger( MOD_ID );
