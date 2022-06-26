@@ -12,11 +12,13 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.ai.attributes.AttributeModifierMap;
 import net.minecraft.entity.ai.attributes.Attributes;
+import net.minecraft.entity.monster.SlimeEntity;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvents;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.IServerWorld;
 import net.minecraft.world.World;
 
@@ -90,16 +92,18 @@ public class MotherCaveSpiderEntity extends _SpecialCaveSpiderEntity {
             if( extraBabies > 0 && amount > 1.0F && level instanceof IServerWorld && random.nextFloat() < 0.33F ) {
                 extraBabies--;
                 spawnBaby( 0.66F, null );
+                playSound( SoundEvents.EGG_THROW, 1.0F, 2.0F / (random.nextFloat() * 0.4F + 0.8F) );
             }
             return true;
         }
         return false;
     }
     
-    /** Called each tick to update this entity while it's dead. */
+    /** Called to remove this entity from the world. Includes death, unloading, interdimensional travel, etc. */
     @Override
-    protected void tickDeath() {
-        if( deathTime == 19 && level instanceof IServerWorld ) { // At 19, the entity will be immediately removed upon call to super method
+    public void remove( boolean keepData ) {
+        //noinspection deprecation
+        if( isDeadOrDying() && !removed && level instanceof IServerWorld ) { // Same conditions as slime splitting
             // Spawn babies on death
             final int babiesToSpawn = babies + extraBabies;
             ILivingEntityData groupData = null;
@@ -108,8 +112,7 @@ public class MotherCaveSpiderEntity extends _SpecialCaveSpiderEntity {
             }
             playSound( SoundEvents.EGG_THROW, 1.0F, 2.0F / (random.nextFloat() * 0.4F + 0.8F) );
         }
-        
-        super.tickDeath();
+        super.remove( keepData );
     }
     
     /** Helper method to simplify spawning babies. */

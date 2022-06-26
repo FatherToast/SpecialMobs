@@ -58,10 +58,10 @@ public class SpecialMobs {
      *      - wither skeletons
      *          - use shields
      *          - babies
-     *      o slimes
-     *          o use attack damage attribute
+     *      - slimes
+     *          o smallest size can deal damage
      *      o magma cubes
-     *          o use attack damage attribute
+     *          o smallest size can deal damage
      *      - spiders
      *          o ranged attack AI
      *      - cave spiders

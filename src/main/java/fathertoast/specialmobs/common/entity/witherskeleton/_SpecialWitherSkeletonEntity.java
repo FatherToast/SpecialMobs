@@ -162,14 +162,11 @@ public class _SpecialWitherSkeletonEntity extends WitherSkeletonEntity implement
         return arrow;
     }
     
-    /** Called to melee attack the target. */
+    /** Called when this entity successfully damages a target to apply on-hit effects. */
     @Override
-    public boolean doHurtTarget( Entity target ) {
-        if( super.doHurtTarget( target ) ) {
-            onVariantAttack( target );
-            return true;
-        }
-        return false;
+    public void doEnchantDamageEffects( LivingEntity attacker, Entity target ) {
+        onVariantAttack( target );
+        super.doEnchantDamageEffects( attacker, target );
     }
     
     /** Override to apply effects when this entity hits a target with a melee attack. */

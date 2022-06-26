@@ -1,81 +1,84 @@
-package fathertoast.specialmobs.common.entity.enderman;
+package fathertoast.specialmobs.common.entity.slime;
 
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
-import fathertoast.specialmobs.common.util.ExplosionHelper;
+import fathertoast.specialmobs.common.entity.ai.SpecialLeapAtTargetGoal;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import mcp.MethodsReturnNonnullByDefault;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.AttributeModifierMap;
-import net.minecraft.entity.effect.LightningBoltEntity;
+import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.item.Items;
+import net.minecraft.particles.IParticleData;
+import net.minecraft.particles.ParticleTypes;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 @SpecialMob
-public class LightningEndermanEntity extends _SpecialEndermanEntity {
+public class GrapeSlimeEntity extends _SpecialSlimeEntity {
     
     //--------------- Static Special Mob Hooks ----------------
     
     @SpecialMob.BestiaryInfoSupplier
     public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
-        entityType.fireImmune();
-        return new BestiaryInfo( 0x4BB4B5 );
+        return new BestiaryInfo( 0xB333B3 );
+        //TODO theme - mountain
     }
     
     @SpecialMob.AttributeCreator
     public static AttributeModifierMap.MutableAttribute createAttributes() {
-        return _SpecialEndermanEntity.createAttributes();
+        return _SpecialSlimeEntity.createAttributes(); // Slimes define their attributes elsewhere based on size
     }
     
     @SpecialMob.LanguageProvider
     public static String[] getTranslations( String langKey ) {
-        return References.translations( langKey, "Lightning Enderman",
+        return References.translations( langKey, "Grape Slime",
                 "", "", "", "", "", "" );//TODO
     }
     
     @SpecialMob.LootTableProvider
     public static void buildLootTable( LootTableBuilder loot ) {
         addBaseLoot( loot );
-        loot.addCommonDrop( "common", Items.REDSTONE );
+        loot.addGuaranteedDrop( "base", Items.SLIME_BALL, 1 );
+        loot.addUncommonDrop( "uncommon", Items.PURPLE_DYE );
     }
     
     @SpecialMob.Constructor
-    public LightningEndermanEntity( EntityType<? extends _SpecialEndermanEntity> entityType, World world ) {
+    public GrapeSlimeEntity( EntityType<? extends _SpecialSlimeEntity> entityType, World world ) {
         super( entityType, world );
-        getSpecialData().setImmuneToFire( true );
-        xpReward += 2;
+        getSpecialData().setFallDamageMultiplier( 0.0F );
+        slimeExperienceValue += 1;
     }
     
     
     //--------------- Variant-Specific Implementations ----------------
     
-    /** Override to apply effects when this entity hits a target with a melee attack. */
+    /** Override to modify this slime's base attributes by size. */
     @Override
-    protected void onVariantAttack( Entity target ) {
-        if( target instanceof LivingEntity ) {
-            ExplosionHelper.spawnLightning( level, target.getX(), target.getY(), target.getZ() );
-            for( int i = 0; i < 64; i++ ) {
-                if( teleport() ) break;
-            }
-        }
+    protected void modifyVariantAttributes( int size ) {
+        addAttribute( Attributes.MAX_HEALTH, 4.0 * size );
+        multAttribute( Attributes.MOVEMENT_SPEED, 1.2 );
     }
     
-    /** Called when this entity is struck by lightning. */
+    /** Override to change this entity's AI goals. */
     @Override
-    public void thunderHit( ServerWorld world, LightningBoltEntity lightningBolt ) { }
+    protected void registerVariantGoals() {
+        goalSelector.addGoal( 0, new SpecialLeapAtTargetGoal(
+                this, 10, 6.0F, 12.0F, 1.1F, 2.6F ) );
+    }
+    
+    /** @return This slime's particle type for jump effects. */
+    @Override
+    protected IParticleData getParticleType() { return ParticleTypes.SPLASH; } //TODO
     
     private static final ResourceLocation[] TEXTURES = {
-            GET_TEXTURE_PATH( "lightning" ),
-            GET_TEXTURE_PATH( "lightning_eyes" )
+            GET_TEXTURE_PATH( "grape" )
     };
     
     /** @return All default textures for this entity. */

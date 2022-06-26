@@ -1,81 +1,80 @@
-package fathertoast.specialmobs.common.entity.enderman;
+package fathertoast.specialmobs.common.entity.slime;
 
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
-import fathertoast.specialmobs.common.util.ExplosionHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import mcp.MethodsReturnNonnullByDefault;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.AttributeModifierMap;
-import net.minecraft.entity.effect.LightningBoltEntity;
+import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.item.Items;
+import net.minecraft.particles.IParticleData;
+import net.minecraft.particles.ParticleTypes;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 @SpecialMob
-public class LightningEndermanEntity extends _SpecialEndermanEntity {
+public class BlueberrySlimeEntity extends _SpecialSlimeEntity {
     
     //--------------- Static Special Mob Hooks ----------------
     
     @SpecialMob.BestiaryInfoSupplier
     public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
-        entityType.fireImmune();
-        return new BestiaryInfo( 0x4BB4B5 );
+        return new BestiaryInfo( 0x766BBC );
+        //TODO theme - water
     }
     
     @SpecialMob.AttributeCreator
     public static AttributeModifierMap.MutableAttribute createAttributes() {
-        return _SpecialEndermanEntity.createAttributes();
+        return _SpecialSlimeEntity.createAttributes(); // Slimes define their attributes elsewhere based on size
     }
     
     @SpecialMob.LanguageProvider
     public static String[] getTranslations( String langKey ) {
-        return References.translations( langKey, "Lightning Enderman",
+        return References.translations( langKey, "Blueberry Slime",
                 "", "", "", "", "", "" );//TODO
     }
     
     @SpecialMob.LootTableProvider
     public static void buildLootTable( LootTableBuilder loot ) {
         addBaseLoot( loot );
-        loot.addCommonDrop( "common", Items.REDSTONE );
+        loot.addRareDrop( "rare", Items.GOLD_NUGGET, Items.PRISMARINE_SHARD, Items.PRISMARINE_CRYSTALS );
+        loot.addUncommonDrop( "uncommon", Items.BLUE_DYE );
     }
     
     @SpecialMob.Constructor
-    public LightningEndermanEntity( EntityType<? extends _SpecialEndermanEntity> entityType, World world ) {
+    public BlueberrySlimeEntity( EntityType<? extends _SpecialSlimeEntity> entityType, World world ) {
         super( entityType, world );
-        getSpecialData().setImmuneToFire( true );
-        xpReward += 2;
+        getSpecialData().setImmuneToBurning( true );
+        getSpecialData().setCanBreatheInWater( true );
+        slimeExperienceValue += 1;
     }
     
     
     //--------------- Variant-Specific Implementations ----------------
     
-    /** Override to apply effects when this entity hits a target with a melee attack. */
+    /** Override to modify this slime's base attributes by size. */
     @Override
-    protected void onVariantAttack( Entity target ) {
-        if( target instanceof LivingEntity ) {
-            ExplosionHelper.spawnLightning( level, target.getX(), target.getY(), target.getZ() );
-            for( int i = 0; i < 64; i++ ) {
-                if( teleport() ) break;
-            }
-        }
+    protected void modifyVariantAttributes( int size ) {
+        addAttribute( Attributes.ATTACK_DAMAGE, 1.0 * size );
     }
     
-    /** Called when this entity is struck by lightning. */
+    /** @return This slime's particle type for jump effects. */
     @Override
-    public void thunderHit( ServerWorld world, LightningBoltEntity lightningBolt ) { }
+    protected IParticleData getParticleType() { return ParticleTypes.SPLASH; }
+    
+    /** Override to change this entity's AI goals. */
+    @Override
+    protected boolean isAffectedByFluids() { return false; } // TODO figure out the right way to do this
     
     private static final ResourceLocation[] TEXTURES = {
-            GET_TEXTURE_PATH( "lightning" ),
-            GET_TEXTURE_PATH( "lightning_eyes" )
+            GET_TEXTURE_PATH( "blueberry" )
     };
     
     /** @return All default textures for this entity. */

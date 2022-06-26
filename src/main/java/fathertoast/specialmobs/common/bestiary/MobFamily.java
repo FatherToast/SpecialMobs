@@ -61,10 +61,10 @@ public class MobFamily<T extends LivingEntity> {
             "Brute", "Gatling", "Giant", "Knight", /*"Ninja",*/ "Sniper"//, "Spitfire"
     );
     
-    //    public static final MobFamily<SlimeEntity> SLIME = new MobFamily<>(
-    //            "Slime", "slimes", 0x51A03E, new EntityType[] { EntityType.SLIME },
-    //            "Blackberry", "Blueberry", "Caramel", "Grape", "Lemon", "Strawberry", "Watermelon"
-    //    );
+    public static final MobFamily<SlimeEntity> SLIME = new MobFamily<>(
+            "Slime", "slimes", 0x51A03E, new EntityType[] { EntityType.SLIME },
+            "Blackberry", /*"Blueberry",*/ "Caramel", "Grape", "Lemon", "Strawberry", "Watermelon"
+    );
     //    public static final MobFamily<MagmaCubeEntity> MAGMA_CUBE = new MobFamily<>(
     //            "MagmaCube", "magma cubes", 0x340000, new EntityType[] { EntityType.MAGMA_CUBE },
     //            "Flying", "Hardened", "Sticky", "Volatile"
