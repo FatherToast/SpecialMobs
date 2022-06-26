@@ -1,10 +1,5 @@
 package fathertoast.specialmobs.client;
 
-import fathertoast.specialmobs.client.renderer.entity.SpecialCreeperRenderer;
-import fathertoast.specialmobs.client.renderer.entity.SpecialSilverfishRenderer;
-import fathertoast.specialmobs.client.renderer.entity.SpecialSkeletonRenderer;
-import fathertoast.specialmobs.client.renderer.entity.SpecialSpiderRenderer;
-import fathertoast.specialmobs.client.renderer.entity.SpecialZombieRenderer;
 import fathertoast.specialmobs.client.renderer.entity.*;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.core.SpecialMobs;
@@ -43,6 +38,7 @@ public class ClientRegister {
         registerFamilyRenderers( MobFamily.CAVE_SPIDER, SpecialSpiderRenderer::new );
         registerFamilyRenderers( MobFamily.SILVERFISH, SpecialSilverfishRenderer::new );
         registerFamilyRenderers( MobFamily.ENDERMAN, SpecialEndermanRenderer::new );
+        //registerFamilyRenderers( MobFamily.WITCH, SpecialWitchRenderer::new );
         
         // Custom renderers
         registerRenderer( NinjaSkeletonEntity.class, NinjaSkeletonRenderer::new );
@@ -52,17 +48,14 @@ public class ClientRegister {
     private static <T extends LivingEntity> void registerFamilyRenderers( MobFamily<T> family, IRenderFactory<? super T> renderFactory ) {
         RenderingRegistry.registerEntityRenderingHandler( family.vanillaReplacement.entityType.get(), renderFactory );
         for( MobFamily.Species<? extends T> species : family.variants )
-            //if( !species.hasCustomRenderer )
             RenderingRegistry.registerEntityRenderingHandler( species.entityType.get(), renderFactory );
     }
     
     private static <T extends LivingEntity> void registerRenderer( Class<T> entityClass, IRenderFactory<? super T> renderFactory ) {
         MobFamily.Species<T> species = MobFamily.findSpecies( entityClass );
         
-        if( species == null ) {
-            SpecialMobs.LOG.error( "Could not register renderer for entity class {}, as no belonging mob species was found.", entityClass.getSimpleName() );
-            return;
-        }
+        if( species == null )
+            throw new IllegalArgumentException( "Could not register renderer for entity class '" + entityClass.getSimpleName() + "', as no belonging mob species was found." );
         RenderingRegistry.registerEntityRenderingHandler( species.entityType.get(), renderFactory );
     }
 }
