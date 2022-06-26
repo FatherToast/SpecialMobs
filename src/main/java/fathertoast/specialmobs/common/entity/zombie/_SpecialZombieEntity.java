@@ -6,15 +6,25 @@ import fathertoast.specialmobs.common.core.SpecialMobs;
 import fathertoast.specialmobs.common.entity.ISpecialMob;
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.entity.SpecialMobData;
+import fathertoast.specialmobs.common.entity.ai.AIHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.*;
 import net.minecraft.entity.ai.attributes.AttributeModifierMap;
+import net.minecraft.entity.ai.goal.Goal;
+import net.minecraft.entity.ai.goal.RangedBowAttackGoal;
+import net.minecraft.entity.ai.goal.ZombieAttackGoal;
 import net.minecraft.entity.monster.ZombieEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.projectile.AbstractArrowEntity;
+import net.minecraft.entity.projectile.ProjectileHelper;
 import net.minecraft.entity.projectile.SnowballEntity;
+import net.minecraft.inventory.EquipmentSlotType;
+import net.minecraft.item.BowItem;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
@@ -22,6 +32,8 @@ import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.SoundEvents;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.IServerWorld;
@@ -33,13 +45,13 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 @SpecialMob
-public class _SpecialZombieEntity extends ZombieEntity implements ISpecialMob<_SpecialZombieEntity> {
+public class _SpecialZombieEntity extends ZombieEntity implements IRangedAttackMob, ISpecialMob<_SpecialZombieEntity> {
     
     //--------------- Static Special Mob Hooks ----------------
     
     @SpecialMob.BestiaryInfoSupplier
     public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
-        return new BestiaryInfo( 0x799C65 );
+        return new BestiaryInfo( 0x799C65 );//sized(0.6F, 1.95F)
     }
     
     @SpecialMob.AttributeCreator
@@ -61,7 +73,8 @@ public class _SpecialZombieEntity extends ZombieEntity implements ISpecialMob<_S
     @SpecialMob.Constructor
     public _SpecialZombieEntity( EntityType<? extends _SpecialZombieEntity> entityType, World world ) {
         super( entityType, world );
-        specialData.initialize();
+        reassessWeaponGoal();
+        getSpecialData().initialize();
     }
     
     
@@ -71,9 +84,11 @@ public class _SpecialZombieEntity extends ZombieEntity implements ISpecialMob<_S
     @Override
     protected void registerGoals() {
         super.registerGoals();
+        AIHelper.removeGoals( goalSelector, ZombieAttackGoal.class );
         
         getSpecialData().rangedAttackDamage = 2.0F;
-        getSpecialData().rangedAttackSpread = 18.0F;
+        getSpecialData().rangedAttackSpread = 20.0F;
+        getSpecialData().rangedWalkSpeed = 0.8F;
         getSpecialData().rangedAttackCooldown = 30;
         getSpecialData().rangedAttackMaxCooldown = getSpecialData().rangedAttackCooldown;
         getSpecialData().rangedAttackMaxRange = 12.0F;
@@ -83,14 +98,73 @@ public class _SpecialZombieEntity extends ZombieEntity implements ISpecialMob<_S
     /** Override to change this entity's AI goals. */
     protected void registerVariantGoals() { }
     
-    /** Called to melee attack the target. */
+    /** Helper method to set the ranged attack AI more easily. */
+    protected void disableRangedAI() { setRangedAI( 1.0, 20, 0.0F ); }
+    
+    /** Helper method to set the ranged attack AI more easily. */
+    protected void setRangedAI( double walkSpeed, int cooldownTime ) {
+        getSpecialData().rangedWalkSpeed = (float) walkSpeed;
+        getSpecialData().rangedAttackCooldown = cooldownTime;
+        getSpecialData().rangedAttackMaxCooldown = cooldownTime;
+    }
+    
+    /** Helper method to set the ranged attack AI more easily. */
+    protected void setRangedAI( double walkSpeed, int cooldownTime, float range ) {
+        setRangedAI( walkSpeed, cooldownTime );
+        getSpecialData().rangedAttackMaxRange = range;
+    }
+    
+    /** Override to change this entity's attack goal priority. */
+    protected int getVariantAttackPriority() { return 2; }
+    
+    /** Called during spawn finalization to set starting equipment. */
     @Override
-    public boolean doHurtTarget( Entity target ) {
-        if( super.doHurtTarget( target ) ) {
-            onVariantAttack( target );
-            return true;
+    protected void populateDefaultEquipmentSlots( DifficultyInstance difficulty ) {
+        super.populateDefaultEquipmentSlots( difficulty );
+        if( random.nextDouble() < getVariantBowChance() ) { //TODO config the default 5% chance
+            setItemSlot( EquipmentSlotType.MAINHAND, new ItemStack( Items.BOW ) );
         }
-        return false;
+    }
+    
+    /** Override to change this entity's chance to spawn with a bow. */
+    protected double getVariantBowChance() { return getSpecialData().rangedAttackMaxRange > 0.0F ? 0.05 : 0.0; }
+    
+    /** Called to attack the target with a ranged attack. */
+    @Override
+    public void performRangedAttack( LivingEntity target, float damageMulti ) {
+        final ItemStack arrowItem = getProjectile( getItemInHand( ProjectileHelper.getWeaponHoldingHand(
+                this, item -> item instanceof BowItem ) ) );
+        AbstractArrowEntity arrow = getArrow( arrowItem, damageMulti );
+        if( getMainHandItem().getItem() instanceof BowItem )
+            arrow = ((BowItem) getMainHandItem().getItem()).customArrow( arrow );
+        
+        final double dX = target.getX() - getX();
+        final double dY = target.getY( 1.0 / 3.0 ) - arrow.getY();
+        final double dZ = target.getZ() - getZ();
+        final double dH = MathHelper.sqrt( dX * dX + dZ * dZ );
+        arrow.shoot( dX, dY + dH * 0.2, dZ, 1.6F,
+                getSpecialData().rangedAttackSpread * (1.0F - 0.2858F * level.getDifficulty().getId()) );
+        
+        playSound( SoundEvents.SKELETON_SHOOT, 1.0F, 1.0F / (random.nextFloat() * 0.4F + 0.8F) );
+        level.addFreshEntity( arrow );
+    }
+    
+    /** @return The arrow for this zombie to shoot. */
+    protected AbstractArrowEntity getArrow( ItemStack arrowItem, float damageMulti ) {
+        return getVariantArrow( ProjectileHelper.getMobArrow( this, arrowItem,
+                damageMulti * getSpecialData().rangedAttackDamage ), arrowItem, damageMulti );
+    }
+    
+    /** Override to modify this entity's ranged attack projectile. */
+    protected AbstractArrowEntity getVariantArrow( AbstractArrowEntity arrow, ItemStack arrowItem, float damageMulti ) {
+        return arrow;
+    }
+    
+    /** Called when this entity successfully damages a target to apply on-hit effects. */
+    @Override
+    public void doEnchantDamageEffects( LivingEntity attacker, Entity target ) {
+        onVariantAttack( target );
+        super.doEnchantDamageEffects( attacker, target );
     }
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
@@ -108,6 +182,9 @@ public class _SpecialZombieEntity extends ZombieEntity implements ISpecialMob<_S
     /** The parameter for special mob render scale. */
     private static final DataParameter<Float> SCALE = EntityDataManager.defineId( _SpecialZombieEntity.class, DataSerializers.FLOAT );
     
+    /** This entity's attack AI. */
+    private Goal currentAttackAI;
+    
     /** Called from the Entity.class constructor to define data watcher variables. */
     @Override
     protected void defineSynchedData() {
@@ -120,8 +197,34 @@ public class _SpecialZombieEntity extends ZombieEntity implements ISpecialMob<_S
     public ILivingEntityData finalizeSpawn( IServerWorld world, DifficultyInstance difficulty, SpawnReason spawnReason,
                                             @Nullable ILivingEntityData groupData, @Nullable CompoundNBT eggTag ) {
         groupData = super.finalizeSpawn( world, difficulty, spawnReason, groupData, eggTag );
-        // TODO ranged attack
+        reassessWeaponGoal();
         return groupData;
+    }
+    
+    /** Called to set the item equipped in a particular slot. */
+    @Override
+    public void setItemSlot( EquipmentSlotType slot, ItemStack item ) {
+        super.setItemSlot( slot, item );
+        if( !level.isClientSide ) reassessWeaponGoal();
+    }
+    
+    /** Called to set this entity's attack AI based on current equipment. */
+    public void reassessWeaponGoal() {
+        if( level != null && !level.isClientSide ) {
+            if( currentAttackAI != null ) goalSelector.removeGoal( currentAttackAI );
+            
+            final SpecialMobData<_SpecialZombieEntity> data = getSpecialData();
+            final ItemStack weapon = getItemInHand( ProjectileHelper.getWeaponHoldingHand(
+                    this, item -> item instanceof BowItem ) );
+            if( data.rangedAttackMaxRange > 0.0F && weapon.getItem() == Items.BOW ) {
+                currentAttackAI = new RangedBowAttackGoal<>( this, data.rangedWalkSpeed,
+                        data.rangedAttackCooldown, data.rangedAttackMaxRange );
+            }
+            else {
+                currentAttackAI = new ZombieAttackGoal( this, 1.0, false );
+            }
+            goalSelector.addGoal( getVariantAttackPriority(), currentAttackAI );
+        }
     }
     
     
@@ -164,18 +267,22 @@ public class _SpecialZombieEntity extends ZombieEntity implements ISpecialMob<_S
     /** @return The eye height of this entity when standing. */
     @Override
     protected float getStandingEyeHeight( Pose pose, EntitySize size ) {
-        return super.getStandingEyeHeight( pose, size ) * getSpecialData().getBaseScale() * (isBaby() ? 0.53448F : 1.0F);
+        return super.getStandingEyeHeight( pose, size ) * getSpecialData().getBaseScale();// * (isBaby() ? 0.53448F : 1.0F); - Handled in super
     }
     
     /** @return Whether this entity is immune to fire damage. */
     @Override
-    public boolean fireImmune() { return specialData.isImmuneToFire(); }
+    public boolean fireImmune() { return getSpecialData().isImmuneToFire(); }
     
     /** Sets this entity on fire for a specific duration. */
     @Override
     public void setRemainingFireTicks( int ticks ) {
         if( !getSpecialData().isImmuneToBurning() ) super.setRemainingFireTicks( ticks );
     }
+    
+    /** @return True if this zombie burns in sunlight. */
+    @Override
+    protected boolean isSunSensitive() { return !getSpecialData().isImmuneToFire() && !getSpecialData().isImmuneToBurning(); }
     
     /** @return True if this entity can be leashed. */
     @Override
@@ -184,7 +291,7 @@ public class _SpecialZombieEntity extends ZombieEntity implements ISpecialMob<_S
     /** Sets this entity 'stuck' inside a block, such as a cobweb or sweet berry bush. Mod blocks could use this as a speed boost. */
     @Override
     public void makeStuckInBlock( BlockState block, Vector3d speedMulti ) {
-        if( specialData.canBeStuckIn( block ) ) super.makeStuckInBlock( block, speedMulti );
+        if( getSpecialData().canBeStuckIn( block ) ) super.makeStuckInBlock( block, speedMulti );
     }
     
     /** @return Called when this mob falls. Calculates and applies fall damage. Returns false if canceled. */
@@ -246,5 +353,7 @@ public class _SpecialZombieEntity extends ZombieEntity implements ISpecialMob<_S
         
         getSpecialData().readFromNBT( saveTag );
         readVariantSaveData( saveTag );
+        
+        reassessWeaponGoal();
     }
 }

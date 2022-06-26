@@ -79,7 +79,7 @@ public class _SpecialSkeletonEntity extends AbstractSkeletonEntity implements IS
     @SpecialMob.Constructor
     public _SpecialSkeletonEntity( EntityType<? extends _SpecialSkeletonEntity> entityType, World world ) {
         super( entityType, world );
-        specialData.initialize();
+        getSpecialData().initialize();
     }
     
     
@@ -164,14 +164,11 @@ public class _SpecialSkeletonEntity extends AbstractSkeletonEntity implements IS
         return arrow;
     }
     
-    /** Called to melee attack the target. */
+    /** Called when this entity successfully damages a target to apply on-hit effects. */
     @Override
-    public boolean doHurtTarget( Entity target ) {
-        if( super.doHurtTarget( target ) ) {
-            onVariantAttack( target );
-            return true;
-        }
-        return false;
+    public void doEnchantDamageEffects( LivingEntity attacker, Entity target ) {
+        onVariantAttack( target );
+        super.doEnchantDamageEffects( attacker, target );
     }
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
@@ -209,7 +206,7 @@ public class _SpecialSkeletonEntity extends AbstractSkeletonEntity implements IS
         return groupData;
     }
     
-    /** Called to change */
+    /** Called to set this entity's attack AI based on current equipment. */
     @Override
     public void reassessWeaponGoal() {
         if( level != null && !level.isClientSide ) {
@@ -358,7 +355,7 @@ public class _SpecialSkeletonEntity extends AbstractSkeletonEntity implements IS
     
     /** @return Whether this entity is immune to fire damage. */
     @Override
-    public boolean fireImmune() { return specialData.isImmuneToFire(); }
+    public boolean fireImmune() { return getSpecialData().isImmuneToFire(); }
     
     /** Sets this entity on fire for a specific duration. */
     @Override
@@ -373,7 +370,7 @@ public class _SpecialSkeletonEntity extends AbstractSkeletonEntity implements IS
     /** Sets this entity 'stuck' inside a block, such as a cobweb or sweet berry bush. Mod blocks could use this as a speed boost. */
     @Override
     public void makeStuckInBlock( BlockState block, Vector3d speedMulti ) {
-        if( specialData.canBeStuckIn( block ) ) super.makeStuckInBlock( block, speedMulti );
+        if( getSpecialData().canBeStuckIn( block ) ) super.makeStuckInBlock( block, speedMulti );
     }
     
     /** @return Called when this mob falls. Calculates and applies fall damage. Returns false if canceled. */

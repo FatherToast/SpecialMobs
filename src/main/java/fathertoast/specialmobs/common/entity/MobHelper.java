@@ -176,8 +176,8 @@ public final class MobHelper {
     public static EffectInstance nextPlagueEffect( Random random, World world ) {
         final int duration = MobHelper.getDebuffDuration( world.getDifficulty() );
         
-        //EffectInstance potion = POTIONS_PLAGUE[random.nextInt( POTIONS_PLAGUE.length - (Config.get().GENERAL.DISABLE_NAUSEA ? 1 : 0) )]; TODO config
-        EffectInstance potion = PLAGUE_EFFECTS[random.nextInt( PLAGUE_EFFECTS.length )];
+        //final EffectInstance potion = PLAGUE_EFFECTS[random.nextInt( PLAGUE_EFFECTS.length - (Config.get().GENERAL.DISABLE_NAUSEA ? 1 : 0) )]; TODO config
+        final EffectInstance potion = PLAGUE_EFFECTS[random.nextInt( PLAGUE_EFFECTS.length )];
         return new EffectInstance( potion.getEffect(), duration * potion.getDuration(), potion.getAmplifier() );
     }
     
@@ -195,7 +195,7 @@ public final class MobHelper {
     public static EffectInstance nextWitchSpiderEffect( Random random, World world, boolean includePoison ) {
         final int duration = MobHelper.getDebuffDuration( world.getDifficulty() );
         
-        EffectInstance potion = WITCH_EFFECTS[random.nextInt( WITCH_EFFECTS.length - (includePoison ? 0 : 1) )];
+        final EffectInstance potion = WITCH_EFFECTS[random.nextInt( WITCH_EFFECTS.length - (includePoison ? 0 : 1) )];
         return new EffectInstance( potion.getEffect(), duration * potion.getDuration(), potion.getAmplifier() );
     }
     

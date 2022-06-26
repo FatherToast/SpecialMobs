@@ -11,10 +11,18 @@ import java.util.ArrayList;
  */
 public final class AIHelper {
     
-    /** Inserts an AI goal at the specified priority. Existing goals have their priority adjusted accordingly. */
+    /** Inserts an AI goal at the specified priority. Existing goals have their priority incremented accordingly. */
     public static void insertGoal( GoalSelector ai, int priority, Goal goal ) {
         for( PrioritizedGoal task : new ArrayList<>( ai.availableGoals ) ) {
             if( task.getPriority() >= priority ) task.priority++;
+        }
+        ai.addGoal( priority, goal );
+    }
+    
+    /** Inserts an AI goal at the specified priority. Existing goals have their priority decremented accordingly. */
+    public static void insertGoalReverse( GoalSelector ai, int priority, Goal goal ) {
+        for( PrioritizedGoal task : new ArrayList<>( ai.availableGoals ) ) {
+            if( task.getPriority() <= priority ) task.priority--;
         }
         ai.addGoal( priority, goal );
     }

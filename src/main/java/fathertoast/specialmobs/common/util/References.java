@@ -77,6 +77,7 @@ public final class References {
     public static final String TAG_HEALTH_STACKS = "HealthStacks"; // Hungry Spider
     
     // Misc.
+    public static final String TAG_FUSE_TIME = "FuseTime"; // Blackberry Slime, Volatile Magma Cube
     public static final String TAG_AMMO = "Ammo"; // Web (Cave) Spider
     public static final String TAG_IS_FAKE = "IsFake"; // Mirage Enderman
     

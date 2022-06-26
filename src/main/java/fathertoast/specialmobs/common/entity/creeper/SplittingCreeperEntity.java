@@ -32,6 +32,7 @@ public class SplittingCreeperEntity extends _SpecialCreeperEntity {
     
     @SpecialMob.BestiaryInfoSupplier
     public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
+        entityType.sized( 0.7F, 1.99F );
         return new BestiaryInfo( 0x5F9D22, BestiaryInfo.BaseWeight.LOW );
     }
     
@@ -57,6 +58,7 @@ public class SplittingCreeperEntity extends _SpecialCreeperEntity {
     @SpecialMob.Constructor
     public SplittingCreeperEntity( EntityType<? extends _SpecialCreeperEntity> entityType, World world ) {
         super( entityType, world );
+        getSpecialData().setBaseScale( 1.2F );
         getSpecialData().setImmuneToBurning( true );
         setExplodesWhenShot( true );
         xpReward += 2;

@@ -25,7 +25,7 @@ public class ToughSilverfishEntity extends _SpecialSilverfishEntity {
     
     @SpecialMob.BestiaryInfoSupplier
     public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
-        entityType.sized( 0.6F, 0.9F );
+        entityType.sized( 0.6F, 0.45F );
         return new BestiaryInfo( 0xDD0E0E, BestiaryInfo.BaseWeight.LOW );
     }
     

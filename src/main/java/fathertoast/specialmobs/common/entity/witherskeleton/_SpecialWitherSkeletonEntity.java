@@ -76,7 +76,7 @@ public class _SpecialWitherSkeletonEntity extends WitherSkeletonEntity implement
     @SpecialMob.Constructor
     public _SpecialWitherSkeletonEntity( EntityType<? extends _SpecialWitherSkeletonEntity> entityType, World world ) {
         super( entityType, world );
-        specialData.initialize();
+        getSpecialData().initialize();
         getSpecialData().setImmuneToFire( true );
     }
     
@@ -162,14 +162,11 @@ public class _SpecialWitherSkeletonEntity extends WitherSkeletonEntity implement
         return arrow;
     }
     
-    /** Called to melee attack the target. */
+    /** Called when this entity successfully damages a target to apply on-hit effects. */
     @Override
-    public boolean doHurtTarget( Entity target ) {
-        if( super.doHurtTarget( target ) ) {
-            onVariantAttack( target );
-            return true;
-        }
-        return false;
+    public void doEnchantDamageEffects( LivingEntity attacker, Entity target ) {
+        onVariantAttack( target );
+        super.doEnchantDamageEffects( attacker, target );
     }
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
@@ -207,7 +204,7 @@ public class _SpecialWitherSkeletonEntity extends WitherSkeletonEntity implement
         return groupData;
     }
     
-    /** Called to change */
+    /** Called to set this entity's attack AI based on current equipment. */
     @Override
     public void reassessWeaponGoal() {
         if( level != null && !level.isClientSide ) {
@@ -315,13 +312,13 @@ public class _SpecialWitherSkeletonEntity extends WitherSkeletonEntity implement
     
     /** @return The eye height of this entity when standing. */
     @Override
-    protected float getStandingEyeHeight( Pose pose, EntitySize size ) {//TODO fix this
-        return super.getStandingEyeHeight( pose, size ) * getSpecialData().getBaseScale() * (isBaby() ? 0.53448F : 1.0F);
+    protected float getStandingEyeHeight( Pose pose, EntitySize size ) {
+        return 1.74F * getSpecialData().getBaseScale() * (isBaby() ? 0.53448F : 1.0F); // Use base skeleton scale instead of super
     }
     
     /** @return Whether this entity is immune to fire damage. */
     @Override
-    public boolean fireImmune() { return specialData.isImmuneToFire(); }
+    public boolean fireImmune() { return getSpecialData().isImmuneToFire(); }
     
     /** Sets this entity on fire for a specific duration. */
     @Override
@@ -336,7 +333,7 @@ public class _SpecialWitherSkeletonEntity extends WitherSkeletonEntity implement
     /** Sets this entity 'stuck' inside a block, such as a cobweb or sweet berry bush. Mod blocks could use this as a speed boost. */
     @Override
     public void makeStuckInBlock( BlockState block, Vector3d speedMulti ) {
-        if( specialData.canBeStuckIn( block ) ) super.makeStuckInBlock( block, speedMulti );
+        if( getSpecialData().canBeStuckIn( block ) ) super.makeStuckInBlock( block, speedMulti );
     }
     
     /** @return Called when this mob falls. Calculates and applies fall damage. Returns false if canceled. */

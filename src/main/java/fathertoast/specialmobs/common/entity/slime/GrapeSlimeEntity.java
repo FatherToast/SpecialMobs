@@ -1,17 +1,18 @@
-package fathertoast.specialmobs.common.entity.skeleton;
+package fathertoast.specialmobs.common.entity.slime;
 
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
-import fathertoast.specialmobs.common.util.AttributeHelper;
+import fathertoast.specialmobs.common.entity.ai.SpecialLeapAtTargetGoal;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import mcp.MethodsReturnNonnullByDefault;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.AttributeModifierMap;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.item.Items;
+import net.minecraft.particles.IParticleData;
+import net.minecraft.particles.ParticleTypes;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 
@@ -20,71 +21,64 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 @SpecialMob
-public class SpitfireSkeletonEntity extends _SpecialSkeletonEntity {
+public class GrapeSlimeEntity extends _SpecialSlimeEntity {
     
     //--------------- Static Special Mob Hooks ----------------
     
     @SpecialMob.BestiaryInfoSupplier
     public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
-        entityType.sized( 0.9F, 2.99F ).fireImmune();
-        return new BestiaryInfo( 0xDC1A00, BestiaryInfo.BaseWeight.LOW );
-        //TODO theme - fire
+        return new BestiaryInfo( 0xB333B3 );
+        //TODO theme - mountain
     }
     
     @SpecialMob.AttributeCreator
     public static AttributeModifierMap.MutableAttribute createAttributes() {
-        return AttributeHelper.of( _SpecialSkeletonEntity.createAttributes() )
-                .addAttribute( Attributes.MAX_HEALTH, 20.0 )
-                .addAttribute( Attributes.ATTACK_DAMAGE, 2.0 )
-                .build();
+        return _SpecialSlimeEntity.createAttributes(); // Slimes define their attributes elsewhere based on size
     }
     
     @SpecialMob.LanguageProvider
     public static String[] getTranslations( String langKey ) {
-        return References.translations( langKey, "Spitfire Skeleton",
+        return References.translations( langKey, "Grape Slime",
                 "", "", "", "", "", "" );//TODO
     }
     
     @SpecialMob.LootTableProvider
     public static void buildLootTable( LootTableBuilder loot ) {
         addBaseLoot( loot );
-        loot.addCommonDrop( "common", Items.FIRE_CHARGE );
+        loot.addGuaranteedDrop( "base", Items.SLIME_BALL, 1 );
+        loot.addUncommonDrop( "uncommon", Items.PURPLE_DYE );
     }
     
     @SpecialMob.Constructor
-    public SpitfireSkeletonEntity( EntityType<? extends _SpecialSkeletonEntity> entityType, World world ) {
+    public GrapeSlimeEntity( EntityType<? extends _SpecialSlimeEntity> entityType, World world ) {
         super( entityType, world );
-        getSpecialData().setBaseScale( 1.5F );
-        getSpecialData().setImmuneToFire( true );
-        getSpecialData().setDamagedByWater( true );
-        maxUpStep = 1.0F;
-        xpReward += 2;
+        getSpecialData().setFallDamageMultiplier( 0.0F );
+        slimeExperienceValue += 1;
     }
     
     
     //--------------- Variant-Specific Implementations ----------------
     
+    /** Override to modify this slime's base attributes by size. */
+    @Override
+    protected void modifyVariantAttributes( int size ) {
+        addAttribute( Attributes.MAX_HEALTH, 4.0 * size );
+        multAttribute( Attributes.MOVEMENT_SPEED, 1.2 );
+    }
+    
     /** Override to change this entity's AI goals. */
     @Override
     protected void registerVariantGoals() {
-        getSpecialData().rangedAttackDamage += 2.0F;
-        getSpecialData().rangedAttackSpread *= 0.5F;
+        goalSelector.addGoal( 0, new SpecialLeapAtTargetGoal(
+                this, 10, 6.0F, 12.0F, 1.1F, 2.6F ) );
     }
     
-    /** Override to apply effects when this entity hits a target with a melee attack. */
+    /** @return This slime's particle type for jump effects. */
     @Override
-    protected void onVariantAttack( Entity target ) {
-        target.setSecondsOnFire( 10 );
-    }
-    
-    /** Called to attack the target with a ranged attack. */
-    @Override
-    public void performRangedAttack( LivingEntity target, float damageMulti ) {
-        //TODO
-    }
+    protected IParticleData getParticleType() { return ParticleTypes.SPLASH; } //TODO
     
     private static final ResourceLocation[] TEXTURES = {
-            GET_TEXTURE_PATH( "fire" )
+            GET_TEXTURE_PATH( "grape" )
     };
     
     /** @return All default textures for this entity. */

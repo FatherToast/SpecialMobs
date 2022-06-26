@@ -66,7 +66,7 @@ public class _SpecialCreeperEntity extends CreeperEntity implements ISpecialMob<
     @SpecialMob.Constructor
     public _SpecialCreeperEntity( EntityType<? extends _SpecialCreeperEntity> entityType, World world ) {
         super( entityType, world );
-        specialData.initialize();
+        getSpecialData().initialize();
     }
     
     
@@ -82,14 +82,11 @@ public class _SpecialCreeperEntity extends CreeperEntity implements ISpecialMob<
     /** Override to change this entity's AI goals. */
     protected void registerVariantGoals() { }
     
-    /** Called to melee attack the target. */
+    /** Called when this entity successfully damages a target to apply on-hit effects. */
     @Override
-    public boolean doHurtTarget( Entity target ) {
-        if( super.doHurtTarget( target ) ) {
-            onVariantAttack( target );
-            return true;
-        }
-        return false;
+    public void doEnchantDamageEffects( LivingEntity attacker, Entity target ) {
+        onVariantAttack( target );
+        super.doEnchantDamageEffects( attacker, target );
     }
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
@@ -293,15 +290,15 @@ public class _SpecialCreeperEntity extends CreeperEntity implements ISpecialMob<
         getSpecialData().tick();
     }
     
-    /** @return The eye height of this entity when standing. */
-    @Override
-    protected float getStandingEyeHeight( Pose pose, EntitySize size ) {
-        return super.getStandingEyeHeight( pose, size ) * getSpecialData().getBaseScale() * (isBaby() ? 0.53448F : 1.0F);
-    }
+    //    /** @return The eye height of this entity when standing. */ - Creepers use auto-scaled eye height
+    //    @Override
+    //    protected float getStandingEyeHeight( Pose pose, EntitySize size ) {
+    //        return super.getStandingEyeHeight( pose, size ) * getSpecialData().getBaseScale() * (isBaby() ? 0.53448F : 1.0F);
+    //    }
     
     /** @return Whether this entity is immune to fire damage. */
     @Override
-    public boolean fireImmune() { return specialData.isImmuneToFire(); }
+    public boolean fireImmune() { return getSpecialData().isImmuneToFire(); }
     
     /** Sets this entity on fire for a specific duration. */
     @Override
@@ -316,7 +313,7 @@ public class _SpecialCreeperEntity extends CreeperEntity implements ISpecialMob<
     /** Sets this entity 'stuck' inside a block, such as a cobweb or sweet berry bush. Mod blocks could use this as a speed boost. */
     @Override
     public void makeStuckInBlock( BlockState block, Vector3d speedMulti ) {
-        if( specialData.canBeStuckIn( block ) ) super.makeStuckInBlock( block, speedMulti );
+        if( getSpecialData().canBeStuckIn( block ) ) super.makeStuckInBlock( block, speedMulti );
     }
     
     /** @return Called when this mob falls. Calculates and applies fall damage. Returns false if canceled. */

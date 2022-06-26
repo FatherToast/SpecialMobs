@@ -32,6 +32,7 @@ public class BruteSkeletonEntity extends _SpecialSkeletonEntity {
     
     @SpecialMob.BestiaryInfoSupplier
     public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
+        entityType.sized( 0.7F, 2.4F );
         return new BestiaryInfo( 0xFFF87E );
     }
     
@@ -59,6 +60,7 @@ public class BruteSkeletonEntity extends _SpecialSkeletonEntity {
     @SpecialMob.Constructor
     public BruteSkeletonEntity( EntityType<? extends _SpecialSkeletonEntity> entityType, World world ) {
         super( entityType, world );
+        getSpecialData().setBaseScale( 1.2F );
         xpReward += 2;
     }
     

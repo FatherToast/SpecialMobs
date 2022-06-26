@@ -26,7 +26,7 @@ public class SpitfireWitherSkeletonEntity extends _SpecialWitherSkeletonEntity {
     
     @SpecialMob.BestiaryInfoSupplier
     public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
-        entityType.sized( 0.95F, 3.24F );
+        entityType.sized( 0.95F, 3.6F );
         return new BestiaryInfo( 0xDC1A00, BestiaryInfo.BaseWeight.LOW );
     }
     
