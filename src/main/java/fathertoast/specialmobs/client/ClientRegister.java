@@ -8,6 +8,7 @@ import fathertoast.specialmobs.client.renderer.entity.SpecialZombieRenderer;
 import fathertoast.specialmobs.client.renderer.entity.*;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.core.SpecialMobs;
+import fathertoast.specialmobs.common.entity.skeleton.NinjaSkeletonEntity;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.entity.LivingEntity;
 import net.minecraftforge.api.distmarker.Dist;
@@ -28,7 +29,8 @@ public class ClientRegister {
     public static void onClientSetup( FMLClientSetupEvent event ) {
         registerEntityRenderers();
     }
-    
+
+    @SuppressWarnings("all")
     private static void registerEntityRenderers() {
         // Family-based renderers
         registerFamilyRenderers( MobFamily.CREEPER, SpecialCreeperRenderer::new );
@@ -40,11 +42,25 @@ public class ClientRegister {
         registerFamilyRenderers( MobFamily.CAVE_SPIDER, SpecialSpiderRenderer::new );
         registerFamilyRenderers( MobFamily.SILVERFISH, SpecialSilverfishRenderer::new );
         registerFamilyRenderers( MobFamily.ENDERMAN, SpecialEndermanRenderer::new );
+
+        // Custom renderers
+        registerRenderer( NinjaSkeletonEntity.class, NinjaSkeletonRenderer::new);
     }
     
-    private static <T extends LivingEntity> void registerFamilyRenderers( MobFamily<T> family, IRenderFactory<? super T> renderFactory ) {
+    private static <T extends LivingEntity> void registerFamilyRenderers(MobFamily<T> family, IRenderFactory<? super T> renderFactory ) {
         RenderingRegistry.registerEntityRenderingHandler( family.vanillaReplacement.entityType.get(), renderFactory );
         for( MobFamily.Species<? extends T> species : family.variants )
-            RenderingRegistry.registerEntityRenderingHandler( species.entityType.get(), renderFactory );
+            if ( !species.hasCustomRenderer )
+                RenderingRegistry.registerEntityRenderingHandler(species.entityType.get(), renderFactory);
+    }
+
+    private static <T extends LivingEntity> void registerRenderer(Class<T> entityClass, IRenderFactory<? super T> renderFactory) {
+        MobFamily.Species<T> species = MobFamily.findSpecies(entityClass);
+
+        if (species == null) {
+            SpecialMobs.LOG.error("Could not register renderer for entity class {}, as no belonging mob species was found.", entityClass.getSimpleName());
+            return;
+        }
+        RenderingRegistry.registerEntityRenderingHandler(species.entityType.get(), renderFactory);
     }
 }

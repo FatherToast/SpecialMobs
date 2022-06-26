@@ -61,7 +61,7 @@ public class NinjaSkeletonEntity extends _SpecialSkeletonEntity implements INinj
                 Blocks.INFESTED_CRACKED_STONE_BRICKS, Blocks.INFESTED_MOSSY_STONE_BRICKS, Blocks.INFESTED_CHISELED_STONE_BRICKS );
     }
     
-    @SpecialMob.Constructor
+    @SpecialMob.Constructor(hasCustomRenderer = true)
     public NinjaSkeletonEntity( EntityType<? extends _SpecialSkeletonEntity> entityType, World world ) {
         super( entityType, world );
         xpReward += 2;
@@ -120,6 +120,8 @@ public class NinjaSkeletonEntity extends _SpecialSkeletonEntity implements INinj
         if( !level.isClientSide() ) {
             if( canHide ) {
                 //EntityAINinja.startHiding( this ); TODO
+                this.setHiding(true);
+                this.setDisguiseBlock(Blocks.DIRT.defaultBlockState());
             }
             else if( onGround && getDisguiseBlock() == null &&
                     (getTarget() == null || getTarget() instanceof PlayerEntity && ((PlayerEntity) getTarget()).isCreative()) ) {
@@ -132,22 +134,24 @@ public class NinjaSkeletonEntity extends _SpecialSkeletonEntity implements INinj
     //    // Moves this entity.
     //    @Override TODO
     //    public void move( MoverType type, double x, double y, double z ) {
-    //        if( isImmobile() && type != MoverType.PISTON ) {
+    //        if( isHiding() && type != MoverType.PISTON ) {
     //            motionY = 0.0;
     //        }
     //        else {
     //            super.move( type, x, y, z );
     //        }
     //    }
-    //
-    //    // Returns true if this entity should push and be pushed by other entities when colliding.
-    //    @Override
-    //    public boolean canBePushed() { return !isImmobile(); }
+
+    /** Returns true if this entity should push and be pushed by other entities when colliding. */
+    @Override
+    public boolean isPushable() {
+        return super.isPushable() && !isHiding();
+    }
     
     /** Sets this entity on fire for a specific duration. */
     @Override
     public void setRemainingFireTicks( int ticks ) {
-        if( !isImmobile() ) super.setRemainingFireTicks( ticks );
+        if( !isHiding() ) super.setRemainingFireTicks( ticks );
     }
     
     /** Reveals this ninja and sets its target so that it doesn't immediately re-disguise itself. */
@@ -186,12 +190,12 @@ public class NinjaSkeletonEntity extends _SpecialSkeletonEntity implements INinj
     
     /** @return Whether this ninja is currently immobile. */
     @Override
-    public boolean isImmobile() { return getEntityData().get( IS_HIDING ); }
+    public boolean isHiding() { return getEntityData().get( IS_HIDING ); }
     
     /** Sets this ninja's immovable state. When activated, the entity is 'snapped' to the nearest block position. */
     @Override
-    public void setImmobile( boolean value ) {
-        if( value != isImmobile() ) {
+    public void setHiding( boolean value ) {
+        if( value != isHiding() ) {
             getEntityData().set( IS_HIDING, value );
             if( value ) {
                 clearFire();

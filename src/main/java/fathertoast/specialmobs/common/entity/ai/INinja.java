@@ -11,10 +11,10 @@ import javax.annotation.Nullable;
 public interface INinja {
     
     /** @return Whether this ninja is currently immobile. */
-    boolean isImmobile();
+    boolean isHiding();
     
     /** Sets this ninja's immovable state. When activated, the entity is 'snapped' to the nearest block position. */
-    void setImmobile( boolean value );
+    void setHiding( boolean value );
     
     /** @return The block being hidden (rendered) as, or null if not hiding. */
     @Nullable

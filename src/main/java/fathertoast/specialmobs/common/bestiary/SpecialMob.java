@@ -36,7 +36,9 @@ public @interface SpecialMob {
      */
     @Retention( RetentionPolicy.RUNTIME )
     @Target( ElementType.CONSTRUCTOR )
-    @interface Constructor { }
+    @interface Constructor {
+        boolean hasCustomRenderer() default false;
+    }
     
     /**
      * REQUIRED. This is called during registration to collect static properties of the mob needed for the bestiary

@@ -104,6 +104,19 @@ public final class AnnotationHelper {
             throw new RuntimeException( "Entity class for " + species.name + " has invalid loot table builder method", ex );
         }
     }
+
+    /**
+     *  Returns the boolean value for custom rendering from the target class' Constructor annotation.
+     *  {@link SpecialMob.Constructor#hasCustomRenderer()}
+     */
+    public static boolean hasCustomRenderer( Class<?> entityClass ) {
+        if (entityClass.isAnnotationPresent(SpecialMob.Constructor.class)) {
+            return entityClass.getDeclaredAnnotation(SpecialMob.Constructor.class).hasCustomRenderer();
+        }
+        else {
+            return false;
+        }
+    }
     
     
     //--------------- RAW ANNOTATION METHODS ----------------
