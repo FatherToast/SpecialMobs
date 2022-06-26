@@ -61,7 +61,6 @@ public class SpecialMobs {
      *      - slimes
      *          - smallest size can deal damage
      *      o magma cubes
-     *          o smallest size can deal damage
      *      - spiders
      *          o ranged attack AI
      *      - cave spiders

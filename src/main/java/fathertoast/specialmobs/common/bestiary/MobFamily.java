@@ -67,10 +67,10 @@ public class MobFamily<T extends LivingEntity> {
             "Slime", "slimes", 0x51A03E, new EntityType[] { EntityType.SLIME },
             "Blackberry", "Blueberry", "Caramel", "Grape", "Lemon", "Strawberry", "Watermelon"
     );
-    //    public static final MobFamily<MagmaCubeEntity> MAGMA_CUBE = new MobFamily<>(
-    //            "MagmaCube", "magma cubes", 0x340000, new EntityType[] { EntityType.MAGMA_CUBE },
-    //            "Flying", /*"Fury",*/ "Hardened", "Sticky", "Volatile"
-    //    );
+    public static final MobFamily<MagmaCubeEntity> MAGMA_CUBE = new MobFamily<>(
+            "MagmaCube", "magma cubes", 0x340000, new EntityType[] { EntityType.MAGMA_CUBE },
+            "Bouncing", "Hardened", "Sticky", "Volatile"
+    );
     
     public static final MobFamily<SpiderEntity> SPIDER = new MobFamily<>(
             "Spider", "spiders", 0x342D27, new EntityType[] { EntityType.SPIDER },
@@ -131,12 +131,12 @@ public class MobFamily<T extends LivingEntity> {
     
     /** @return A list of all species. */
     public static List<Species<?>> getAllSpecies() { return SPECIES_LIST; }
-
-    @SuppressWarnings("unchecked")
+    
+    @SuppressWarnings( "unchecked" )
     @Nullable
-    public static <T extends LivingEntity> Species<T> findSpecies(Class<T> entityClass) {
-        for (Species<?> species : getAllSpecies()) {
-            if (species.entityClass == entityClass)
+    public static <T extends LivingEntity> Species<T> findSpecies( Class<T> entityClass ) {
+        for( Species<?> species : getAllSpecies() ) {
+            if( species.entityClass == entityClass )
                 return (Species<T>) species;
         }
         return null;
@@ -249,14 +249,14 @@ public class MobFamily<T extends LivingEntity> {
         public final RegistryObject<EntityType<T>> entityType;
         /** This species's spawn egg item, wrapped in its registry object. */
         public final RegistryObject<ForgeSpawnEggItem> spawnEgg;
-
+        
         /** Whether this species has a custom renderer. */
         public final boolean hasCustomRenderer;
         
         /** Constructs a new mob species. For vanilla replacements, the variant name is null. */
         private Species( MobFamily<? super T> parentFamily, String packageRoot, @Nullable String variantName ) {
             final boolean vanillaReplacement = variantName == null;
-
+            
             family = parentFamily;
             specialVariantName = variantName;
             name = vanillaReplacement ? parentFamily.name : variantName + parentFamily.name;
@@ -275,7 +275,7 @@ public class MobFamily<T extends LivingEntity> {
             hasCustomRenderer = AnnotationHelper.hasCustomRenderer( entityClass );
             AnnotationHelper.injectEntityTypeHolder( this );
         }
-
+        
         /** Finds the entity class based on a standard format. */
         private Class<T> findClass( String format, String packageRoot ) {
             try {

@@ -1,4 +1,4 @@
-package fathertoast.specialmobs.common.entity.slime;
+package fathertoast.specialmobs.common.entity.magmacube;
 
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
@@ -14,8 +14,7 @@ import net.minecraft.entity.ai.attributes.Attribute;
 import net.minecraft.entity.ai.attributes.AttributeModifierMap;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.ai.attributes.ModifiableAttributeInstance;
-import net.minecraft.entity.monster.MonsterEntity;
-import net.minecraft.entity.monster.SlimeEntity;
+import net.minecraft.entity.monster.MagmaCubeEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.SnowballEntity;
 import net.minecraft.nbt.CompoundNBT;
@@ -33,33 +32,33 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 @SpecialMob
-public class _SpecialSlimeEntity extends SlimeEntity implements ISpecialMob<_SpecialSlimeEntity> {
+public class _SpecialMagmaCubeEntity extends MagmaCubeEntity implements ISpecialMob<_SpecialMagmaCubeEntity> {
     
     //--------------- Static Special Mob Hooks ----------------
     
     @SpecialMob.BestiaryInfoSupplier
     public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
-        return new BestiaryInfo( 0x51A03E );
+        return new BestiaryInfo( 0xFCFC00 );
     }
     
     @SpecialMob.AttributeCreator
     public static AttributeModifierMap.MutableAttribute createAttributes() {
-        return MonsterEntity.createMonsterAttributes(); // Slimes define their attributes elsewhere based on size
+        return MagmaCubeEntity.createAttributes(); // Slimes define their attributes elsewhere based on size
     }
     
     @SpecialMob.LanguageProvider
     public static String[] getTranslations( String langKey ) {
-        return References.translations( langKey, "Slime",
+        return References.translations( langKey, "Magma Cube",
                 "", "", "", "", "", "" );//TODO
     }
     
     @SpecialMob.LootTableProvider
     public static void addBaseLoot( LootTableBuilder loot ) {
-        loot.addLootTable( "main", EntityType.SLIME.getDefaultLootTable() );
+        loot.addLootTable( "main", EntityType.MAGMA_CUBE.getDefaultLootTable() );
     }
     
     @SpecialMob.Constructor
-    public _SpecialSlimeEntity( EntityType<? extends _SpecialSlimeEntity> entityType, World world ) {
+    public _SpecialMagmaCubeEntity( EntityType<? extends _SpecialMagmaCubeEntity> entityType, World world ) {
         super( entityType, world );
         getSpecialData().initialize();
     }
@@ -100,7 +99,7 @@ public class _SpecialSlimeEntity extends SlimeEntity implements ISpecialMob<_Spe
     //--------------- Family-Specific Implementations ----------------
     
     /** The parameter for special mob render scale. */
-    private static final DataParameter<Float> SCALE = EntityDataManager.defineId( _SpecialSlimeEntity.class, DataSerializers.FLOAT );
+    private static final DataParameter<Float> SCALE = EntityDataManager.defineId( _SpecialMagmaCubeEntity.class, DataSerializers.FLOAT );
     
     protected int slimeExperienceValue = 0;
     
@@ -110,10 +109,6 @@ public class _SpecialSlimeEntity extends SlimeEntity implements ISpecialMob<_Spe
         super.defineSynchedData();
         specialData = new SpecialMobData<>( this, SCALE, 1.0F );
     }
-    
-    /** Returns true if this slime can deal damage. */
-    @Override
-    protected boolean isDealsDamage() { return getSize() > 0 && isEffectiveAi(); } // TODO config for allow tiny slimes to hit
     
     /** Sets this slime's size, optionally resetting its health to max. */
     @Override
@@ -126,12 +121,12 @@ public class _SpecialSlimeEntity extends SlimeEntity implements ISpecialMob<_Spe
     }
     
     /**
-     * Alters this slime's base attribute by adding an amount to it.
+     * Alters this magma cube's base attribute by adding an amount to it.
      * Do NOT use this for move speed, instead use {@link #multAttribute(Attribute, double)}
      */
     protected void addAttribute( Attribute attribute, double amount ) {
-        if( attribute != Attributes.MAX_HEALTH && attribute != Attributes.ATTACK_DAMAGE && attribute != Attributes.MOVEMENT_SPEED )
-            throw new IllegalArgumentException( "Slime relative attributes are only health, damage, and speed!" );
+        if( attribute != Attributes.MAX_HEALTH && attribute != Attributes.ARMOR && attribute != Attributes.ATTACK_DAMAGE && attribute != Attributes.MOVEMENT_SPEED )
+            throw new IllegalArgumentException( "Magma cube relative attributes are only health, armor, damage, and speed!" );
         
         final ModifiableAttributeInstance attributeInstance = getAttribute( attribute );
         if( attributeInstance == null )
@@ -140,12 +135,12 @@ public class _SpecialSlimeEntity extends SlimeEntity implements ISpecialMob<_Spe
     }
     
     /**
-     * Alters this slime's base attribute by multiplying it by an amount.
+     * Alters this magma cube's base attribute by multiplying it by an amount.
      * Mainly use this for move speed, for other attributes use {@link #addAttribute(Attribute, double)}
      */
     protected void multAttribute( Attribute attribute, double amount ) {
-        if( attribute != Attributes.MAX_HEALTH && attribute != Attributes.ATTACK_DAMAGE && attribute != Attributes.MOVEMENT_SPEED )
-            throw new IllegalArgumentException( "Slime relative attributes are only health, damage, and speed!" );
+        if( attribute != Attributes.MAX_HEALTH && attribute != Attributes.ARMOR && attribute != Attributes.ATTACK_DAMAGE && attribute != Attributes.MOVEMENT_SPEED )
+            throw new IllegalArgumentException( "Magma cube relative attributes are only health, armor, damage, and speed!" );
         
         final ModifiableAttributeInstance attributeInstance = getAttribute( attribute );
         if( attributeInstance == null )
@@ -153,10 +148,10 @@ public class _SpecialSlimeEntity extends SlimeEntity implements ISpecialMob<_Spe
         attributeInstance.setBaseValue( attributeInstance.getBaseValue() * amount );
     }
     
-    /** Sets this slime's base attribute. */
+    /** Sets this magma cube's base attribute. */
     protected void setAttribute( Attribute attribute, double amount ) {
-        if( attribute == Attributes.MAX_HEALTH || attribute == Attributes.ATTACK_DAMAGE || attribute == Attributes.MOVEMENT_SPEED )
-            throw new IllegalArgumentException( "Use slime relative attribute!" );
+        if( attribute == Attributes.MAX_HEALTH || attribute == Attributes.ARMOR || attribute == Attributes.ATTACK_DAMAGE || attribute == Attributes.MOVEMENT_SPEED )
+            throw new IllegalArgumentException( "Use magma cube relative attribute!" );
         
         final ModifiableAttributeInstance attributeInstance = getAttribute( attribute );
         if( attributeInstance == null )
@@ -167,11 +162,11 @@ public class _SpecialSlimeEntity extends SlimeEntity implements ISpecialMob<_Spe
     
     //--------------- ISpecialMob Implementation ----------------
     
-    private SpecialMobData<_SpecialSlimeEntity> specialData;
+    private SpecialMobData<_SpecialMagmaCubeEntity> specialData;
     
     /** @return This mob's special data. */
     @Override
-    public SpecialMobData<_SpecialSlimeEntity> getSpecialData() { return specialData; }
+    public SpecialMobData<_SpecialMagmaCubeEntity> getSpecialData() { return specialData; }
     
     /** @return The experience that should be dropped by this entity. */
     @Override
@@ -185,11 +180,11 @@ public class _SpecialSlimeEntity extends SlimeEntity implements ISpecialMob<_Spe
     }
     
     static ResourceLocation GET_TEXTURE_PATH( String type ) {
-        return SpecialMobs.resourceLoc( SpecialMobs.TEXTURE_PATH + "slime/" + type + ".png" );
+        return SpecialMobs.resourceLoc( SpecialMobs.TEXTURE_PATH + "magmacube/" + type + ".png" );
     }
     
     private static final ResourceLocation[] TEXTURES = {
-            new ResourceLocation( "textures/entity/slime/slime.png" )
+            new ResourceLocation( "textures/entity/slime/magmacube.png" )
     };
     
     /** @return All default textures for this entity. */
