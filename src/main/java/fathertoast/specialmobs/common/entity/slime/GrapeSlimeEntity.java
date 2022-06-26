@@ -12,6 +12,7 @@ import net.minecraft.entity.ai.attributes.AttributeModifierMap;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.item.Items;
 import net.minecraft.particles.IParticleData;
+import net.minecraft.particles.ItemParticleData;
 import net.minecraft.particles.ParticleTypes;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
@@ -73,9 +74,11 @@ public class GrapeSlimeEntity extends _SpecialSlimeEntity {
                 this, 10, 6.0F, 12.0F, 1.1F, 2.6F ) );
     }
     
+    private static final IParticleData JUMP_PARTICLE = new ItemParticleData( ParticleTypes.ITEM, Items.PURPLE_DYE.getDefaultInstance() );
+    
     /** @return This slime's particle type for jump effects. */
     @Override
-    protected IParticleData getParticleType() { return ParticleTypes.SPLASH; } //TODO
+    protected IParticleData getParticleType() { return JUMP_PARTICLE; }
     
     private static final ResourceLocation[] TEXTURES = {
             GET_TEXTURE_PATH( "grape" )

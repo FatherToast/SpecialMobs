@@ -24,6 +24,7 @@ public final class References {
     
     public static final byte EVENT_SHIELD_BLOCK_SOUND = 29;
     public static final byte EVENT_SHIELD_BREAK_SOUND = 30;
+    public static final byte EVENT_TELEPORT_TRAIL_PARTICLES = 46;
     
     
     //--------------- NBT STUFF ----------------

@@ -1,18 +1,22 @@
 package fathertoast.specialmobs.common.entity;
 
 import fathertoast.specialmobs.common.util.References;
+import net.minecraft.block.FlowingFluidBlock;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.CreatureAttribute;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.AbstractArrowEntity;
+import net.minecraft.fluid.Fluid;
 import net.minecraft.item.*;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.EffectType;
 import net.minecraft.potion.Effects;
+import net.minecraft.tags.ITag;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.Hand;
+import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.World;
@@ -208,7 +212,7 @@ public final class MobHelper {
      * @param needsShield If false, allows the blocker to succeed without a shield.
      * @return True if the block was successful.
      */
-    public static boolean tryBlock( LivingEntity blocker, DamageSource source, boolean needsShield ) {
+    public static boolean tryBlockAttack( LivingEntity blocker, DamageSource source, boolean needsShield ) {
         if( blocker.level.isClientSide() || blocker.isInvulnerableTo( source ) || source.isBypassArmor() ) return false;
         
         // Block everything coming from entities at least 6 blocks away, otherwise 33% block chance
@@ -263,6 +267,28 @@ public final class MobHelper {
             blocker.level.broadcastEntityEvent( blocker, References.EVENT_SHIELD_BREAK_SOUND );
             blocker.broadcastBreakEvent( shieldHand );
             blocker.setItemInHand( shieldHand, ItemStack.EMPTY );
+        }
+    }
+    
+    /**
+     * Floats the entity upward if they are in a given fluid type. Used by entities that walk on fluids so their
+     * AI doesn't break if they wind up inside that fluid.
+     * <p>
+     * Should be called in the entity's #tick() loop right after super.
+     *
+     * @param entity       The entity to float.
+     * @param acceleration How fast the entity floats upward.
+     * @param fluid        The fluid to float in.
+     */
+    public static void floatInFluid( Entity entity, double acceleration, ITag<Fluid> fluid ) {
+        if( entity.tickCount > 1 && entity.getFluidHeight( fluid ) > 0.0 ) {
+            if( ISelectionContext.of( entity ).isAbove( FlowingFluidBlock.STABLE_SHAPE, entity.blockPosition(), true ) &&
+                    !entity.level.getFluidState( entity.blockPosition().above() ).is( fluid ) ) {
+                entity.setOnGround( true );
+            }
+            else {
+                entity.setDeltaMovement( entity.getDeltaMovement().scale( 0.5 ).add( 0.0, acceleration, 0.0 ) );
+            }
         }
     }
 }

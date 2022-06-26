@@ -81,10 +81,6 @@ public class BlackberrySlimeEntity extends _SpecialSlimeEntity {
         addAttribute( Attributes.MAX_HEALTH, 2.0 * size );
     }
     
-    /** @return This slime's particle type for jump effects. */
-    @Override
-    protected IParticleData getParticleType() { return ParticleTypes.SMOKE; }
-    
     /** Override to change this entity's AI goals. */
     @Override
     protected void registerVariantGoals() {
@@ -187,6 +183,10 @@ public class BlackberrySlimeEntity extends _SpecialSlimeEntity {
         if( saveTag.contains( References.TAG_FUSE_TIME, References.NBT_TYPE_NUMERICAL ) )
             fuse = saveTag.getByte( References.TAG_FUSE_TIME );
     }
+    
+    /** @return This slime's particle type for jump effects. */
+    @Override
+    protected IParticleData getParticleType() { return ParticleTypes.SMOKE; }
     
     private static final ResourceLocation[] TEXTURES = {
             GET_TEXTURE_PATH( "blackberry" )

@@ -65,20 +65,20 @@ public class MobFamily<T extends LivingEntity> {
     
     public static final MobFamily<SlimeEntity> SLIME = new MobFamily<>(
             "Slime", "slimes", 0x51A03E, new EntityType[] { EntityType.SLIME },
-            "Blackberry", /*"Blueberry",*/ "Caramel", "Grape", "Lemon", "Strawberry", "Watermelon"
+            "Blackberry", "Blueberry", "Caramel", "Grape", "Lemon", "Strawberry", "Watermelon"
     );
     //    public static final MobFamily<MagmaCubeEntity> MAGMA_CUBE = new MobFamily<>(
     //            "MagmaCube", "magma cubes", 0x340000, new EntityType[] { EntityType.MAGMA_CUBE },
-    //            "Flying", "Hardened", "Sticky", "Volatile"
+    //            "Flying", /*"Fury",*/ "Hardened", "Sticky", "Volatile"
     //    );
     
     public static final MobFamily<SpiderEntity> SPIDER = new MobFamily<>(
             "Spider", "spiders", 0x342D27, new EntityType[] { EntityType.SPIDER },
-            "Baby", "Desert", "Flying", "Giant", "Hungry", "Mother", "Pale", "Poison", "Web", "Witch"
+            "Baby", "Desert", "Flying", "Giant", "Hungry", "Mother", "Pale", "Poison", /*"Water",*/ "Web", "Witch"
     );
     public static final MobFamily<CaveSpiderEntity> CAVE_SPIDER = new MobFamily<>(
             "CaveSpider", "cave spiders", 0x0C424E, new EntityType[] { EntityType.CAVE_SPIDER },
-            "Baby", "Flying", "Mother", "Web", "Witch"
+            "Baby", "Flying", "Mother", /*"Water",*/ "Web", "Witch"
     );
     
     public static final MobFamily<SilverfishEntity> SILVERFISH = new MobFamily<>(
@@ -93,7 +93,7 @@ public class MobFamily<T extends LivingEntity> {
     
     //    public static final MobFamily<WitchEntity> WITCH = new MobFamily<>(
     //            "Witch", "witches", 0x340000, new EntityType[] { EntityType.WITCH },
-    //            "Domination", "Shadows", "Undead", "Wilds", "Wind"
+    //            "Domination", "Shadows", "Undead", "Wilds", "Wind"//Note - should wind be able to walk on water?
     //    );
     
     //    public static final MobFamily<GhastEntity> GHAST = new MobFamily<>(

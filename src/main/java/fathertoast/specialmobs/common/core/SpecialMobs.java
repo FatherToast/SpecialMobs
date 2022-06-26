@@ -59,7 +59,7 @@ public class SpecialMobs {
      *          - use shields
      *          - babies
      *      - slimes
-     *          o smallest size can deal damage
+     *          - smallest size can deal damage
      *      o magma cubes
      *          o smallest size can deal damage
      *      - spiders

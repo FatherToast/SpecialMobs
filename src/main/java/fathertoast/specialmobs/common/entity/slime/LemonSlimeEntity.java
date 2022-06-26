@@ -14,6 +14,7 @@ import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.effect.LightningBoltEntity;
 import net.minecraft.item.Items;
 import net.minecraft.particles.IParticleData;
+import net.minecraft.particles.ItemParticleData;
 import net.minecraft.particles.ParticleTypes;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.vector.Vector3d;
@@ -69,10 +70,6 @@ public class LemonSlimeEntity extends _SpecialSlimeEntity {
         addAttribute( Attributes.MAX_HEALTH, 2.0 * size );
     }
     
-    /** @return This slime's particle type for jump effects. */
-    @Override
-    protected IParticleData getParticleType() { return ParticleTypes.SPLASH; } //TODO
-    
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override
     protected void onVariantAttack( Entity target ) {
@@ -91,6 +88,12 @@ public class LemonSlimeEntity extends _SpecialSlimeEntity {
     /** Called when this entity is struck by lightning. */
     @Override
     public void thunderHit( ServerWorld world, LightningBoltEntity lightningBolt ) { }
+    
+    private static final IParticleData JUMP_PARTICLE = new ItemParticleData( ParticleTypes.ITEM, Items.YELLOW_DYE.getDefaultInstance() );
+    
+    /** @return This slime's particle type for jump effects. */
+    @Override
+    protected IParticleData getParticleType() { return JUMP_PARTICLE; }
     
     private static final ResourceLocation[] TEXTURES = {
             GET_TEXTURE_PATH( "lemon" )

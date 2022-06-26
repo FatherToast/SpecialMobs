@@ -13,6 +13,7 @@ import net.minecraft.entity.ai.attributes.AttributeModifierMap;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.item.Items;
 import net.minecraft.particles.IParticleData;
+import net.minecraft.particles.ItemParticleData;
 import net.minecraft.particles.ParticleTypes;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.vector.Vector3d;
@@ -76,10 +77,6 @@ public class WatermelonSlimeEntity extends _SpecialSlimeEntity {
                 this, 10, 0.0F, 5.0F, 1.16F, 1.0F ) );
     }
     
-    /** @return This slime's particle type for jump effects. */
-    @Override
-    protected IParticleData getParticleType() { return ParticleTypes.SPLASH; } //TODO
-    
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override
     protected void onVariantAttack( Entity target ) {
@@ -94,6 +91,12 @@ public class WatermelonSlimeEntity extends _SpecialSlimeEntity {
             setDeltaMovement( getDeltaMovement().multiply( 0.2, 1.0, 0.2 ) );
         }
     }
+    
+    private static final IParticleData JUMP_PARTICLE = new ItemParticleData( ParticleTypes.ITEM, Items.MELON_SLICE.getDefaultInstance() );
+    
+    /** @return This slime's particle type for jump effects. */
+    @Override
+    protected IParticleData getParticleType() { return JUMP_PARTICLE; }
     
     private static final ResourceLocation[] TEXTURES = {
             GET_TEXTURE_PATH( "watermelon" )

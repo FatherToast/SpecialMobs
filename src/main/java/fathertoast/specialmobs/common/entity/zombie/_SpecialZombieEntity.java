@@ -325,7 +325,7 @@ public class _SpecialZombieEntity extends ZombieEntity implements IRangedAttackM
         }
         
         // Shield blocking logic
-        if( amount > 0.0F && MobHelper.tryBlock( this, source, true ) ) return false;
+        if( amount > 0.0F && MobHelper.tryBlockAttack( this, source, true ) ) return false;
         return super.hurt( source, amount );
     }
     

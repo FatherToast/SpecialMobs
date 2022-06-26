@@ -1,8 +1,7 @@
 package fathertoast.specialmobs.common.entity.ai;
 
-import net.minecraft.entity.ai.goal.Goal;
-import net.minecraft.entity.ai.goal.GoalSelector;
-import net.minecraft.entity.ai.goal.PrioritizedGoal;
+import net.minecraft.entity.CreatureEntity;
+import net.minecraft.entity.ai.goal.*;
 
 import java.util.ArrayList;
 
@@ -38,6 +37,18 @@ public final class AIHelper {
     public static void removeGoals( GoalSelector ai, Class<? extends Goal> goalType ) {
         for( PrioritizedGoal task : new ArrayList<>( ai.availableGoals ) ) {
             if( task.getGoal().getClass().equals( goalType ) ) ai.removeGoal( task.getGoal() );
+        }
+    }
+    
+    /** Replaces the entity's water avoiding random walking goal with an equivalent non-water-avoiding goal. */
+    public static void replaceWaterAvoidingRandomWalking( CreatureEntity entity, double speedModifier ) {
+        for( PrioritizedGoal task : new ArrayList<>( entity.goalSelector.availableGoals ) ) {
+            if( task.getGoal() instanceof WaterAvoidingRandomWalkingGoal ) {
+                final int priority = task.getPriority();
+                entity.goalSelector.removeGoal( task.getGoal() );
+                entity.goalSelector.addGoal( priority, new RandomWalkingGoal( entity, speedModifier ) );
+                return;
+            }
         }
     }
 }
