@@ -1,6 +1,7 @@
 package fathertoast.specialmobs.common.entity.spider;
 
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
+import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.util.AttributeHelper;
 import fathertoast.specialmobs.common.util.References;
@@ -29,6 +30,9 @@ import javax.annotation.ParametersAreNonnullByDefault;
 public class MotherSpiderEntity extends _SpecialSpiderEntity {
     
     //--------------- Static Special Mob Hooks ----------------
+    
+    @SpecialMob.SpeciesReference
+    public static MobFamily.Species<MotherSpiderEntity> SPECIES;
     
     @SpecialMob.BestiaryInfoSupplier
     public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
@@ -116,7 +120,7 @@ public class MotherSpiderEntity extends _SpecialSpiderEntity {
     /** Helper method to simplify spawning babies. */
     @Nullable
     private ILivingEntityData spawnBaby( float speed, @Nullable ILivingEntityData groupData ) {
-        final BabySpiderEntity baby = BabySpiderEntity.ENTITY_TYPE.get().create( level );
+        final BabySpiderEntity baby = BabySpiderEntity.SPECIES.entityType.get().create( level );
         if( baby == null ) return groupData;
         
         baby.copyPosition( this );

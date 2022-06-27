@@ -1,6 +1,7 @@
 package fathertoast.specialmobs.common.entity.creeper;
 
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
+import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.util.AttributeHelper;
 import fathertoast.specialmobs.common.util.ExplosionHelper;
@@ -29,6 +30,9 @@ import javax.annotation.ParametersAreNonnullByDefault;
 public class SplittingCreeperEntity extends _SpecialCreeperEntity {
     
     //--------------- Static Special Mob Hooks ----------------
+    
+    @SpecialMob.SpeciesReference
+    public static MobFamily.Species<SplittingCreeperEntity> SPECIES;
     
     @SpecialMob.BestiaryInfoSupplier
     public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
@@ -89,7 +93,7 @@ public class SplittingCreeperEntity extends _SpecialCreeperEntity {
     /** Helper method to simplify spawning babies. */
     @Nullable
     private ILivingEntityData spawnBaby( float speed, @Nullable ILivingEntityData groupData ) {
-        final MiniCreeperEntity baby = MiniCreeperEntity.ENTITY_TYPE.get().create( level );
+        final MiniCreeperEntity baby = MiniCreeperEntity.SPECIES.entityType.get().create( level );
         if( baby == null ) return groupData;
         
         baby.copyPosition( this );

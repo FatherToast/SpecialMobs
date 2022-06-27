@@ -1,6 +1,7 @@
 package fathertoast.specialmobs.common.entity.skeleton;
 
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
+import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.util.References;
@@ -9,7 +10,6 @@ import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.AttributeModifierMap;
 import net.minecraft.entity.projectile.AbstractArrowEntity;
 import net.minecraft.entity.projectile.ArrowEntity;
 import net.minecraft.item.ItemStack;
@@ -30,15 +30,13 @@ public class PoisonSkeletonEntity extends _SpecialSkeletonEntity {
     
     //--------------- Static Special Mob Hooks ----------------
     
+    @SpecialMob.SpeciesReference
+    public static MobFamily.Species<PoisonSkeletonEntity> SPECIES;
+    
     @SpecialMob.BestiaryInfoSupplier
     public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
         return new BestiaryInfo( 0x779C68 );
         //TODO theme - forest
-    }
-    
-    @SpecialMob.AttributeCreator
-    public static AttributeModifierMap.MutableAttribute createAttributes() {
-        return _SpecialSkeletonEntity.createAttributes();
     }
     
     @SpecialMob.LanguageProvider

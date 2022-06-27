@@ -40,22 +40,18 @@ public class ClientRegister {
         registerFamilyRenderers( MobFamily.ENDERMAN, SpecialEndermanRenderer::new );
         //registerFamilyRenderers( MobFamily.WITCH, SpecialWitchRenderer::new );
         
-        // Custom renderers
-        registerRenderer( NinjaSkeletonEntity.class, NinjaSkeletonRenderer::new );
-        registerRenderer( NinjaWitherSkeletonEntity.class, NinjaSkeletonRenderer::new );
+        // Species overrides
+        registerSpeciesRenderer( NinjaSkeletonEntity.SPECIES, NinjaSkeletonRenderer::new );
+        registerSpeciesRenderer( NinjaWitherSkeletonEntity.SPECIES, NinjaSkeletonRenderer::new );
     }
     
     private static <T extends LivingEntity> void registerFamilyRenderers( MobFamily<T> family, IRenderFactory<? super T> renderFactory ) {
         RenderingRegistry.registerEntityRenderingHandler( family.vanillaReplacement.entityType.get(), renderFactory );
         for( MobFamily.Species<? extends T> species : family.variants )
-            RenderingRegistry.registerEntityRenderingHandler( species.entityType.get(), renderFactory );
+            registerSpeciesRenderer( species, renderFactory );
     }
     
-    private static <T extends LivingEntity> void registerRenderer( Class<T> entityClass, IRenderFactory<? super T> renderFactory ) {
-        MobFamily.Species<T> species = MobFamily.findSpecies( entityClass );
-        
-        if( species == null )
-            throw new IllegalArgumentException( "Could not register renderer for entity class '" + entityClass.getSimpleName() + "', as no belonging mob species was found." );
+    private static <T extends LivingEntity> void registerSpeciesRenderer( MobFamily.Species<T> species, IRenderFactory<? super T> renderFactory ) {
         RenderingRegistry.registerEntityRenderingHandler( species.entityType.get(), renderFactory );
     }
 }

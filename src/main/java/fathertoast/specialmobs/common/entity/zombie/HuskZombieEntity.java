@@ -1,6 +1,7 @@
 package fathertoast.specialmobs.common.entity.zombie;
 
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
+import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.util.References;
@@ -10,6 +11,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.AttributeModifierMap;
+import net.minecraft.entity.monster.HuskEntity;
 import net.minecraft.entity.projectile.AbstractArrowEntity;
 import net.minecraft.entity.projectile.ArrowEntity;
 import net.minecraft.item.ItemStack;
@@ -30,6 +32,9 @@ public class HuskZombieEntity extends _SpecialZombieEntity {
     
     //--------------- Static Special Mob Hooks ----------------
     
+    @SpecialMob.SpeciesReference
+    public static MobFamily.Species<HuskZombieEntity> SPECIES;
+    
     @SpecialMob.BestiaryInfoSupplier
     public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
         return new BestiaryInfo( 0xE6CC94, BestiaryInfo.BaseWeight.LOW );
@@ -38,7 +43,7 @@ public class HuskZombieEntity extends _SpecialZombieEntity {
     
     @SpecialMob.AttributeCreator
     public static AttributeModifierMap.MutableAttribute createAttributes() {
-        return _SpecialZombieEntity.createAttributes();
+        return HuskEntity.createAttributes();
     }
     
     @SpecialMob.LanguageProvider

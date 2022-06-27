@@ -1,6 +1,7 @@
 package fathertoast.specialmobs.common.entity.enderman;
 
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
+import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.util.AttributeHelper;
 import fathertoast.specialmobs.common.util.References;
@@ -16,7 +17,6 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.RegistryObject;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
@@ -27,8 +27,8 @@ public class MirageEndermanEntity extends _SpecialEndermanEntity {
     
     //--------------- Static Special Mob Hooks ----------------
     
-    @SpecialMob.TypeHolder
-    public static RegistryObject<EntityType<MirageEndermanEntity>> ENTITY_TYPE;
+    @SpecialMob.SpeciesReference
+    public static MobFamily.Species<MirageEndermanEntity> SPECIES;
     
     @SpecialMob.BestiaryInfoSupplier
     public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
@@ -122,7 +122,7 @@ public class MirageEndermanEntity extends _SpecialEndermanEntity {
     
     private void mirage( double xI, double yI, double zI ) {
         if( !isFake && getTarget() != null ) {
-            final MirageEndermanEntity mirage = ENTITY_TYPE.get().create( level );
+            final MirageEndermanEntity mirage = SPECIES.entityType.get().create( level );
             if( mirage == null ) return;
             
             mirage.setFake();

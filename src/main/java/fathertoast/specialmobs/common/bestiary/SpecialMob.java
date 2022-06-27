@@ -16,15 +16,15 @@ import java.lang.annotation.Target;
 public @interface SpecialMob {
     
     /**
-     * OPTIONAL. This is injected with the species's entity type during registration so you may access it later, as needed.
+     * REQUIRED. This is injected with a reference to the species during registration so you may access it later, as needed.
      * <p>
      * The annotated field must have a signature that follows the pattern:
      * <p>
-     * public static RegistryObject<EntityType<T>> FIELD_NAME;
+     * public static MobFamily.Species<T> FIELD_NAME;
      */
     @Retention( RetentionPolicy.RUNTIME )
     @Target( ElementType.FIELD )
-    @interface TypeHolder { }
+    @interface SpeciesReference { }
     
     /**
      * REQUIRED. This is grabbed during registration to be used as a mob 'factory'; the needed constructor will probably
@@ -36,13 +36,12 @@ public @interface SpecialMob {
      */
     @Retention( RetentionPolicy.RUNTIME )
     @Target( ElementType.CONSTRUCTOR )
-    @interface Constructor {
-        boolean hasCustomRenderer() default false;
-    }
+    @interface Constructor { }
     
     /**
      * REQUIRED. This is called during registration to collect static properties of the mob needed for the bestiary
      * and for building the species's entity type.
+     * This is not 'overridable' because all species must have unique info in the bestiary.
      * <p>
      * The annotated method must have a signature that follows the pattern:
      * <p>
@@ -57,7 +56,9 @@ public @interface SpecialMob {
     @interface BestiaryInfoSupplier { }
     
     /**
-     * REQUIRED. This is called during registration to build the base attributes for the species.
+     * OVERRIDABLE. This is called during registration to build the base attributes for the species.
+     * 'Overridable' static methods inherit from their superclass if not defined in a subclass, but must be defined somewhere.
+     * This is 'overridable' because not all species need to have different attributes from their parent vanilla mob.
      * <p>
      * The annotated method must have a signature that follows the pattern:
      * <p>
@@ -72,6 +73,7 @@ public @interface SpecialMob {
     
     /**
      * REQUIRED. This is called during data generation to build the mod's default lang files.
+     * This is not 'overridable' because all species must have unique names.
      * <p>
      * The annotated method must have a signature that follows the pattern:
      * <p>
@@ -89,6 +91,7 @@ public @interface SpecialMob {
     /**
      * REQUIRED. This is called during data generation to build the mob's default loot table. Special variants will
      * typically start this method by calling their vanilla replacement's implementation of this method.
+     * This is not 'overridable' because all species must have unique default loot tables.
      * <p>
      * The annotated method must have a signature that follows the pattern:
      * <p>

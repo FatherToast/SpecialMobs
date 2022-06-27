@@ -1,6 +1,7 @@
 package fathertoast.specialmobs.common.entity.silverfish;
 
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
+import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.util.AttributeHelper;
 import fathertoast.specialmobs.common.util.References;
@@ -22,6 +23,9 @@ import javax.annotation.ParametersAreNonnullByDefault;
 public class ToughSilverfishEntity extends _SpecialSilverfishEntity {
     
     //--------------- Static Special Mob Hooks ----------------
+    
+    @SpecialMob.SpeciesReference
+    public static MobFamily.Species<ToughSilverfishEntity> SPECIES;
     
     @SpecialMob.BestiaryInfoSupplier
     public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {

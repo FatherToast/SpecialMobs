@@ -1,6 +1,7 @@
 package fathertoast.specialmobs.common.entity.zombie;
 
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
+import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
@@ -8,7 +9,6 @@ import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.AttributeModifierMap;
 import net.minecraft.entity.projectile.AbstractArrowEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -27,16 +27,14 @@ public class FireZombieEntity extends _SpecialZombieEntity {
     
     //--------------- Static Special Mob Hooks ----------------
     
+    @SpecialMob.SpeciesReference
+    public static MobFamily.Species<FireZombieEntity> SPECIES;
+    
     @SpecialMob.BestiaryInfoSupplier
     public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
         entityType.fireImmune();
         return new BestiaryInfo( 0xDC1A00 );
         //TODO theme - fire
-    }
-    
-    @SpecialMob.AttributeCreator
-    public static AttributeModifierMap.MutableAttribute createAttributes() {
-        return _SpecialZombieEntity.createAttributes();
     }
     
     @SpecialMob.LanguageProvider

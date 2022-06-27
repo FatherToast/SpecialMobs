@@ -1,6 +1,7 @@
 package fathertoast.specialmobs.common.entity.zombie;
 
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
+import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.core.SpecialMobs;
 import fathertoast.specialmobs.common.entity.ISpecialMob;
@@ -49,9 +50,12 @@ public class _SpecialZombieEntity extends ZombieEntity implements IRangedAttackM
     
     //--------------- Static Special Mob Hooks ----------------
     
+    @SpecialMob.SpeciesReference
+    public static MobFamily.Species<_SpecialZombieEntity> SPECIES;
+    
     @SpecialMob.BestiaryInfoSupplier
     public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
-        return new BestiaryInfo( 0x799C65 );//sized(0.6F, 1.95F)
+        return new BestiaryInfo( 0x799C65 );
     }
     
     @SpecialMob.AttributeCreator

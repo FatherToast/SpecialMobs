@@ -2,12 +2,10 @@ package fathertoast.specialmobs.common.bestiary;
 
 import fathertoast.specialmobs.common.core.register.SMEntities;
 import fathertoast.specialmobs.common.core.register.SMItems;
-import fathertoast.specialmobs.common.entity.ISpecialMob;
 import fathertoast.specialmobs.common.util.AnnotationHelper;
 import fathertoast.specialmobs.common.util.References;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.block.Block;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.monster.*;
@@ -132,16 +130,6 @@ public class MobFamily<T extends LivingEntity> {
     /** @return A list of all species. */
     public static List<Species<?>> getAllSpecies() { return SPECIES_LIST; }
     
-    @SuppressWarnings( "unchecked" )
-    @Nullable
-    public static <T extends LivingEntity> Species<T> findSpecies( Class<T> entityClass ) {
-        for( Species<?> species : getAllSpecies() ) {
-            if( species.entityClass == entityClass )
-                return (Species<T>) species;
-        }
-        return null;
-    }
-    
     /** @return The family of mobs that can replace the passed entity; returns null if the entity is not replaceable. */
     @Nullable
     public static MobFamily<?> getReplacementFamily( LivingEntity entity ) {
@@ -250,9 +238,6 @@ public class MobFamily<T extends LivingEntity> {
         /** This species's spawn egg item, wrapped in its registry object. */
         public final RegistryObject<ForgeSpawnEggItem> spawnEgg;
         
-        /** Whether this species has a custom renderer. */
-        public final boolean hasCustomRenderer;
-        
         /** Constructs a new mob species. For vanilla replacements, the variant name is null. */
         private Species( MobFamily<? super T> parentFamily, String packageRoot, @Nullable String variantName ) {
             final boolean vanillaReplacement = variantName == null;
@@ -272,8 +257,9 @@ public class MobFamily<T extends LivingEntity> {
             // Initialize deferred registry objects
             entityType = SMEntities.register( name.toLowerCase( Locale.ROOT ), entityTypeBuilder );
             spawnEgg = SMItems.registerSpawnEgg( entityType, parentFamily.eggBaseColor, bestiaryInfo.eggSpotsColor );
-            hasCustomRenderer = AnnotationHelper.hasCustomRenderer( entityClass );
-            AnnotationHelper.injectEntityTypeHolder( this );
+            
+            // Register this species with the entity class
+            AnnotationHelper.injectSpeciesReference( this );
         }
         
         /** Finds the entity class based on a standard format. */

@@ -4,11 +4,13 @@ import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
+import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.AttributeModifierMap;
 import net.minecraft.item.Item;
 
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
@@ -16,19 +18,21 @@ import java.lang.reflect.*;
 /**
  * Provides helper methods to handle annotation processing through reflection.
  */
+@SuppressWarnings( "SameParameterValue" )
 @ParametersAreNonnullByDefault
+@MethodsReturnNonnullByDefault
 public final class AnnotationHelper {
     
     //--------------- PRETTY HELPER METHODS ----------------
     
     /** Creates an entity factory from a special mob species. Throws an exception if anything goes wrong. */
-    public static void injectEntityTypeHolder( MobFamily.Species<?> species ) {
+    public static void injectSpeciesReference( MobFamily.Species<?> species ) {
         try {
-            final Field field = getFieldOptional( species.entityClass, SpecialMob.TypeHolder.class );
-            if( field != null ) field.set( null, species.entityType );
+            final Field field = getField( species.entityClass, SpecialMob.SpeciesReference.class );
+            field.set( null, species );
         }
-        catch( IllegalAccessException ex ) {
-            throw new RuntimeException( "Entity class for " + species.name + " has invalid entity type holder", ex );
+        catch( IllegalAccessException | NoSuchFieldException ex ) {
+            throw new RuntimeException( "Entity class for " + species.name + " has invalid species reference holder", ex );
         }
     }
     
@@ -63,7 +67,7 @@ public final class AnnotationHelper {
     /** Creates an attribute modifier map from a special mob species. Throws an exception if anything goes wrong. */
     public static AttributeModifierMap createAttributes( MobFamily.Species<?> species ) {
         try {
-            return ((AttributeModifierMap.MutableAttribute) getMethod( species.entityClass, SpecialMob.AttributeCreator.class )
+            return ((AttributeModifierMap.MutableAttribute) getMethodOrSuper( species.entityClass, SpecialMob.AttributeCreator.class )
                     .invoke( null )).build();
         }
         catch( NoSuchMethodException | InvocationTargetException | IllegalAccessException ex ) {
@@ -104,31 +108,18 @@ public final class AnnotationHelper {
             throw new RuntimeException( "Entity class for " + species.name + " has invalid loot table builder method", ex );
         }
     }
-
-    /**
-     *  Returns the boolean value for custom rendering from the target class' Constructor annotation.
-     *  {@link SpecialMob.Constructor#hasCustomRenderer()}
-     */
-    public static boolean hasCustomRenderer( Class<?> entityClass ) {
-        if (entityClass.isAnnotationPresent(SpecialMob.Constructor.class)) {
-            return entityClass.getDeclaredAnnotation(SpecialMob.Constructor.class).hasCustomRenderer();
-        }
-        else {
-            return false;
-        }
-    }
     
     
     //--------------- RAW ANNOTATION METHODS ----------------
     
     /**
      * @return Pulls a static field with a specific annotation from a class.
-     * @throws NoSuchFieldException if the field does not exist.
+     * @throws NoSuchFieldException if the field does not exist in the class.
      */
     private static Field getField( Class<?> type, Class<? extends Annotation> annotation ) throws NoSuchFieldException {
         final Field field = getFieldOptional( type, annotation );
         if( field == null ) {
-            throw new NoSuchFieldException( String.format( "Could not find static @%s annotated field in %s",
+            throw new NoSuchFieldException( String.format( "Could not find required static @%s annotated field in %s",
                     annotation.getSimpleName(), type.getName() ) );
         }
         return field;
@@ -137,8 +128,9 @@ public final class AnnotationHelper {
     /**
      * @return Pulls a static field with a specific annotation from a class, or null if the field does not exist.
      */
+    @Nullable
     private static Field getFieldOptional( Class<?> type, Class<? extends Annotation> annotation ) {
-        for( Field field : type.getFields() ) {
+        for( Field field : type.getDeclaredFields() ) {
             if( Modifier.isStatic( field.getModifiers() ) && field.isAnnotationPresent( annotation ) )
                 return field;
         }
@@ -147,26 +139,32 @@ public final class AnnotationHelper {
     
     /**
      * @return Pulls a static method with a specific annotation from a class.
-     * @throws NoSuchMethodException if the method does not exist.
+     * @throws NoSuchMethodException if the method does not exist in the class.
      */
     private static Method getMethod( Class<?> type, Class<? extends Annotation> annotation ) throws NoSuchMethodException {
-        final Method method = getMethodOptional( type, annotation );
-        if( method == null ) {
-            throw new NoSuchMethodException( String.format( "Could not find static @%s annotated method in %s",
-                    annotation.getSimpleName(), type.getName() ) );
-        }
-        return method;
-    }
-    
-    /**
-     * @return Pulls a static method with a specific annotation from a class, or null if the method does not exist.
-     */
-    private static Method getMethodOptional( Class<?> type, Class<? extends Annotation> annotation ) {
-        for( Method method : type.getMethods() ) {
+        for( Method method : type.getDeclaredMethods() ) {
             if( Modifier.isStatic( method.getModifiers() ) && method.isAnnotationPresent( annotation ) )
                 return method;
         }
-        return null;
+        throw new NoSuchMethodException( String.format( "Could not find required static @%s annotated method in %s",
+                annotation.getSimpleName(), type.getName() ) );
+    }
+    
+    /**
+     * @return Pulls a static method with a specific annotation from a class, or its super class(es) if none is defined in the class.
+     * @throws NoSuchMethodException if the method does not exist in the class or any of its parents.
+     */
+    private static Method getMethodOrSuper( Class<? extends LivingEntity> type, Class<? extends Annotation> annotation ) throws NoSuchMethodException {
+        Class<?> currentType = type;
+        while( currentType != LivingEntity.class ) {
+            for( Method method : currentType.getDeclaredMethods() ) {
+                if( Modifier.isStatic( method.getModifiers() ) && method.isAnnotationPresent( annotation ) )
+                    return method;
+            }
+            currentType = currentType.getSuperclass();
+        }
+        throw new NoSuchMethodException( String.format( "Could not find 'overridable' static @%s annotated method in %s or its parents",
+                annotation.getSimpleName(), type.getName() ) );
     }
     
     /**

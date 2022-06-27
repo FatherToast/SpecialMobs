@@ -1,6 +1,7 @@
 package fathertoast.specialmobs.common.entity.zombie;
 
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
+import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.core.register.SMItems;
 import fathertoast.specialmobs.common.entity.MobHelper;
@@ -31,6 +32,9 @@ import javax.annotation.ParametersAreNonnullByDefault;
 public class MadScientistZombieEntity extends _SpecialZombieEntity {
     
     //--------------- Static Special Mob Hooks ----------------
+    
+    @SpecialMob.SpeciesReference
+    public static MobFamily.Species<MadScientistZombieEntity> SPECIES;
     
     @SpecialMob.BestiaryInfoSupplier
     public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {

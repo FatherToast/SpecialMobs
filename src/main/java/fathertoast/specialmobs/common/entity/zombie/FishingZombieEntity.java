@@ -1,6 +1,7 @@
 package fathertoast.specialmobs.common.entity.zombie;
 
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
+import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.entity.ai.IAngler;
 import fathertoast.specialmobs.common.util.AttributeHelper;
@@ -33,6 +34,9 @@ import javax.annotation.ParametersAreNonnullByDefault;
 public class FishingZombieEntity extends _SpecialZombieEntity implements IAngler {
     
     //--------------- Static Special Mob Hooks ----------------
+    
+    @SpecialMob.SpeciesReference
+    public static MobFamily.Species<FishingZombieEntity> SPECIES;
     
     @SpecialMob.BestiaryInfoSupplier
     public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {

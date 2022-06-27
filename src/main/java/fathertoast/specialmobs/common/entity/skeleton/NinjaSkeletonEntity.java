@@ -1,6 +1,7 @@
 package fathertoast.specialmobs.common.entity.skeleton;
 
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
+import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.entity.ai.INinja;
 import fathertoast.specialmobs.common.util.AttributeHelper;
@@ -36,6 +37,9 @@ public class NinjaSkeletonEntity extends _SpecialSkeletonEntity implements INinj
     
     //--------------- Static Special Mob Hooks ----------------
     
+    @SpecialMob.SpeciesReference
+    public static MobFamily.Species<NinjaSkeletonEntity> SPECIES;
+    
     @SpecialMob.BestiaryInfoSupplier
     public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
         return new BestiaryInfo( 0x333366 );
@@ -61,7 +65,7 @@ public class NinjaSkeletonEntity extends _SpecialSkeletonEntity implements INinj
                 Blocks.INFESTED_CRACKED_STONE_BRICKS, Blocks.INFESTED_MOSSY_STONE_BRICKS, Blocks.INFESTED_CHISELED_STONE_BRICKS );
     }
     
-    @SpecialMob.Constructor(hasCustomRenderer = true)
+    @SpecialMob.Constructor
     public NinjaSkeletonEntity( EntityType<? extends _SpecialSkeletonEntity> entityType, World world ) {
         super( entityType, world );
         xpReward += 2;
@@ -120,8 +124,8 @@ public class NinjaSkeletonEntity extends _SpecialSkeletonEntity implements INinj
         if( !level.isClientSide() ) {
             if( canHide ) {
                 //EntityAINinja.startHiding( this ); TODO
-                this.setHiding(true);
-                this.setDisguiseBlock(Blocks.DIRT.defaultBlockState());
+                this.setHiding( true );
+                this.setDisguiseBlock( Blocks.DIRT.defaultBlockState() );
             }
             else if( onGround && getDisguiseBlock() == null &&
                     (getTarget() == null || getTarget() instanceof PlayerEntity && ((PlayerEntity) getTarget()).isCreative()) ) {
@@ -141,7 +145,7 @@ public class NinjaSkeletonEntity extends _SpecialSkeletonEntity implements INinj
     //            super.move( type, x, y, z );
     //        }
     //    }
-
+    
     /** Returns true if this entity should push and be pushed by other entities when colliding. */
     @Override
     public boolean isPushable() {

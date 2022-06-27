@@ -1,6 +1,7 @@
 package fathertoast.specialmobs.common.entity.skeleton;
 
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
+import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.core.SpecialMobs;
 import fathertoast.specialmobs.common.entity.ISpecialMob;
@@ -54,6 +55,9 @@ import java.util.UUID;
 public class _SpecialSkeletonEntity extends AbstractSkeletonEntity implements ISpecialMob<_SpecialSkeletonEntity> {
     
     //--------------- Static Special Mob Hooks ----------------
+    
+    @SpecialMob.SpeciesReference
+    public static MobFamily.Species<_SpecialSkeletonEntity> SPECIES;
     
     @SpecialMob.BestiaryInfoSupplier
     public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {

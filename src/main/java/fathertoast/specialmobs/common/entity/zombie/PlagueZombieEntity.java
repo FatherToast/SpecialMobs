@@ -1,6 +1,7 @@
 package fathertoast.specialmobs.common.entity.zombie;
 
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
+import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.util.AttributeHelper;
@@ -17,8 +18,6 @@ import net.minecraft.entity.projectile.AbstractArrowEntity;
 import net.minecraft.entity.projectile.ArrowEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.potion.EffectInstance;
-import net.minecraft.potion.Effects;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 
@@ -30,6 +29,9 @@ import javax.annotation.ParametersAreNonnullByDefault;
 public class PlagueZombieEntity extends _SpecialZombieEntity {
     
     //--------------- Static Special Mob Hooks ----------------
+    
+    @SpecialMob.SpeciesReference
+    public static MobFamily.Species<PlagueZombieEntity> SPECIES;
     
     @SpecialMob.BestiaryInfoSupplier
     public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
