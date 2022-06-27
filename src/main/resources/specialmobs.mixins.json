@@ -1,0 +1,19 @@
+{
+  "required": true,
+  "package": "fathertoast.specialmobs.common.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "minVersion": "0.8",
+  "refmap": "specialmobs.mixins.refmap.json",
+
+  "mixins": [],
+
+  "client": [
+    "EntityRendererManagerMixin"
+  ],
+
+  "server": [],
+
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
