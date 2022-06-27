@@ -8,6 +8,7 @@ import fathertoast.specialmobs.common.entity.ISpecialMob;
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.entity.SpecialMobData;
 import fathertoast.specialmobs.common.entity.ai.AIHelper;
+import fathertoast.specialmobs.common.entity.ai.SpecialHurtByTargetGoal;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import mcp.MethodsReturnNonnullByDefault;
@@ -18,6 +19,7 @@ import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.entity.ai.goal.RangedBowAttackGoal;
 import net.minecraft.entity.ai.goal.ZombieAttackGoal;
 import net.minecraft.entity.monster.ZombieEntity;
+import net.minecraft.entity.monster.ZombifiedPiglinEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.AbstractArrowEntity;
 import net.minecraft.entity.projectile.ProjectileHelper;
@@ -89,6 +91,8 @@ public class _SpecialZombieEntity extends ZombieEntity implements IRangedAttackM
     protected void registerGoals() {
         super.registerGoals();
         AIHelper.removeGoals( goalSelector, ZombieAttackGoal.class );
+        AIHelper.replaceHurtByTarget( this, new SpecialHurtByTargetGoal( this, ZombieEntity.class )
+                .setAlertOthers( ZombifiedPiglinEntity.class ) );
         
         getSpecialData().rangedAttackDamage = 2.0F;
         getSpecialData().rangedAttackSpread = 20.0F;

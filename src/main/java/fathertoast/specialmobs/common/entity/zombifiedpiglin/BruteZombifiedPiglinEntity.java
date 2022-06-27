@@ -1,4 +1,4 @@
-package fathertoast.specialmobs.common.entity.skeleton;
+package fathertoast.specialmobs.common.entity.zombifiedpiglin;
 
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
@@ -15,11 +15,13 @@ import net.minecraft.entity.ai.attributes.AttributeModifierMap;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.projectile.AbstractArrowEntity;
 import net.minecraft.entity.projectile.ArrowEntity;
+import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.Effects;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.World;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -27,22 +29,22 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 @SpecialMob
-public class BruteSkeletonEntity extends _SpecialSkeletonEntity {
+public class BruteZombifiedPiglinEntity extends _SpecialZombifiedPiglinEntity {
     
     //--------------- Static Special Mob Hooks ----------------
     
     @SpecialMob.SpeciesReference
-    public static MobFamily.Species<BruteSkeletonEntity> SPECIES;
+    public static MobFamily.Species<BruteZombifiedPiglinEntity> SPECIES;
     
     @SpecialMob.BestiaryInfoSupplier
     public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
-        entityType.sized( 0.7F, 2.4F );
+        entityType.sized( 0.7F, 2.35F );
         return new BestiaryInfo( 0xFFF87E );
     }
     
     @SpecialMob.AttributeCreator
     public static AttributeModifierMap.MutableAttribute createAttributes() {
-        return AttributeHelper.of( _SpecialSkeletonEntity.createAttributes() )
+        return AttributeHelper.of( _SpecialZombifiedPiglinEntity.createAttributes() )
                 .addAttribute( Attributes.MAX_HEALTH, 10.0 )
                 .addAttribute( Attributes.ARMOR, 10.0 )
                 .build();
@@ -50,7 +52,7 @@ public class BruteSkeletonEntity extends _SpecialSkeletonEntity {
     
     @SpecialMob.LanguageProvider
     public static String[] getTranslations( String langKey ) {
-        return References.translations( langKey, "Skeleton Brute",
+        return References.translations( langKey, "Zombified Piglin Brute",
                 "", "", "", "", "", "" );//TODO
     }
     
@@ -62,7 +64,7 @@ public class BruteSkeletonEntity extends _SpecialSkeletonEntity {
     }
     
     @SpecialMob.Constructor
-    public BruteSkeletonEntity( EntityType<? extends _SpecialSkeletonEntity> entityType, World world ) {
+    public BruteZombifiedPiglinEntity( EntityType<? extends _SpecialZombifiedPiglinEntity> entityType, World world ) {
         super( entityType, world );
         getSpecialData().setBaseScale( 1.2F );
         xpReward += 2;
@@ -70,6 +72,16 @@ public class BruteSkeletonEntity extends _SpecialSkeletonEntity {
     
     
     //--------------- Variant-Specific Implementations ----------------
+    
+    /** Called during spawn finalization to set starting equipment. */
+    @Override
+    protected void populateDefaultEquipmentSlots( DifficultyInstance difficulty ) {
+        super.populateDefaultEquipmentSlots( difficulty );
+        // A reference to the vanilla piglin brutes
+        if( getItemBySlot( EquipmentSlotType.MAINHAND ).getItem() == Items.GOLDEN_SWORD ) {
+            setItemSlot( EquipmentSlotType.MAINHAND, new ItemStack( Items.GOLDEN_AXE ) );
+        }
+    }
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override

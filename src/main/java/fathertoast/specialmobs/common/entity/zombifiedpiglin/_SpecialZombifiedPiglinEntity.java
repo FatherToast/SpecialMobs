@@ -1,10 +1,11 @@
-package fathertoast.specialmobs.common.entity.silverfish;
+package fathertoast.specialmobs.common.entity.zombifiedpiglin;
 
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.core.SpecialMobs;
 import fathertoast.specialmobs.common.entity.ISpecialMob;
+import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.entity.SpecialMobData;
 import fathertoast.specialmobs.common.entity.ai.AIHelper;
 import fathertoast.specialmobs.common.entity.ai.SpecialHurtByTargetGoal;
@@ -14,10 +15,18 @@ import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.*;
 import net.minecraft.entity.ai.attributes.AttributeModifierMap;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.entity.monster.SilverfishEntity;
+import net.minecraft.entity.ai.goal.Goal;
+import net.minecraft.entity.ai.goal.RangedBowAttackGoal;
+import net.minecraft.entity.ai.goal.ZombieAttackGoal;
+import net.minecraft.entity.monster.ZombifiedPiglinEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.projectile.AbstractArrowEntity;
+import net.minecraft.entity.projectile.ProjectileHelper;
 import net.minecraft.entity.projectile.SnowballEntity;
+import net.minecraft.inventory.EquipmentSlotType;
+import net.minecraft.item.BowItem;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
@@ -25,6 +34,8 @@ import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.SoundEvents;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.IServerWorld;
@@ -32,42 +43,42 @@ import net.minecraft.world.World;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.List;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 @SpecialMob
-public class _SpecialSilverfishEntity extends SilverfishEntity implements ISpecialMob<_SpecialSilverfishEntity> {
+public class _SpecialZombifiedPiglinEntity extends ZombifiedPiglinEntity implements IRangedAttackMob, ISpecialMob<_SpecialZombifiedPiglinEntity> {
     
     //--------------- Static Special Mob Hooks ----------------
     
     @SpecialMob.SpeciesReference
-    public static MobFamily.Species<_SpecialSilverfishEntity> SPECIES;
+    public static MobFamily.Species<_SpecialZombifiedPiglinEntity> SPECIES;
     
     @SpecialMob.BestiaryInfoSupplier
     public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
-        return new BestiaryInfo( 0x303030 );
+        return new BestiaryInfo( 0x4C7129 );
     }
     
     @SpecialMob.AttributeCreator
     public static AttributeModifierMap.MutableAttribute createAttributes() {
-        return SilverfishEntity.createAttributes();
+        return ZombifiedPiglinEntity.createAttributes();
     }
     
     @SpecialMob.LanguageProvider
     public static String[] getTranslations( String langKey ) {
-        return References.translations( langKey, "Silverfish",
+        return References.translations( langKey, "Zombified Piglin",
                 "", "", "", "", "", "" );//TODO
     }
     
     @SpecialMob.LootTableProvider
     public static void addBaseLoot( LootTableBuilder loot ) {
-        loot.addLootTable( "main", EntityType.SILVERFISH.getDefaultLootTable() );
+        loot.addLootTable( "main", EntityType.ZOMBIFIED_PIGLIN.getDefaultLootTable() );
     }
     
     @SpecialMob.Constructor
-    public _SpecialSilverfishEntity( EntityType<? extends _SpecialSilverfishEntity> entityType, World world ) {
+    public _SpecialZombifiedPiglinEntity( EntityType<? extends _SpecialZombifiedPiglinEntity> entityType, World world ) {
         super( entityType, world );
+        reassessWeaponGoal();
         getSpecialData().initialize();
     }
     
@@ -78,18 +89,88 @@ public class _SpecialSilverfishEntity extends SilverfishEntity implements ISpeci
     @Override
     protected void registerGoals() {
         super.registerGoals();
-        AIHelper.replaceHurtByTarget( this, new SpecialHurtByTargetGoal( this, SilverfishEntity.class ).setAlertOthers() );
+        AIHelper.removeGoals( goalSelector, ZombieAttackGoal.class );
+        AIHelper.replaceHurtByTarget( this, new SpecialHurtByTargetGoal( this, ZombifiedPiglinEntity.class ).setAlertOthers() );
         
-        getSpecialData().rangedAttackDamage = 1.0F;
+        getSpecialData().rangedAttackDamage = 2.0F;
         getSpecialData().rangedAttackSpread = 14.0F;
-        getSpecialData().rangedAttackCooldown = 40;
+        getSpecialData().rangedWalkSpeed = 0.8F;
+        getSpecialData().rangedAttackCooldown = 20;
         getSpecialData().rangedAttackMaxCooldown = getSpecialData().rangedAttackCooldown;
-        getSpecialData().rangedAttackMaxRange = 10.0F;
+        getSpecialData().rangedAttackMaxRange = 15.0F;
         registerVariantGoals();
     }
     
     /** Override to change this entity's AI goals. */
     protected void registerVariantGoals() { }
+    
+    /** Helper method to set the ranged attack AI more easily. */
+    protected void disableRangedAI() { setRangedAI( 1.0, 20, 0.0F ); }
+    
+    /** Helper method to set the ranged attack AI more easily. */
+    protected void setRangedAI( double walkSpeed, int cooldownTime ) {
+        getSpecialData().rangedWalkSpeed = (float) walkSpeed;
+        getSpecialData().rangedAttackCooldown = cooldownTime;
+        getSpecialData().rangedAttackMaxCooldown = cooldownTime;
+    }
+    
+    /** Helper method to set the ranged attack AI more easily. */
+    protected void setRangedAI( double walkSpeed, int cooldownTime, float range ) {
+        setRangedAI( walkSpeed, cooldownTime );
+        getSpecialData().rangedAttackMaxRange = range;
+    }
+    
+    /** Override to change this entity's attack goal priority. */
+    protected int getVariantAttackPriority() { return 2; }
+    
+    /** Called during spawn finalization to set starting equipment. */
+    @Override
+    protected void populateDefaultEquipmentSlots( DifficultyInstance difficulty ) {
+        super.populateDefaultEquipmentSlots( difficulty );
+        if( random.nextDouble() < getVariantBowChance() ) { //TODO config the default 20% chance
+            setItemSlot( EquipmentSlotType.MAINHAND, new ItemStack( Items.BOW ) );
+        }
+        else if( random.nextDouble() < getVariantShieldChance() ) { //TODO config the default 5% chance
+            setItemSlot( EquipmentSlotType.OFFHAND, new ItemStack( Items.SHIELD ) );
+        }
+    }
+    
+    /** Override to change this entity's chance to spawn with a bow. */
+    protected double getVariantBowChance() { return getSpecialData().rangedAttackMaxRange > 0.0F ? 0.2 : 0.0; }
+    
+    /** Override to change this entity's chance to spawn with a shield. */
+    protected double getVariantShieldChance() { return 0.05; }
+    
+    /** Called to attack the target with a ranged attack. */
+    @Override
+    public void performRangedAttack( LivingEntity target, float damageMulti ) {
+        final ItemStack arrowItem = getProjectile( getItemInHand( ProjectileHelper.getWeaponHoldingHand(
+                this, item -> item instanceof BowItem ) ) );
+        AbstractArrowEntity arrow = getArrow( arrowItem, damageMulti );
+        if( getMainHandItem().getItem() instanceof BowItem )
+            arrow = ((BowItem) getMainHandItem().getItem()).customArrow( arrow );
+        
+        final double dX = target.getX() - getX();
+        final double dY = target.getY( 1.0 / 3.0 ) - arrow.getY();
+        final double dZ = target.getZ() - getZ();
+        final double dH = MathHelper.sqrt( dX * dX + dZ * dZ );
+        arrow.shoot( dX, dY + dH * 0.2, dZ, 1.6F,
+                getSpecialData().rangedAttackSpread * (1.0F - 0.2858F * level.getDifficulty().getId()) );
+        
+        playSound( SoundEvents.SKELETON_SHOOT, 1.0F, 1.0F / (random.nextFloat() * 0.4F + 0.8F) );
+        level.addFreshEntity( arrow );
+    }
+    
+    /** @return The arrow for this zombie to shoot. */
+    protected AbstractArrowEntity getArrow( ItemStack arrowItem, float damageMulti ) {
+        return getVariantArrow( ProjectileHelper.getMobArrow( this, arrowItem,
+                damageMulti * getSpecialData().rangedAttackDamage ), arrowItem, damageMulti );
+    }
+    
+    /** Override to modify this entity's ranged attack projectile. */
+    protected AbstractArrowEntity getVariantArrow( AbstractArrowEntity arrow, ItemStack arrowItem, float damageMulti ) {
+        return arrow;
+    }
     
     /** Called when this entity successfully damages a target to apply on-hit effects. */
     @Override
@@ -111,7 +192,10 @@ public class _SpecialSilverfishEntity extends SilverfishEntity implements ISpeci
     //--------------- Family-Specific Implementations ----------------
     
     /** The parameter for special mob render scale. */
-    private static final DataParameter<Float> SCALE = EntityDataManager.defineId( _SpecialSilverfishEntity.class, DataSerializers.FLOAT );
+    private static final DataParameter<Float> SCALE = EntityDataManager.defineId( _SpecialZombifiedPiglinEntity.class, DataSerializers.FLOAT );
+    
+    /** This entity's attack AI. */
+    private Goal currentAttackAI;
     
     /** Called from the Entity.class constructor to define data watcher variables. */
     @Override
@@ -125,39 +209,44 @@ public class _SpecialSilverfishEntity extends SilverfishEntity implements ISpeci
     public ILivingEntityData finalizeSpawn( IServerWorld world, DifficultyInstance difficulty, SpawnReason spawnReason,
                                             @Nullable ILivingEntityData groupData, @Nullable CompoundNBT eggTag ) {
         groupData = super.finalizeSpawn( world, difficulty, spawnReason, groupData, eggTag );
-        
-        // TODO ranged attack
-        
-        if( random.nextFloat() < 0.05 ) { //TODO config
-            // Immediately start calling for reinforcements if it can find a player
-            if( getTarget() == null ) {
-                final double followRange = getAttributeValue( Attributes.FOLLOW_RANGE );
-                final List<PlayerEntity> nearbyPlayers = world.getNearbyPlayers( new EntityPredicate().range( followRange ),
-                        this, getBoundingBox().inflate( followRange, followRange, followRange ) );
-                for( PlayerEntity player : nearbyPlayers ) {
-                    if( player != null && canSee( player ) ) {
-                        setTarget( player );
-                        break;
-                    }
-                }
-            }
-            if( getTarget() != null ) {
-                // Triggers silverfish call for reinforcements
-                hurt( DamageSource.MAGIC, 0.0F );
-            }
-        }
-        
+        reassessWeaponGoal();
         return groupData;
+    }
+    
+    /** Called to set the item equipped in a particular slot. */
+    @Override
+    public void setItemSlot( EquipmentSlotType slot, ItemStack item ) {
+        super.setItemSlot( slot, item );
+        if( !level.isClientSide ) reassessWeaponGoal();
+    }
+    
+    /** Called to set this entity's attack AI based on current equipment. */
+    public void reassessWeaponGoal() {
+        if( level != null && !level.isClientSide ) {
+            if( currentAttackAI != null ) goalSelector.removeGoal( currentAttackAI );
+            
+            final SpecialMobData<_SpecialZombifiedPiglinEntity> data = getSpecialData();
+            final ItemStack weapon = getItemInHand( ProjectileHelper.getWeaponHoldingHand(
+                    this, item -> item instanceof BowItem ) );
+            if( data.rangedAttackMaxRange > 0.0F && weapon.getItem() == Items.BOW ) {
+                currentAttackAI = new RangedBowAttackGoal<>( this, data.rangedWalkSpeed,
+                        data.rangedAttackCooldown, data.rangedAttackMaxRange );
+            }
+            else {
+                currentAttackAI = new ZombieAttackGoal( this, 1.0, false );
+            }
+            goalSelector.addGoal( getVariantAttackPriority(), currentAttackAI );
+        }
     }
     
     
     //--------------- ISpecialMob Implementation ----------------
     
-    private SpecialMobData<_SpecialSilverfishEntity> specialData;
+    private SpecialMobData<_SpecialZombifiedPiglinEntity> specialData;
     
     /** @return This mob's special data. */
     @Override
-    public SpecialMobData<_SpecialSilverfishEntity> getSpecialData() { return specialData; }
+    public SpecialMobData<_SpecialZombifiedPiglinEntity> getSpecialData() { return specialData; }
     
     /** @return The experience that should be dropped by this entity. */
     @Override
@@ -168,10 +257,10 @@ public class _SpecialSilverfishEntity extends SilverfishEntity implements ISpeci
     public final void setExperience( int xp ) { xpReward = xp; }
     
     static ResourceLocation GET_TEXTURE_PATH( String type ) {
-        return SpecialMobs.resourceLoc( SpecialMobs.TEXTURE_PATH + "silverfish/" + type + ".png" );
+        return SpecialMobs.resourceLoc( SpecialMobs.TEXTURE_PATH + "zombifiedpiglin/" + type + ".png" );
     }
     
-    private static final ResourceLocation[] TEXTURES = { new ResourceLocation( "textures/entity/silverfish.png" ) };
+    private static final ResourceLocation[] TEXTURES = { new ResourceLocation( "textures/entity/piglin/zombified_piglin.png" ) };
     
     /** @return All default textures for this entity. */
     @Override
@@ -190,7 +279,7 @@ public class _SpecialSilverfishEntity extends SilverfishEntity implements ISpeci
     /** @return The eye height of this entity when standing. */
     @Override
     protected float getStandingEyeHeight( Pose pose, EntitySize size ) {
-        return super.getStandingEyeHeight( pose, size ) * getSpecialData().getBaseScale() * (isBaby() ? 0.53448F : 1.0F);
+        return super.getStandingEyeHeight( pose, size ) * getSpecialData().getBaseScale();// * (isBaby() ? 0.53448F : 1.0F); - Handled in super
     }
     
     /** @return Whether this entity is immune to fire damage. */
@@ -202,6 +291,10 @@ public class _SpecialSilverfishEntity extends SilverfishEntity implements ISpeci
     public void setRemainingFireTicks( int ticks ) {
         if( !getSpecialData().isImmuneToBurning() ) super.setRemainingFireTicks( ticks );
     }
+    
+    /** @return True if this zombie burns in sunlight. */
+    @Override
+    protected boolean isSunSensitive() { return !getSpecialData().isImmuneToFire() && !getSpecialData().isImmuneToBurning(); }
     
     /** @return True if this entity can be leashed. */
     @Override
@@ -238,9 +331,13 @@ public class _SpecialSilverfishEntity extends SilverfishEntity implements ISpeci
     /** @return Attempts to damage this entity; returns true if the hit was successful. */
     @Override
     public boolean hurt( DamageSource source, float amount ) {
-        if( isSensitiveToWater() && source.getDirectEntity() instanceof SnowballEntity ) {
+        final Entity entity = source.getDirectEntity();
+        if( isSensitiveToWater() && entity instanceof SnowballEntity ) {
             amount = Math.max( 3.0F, amount );
         }
+        
+        // Shield blocking logic
+        if( amount > 0.0F && MobHelper.tryBlockAttack( this, source, true ) ) return false;
         return super.hurt( source, amount );
     }
     
@@ -268,5 +365,7 @@ public class _SpecialSilverfishEntity extends SilverfishEntity implements ISpeci
         
         getSpecialData().readFromNBT( saveTag );
         readVariantSaveData( saveTag );
+        
+        reassessWeaponGoal();
     }
 }

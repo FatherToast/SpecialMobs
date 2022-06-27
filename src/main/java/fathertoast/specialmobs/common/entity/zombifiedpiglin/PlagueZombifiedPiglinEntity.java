@@ -1,4 +1,4 @@
-package fathertoast.specialmobs.common.entity.skeleton;
+package fathertoast.specialmobs.common.entity.zombifiedpiglin;
 
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
@@ -8,6 +8,7 @@ import fathertoast.specialmobs.common.util.AttributeHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import mcp.MethodsReturnNonnullByDefault;
+import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -17,8 +18,6 @@ import net.minecraft.entity.projectile.AbstractArrowEntity;
 import net.minecraft.entity.projectile.ArrowEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.potion.EffectInstance;
-import net.minecraft.potion.Effects;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 
@@ -27,45 +26,43 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 @SpecialMob
-public class BruteSkeletonEntity extends _SpecialSkeletonEntity {
+public class PlagueZombifiedPiglinEntity extends _SpecialZombifiedPiglinEntity {
     
     //--------------- Static Special Mob Hooks ----------------
     
     @SpecialMob.SpeciesReference
-    public static MobFamily.Species<BruteSkeletonEntity> SPECIES;
+    public static MobFamily.Species<PlagueZombifiedPiglinEntity> SPECIES;
     
     @SpecialMob.BestiaryInfoSupplier
     public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
-        entityType.sized( 0.7F, 2.4F );
-        return new BestiaryInfo( 0xFFF87E );
+        return new BestiaryInfo( 0x8AA838 );
+        //TODO theme - forest
     }
     
     @SpecialMob.AttributeCreator
     public static AttributeModifierMap.MutableAttribute createAttributes() {
-        return AttributeHelper.of( _SpecialSkeletonEntity.createAttributes() )
-                .addAttribute( Attributes.MAX_HEALTH, 10.0 )
-                .addAttribute( Attributes.ARMOR, 10.0 )
+        return AttributeHelper.of( _SpecialZombifiedPiglinEntity.createAttributes() )
+                .multAttribute( Attributes.MOVEMENT_SPEED, 1.1 )
                 .build();
     }
     
     @SpecialMob.LanguageProvider
     public static String[] getTranslations( String langKey ) {
-        return References.translations( langKey, "Skeleton Brute",
+        return References.translations( langKey, "Plagued Piglin",
                 "", "", "", "", "", "" );//TODO
     }
     
     @SpecialMob.LootTableProvider
     public static void buildLootTable( LootTableBuilder loot ) {
         addBaseLoot( loot );
-        loot.addCommonDrop( "common", Items.FLINT, 1 );
-        loot.addRareDrop( "rare", Items.IRON_INGOT );
+        loot.addUncommonDrop( "uncommon", Items.POISONOUS_POTATO, Items.SPIDER_EYE, Items.FERMENTED_SPIDER_EYE,
+                Blocks.RED_MUSHROOM, Blocks.BROWN_MUSHROOM );
     }
     
     @SpecialMob.Constructor
-    public BruteSkeletonEntity( EntityType<? extends _SpecialSkeletonEntity> entityType, World world ) {
+    public PlagueZombifiedPiglinEntity( EntityType<? extends _SpecialZombifiedPiglinEntity> entityType, World world ) {
         super( entityType, world );
-        getSpecialData().setBaseScale( 1.2F );
-        xpReward += 2;
+        xpReward += 1;
     }
     
     
@@ -75,7 +72,7 @@ public class BruteSkeletonEntity extends _SpecialSkeletonEntity {
     @Override
     protected void onVariantAttack( Entity target ) {
         if( target instanceof LivingEntity ) {
-            MobHelper.causeLifeLoss( (LivingEntity) target, 2.0F );
+            ((LivingEntity) target).addEffect( MobHelper.nextPlagueEffect( random, level ) );
         }
     }
     
@@ -83,15 +80,13 @@ public class BruteSkeletonEntity extends _SpecialSkeletonEntity {
     @Override
     protected AbstractArrowEntity getVariantArrow( AbstractArrowEntity arrow, ItemStack arrowItem, float damageMulti ) {
         if( arrow instanceof ArrowEntity ) {
-            ((ArrowEntity) arrow).addEffect( new EffectInstance( Effects.HARM ) );
+            ((ArrowEntity) arrow).addEffect( MobHelper.nextPlagueEffect( random, level ) );
         }
         return arrow;
     }
     
     private static final ResourceLocation[] TEXTURES = {
-            GET_TEXTURE_PATH( "brute" ),
-            null,
-            GET_TEXTURE_PATH( "brute_overlay" )
+            GET_TEXTURE_PATH( "plague" )
     };
     
     /** @return All default textures for this entity. */

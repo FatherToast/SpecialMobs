@@ -47,10 +47,10 @@ public class MobFamily<T extends LivingEntity> {
             "Zombie", "zombies", 0x00AFAF, new EntityType[] { EntityType.ZOMBIE, EntityType.HUSK },
             "Brute", "Fire", /*"Fishing",*/ "Giant", "Hungry", "Husk", "MadScientist", "Plague"
     );
-    //    public static final MobFamily<ZombieEntity> ZOMBIFIED_PIGLIN = new MobFamily<>(
-    //            "ZombifiedPiglin", "zombie pigmen", 0xEA9393, new EntityType[] { EntityType.ZOMBIFIED_PIGLIN },
-    //            "Brute", "Fishing", "Giant", "Hungry", "Knight", "Plague", "Vampire"
-    //    );
+    public static final MobFamily<ZombifiedPiglinEntity> ZOMBIFIED_PIGLIN = new MobFamily<>(//TODO figure out crossbows
+            "ZombifiedPiglin", "zombified piglins", 0xEA9393, new EntityType[] { EntityType.ZOMBIFIED_PIGLIN },
+            "Brute", /*"Fishing",*/ "Giant", "Hungry", "Knight", "Plague", "Vampire"
+    );
     
     public static final MobFamily<AbstractSkeletonEntity> SKELETON = new MobFamily<>(
             "Skeleton", "skeletons", 0xC1C1C1, new EntityType[] { EntityType.SKELETON, EntityType.STRAY },

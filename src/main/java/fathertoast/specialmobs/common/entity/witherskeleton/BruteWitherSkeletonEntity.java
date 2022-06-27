@@ -83,7 +83,7 @@ public class BruteWitherSkeletonEntity extends _SpecialWitherSkeletonEntity {
     @Override
     protected AbstractArrowEntity getVariantArrow( AbstractArrowEntity arrow, ItemStack arrowItem, float damageMulti ) {
         if( arrow instanceof ArrowEntity ) {
-            ((ArrowEntity) arrow).addEffect( new EffectInstance( Effects.HARM, 1 ) );
+            ((ArrowEntity) arrow).addEffect( new EffectInstance( Effects.HARM ) );
         }
         return arrow;
     }
