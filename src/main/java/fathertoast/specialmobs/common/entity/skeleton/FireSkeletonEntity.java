@@ -50,7 +50,6 @@ public class FireSkeletonEntity extends _SpecialSkeletonEntity {
     @SpecialMob.Constructor
     public FireSkeletonEntity( EntityType<? extends _SpecialSkeletonEntity> entityType, World world ) {
         super( entityType, world );
-        getSpecialData().setImmuneToFire( true );
         getSpecialData().setDamagedByWater( true );
         xpReward += 1;
     }

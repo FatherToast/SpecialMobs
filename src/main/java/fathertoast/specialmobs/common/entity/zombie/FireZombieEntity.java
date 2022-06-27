@@ -53,7 +53,6 @@ public class FireZombieEntity extends _SpecialZombieEntity {
     @SpecialMob.Constructor
     public FireZombieEntity( EntityType<? extends _SpecialZombieEntity> entityType, World world ) {
         super( entityType, world );
-        getSpecialData().setImmuneToFire( true );
         getSpecialData().setDamagedByWater( true );
         xpReward += 1;
     }

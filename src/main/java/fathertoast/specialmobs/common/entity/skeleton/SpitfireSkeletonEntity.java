@@ -59,7 +59,6 @@ public class SpitfireSkeletonEntity extends _SpecialSkeletonEntity {
     public SpitfireSkeletonEntity( EntityType<? extends _SpecialSkeletonEntity> entityType, World world ) {
         super( entityType, world );
         getSpecialData().setBaseScale( 1.5F );
-        getSpecialData().setImmuneToFire( true );
         getSpecialData().setDamagedByWater( true );
         maxUpStep = 1.0F;
         xpReward += 2;

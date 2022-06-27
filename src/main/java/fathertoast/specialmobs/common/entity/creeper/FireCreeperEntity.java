@@ -49,7 +49,6 @@ public class FireCreeperEntity extends _SpecialCreeperEntity {
     public FireCreeperEntity( EntityType<? extends _SpecialCreeperEntity> entityType, World world ) {
         super( entityType, world );
         getSpecialData().setDamagedByWater( true );
-        getSpecialData().setImmuneToFire( true );
         setCannotExplodeWhileWet( true );
         xpReward += 1;
     }

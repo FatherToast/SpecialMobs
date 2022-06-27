@@ -49,7 +49,6 @@ public class LightningEndermanEntity extends _SpecialEndermanEntity {
     @SpecialMob.Constructor
     public LightningEndermanEntity( EntityType<? extends _SpecialEndermanEntity> entityType, World world ) {
         super( entityType, world );
-        getSpecialData().setImmuneToFire( true );
         xpReward += 2;
     }
     

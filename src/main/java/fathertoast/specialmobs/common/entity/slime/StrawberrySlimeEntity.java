@@ -58,7 +58,6 @@ public class StrawberrySlimeEntity extends _SpecialSlimeEntity {
     @SpecialMob.Constructor
     public StrawberrySlimeEntity( EntityType<? extends _SpecialSlimeEntity> entityType, World world ) {
         super( entityType, world );
-        getSpecialData().setImmuneToFire( true );
         getSpecialData().setDamagedByWater( true );
         slimeExperienceValue += 1;
         

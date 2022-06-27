@@ -47,7 +47,6 @@ public class LightningCreeperEntity extends _SpecialCreeperEntity {
     @SpecialMob.Constructor
     public LightningCreeperEntity( EntityType<? extends _SpecialCreeperEntity> entityType, World world ) {
         super( entityType, world );
-        getSpecialData().setImmuneToFire( true );
         xpReward += 1;
     }
     

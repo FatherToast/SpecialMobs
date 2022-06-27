@@ -81,7 +81,6 @@ public class _SpecialWitherSkeletonEntity extends WitherSkeletonEntity implement
     public _SpecialWitherSkeletonEntity( EntityType<? extends _SpecialWitherSkeletonEntity> entityType, World world ) {
         super( entityType, world );
         getSpecialData().initialize();
-        getSpecialData().setImmuneToFire( true );
     }
     
     

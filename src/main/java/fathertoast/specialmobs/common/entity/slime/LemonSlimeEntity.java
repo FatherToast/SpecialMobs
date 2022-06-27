@@ -55,7 +55,6 @@ public class LemonSlimeEntity extends _SpecialSlimeEntity {
     @SpecialMob.Constructor
     public LemonSlimeEntity( EntityType<? extends _SpecialSlimeEntity> entityType, World world ) {
         super( entityType, world );
-        getSpecialData().setImmuneToFire( true );
         slimeExperienceValue += 2;
     }
     
