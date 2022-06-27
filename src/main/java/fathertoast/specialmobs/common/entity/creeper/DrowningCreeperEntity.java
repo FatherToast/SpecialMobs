@@ -69,7 +69,6 @@ public class DrowningCreeperEntity extends _SpecialCreeperEntity {
     @SpecialMob.Constructor
     public DrowningCreeperEntity( EntityType<? extends _SpecialCreeperEntity> entityType, World world ) {
         super( entityType, world );
-        getSpecialData().setImmuneToBurning( true );
         getSpecialData().setCanBreatheInWater( true );
         getSpecialData().setIgnoreWaterPush( true );
         xpReward += 2;
@@ -156,6 +155,13 @@ public class DrowningCreeperEntity extends _SpecialCreeperEntity {
             level.addFreshEntity( lePuffPuff );
         }
     }
+    
+    // The below two methods are here to effectively override the private Entity#isInRain to always return true (always wet)
+    @Override
+    public boolean isInWaterOrRain() { return true; }
+    
+    @Override
+    public boolean isInWaterRainOrBubble() { return true; }
     
     private static final ResourceLocation[] TEXTURES = {
             GET_TEXTURE_PATH( "drowning" ),

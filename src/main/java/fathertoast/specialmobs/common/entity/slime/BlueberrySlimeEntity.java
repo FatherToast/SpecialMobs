@@ -57,8 +57,8 @@ public class BlueberrySlimeEntity extends _SpecialSlimeEntity {
     @SpecialMob.Constructor
     public BlueberrySlimeEntity( EntityType<? extends _SpecialSlimeEntity> entityType, World world ) {
         super( entityType, world );
-        getSpecialData().setImmuneToBurning( true );
         getSpecialData().setCanBreatheInWater( true );
+        getSpecialData().setIgnoreWaterPush( true );
         slimeExperienceValue += 1;
         
         setPathfindingMalus( PathNodeType.WATER, PathNodeType.WALKABLE.getMalus() );
@@ -94,6 +94,13 @@ public class BlueberrySlimeEntity extends _SpecialSlimeEntity {
         super.tick();
         MobHelper.floatInFluid( this, 0.06, FluidTags.WATER );
     }
+    
+    // The below two methods are here to effectively override the private Entity#isInRain to always return true (always wet)
+    @Override
+    public boolean isInWaterOrRain() { return true; }
+    
+    @Override
+    public boolean isInWaterRainOrBubble() { return true; }
     
     /** Override to load data from this entity's NBT data. */
     @Override
