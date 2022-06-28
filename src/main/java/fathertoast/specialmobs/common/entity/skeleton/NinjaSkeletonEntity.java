@@ -3,7 +3,9 @@ package fathertoast.specialmobs.common.entity.skeleton;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
+import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.entity.ai.INinja;
+import fathertoast.specialmobs.common.entity.ai.NinjaGoal;
 import fathertoast.specialmobs.common.util.AttributeHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
@@ -19,10 +21,13 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
+import net.minecraft.potion.EffectInstance;
+import net.minecraft.potion.Effects;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.Hand;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.World;
 
@@ -78,8 +83,7 @@ public class NinjaSkeletonEntity extends _SpecialSkeletonEntity implements INinj
     @Override
     protected void registerVariantGoals() {
         setRangedAI( 1.0, 10, 9.0F );
-        
-        //TODO AIHelper.insertGoalReverse( goalSelector, getVariantAttackPriority() - 1, null );
+        goalSelector.addGoal( -9, new NinjaGoal<>( this ) );
     }
     
     /** Called during spawn finalization to set starting equipment. */
@@ -95,15 +99,13 @@ public class NinjaSkeletonEntity extends _SpecialSkeletonEntity implements INinj
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override
-    protected void onVariantAttack( Entity target ) {
-        revealTo( target );
-    }
+    protected void onVariantAttack( Entity target ) { revealTo( target, true ); }
     
     /** @return Attempts to damage this entity; returns true if the hit was successful. */
     @Override
     public boolean hurt( DamageSource source, float amount ) {
         if( super.hurt( source, amount ) ) {
-            revealTo( source.getEntity() );
+            revealTo( source.getEntity(), false );
             return true;
         }
         return false;
@@ -113,21 +115,25 @@ public class NinjaSkeletonEntity extends _SpecialSkeletonEntity implements INinj
     @Override
     public ActionResultType mobInteract( PlayerEntity player, Hand hand ) {
         // Attack if the player tries to right click the "block"
-        if( !level.isClientSide() && getDisguiseBlock() != null ) revealTo( player );
+        if( !level.isClientSide() && getHiddenDragon() != null ) revealTo( player, true );
         return super.mobInteract( player, hand );
+    }
+    
+    /** Called by the player when it touches this entity. */
+    @Override
+    public void playerTouch( PlayerEntity player ) {
+        if( !level.isClientSide() && getHiddenDragon() != null && !player.isCreative() ) revealTo( player, true );
+        super.playerTouch( player );
     }
     
     /** Called each tick to update this entity. */
     @Override
     public void tick() {
-        // TODO can this be moved to the ninja AI?
         if( !level.isClientSide() ) {
             if( canHide ) {
-                //EntityAINinja.startHiding( this ); TODO
-                this.setHiding( true );
-                this.setDisguiseBlock( Blocks.DIRT.defaultBlockState() );
+                setHiddenDragon( NinjaGoal.pickDisguise( this ) );
             }
-            else if( onGround && getDisguiseBlock() == null &&
+            else if( onGround && getHiddenDragon() == null &&
                     (getTarget() == null || getTarget() instanceof PlayerEntity && ((PlayerEntity) getTarget()).isCreative()) ) {
                 canHide = true;
             }
@@ -135,33 +141,48 @@ public class NinjaSkeletonEntity extends _SpecialSkeletonEntity implements INinj
         super.tick();
     }
     
-    //    // Moves this entity.
-    //    @Override TODO
-    //    public void move( MoverType type, double x, double y, double z ) {
-    //        if( isHiding() && type != MoverType.PISTON ) {
-    //            motionY = 0.0;
-    //        }
-    //        else {
-    //            super.move( type, x, y, z );
-    //        }
-    //    }
+    /** Moves this entity to a new position and rotation. */
+    @Override
+    public void moveTo( double x, double y, double z, float yaw, float pitch ) {
+        if( !isCrouchingTiger() ) super.moveTo( x, y, z, yaw, pitch );
+    }
+    
+    /** Sets this entity's movement. */
+    @Override
+    public void setDeltaMovement( Vector3d vec ) {
+        if( !isCrouchingTiger() ) super.setDeltaMovement( vec );
+    }
     
     /** Returns true if this entity should push and be pushed by other entities when colliding. */
     @Override
     public boolean isPushable() {
-        return super.isPushable() && !isHiding();
+        return super.isPushable() && !isCrouchingTiger();
     }
     
     /** Sets this entity on fire for a specific duration. */
     @Override
     public void setRemainingFireTicks( int ticks ) {
-        if( !isHiding() ) super.setRemainingFireTicks( ticks );
+        if( !isCrouchingTiger() ) super.setRemainingFireTicks( ticks );
     }
     
     /** Reveals this ninja and sets its target so that it doesn't immediately re-disguise itself. */
-    public void revealTo( @Nullable Entity target ) {
-        setDisguiseBlock( null );
-        if( target instanceof LivingEntity ) setTarget( (LivingEntity) target );
+    public void revealTo( @Nullable Entity target, boolean ambush ) {
+        if( getHiddenDragon() == null ) return;
+        setHiddenDragon( null );
+        
+        if( target instanceof LivingEntity && !(target instanceof PlayerEntity && ((PlayerEntity) target).isCreative()) ) {
+            final LivingEntity livingTarget = (LivingEntity) target;
+            setTarget( livingTarget );
+            
+            if( ambush ) {
+                final int duration = MobHelper.getDebuffDuration( level.getDifficulty() );
+                
+                livingTarget.addEffect( new EffectInstance( Effects.POISON, duration ) );
+                livingTarget.addEffect( new EffectInstance( Effects.MOVEMENT_SLOWDOWN, duration ) );
+                livingTarget.addEffect( new EffectInstance( Effects.BLINDNESS, duration ) );
+                livingTarget.removeEffect( Effects.NIGHT_VISION ); // Prevent blind + night vision combo (black screen)
+            }
+        }
     }
     
     private static final ResourceLocation[] TEXTURES = {
@@ -194,37 +215,31 @@ public class NinjaSkeletonEntity extends _SpecialSkeletonEntity implements INinj
     
     /** @return Whether this ninja is currently immobile. */
     @Override
-    public boolean isHiding() { return getEntityData().get( IS_HIDING ); }
+    public boolean isCrouchingTiger() { return getEntityData().get( IS_HIDING ); }
     
     /** Sets this ninja's immovable state. When activated, the entity is 'snapped' to the nearest block position. */
     @Override
-    public void setHiding( boolean value ) {
-        if( value != isHiding() ) {
+    public void setCrouchingTiger( boolean value ) {
+        if( value != isCrouchingTiger() ) {
             getEntityData().set( IS_HIDING, value );
-            if( value ) {
-                clearFire();
-                moveTo( Math.floor( getX() ) + 0.5, Math.floor( getY() ), Math.floor( getZ() ) + 0.5 );
-            }
         }
     }
     
     /** @return The block being hidden (rendered) as, or null if not hiding. */
     @Nullable
     @Override
-    public BlockState getDisguiseBlock() {
+    public BlockState getHiddenDragon() {
         if( isAlive() ) return getEntityData().get( HIDING_BLOCK ).orElse( null );
         return null;
     }
     
     /** Sets the block being hidden (rendered) as, set to null to cancel hiding. */
     @Override
-    public void setDisguiseBlock( @Nullable BlockState block ) {
+    public void setHiddenDragon( @Nullable BlockState block ) {
         getEntityData().set( HIDING_BLOCK, Optional.ofNullable( block ) );
         canHide = false;
         
         // Smoke puff when emerging from disguise
-        if( block == null ) {
-            //spawnExplosionParticle(); TODO
-        }
+        if( block == null ) spawnAnim();
     }
 }
