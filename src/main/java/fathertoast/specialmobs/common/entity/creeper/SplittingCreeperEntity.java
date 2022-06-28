@@ -87,6 +87,7 @@ public class SplittingCreeperEntity extends _SpecialCreeperEntity {
         for( int i = 0; i < babiesToSpawn; i++ ) {
             groupData = spawnBaby( explosionPower / 3.0F, groupData );
         }
+        spawnAnim();
         playSound( SoundEvents.EGG_THROW, 1.0F, 2.0F / (random.nextFloat() * 0.4F + 0.8F) );
     }
     

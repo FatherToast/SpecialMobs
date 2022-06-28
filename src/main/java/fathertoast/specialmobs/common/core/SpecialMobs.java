@@ -52,10 +52,10 @@ public class SpecialMobs {
      *          + transformations
      *          - ranged attack AI (using bow)
      *          - use shields
-     *          + drowned
-     *      o zombified piglins
-     *          o ranged attack AI (using bow)
-     *          o use shields
+     *      + drowned
+     *      - zombified piglins
+     *          - ranged attack AI (using bow)
+     *          - use shields
      *      - skeletons
      *          - use shields
      *          - babies
@@ -64,7 +64,7 @@ public class SpecialMobs {
      *          - babies
      *      - slimes
      *          - smallest size can deal damage
-     *      o magma cubes
+     *      - magma cubes
      *      - spiders
      *          o ranged attack AI
      *      - cave spiders
@@ -84,6 +84,7 @@ public class SpecialMobs {
      *      ? zoglins
      *      ? endermites
      *      ? guardians
+     *          ? vortex
      *      ? shulkers
      *      ? phantoms
      *      + the goat

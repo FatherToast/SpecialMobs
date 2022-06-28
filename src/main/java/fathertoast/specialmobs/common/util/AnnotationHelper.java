@@ -172,7 +172,7 @@ public final class AnnotationHelper {
      * @throws NoSuchMethodException if the constructor does not exist.
      */
     private static <T> Constructor<T> getConstructor( Class<T> type, Class<? extends Annotation> annotation ) throws NoSuchMethodException {
-        for( Constructor<?> constructor : type.getConstructors() ) {
+        for( Constructor<?> constructor : type.getDeclaredConstructors() ) {
             if( constructor.isAnnotationPresent( annotation ) )
                 //noinspection unchecked
                 return (Constructor<T>) constructor;

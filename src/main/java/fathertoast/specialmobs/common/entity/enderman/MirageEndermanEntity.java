@@ -89,6 +89,7 @@ public class MirageEndermanEntity extends _SpecialEndermanEntity {
     @Override
     public void tick() {
         if( isFake && tickCount >= 200 ) {
+            spawnAnim();
             remove();
         }
         super.tick();
