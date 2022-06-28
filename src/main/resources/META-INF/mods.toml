@@ -24,18 +24,25 @@ Source: https://github.com/FatherToast/
 Discussion: https://discord.gg/GFTzTdX
 '''
 
-[[dependencies.deadlyworld]]
+[[dependencies.specialmobs]]
 modId = "forge"
 mandatory = true
 versionRange = "[36.2.17,)"
 ordering = "NONE"
 side = "BOTH"
 
-[[dependencies.deadlyworld]]
+[[dependencies.specialmobs]]
 modId = "minecraft"
 mandatory = true
 versionRange = "[1.16.5,1.17)"
 ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.specialmobs]]
+modId = "theoneprobe"
+mandatory = false
+versionRange = "[1.16,)"
+ordering = "BEFORE"
 side = "BOTH"
 
 # A URL to query for updates for this mod. See the JSON update specification https://mcforge.readthedocs.io/en/latest/gettingstarted/autoupdate/

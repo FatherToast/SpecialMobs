@@ -55,7 +55,7 @@ public class NinjaSkeletonRenderer extends SkeletonRenderer {
         matrixStack.pushPose();
         
         matrixStack.translate( -0.5D, 0.0D, -0.5D );
-        this.blockRenderer.renderBlock( Blocks.LECTERN.defaultBlockState(), matrixStack, buffer, i, OverlayTexture.NO_OVERLAY, EmptyModelData.INSTANCE );
+        this.blockRenderer.renderBlock( state, matrixStack, buffer, i, OverlayTexture.NO_OVERLAY, EmptyModelData.INSTANCE );
         
         matrixStack.popPose();
     }
