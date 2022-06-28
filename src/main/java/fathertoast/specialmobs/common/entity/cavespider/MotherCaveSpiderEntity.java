@@ -94,6 +94,7 @@ public class MotherCaveSpiderEntity extends _SpecialCaveSpiderEntity {
             if( extraBabies > 0 && amount > 1.0F && level instanceof IServerWorld && random.nextFloat() < 0.33F ) {
                 extraBabies--;
                 spawnBaby( 0.66F, null );
+                spawnAnim();
                 playSound( SoundEvents.EGG_THROW, 1.0F, 2.0F / (random.nextFloat() * 0.4F + 0.8F) );
             }
             return true;
@@ -112,6 +113,7 @@ public class MotherCaveSpiderEntity extends _SpecialCaveSpiderEntity {
             for( int i = 0; i < babiesToSpawn; i++ ) {
                 groupData = spawnBaby( 0.33F, groupData );
             }
+            spawnAnim();
             playSound( SoundEvents.EGG_THROW, 1.0F, 2.0F / (random.nextFloat() * 0.4F + 0.8F) );
         }
         super.remove( keepData );
