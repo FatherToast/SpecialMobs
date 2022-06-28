@@ -47,6 +47,7 @@ public class MobFamily<T extends LivingEntity> {
             "Zombie", "zombies", 0x00AFAF, new EntityType[] { EntityType.ZOMBIE, EntityType.HUSK },
             "Brute", "Fire", /*"Fishing",*/ "Giant", "Hungry", "Husk", "MadScientist", "Plague"
     );
+    // TODO Drowned family and zombie transform mechanic
     public static final MobFamily<ZombifiedPiglinEntity> ZOMBIFIED_PIGLIN = new MobFamily<>(//TODO figure out crossbows
             "ZombifiedPiglin", "zombified piglins", 0xEA9393, new EntityType[] { EntityType.ZOMBIFIED_PIGLIN },
             "Brute", /*"Fishing",*/ "Giant", "Hungry", "Knight", "Plague", "Vampire"
