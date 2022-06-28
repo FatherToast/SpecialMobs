@@ -16,6 +16,8 @@ import net.minecraft.potion.Effects;
 import net.minecraft.tags.ITag;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.Hand;
+import net.minecraft.util.SoundCategory;
+import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.Difficulty;
@@ -244,7 +246,7 @@ public final class MobHelper {
             Vector3d targetVec = sourcePos.vectorTo( blocker.position() ).normalize();
             targetVec = new Vector3d( targetVec.x, 0.0, targetVec.z );
             if( targetVec.dot( lookVec ) < 0.0 ) {
-                blocker.level.broadcastEntityEvent( blocker, References.EVENT_SHIELD_BLOCK_SOUND );
+                blocker.level.playSound(null, blocker.getX() + 0.5D, blocker.getY(), blocker.getZ() + 0.5D, SoundEvents.SHIELD_BLOCK, SoundCategory.NEUTRAL, 0.9F, 1.0F);
                 if( needsShield && entity instanceof PlayerEntity ) {
                     maybeDestroyShield( blocker, shield, shieldHand, ((PlayerEntity) entity).getMainHandItem() );
                 }
@@ -264,7 +266,7 @@ public final class MobHelper {
     private static void maybeDestroyShield( LivingEntity blocker, ItemStack shield, Hand shieldHand, ItemStack weapon ) {
         if( !weapon.isEmpty() && !shield.isEmpty() && weapon.getItem() instanceof AxeItem && shield.getItem() == Items.SHIELD &&
                 blocker.getRandom().nextFloat() < 0.25F - EnchantmentHelper.getBlockEfficiency( blocker ) * 0.05F ) {
-            blocker.level.broadcastEntityEvent( blocker, References.EVENT_SHIELD_BREAK_SOUND );
+            blocker.level.playSound(null, blocker.getX() + 0.5D, blocker.getY(), blocker.getZ() + 0.5D, SoundEvents.SHIELD_BREAK, SoundCategory.NEUTRAL, 0.9F, 1.0F);
             blocker.broadcastBreakEvent( shieldHand );
             blocker.setItemInHand( shieldHand, ItemStack.EMPTY );
         }
