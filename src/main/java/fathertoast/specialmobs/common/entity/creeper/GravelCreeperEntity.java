@@ -14,6 +14,7 @@ import net.minecraft.entity.item.FallingBlockEntity;
 import net.minecraft.item.Items;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.World;
@@ -90,6 +91,8 @@ public class GravelCreeperEntity extends _SpecialCreeperEntity {
                     MathHelper.sin( yaw ) * speed );
             level.addFreshEntity( gravel );
         }
+        spawnAnim();
+        playSound( SoundEvents.GRAVEL_BREAK, 1.0F, 1.0F / (random.nextFloat() * 0.4F + 0.8F) );
     }
     
     /** @return Attempts to damage this entity; returns true if the hit was successful. */

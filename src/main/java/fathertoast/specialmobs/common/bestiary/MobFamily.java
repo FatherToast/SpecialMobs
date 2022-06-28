@@ -40,7 +40,7 @@ public class MobFamily<T extends LivingEntity> {
     public static final MobFamily<CreeperEntity> CREEPER = new MobFamily<>(
             "Creeper", "creepers", 0x0DA70B, new EntityType[] { EntityType.CREEPER },
             "Dark", "Death", "Dirt", "Doom", "Drowning", "Ender", "Fire", "Gravel", "Jumping", "Lightning",
-            "Mini", /*"Scope",*/ "Splitting"
+            "Mini", /*"Scope",*/ "Skeleton", "Splitting"
     );
     
     public static final MobFamily<ZombieEntity> ZOMBIE = new MobFamily<>(
