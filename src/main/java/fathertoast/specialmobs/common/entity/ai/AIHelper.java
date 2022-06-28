@@ -51,4 +51,16 @@ public final class AIHelper {
             }
         }
     }
+    
+    /** Replaces the entity's hurt by target goal with an equivalent replacement more compatible with special mobs. */
+    public static void replaceHurtByTarget( CreatureEntity entity, SpecialHurtByTargetGoal replacement ) {
+        for( PrioritizedGoal task : new ArrayList<>( entity.targetSelector.availableGoals ) ) {
+            if( task.getGoal() instanceof HurtByTargetGoal ) {
+                final int priority = task.getPriority();
+                entity.targetSelector.removeGoal( task.getGoal() );
+                entity.targetSelector.addGoal( priority, replacement );
+                return;
+            }
+        }
+    }
 }

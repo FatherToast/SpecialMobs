@@ -1,6 +1,7 @@
 package fathertoast.specialmobs.common.entity.cavespider;
 
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
+import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.util.AttributeHelper;
 import fathertoast.specialmobs.common.util.References;
@@ -12,13 +13,11 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.ai.attributes.AttributeModifierMap;
 import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.entity.monster.SlimeEntity;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvents;
-import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.IServerWorld;
 import net.minecraft.world.World;
 
@@ -31,6 +30,9 @@ import javax.annotation.ParametersAreNonnullByDefault;
 public class MotherCaveSpiderEntity extends _SpecialCaveSpiderEntity {
     
     //--------------- Static Special Mob Hooks ----------------
+    
+    @SpecialMob.SpeciesReference
+    public static MobFamily.Species<MotherCaveSpiderEntity> SPECIES;
     
     @SpecialMob.BestiaryInfoSupplier
     public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
@@ -118,7 +120,7 @@ public class MotherCaveSpiderEntity extends _SpecialCaveSpiderEntity {
     /** Helper method to simplify spawning babies. */
     @Nullable
     private ILivingEntityData spawnBaby( float speed, @Nullable ILivingEntityData groupData ) {
-        final BabyCaveSpiderEntity baby = BabyCaveSpiderEntity.ENTITY_TYPE.get().create( level );
+        final BabyCaveSpiderEntity baby = BabyCaveSpiderEntity.SPECIES.entityType.get().create( level );
         if( baby == null ) return groupData;
         
         baby.copyPosition( this );

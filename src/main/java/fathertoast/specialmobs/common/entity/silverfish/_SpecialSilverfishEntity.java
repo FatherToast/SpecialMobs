@@ -1,10 +1,13 @@
 package fathertoast.specialmobs.common.entity.silverfish;
 
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
+import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.core.SpecialMobs;
 import fathertoast.specialmobs.common.entity.ISpecialMob;
 import fathertoast.specialmobs.common.entity.SpecialMobData;
+import fathertoast.specialmobs.common.entity.ai.AIHelper;
+import fathertoast.specialmobs.common.entity.ai.SpecialHurtByTargetGoal;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import mcp.MethodsReturnNonnullByDefault;
@@ -37,6 +40,9 @@ import java.util.List;
 public class _SpecialSilverfishEntity extends SilverfishEntity implements ISpecialMob<_SpecialSilverfishEntity> {
     
     //--------------- Static Special Mob Hooks ----------------
+    
+    @SpecialMob.SpeciesReference
+    public static MobFamily.Species<_SpecialSilverfishEntity> SPECIES;
     
     @SpecialMob.BestiaryInfoSupplier
     public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
@@ -72,6 +78,7 @@ public class _SpecialSilverfishEntity extends SilverfishEntity implements ISpeci
     @Override
     protected void registerGoals() {
         super.registerGoals();
+        AIHelper.replaceHurtByTarget( this, new SpecialHurtByTargetGoal( this, SilverfishEntity.class ).setAlertOthers() );
         
         getSpecialData().rangedAttackDamage = 1.0F;
         getSpecialData().rangedAttackSpread = 14.0F;

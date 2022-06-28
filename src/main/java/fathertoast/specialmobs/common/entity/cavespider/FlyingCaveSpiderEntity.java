@@ -1,6 +1,7 @@
 package fathertoast.specialmobs.common.entity.cavespider;
 
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
+import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.entity.ai.SpecialLeapAtTargetGoal;
 import fathertoast.specialmobs.common.util.AttributeHelper;
@@ -23,6 +24,9 @@ import javax.annotation.ParametersAreNonnullByDefault;
 public class FlyingCaveSpiderEntity extends _SpecialCaveSpiderEntity {
     
     //--------------- Static Special Mob Hooks ----------------
+    
+    @SpecialMob.SpeciesReference
+    public static MobFamily.Species<FlyingCaveSpiderEntity> SPECIES;
     
     @SpecialMob.BestiaryInfoSupplier
     public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {

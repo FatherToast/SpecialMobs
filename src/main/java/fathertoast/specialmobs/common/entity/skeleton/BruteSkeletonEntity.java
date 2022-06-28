@@ -1,6 +1,7 @@
 package fathertoast.specialmobs.common.entity.skeleton;
 
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
+import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.util.AttributeHelper;
@@ -29,6 +30,9 @@ import javax.annotation.ParametersAreNonnullByDefault;
 public class BruteSkeletonEntity extends _SpecialSkeletonEntity {
     
     //--------------- Static Special Mob Hooks ----------------
+    
+    @SpecialMob.SpeciesReference
+    public static MobFamily.Species<BruteSkeletonEntity> SPECIES;
     
     @SpecialMob.BestiaryInfoSupplier
     public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
@@ -79,7 +83,7 @@ public class BruteSkeletonEntity extends _SpecialSkeletonEntity {
     @Override
     protected AbstractArrowEntity getVariantArrow( AbstractArrowEntity arrow, ItemStack arrowItem, float damageMulti ) {
         if( arrow instanceof ArrowEntity ) {
-            ((ArrowEntity) arrow).addEffect( new EffectInstance( Effects.HARM, 1 ) );
+            ((ArrowEntity) arrow).addEffect( new EffectInstance( Effects.HARM ) );
         }
         return arrow;
     }

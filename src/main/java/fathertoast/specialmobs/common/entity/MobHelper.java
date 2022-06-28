@@ -68,8 +68,10 @@ public final class MobHelper {
     
     /** @return True if the given item is made of wood. */
     private static boolean isWoodenTool( ItemStack item ) {
+        if( item.isEmpty() ) return false;
         //TODO Consider Tinkers compat - striking component must be wood
-        return !item.isEmpty() && item.getItem() instanceof TieredItem && ((TieredItem) item.getItem()).getTier() == ItemTier.WOOD;
+        return item.getItem() instanceof TieredItem && ((TieredItem) item.getItem()).getTier() == ItemTier.WOOD ||
+                item.getItem() instanceof BowItem || item.getItem() instanceof CrossbowItem;
     }
     
     /** @return True if the given item deals bonus damage against undead. */

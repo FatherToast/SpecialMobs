@@ -1,6 +1,7 @@
 package fathertoast.specialmobs.common.entity.witherskeleton;
 
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
+import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.entity.ai.INinja;
 import fathertoast.specialmobs.common.util.AttributeHelper;
@@ -36,6 +37,9 @@ public class NinjaWitherSkeletonEntity extends _SpecialWitherSkeletonEntity impl
     
     //--------------- Static Special Mob Hooks ----------------
     
+    @SpecialMob.SpeciesReference
+    public static MobFamily.Species<NinjaWitherSkeletonEntity> SPECIES;
+    
     @SpecialMob.BestiaryInfoSupplier
     public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
         return new BestiaryInfo( 0x333366 );
@@ -61,7 +65,7 @@ public class NinjaWitherSkeletonEntity extends _SpecialWitherSkeletonEntity impl
                 Blocks.INFESTED_CRACKED_STONE_BRICKS, Blocks.INFESTED_MOSSY_STONE_BRICKS, Blocks.INFESTED_CHISELED_STONE_BRICKS );
     }
     
-    @SpecialMob.Constructor(hasCustomRenderer = true)
+    @SpecialMob.Constructor
     public NinjaWitherSkeletonEntity( EntityType<? extends _SpecialWitherSkeletonEntity> entityType, World world ) {
         super( entityType, world );
         xpReward += 2;

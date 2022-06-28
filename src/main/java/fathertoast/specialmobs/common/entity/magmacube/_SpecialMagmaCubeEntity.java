@@ -1,6 +1,7 @@
 package fathertoast.specialmobs.common.entity.magmacube;
 
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
+import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.core.SpecialMobs;
 import fathertoast.specialmobs.common.entity.ISpecialMob;
@@ -35,6 +36,9 @@ import javax.annotation.ParametersAreNonnullByDefault;
 public class _SpecialMagmaCubeEntity extends MagmaCubeEntity implements ISpecialMob<_SpecialMagmaCubeEntity> {
     
     //--------------- Static Special Mob Hooks ----------------
+    
+    @SpecialMob.SpeciesReference
+    public static MobFamily.Species<_SpecialMagmaCubeEntity> SPECIES;
     
     @SpecialMob.BestiaryInfoSupplier
     public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {

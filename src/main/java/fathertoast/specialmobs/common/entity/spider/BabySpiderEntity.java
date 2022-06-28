@@ -1,6 +1,7 @@
 package fathertoast.specialmobs.common.entity.spider;
 
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
+import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.util.AttributeHelper;
 import fathertoast.specialmobs.common.util.References;
@@ -12,7 +13,6 @@ import net.minecraft.entity.ai.attributes.AttributeModifierMap;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.item.Items;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.RegistryObject;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
@@ -23,8 +23,8 @@ public class BabySpiderEntity extends _SpecialSpiderEntity {
     
     //--------------- Static Special Mob Hooks ----------------
     
-    @SpecialMob.TypeHolder
-    public static RegistryObject<EntityType<BabySpiderEntity>> ENTITY_TYPE;
+    @SpecialMob.SpeciesReference
+    public static MobFamily.Species<BabySpiderEntity> SPECIES;
     
     @SpecialMob.BestiaryInfoSupplier
     public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {

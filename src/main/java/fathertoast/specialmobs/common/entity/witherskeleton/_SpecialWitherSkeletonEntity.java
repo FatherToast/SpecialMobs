@@ -1,6 +1,7 @@
 package fathertoast.specialmobs.common.entity.witherskeleton;
 
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
+import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.core.SpecialMobs;
 import fathertoast.specialmobs.common.entity.ISpecialMob;
@@ -52,6 +53,9 @@ public class _SpecialWitherSkeletonEntity extends WitherSkeletonEntity implement
     
     //--------------- Static Special Mob Hooks ----------------
     
+    @SpecialMob.SpeciesReference
+    public static MobFamily.Species<_SpecialWitherSkeletonEntity> SPECIES;
+    
     @SpecialMob.BestiaryInfoSupplier
     public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
         return new BestiaryInfo( 0x474D4D );
@@ -77,7 +81,6 @@ public class _SpecialWitherSkeletonEntity extends WitherSkeletonEntity implement
     public _SpecialWitherSkeletonEntity( EntityType<? extends _SpecialWitherSkeletonEntity> entityType, World world ) {
         super( entityType, world );
         getSpecialData().initialize();
-        getSpecialData().setImmuneToFire( true );
     }
     
     

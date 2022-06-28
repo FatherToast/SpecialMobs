@@ -2,12 +2,10 @@ package fathertoast.specialmobs.common.bestiary;
 
 import fathertoast.specialmobs.common.core.register.SMEntities;
 import fathertoast.specialmobs.common.core.register.SMItems;
-import fathertoast.specialmobs.common.entity.ISpecialMob;
 import fathertoast.specialmobs.common.util.AnnotationHelper;
 import fathertoast.specialmobs.common.util.References;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.block.Block;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.monster.*;
@@ -49,10 +47,10 @@ public class MobFamily<T extends LivingEntity> {
             "Zombie", "zombies", 0x00AFAF, new EntityType[] { EntityType.ZOMBIE, EntityType.HUSK },
             "Brute", "Fire", /*"Fishing",*/ "Giant", "Hungry", "Husk", "MadScientist", "Plague"
     );
-    //    public static final MobFamily<ZombieEntity> ZOMBIFIED_PIGLIN = new MobFamily<>(
-    //            "ZombifiedPiglin", "zombie pigmen", 0xEA9393, new EntityType[] { EntityType.ZOMBIFIED_PIGLIN },
-    //            "Brute", "Fishing", "Giant", "Hungry", "Knight", "Plague", "Vampire"
-    //    );
+    public static final MobFamily<ZombifiedPiglinEntity> ZOMBIFIED_PIGLIN = new MobFamily<>(//TODO figure out crossbows
+            "ZombifiedPiglin", "zombified piglins", 0xEA9393, new EntityType[] { EntityType.ZOMBIFIED_PIGLIN },
+            "Brute", /*"Fishing",*/ "Giant", "Hungry", "Knight", "Plague", "Vampire"
+    );
     
     public static final MobFamily<AbstractSkeletonEntity> SKELETON = new MobFamily<>(
             "Skeleton", "skeletons", 0xC1C1C1, new EntityType[] { EntityType.SKELETON, EntityType.STRAY },
@@ -93,7 +91,7 @@ public class MobFamily<T extends LivingEntity> {
     
     //    public static final MobFamily<WitchEntity> WITCH = new MobFamily<>(
     //            "Witch", "witches", 0x340000, new EntityType[] { EntityType.WITCH },
-    //            "Domination", "Shadows", "Undead", "Wilds", "Wind"//Note - should wind be able to walk on water?
+    //            "Domination"//, "Shadows", "Undead", "Wilds", "Wind"//Note - should wind be able to walk on water?
     //    );
     
     //    public static final MobFamily<GhastEntity> GHAST = new MobFamily<>(
@@ -131,16 +129,6 @@ public class MobFamily<T extends LivingEntity> {
     
     /** @return A list of all species. */
     public static List<Species<?>> getAllSpecies() { return SPECIES_LIST; }
-    
-    @SuppressWarnings( "unchecked" )
-    @Nullable
-    public static <T extends LivingEntity> Species<T> findSpecies( Class<T> entityClass ) {
-        for( Species<?> species : getAllSpecies() ) {
-            if( species.entityClass == entityClass )
-                return (Species<T>) species;
-        }
-        return null;
-    }
     
     /** @return The family of mobs that can replace the passed entity; returns null if the entity is not replaceable. */
     @Nullable
@@ -250,9 +238,6 @@ public class MobFamily<T extends LivingEntity> {
         /** This species's spawn egg item, wrapped in its registry object. */
         public final RegistryObject<ForgeSpawnEggItem> spawnEgg;
         
-        /** Whether this species has a custom renderer. */
-        public final boolean hasCustomRenderer;
-        
         /** Constructs a new mob species. For vanilla replacements, the variant name is null. */
         private Species( MobFamily<? super T> parentFamily, String packageRoot, @Nullable String variantName ) {
             final boolean vanillaReplacement = variantName == null;
@@ -272,8 +257,9 @@ public class MobFamily<T extends LivingEntity> {
             // Initialize deferred registry objects
             entityType = SMEntities.register( name.toLowerCase( Locale.ROOT ), entityTypeBuilder );
             spawnEgg = SMItems.registerSpawnEgg( entityType, parentFamily.eggBaseColor, bestiaryInfo.eggSpotsColor );
-            hasCustomRenderer = AnnotationHelper.hasCustomRenderer( entityClass );
-            AnnotationHelper.injectEntityTypeHolder( this );
+            
+            // Register this species with the entity class
+            AnnotationHelper.injectSpeciesReference( this );
         }
         
         /** Finds the entity class based on a standard format. */

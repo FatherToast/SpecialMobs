@@ -1,6 +1,7 @@
 package fathertoast.specialmobs.common.entity.creeper;
 
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
+import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.util.AttributeHelper;
 import fathertoast.specialmobs.common.util.ExplosionHelper;
@@ -19,13 +20,11 @@ import net.minecraft.entity.passive.fish.PufferfishEntity;
 import net.minecraft.item.Items;
 import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.tags.BlockTags;
-import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.IServerWorld;
 import net.minecraft.world.World;
-import net.minecraft.world.spawner.WorldEntitySpawner;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
@@ -35,6 +34,9 @@ import javax.annotation.ParametersAreNonnullByDefault;
 public class DrowningCreeperEntity extends _SpecialCreeperEntity {
     
     //--------------- Static Special Mob Hooks ----------------
+    
+    @SpecialMob.SpeciesReference
+    public static MobFamily.Species<DrowningCreeperEntity> SPECIES;
     
     @SpecialMob.BestiaryInfoSupplier
     public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
@@ -67,7 +69,6 @@ public class DrowningCreeperEntity extends _SpecialCreeperEntity {
     @SpecialMob.Constructor
     public DrowningCreeperEntity( EntityType<? extends _SpecialCreeperEntity> entityType, World world ) {
         super( entityType, world );
-        getSpecialData().setImmuneToBurning( true );
         getSpecialData().setCanBreatheInWater( true );
         getSpecialData().setIgnoreWaterPush( true );
         xpReward += 2;
@@ -154,6 +155,13 @@ public class DrowningCreeperEntity extends _SpecialCreeperEntity {
             level.addFreshEntity( lePuffPuff );
         }
     }
+    
+    // The below two methods are here to effectively override the private Entity#isInRain to always return true (always wet)
+    @Override
+    public boolean isInWaterOrRain() { return true; }
+    
+    @Override
+    public boolean isInWaterRainOrBubble() { return true; }
     
     private static final ResourceLocation[] TEXTURES = {
             GET_TEXTURE_PATH( "drowning" ),
