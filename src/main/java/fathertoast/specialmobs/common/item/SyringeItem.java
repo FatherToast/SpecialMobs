@@ -18,7 +18,7 @@ import net.minecraft.world.World;
 public class SyringeItem extends Item {
 
     public SyringeItem() {
-        super(new Item.Properties().stacksTo(1).rarity(Rarity.UNCOMMON).defaultDurability(10).setNoRepair().tab(ItemGroup.TAB_MISC));
+        super(new Item.Properties().stacksTo(1).rarity(Rarity.UNCOMMON).defaultDurability(5).setNoRepair().tab(ItemGroup.TAB_MISC));
     }
 
     @SpecialMob.LanguageProvider
