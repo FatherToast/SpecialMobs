@@ -45,7 +45,6 @@ public class MadScientistZombieEntity extends _SpecialZombieEntity {
     @SpecialMob.AttributeCreator
     public static AttributeModifierMap.MutableAttribute createAttributes() {
         return AttributeHelper.of( _SpecialZombieEntity.createAttributes() )
-                .multAttribute( Attributes.MOVEMENT_SPEED, 1.1 )
                 .build();
     }
     
@@ -76,7 +75,7 @@ public class MadScientistZombieEntity extends _SpecialZombieEntity {
         disableRangedAI();
         
         AIHelper.insertGoal( goalSelector, 2, new SpecialInjectCreeperGoal<>(
-                this, 1.0D, 20.0D,
+                this, getAttributeValue(Attributes.MOVEMENT_SPEED) * 1.25D, 20.0D,
                 ( madman, creeper ) -> creeper.isAlive() && !creeper.isPowered() && madman.getSensing().canSee( creeper ) ) );
     }
     

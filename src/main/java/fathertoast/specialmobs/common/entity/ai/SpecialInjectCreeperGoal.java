@@ -79,7 +79,7 @@ public class SpecialInjectCreeperGoal<T extends MadScientistZombieEntity> extend
     /** Called each tick while this AI is active. */
     @Override
     public void tick() {
-        if (creeper == null) {
+        if (creeper == null || !targetPredicate.test(madman, creeper)) {
             findCreeper();
         }
         else {

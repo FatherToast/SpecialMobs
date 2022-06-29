@@ -6,6 +6,7 @@ import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.entity.ai.INinja;
 import fathertoast.specialmobs.common.entity.ai.NinjaGoal;
+import fathertoast.specialmobs.common.network.NetworkHelper;
 import fathertoast.specialmobs.common.util.AttributeHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
@@ -237,6 +238,7 @@ public class NinjaWitherSkeletonEntity extends _SpecialWitherSkeletonEntity impl
     @Override
     public void setHiddenDragon( @Nullable BlockState block ) {
         getEntityData().set( HIDING_BLOCK, Optional.ofNullable( block ) );
+        NetworkHelper.updateNinjaModelData( level, getId(), blockPosition() );
         canHide = false;
         
         // Smoke puff when emerging from disguise

@@ -6,6 +6,7 @@ import fathertoast.specialmobs.common.config.Config;
 import fathertoast.specialmobs.common.core.register.SMEntities;
 import fathertoast.specialmobs.common.core.register.SMItems;
 import fathertoast.specialmobs.common.event.BiomeEvents;
+import fathertoast.specialmobs.common.network.PacketHandler;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -100,14 +101,13 @@ public class SpecialMobs {
     /** Logger instance for the mod. */
     public static final Logger LOG = LogManager.getLogger( MOD_ID );
     
-    //** Our mod's packet handler; takes care of networking and sending messages. */
-    //@SuppressWarnings( "FieldCanBeLocal" )
-    //private final PacketHandler packetHandler = new PacketHandler();
+    /** Our mod's packet handler; takes care of networking and sending messages. */
+    @SuppressWarnings( "FieldCanBeLocal" )
+    private final PacketHandler packetHandler = new PacketHandler();
     
     public SpecialMobs() {
         Config.initialize();
-        
-        //packetHandler.registerMessages();
+        packetHandler.registerMessages();
         
         //MinecraftForge.EVENT_BUS.register( new SMEventListener() );
         MinecraftForge.EVENT_BUS.register( new BiomeEvents() );

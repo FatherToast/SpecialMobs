@@ -6,6 +6,7 @@ import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.entity.ai.INinja;
 import fathertoast.specialmobs.common.entity.ai.NinjaGoal;
+import fathertoast.specialmobs.common.network.NetworkHelper;
 import fathertoast.specialmobs.common.util.AttributeHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
@@ -23,13 +24,12 @@ import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.Effects;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.Hand;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.*;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.World;
+import net.minecraftforge.client.model.data.IModelData;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -140,7 +140,18 @@ public class NinjaSkeletonEntity extends _SpecialSkeletonEntity implements INinj
         }
         super.tick();
     }
-    
+
+    @Override
+    protected void playStepSound(BlockPos pos, BlockState state) {
+        // Nope
+    }
+
+    /** @return The sound this entity makes idly. */
+    @Override
+    protected SoundEvent getAmbientSound() {
+        return getHiddenDragon() == null ? null: SoundEvents.SKELETON_AMBIENT;
+    }
+
     /** Moves this entity to a new position and rotation. */
     @Override
     public void moveTo( double x, double y, double z, float yaw, float pitch ) {
@@ -237,6 +248,7 @@ public class NinjaSkeletonEntity extends _SpecialSkeletonEntity implements INinj
     @Override
     public void setHiddenDragon( @Nullable BlockState block ) {
         getEntityData().set( HIDING_BLOCK, Optional.ofNullable( block ) );
+        NetworkHelper.updateNinjaModelData( level, getId(), blockPosition().below() );
         canHide = false;
         
         // Smoke puff when emerging from disguise

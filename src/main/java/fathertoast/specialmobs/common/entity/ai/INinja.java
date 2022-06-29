@@ -1,6 +1,9 @@
 package fathertoast.specialmobs.common.entity.ai;
 
 import net.minecraft.block.BlockState;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.client.model.data.IModelData;
 
 import javax.annotation.Nullable;
 
