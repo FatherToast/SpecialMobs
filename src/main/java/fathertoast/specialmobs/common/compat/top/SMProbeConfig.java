@@ -17,7 +17,7 @@ public class SMProbeConfig implements IProbeConfigProvider {
         if (entity instanceof INinja) {
             INinja ninja = (INinja) entity;
 
-            if (ninja.getDisguiseBlock() != null) {
+            if (ninja.getHiddenDragon() != null) {
                 probeConfig.showMobHealth(IProbeConfig.ConfigMode.NOT);
             }
         }

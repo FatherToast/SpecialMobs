@@ -22,8 +22,8 @@ public class NinjaEntityDisplayOverride implements IEntityDisplayOverride {
         if (entity instanceof INinja) {
             INinja ninja = (INinja) entity;
 
-            if (ninja.getDisguiseBlock() != null) {
-                Block block = ninja.getDisguiseBlock().getBlock();
+            if (ninja.getHiddenDragon() != null) {
+                Block block = ninja.getHiddenDragon().getBlock();
 
                 iProbeInfo.horizontal().item(new ItemStack(block.asItem()));
                 iProbeInfo.horizontal().text(CompoundText.create().text(new StringTextComponent(translateBlockName(block))), iProbeInfo.defaultTextStyle());

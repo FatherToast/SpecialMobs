@@ -30,6 +30,7 @@ import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.IServerWorld;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
+import net.minecraftforge.common.util.Constants;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -108,7 +109,7 @@ public class _SpecialCreeperEntity extends CreeperEntity implements ISpecialMob<
     }
     
     /** Override to change this creeper's explosion power multiplier. */
-    protected float getVariantExplosionPower( float radius ) { return radius * (isPowered() ? 2.0F : 1.0F); }
+    protected float getVariantExplosionPower( float radius ) { return radius * (isSupercharged() ? 3.5F : (isPowered() ? 2.0F : 1.0F)); }
     
     /** Override to change this creeper's explosion. */
     protected void makeVariantExplosion( float explosionPower ) {
@@ -163,6 +164,7 @@ public class _SpecialCreeperEntity extends CreeperEntity implements ISpecialMob<
         super.defineSynchedData();
         specialData = new SpecialMobData<>( this, SCALE, 1.0F );
         entityData.define( EXPLODE_FLAGS, (byte) 0 );
+        entityData.define( IS_SUPERCHARGED, false );
     }
     
     /** Called each tick to update this entity. */
@@ -185,8 +187,11 @@ public class _SpecialCreeperEntity extends CreeperEntity implements ISpecialMob<
     /** Called when this entity is struck by lightning. */
     @Override
     public void thunderHit( ServerWorld world, LightningBoltEntity lightningBolt ) {
+        if (!isPowered() && random.nextDouble() < 0.1D)
+            setSupercharged(true);
+
         super.thunderHit( world, lightningBolt );
-        
+
         // Make it less likely for charged "explode while burning" creepers to immediately explode
         if( explodesWhileBurning() ) clearFire();
     }
@@ -207,6 +212,7 @@ public class _SpecialCreeperEntity extends CreeperEntity implements ISpecialMob<
     
     /** The parameter for creeper explosion properties. This is a combination of boolean flags. */
     private static final DataParameter<Byte> EXPLODE_FLAGS = EntityDataManager.defineId( _SpecialCreeperEntity.class, DataSerializers.BYTE );
+    protected static final DataParameter<Boolean> IS_SUPERCHARGED = EntityDataManager.defineId( _SpecialCreeperEntity.class, DataSerializers.BOOLEAN );
     
     /** The bit for "cannot explode while wet". */
     private static final byte EXPLODE_FLAG_DEFUSE_IN_WATER = 0b0001;
@@ -214,6 +220,17 @@ public class _SpecialCreeperEntity extends CreeperEntity implements ISpecialMob<
     private static final byte EXPLODE_FLAG_ON_FIRE = 0b0010;
     /** The bit for "explodes when shot". */
     private static final byte EXPLODE_FLAG_WHEN_SHOT = 0b0100;
+
+
+    /** @return True if this creeper is super charged. */
+    public boolean isSupercharged() {
+        return entityData.get( IS_SUPERCHARGED );
+    }
+
+    /** Sets this creeper's supercharged state to the given value. */
+    public void setSupercharged( boolean superCharged ) {
+        entityData.set( IS_SUPERCHARGED, superCharged );
+    }
     
     /** @return True if this creeper is unable to explode while wet. */
     public boolean cannotExplodeWhileWet() { return getExplodeFlag( EXPLODE_FLAG_DEFUSE_IN_WATER ); }
@@ -366,7 +383,8 @@ public class _SpecialCreeperEntity extends CreeperEntity implements ISpecialMob<
         super.addAdditionalSaveData( tag );
         
         final CompoundNBT saveTag = SpecialMobData.getSaveLocation( tag );
-        
+
+        saveTag.putBoolean( References.TAG_SUPERCHARGED, isSupercharged() );
         saveTag.putBoolean( References.TAG_DRY_EXPLODE, cannotExplodeWhileWet() );
         saveTag.putBoolean( References.TAG_WHEN_BURNING_EXPLODE, explodesWhileBurning() );
         saveTag.putBoolean( References.TAG_WHEN_SHOT_EXPLODE, explodesWhenShot() );
@@ -381,7 +399,9 @@ public class _SpecialCreeperEntity extends CreeperEntity implements ISpecialMob<
         super.readAdditionalSaveData( tag );
         
         final CompoundNBT saveTag = SpecialMobData.getSaveLocation( tag );
-        
+
+        setSupercharged( saveTag.getBoolean(References.TAG_SUPERCHARGED) );
+
         if( saveTag.contains( References.TAG_DRY_EXPLODE, References.NBT_TYPE_NUMERICAL ) )
             setCannotExplodeWhileWet( saveTag.getBoolean( References.TAG_DRY_EXPLODE ) );
         if( saveTag.contains( References.TAG_WHEN_BURNING_EXPLODE, References.NBT_TYPE_NUMERICAL ) )

@@ -60,6 +60,7 @@ public final class References {
     public static final String TAG_WATER_DAMAGE = "WaterDamage";
     public static final String TAG_STICKY_IMMUNE = "StickyImmune";
     public static final String TAG_POTION_IMMUNE = "PotionImmune";
+    public static final String TAG_SUPERCHARGED = "Supercharged";
     
     // Creepers
     public static final String TAG_DRY_EXPLODE = "CannotExplodeWhileWet";

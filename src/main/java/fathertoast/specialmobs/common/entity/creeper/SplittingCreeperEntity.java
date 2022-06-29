@@ -104,6 +104,7 @@ public class SplittingCreeperEntity extends _SpecialCreeperEntity {
                 SpawnReason.MOB_SUMMONED, groupData, null );
         baby.setTarget( getTarget() );
         if( isPowered() ) baby.getEntityData().set( DATA_IS_POWERED, true );
+        if ( isSupercharged() ) baby.getEntityData().set( IS_SUPERCHARGED, true );
         
         baby.setDeltaMovement(
                 (random.nextDouble() - 0.5) * speed,

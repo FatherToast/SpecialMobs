@@ -1,7 +1,10 @@
 package fathertoast.specialmobs.common.item;
 
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
+import fathertoast.specialmobs.common.entity.creeper._SpecialCreeperEntity;
 import fathertoast.specialmobs.common.util.References;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.monster.CreeperEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
@@ -40,16 +43,49 @@ public class SyringeItem extends Item {
                 usedItem.hurtAndBreak(1, player, (entity) -> {
                     entity.broadcastBreakEvent(hand);
                 });
-                player.getCooldowns().addCooldown(usedItem.getItem(), 1200);
+                if (!player.isCreative()) {
+                    player.getCooldowns().addCooldown(usedItem.getItem(), 1200);
+                }
                 return ActionResult.success(usedItem);
             }
         }
         return ActionResult.fail(usedItem);
     }
 
+    @Override
+    public ActionResultType interactLivingEntity(ItemStack itemStack, PlayerEntity player, LivingEntity livingEntity, Hand hand) {
+        if (livingEntity instanceof CreeperEntity && !((CreeperEntity)livingEntity).isPowered()) {
+            if (player.getCooldowns().isOnCooldown(itemStack.getItem())) {
+                return ActionResultType.PASS;
+            }
+            livingEntity.getEntityData().set(CreeperEntity.DATA_IS_POWERED, true);
+
+            if (livingEntity instanceof _SpecialCreeperEntity) {
+                if (livingEntity.getRandom().nextDouble() < 0.1D) {
+                    ((_SpecialCreeperEntity)livingEntity).setSupercharged( true );
+                }
+            }
+            livingEntity.level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.BEE_STING, SoundCategory.PLAYERS, 0.9F, 1.0F);
+            itemStack.hurtAndBreak(1, player, (entity) -> {
+                entity.broadcastBreakEvent(hand);
+            });
+            if (!player.isCreative()) {
+                player.getCooldowns().addCooldown(itemStack.getItem(), 1200);
+            }
+            return ActionResultType.sidedSuccess(player.level.isClientSide);
+        }
+        return ActionResultType.PASS;
+    }
+
     // Not enchantable
     @Override
     public boolean isEnchantable(ItemStack itemStack) {
+        return false;
+    }
+
+    // Very not enchantable
+    @Override
+    public boolean isBookEnchantable(ItemStack stack, ItemStack book) {
         return false;
     }
 }

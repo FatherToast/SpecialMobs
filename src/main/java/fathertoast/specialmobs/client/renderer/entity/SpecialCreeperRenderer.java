@@ -1,12 +1,14 @@
 package fathertoast.specialmobs.client.renderer.entity;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
+import fathertoast.specialmobs.client.renderer.entity.layers.SpecialCreeperChargeLayer;
 import fathertoast.specialmobs.client.renderer.entity.layers.SpecialMobEyesLayer;
 import fathertoast.specialmobs.client.renderer.entity.layers.SpecialMobOverlayLayer;
 import fathertoast.specialmobs.common.entity.ISpecialMob;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.client.renderer.entity.CreeperRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
+import net.minecraft.client.renderer.entity.layers.CreeperChargeLayer;
 import net.minecraft.client.renderer.entity.model.CreeperModel;
 import net.minecraft.entity.monster.CreeperEntity;
 import net.minecraft.util.ResourceLocation;
@@ -27,6 +29,10 @@ public class SpecialCreeperRenderer extends CreeperRenderer {
         baseShadowRadius = shadowRadius;
         addLayer( new SpecialMobEyesLayer<>( this ) );
         addLayer( new SpecialMobOverlayLayer<>( this, new CreeperModel<>( 0.25F ) ) );
+        addLayer( new SpecialCreeperChargeLayer<>(this, new CreeperModel<>( 2.0F )) );
+
+        // Get rid of this one since we have our own implementation
+        layers.removeIf((layer) -> layer instanceof CreeperChargeLayer);
     }
     
     @Override

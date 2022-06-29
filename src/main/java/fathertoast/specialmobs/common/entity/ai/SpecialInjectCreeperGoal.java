@@ -1,5 +1,6 @@
 package fathertoast.specialmobs.common.entity.ai;
 
+import fathertoast.specialmobs.common.entity.creeper._SpecialCreeperEntity;
 import fathertoast.specialmobs.common.entity.zombie.MadScientistZombieEntity;
 import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.entity.ai.goal.LookAtGoal;
@@ -87,6 +88,11 @@ public class SpecialInjectCreeperGoal<T extends MadScientistZombieEntity> extend
 
             if (madman.distanceTo(creeper) < 1.5D) {
                 creeper.getEntityData().set(CreeperEntity.DATA_IS_POWERED, true);
+
+                // HEE HEE HEE HAW
+                if (creeper instanceof _SpecialCreeperEntity && creeper.level.random.nextDouble() < 0.1F) {
+                    ((_SpecialCreeperEntity)creeper).setSupercharged( true );
+                }
                 madman.level.playSound(null, creeper.getX() + 0.5D, creeper.getY(), creeper.getZ() + 0.5D, SoundEvents.BEE_STING, SoundCategory.HOSTILE, 0.9F, 1.0F);
                 creeper = null;
             }
