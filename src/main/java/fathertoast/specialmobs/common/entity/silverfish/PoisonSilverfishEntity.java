@@ -46,15 +46,17 @@ public class PoisonSilverfishEntity extends _SpecialSilverfishEntity {
         loot.addUncommonDrop( "uncommon", Items.SPIDER_EYE );
     }
     
-    @SpecialMob.Constructor
+    @SpecialMob.Factory
+    public static EntityType.IFactory<PoisonSilverfishEntity> getVariantFactory() { return PoisonSilverfishEntity::new; }
+    
+    
+    //--------------- Variant-Specific Implementations ----------------
+    
     public PoisonSilverfishEntity( EntityType<? extends _SpecialSilverfishEntity> entityType, World world ) {
         super( entityType, world );
         getSpecialData().addPotionImmunity( Effects.POISON );
         xpReward += 1;
     }
-    
-    
-    //--------------- Variant-Specific Implementations ----------------
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override

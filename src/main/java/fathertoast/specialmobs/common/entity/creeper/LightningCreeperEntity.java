@@ -44,14 +44,16 @@ public class LightningCreeperEntity extends _SpecialCreeperEntity {
         loot.addCommonDrop( "common", Items.REDSTONE );
     }
     
-    @SpecialMob.Constructor
+    @SpecialMob.Factory
+    public static EntityType.IFactory<LightningCreeperEntity> getVariantFactory() { return LightningCreeperEntity::new; }
+    
+    
+    //--------------- Variant-Specific Implementations ----------------
+    
     public LightningCreeperEntity( EntityType<? extends _SpecialCreeperEntity> entityType, World world ) {
         super( entityType, world );
         xpReward += 1;
     }
-    
-    
-    //--------------- Variant-Specific Implementations ----------------
     
     /** Override to change this creeper's explosion power multiplier. */
     @Override

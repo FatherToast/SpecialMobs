@@ -52,15 +52,17 @@ public class GiantSpiderEntity extends _SpecialSpiderEntity {
         loot.addGuaranteedDrop( "base", Items.STRING, 2 );
     }
     
-    @SpecialMob.Constructor
+    @SpecialMob.Factory
+    public static EntityType.IFactory<GiantSpiderEntity> getVariantFactory() { return GiantSpiderEntity::new; }
+    
+    
+    //--------------- Variant-Specific Implementations ----------------
+    
     public GiantSpiderEntity( EntityType<? extends _SpecialSpiderEntity> entityType, World world ) {
         super( entityType, world );
         getSpecialData().setBaseScale( 1.5F );
         xpReward += 1;
     }
-    
-    
-    //--------------- Variant-Specific Implementations ----------------
     
     /** Override to change this entity's AI goals. */
     @Override

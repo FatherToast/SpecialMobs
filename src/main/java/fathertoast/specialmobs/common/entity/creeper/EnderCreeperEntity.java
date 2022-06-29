@@ -73,16 +73,18 @@ public class EnderCreeperEntity extends _SpecialCreeperEntity implements IAngera
         loot.addLootTable( "common", EntityType.ENDERMAN.getDefaultLootTable() );
     }
     
-    @SpecialMob.Constructor
+    @SpecialMob.Factory
+    public static EntityType.IFactory<EnderCreeperEntity> getVariantFactory() { return EnderCreeperEntity::new; }
+    
+    
+    //--------------- Variant-Specific Implementations ----------------
+    
     public EnderCreeperEntity( EntityType<? extends _SpecialCreeperEntity> entityType, World world ) {
         super( entityType, world );
         getSpecialData().setDamagedByWater( true );
         setCannotExplodeWhileWet( true );
         xpReward += 2;
     }
-    
-    
-    //--------------- Variant-Specific Implementations ----------------
     
     /** Override to change this entity's AI goals. */
     @Override

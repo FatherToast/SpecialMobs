@@ -53,14 +53,16 @@ public class SniperSkeletonEntity extends _SpecialSkeletonEntity {
         loot.addClusterDrop( "uncommon", Items.SPECTRAL_ARROW, 4 );
     }
     
-    @SpecialMob.Constructor
+    @SpecialMob.Factory
+    public static EntityType.IFactory<SniperSkeletonEntity> getVariantFactory() { return SniperSkeletonEntity::new; }
+    
+    
+    //--------------- Variant-Specific Implementations ----------------
+    
     public SniperSkeletonEntity( EntityType<? extends _SpecialSkeletonEntity> entityType, World world ) {
         super( entityType, world );
         xpReward += 1;
     }
-    
-    
-    //--------------- Variant-Specific Implementations ----------------
     
     /** Override to change this entity's AI goals. */
     @Override

@@ -57,15 +57,17 @@ public class DesertSpiderEntity extends _SpecialSpiderEntity {
         loot.addCommonDrop( "common", Items.LEATHER );
     }
     
-    @SpecialMob.Constructor
+    @SpecialMob.Factory
+    public static EntityType.IFactory<DesertSpiderEntity> getVariantFactory() { return DesertSpiderEntity::new; }
+    
+    
+    //--------------- Variant-Specific Implementations ----------------
+    
     public DesertSpiderEntity( EntityType<? extends _SpecialSpiderEntity> entityType, World world ) {
         super( entityType, world );
         getSpecialData().setBaseScale( 0.8F );
         xpReward += 2;
     }
-    
-    
-    //--------------- Variant-Specific Implementations ----------------
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override

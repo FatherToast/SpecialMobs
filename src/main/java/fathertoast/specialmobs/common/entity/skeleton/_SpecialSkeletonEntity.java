@@ -80,14 +80,16 @@ public class _SpecialSkeletonEntity extends AbstractSkeletonEntity implements IS
         loot.addLootTable( "main", EntityType.SKELETON.getDefaultLootTable() );
     }
     
-    @SpecialMob.Constructor
+    @SpecialMob.Factory
+    public static EntityType.IFactory<_SpecialSkeletonEntity> getFactory() { return _SpecialSkeletonEntity::new; }
+    
+    
+    //--------------- Variant-Specific Breakouts ----------------
+    
     public _SpecialSkeletonEntity( EntityType<? extends _SpecialSkeletonEntity> entityType, World world ) {
         super( entityType, world );
         getSpecialData().initialize();
     }
-    
-    
-    //--------------- Variant-Specific Breakouts ----------------
     
     /** Called in the MobEntity.class constructor to initialize AI goals. */
     @Override

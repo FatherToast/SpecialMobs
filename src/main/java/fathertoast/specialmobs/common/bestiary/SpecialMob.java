@@ -27,18 +27,6 @@ public @interface SpecialMob {
     @interface SpeciesReference { }
     
     /**
-     * REQUIRED. This is grabbed during registration to be used as a mob 'factory'; the needed constructor will probably
-     * already be needed by the entity's superclass, so it's just a matter of applying the annotation in that case.
-     * <p>
-     * The annotated constructor must have a signature that follows the pattern:
-     * <p>
-     * public CLASS_NAME( EntityType entityType, World world )
-     */
-    @Retention( RetentionPolicy.RUNTIME )
-    @Target( ElementType.CONSTRUCTOR )
-    @interface Constructor { }
-    
-    /**
      * REQUIRED. This is called during registration to collect static properties of the mob needed for the bestiary
      * and for building the species's entity type.
      * This is not 'overridable' because all species must have unique info in the bestiary.
@@ -102,4 +90,17 @@ public @interface SpecialMob {
     @Retention( RetentionPolicy.RUNTIME )
     @Target( ElementType.METHOD )
     @interface LootTableProvider { }
+    
+    /**
+     * REQUIRED. This is called during registration to build the mob 'factory'. This will essentially just return the
+     * class constructor that takes an entity type and a world for parameters.
+     * This is not 'overridable' because all species must have unique factories.
+     * <p>
+     * The annotated method must have a signature that follows the pattern:
+     * <p>
+     * public static EntityType.IFactory<T> METHOD_NAME()
+     */
+    @Retention( RetentionPolicy.RUNTIME )
+    @Target( ElementType.METHOD )
+    @interface Factory { }
 }

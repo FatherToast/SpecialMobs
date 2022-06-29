@@ -54,16 +54,18 @@ public class DeathCreeperEntity extends _SpecialCreeperEntity {
         loot.addRareDrop( "rare", Blocks.TNT );
     }
     
-    @SpecialMob.Constructor
+    @SpecialMob.Factory
+    public static EntityType.IFactory<DeathCreeperEntity> getVariantFactory() { return DeathCreeperEntity::new; }
+    
+    
+    //--------------- Variant-Specific Implementations ----------------
+    
     public DeathCreeperEntity( EntityType<? extends _SpecialCreeperEntity> entityType, World world ) {
         super( entityType, world );
         getSpecialData().setBaseScale( 1.5F );
         setExplodesWhileBurning( true );
         xpReward += 2;
     }
-    
-    
-    //--------------- Variant-Specific Implementations ----------------
     
     /** Override to change this creeper's explosion power multiplier. */
     protected float getVariantExplosionPower( float radius ) { return super.getVariantExplosionPower( radius + 1.0F ); }

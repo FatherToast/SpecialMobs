@@ -54,15 +54,17 @@ public class JumpingCreeperEntity extends _SpecialCreeperEntity {
         loot.addSemicommonDrop( "semicommon", Items.SLIME_BALL );
     }
     
-    @SpecialMob.Constructor
+    @SpecialMob.Factory
+    public static EntityType.IFactory<JumpingCreeperEntity> getVariantFactory() { return JumpingCreeperEntity::new; }
+    
+    
+    //--------------- Variant-Specific Implementations ----------------
+    
     public JumpingCreeperEntity( EntityType<? extends _SpecialCreeperEntity> entityType, World world ) {
         super( entityType, world );
         getSpecialData().setFallDamageMultiplier( 0.0F );
         xpReward += 2;
     }
-    
-    
-    //--------------- Variant-Specific Implementations ----------------
     
     /** Override to change this entity's AI goals. */
     @Override

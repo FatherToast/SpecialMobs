@@ -52,16 +52,18 @@ public class GiantSkeletonEntity extends _SpecialSkeletonEntity {
         loot.addGuaranteedDrop( "base", Items.BONE, 2 );
     }
     
-    @SpecialMob.Constructor
+    @SpecialMob.Factory
+    public static EntityType.IFactory<GiantSkeletonEntity> getVariantFactory() { return GiantSkeletonEntity::new; }
+    
+    
+    //--------------- Variant-Specific Implementations ----------------
+    
     public GiantSkeletonEntity( EntityType<? extends _SpecialSkeletonEntity> entityType, World world ) {
         super( entityType, world );
         getSpecialData().setBaseScale( 1.5F );
         maxUpStep = 1.0F;
         xpReward += 1;
     }
-    
-    
-    //--------------- Variant-Specific Implementations ----------------
     
     /** Override to change this entity's AI goals. */
     @Override

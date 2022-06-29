@@ -58,14 +58,16 @@ public class BlackberrySlimeEntity extends _SpecialSlimeEntity {
         loot.addUncommonDrop( "uncommon", Items.BLACK_DYE );
     }
     
-    @SpecialMob.Constructor
+    @SpecialMob.Factory
+    public static EntityType.IFactory<BlackberrySlimeEntity> getVariantFactory() { return BlackberrySlimeEntity::new; }
+    
+    
+    //--------------- Variant-Specific Implementations ----------------
+    
     public BlackberrySlimeEntity( EntityType<? extends _SpecialSlimeEntity> entityType, World world ) {
         super( entityType, world );
         slimeExperienceValue += 2;
     }
-    
-    
-    //--------------- Variant-Specific Implementations ----------------
     
     private static final byte MAX_FUSE = 30;
     

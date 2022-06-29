@@ -47,15 +47,17 @@ public class FireSkeletonEntity extends _SpecialSkeletonEntity {
         loot.addUncommonDrop( "uncommon", Items.COAL );
     }
     
-    @SpecialMob.Constructor
+    @SpecialMob.Factory
+    public static EntityType.IFactory<FireSkeletonEntity> getVariantFactory() { return FireSkeletonEntity::new; }
+    
+    
+    //--------------- Variant-Specific Implementations ----------------
+    
     public FireSkeletonEntity( EntityType<? extends _SpecialSkeletonEntity> entityType, World world ) {
         super( entityType, world );
         getSpecialData().setDamagedByWater( true );
         xpReward += 1;
     }
-    
-    
-    //--------------- Variant-Specific Implementations ----------------
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override

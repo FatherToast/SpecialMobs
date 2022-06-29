@@ -52,16 +52,18 @@ public class GiantZombieEntity extends _SpecialZombieEntity {
         loot.addGuaranteedDrop( "base", Items.ROTTEN_FLESH, 2 );
     }
     
-    @SpecialMob.Constructor
+    @SpecialMob.Factory
+    public static EntityType.IFactory<GiantZombieEntity> getVariantFactory() { return GiantZombieEntity::new; }
+    
+    
+    //--------------- Variant-Specific Implementations ----------------
+    
     public GiantZombieEntity( EntityType<? extends _SpecialZombieEntity> entityType, World world ) {
         super( entityType, world );
         getSpecialData().setBaseScale( 1.5F );
         maxUpStep = 1.0F;
         xpReward += 1;
     }
-    
-    
-    //--------------- Variant-Specific Implementations ----------------
     
     /** Override to change this entity's AI goals. */
     @Override

@@ -50,16 +50,18 @@ public class MiniEndermanEntity extends _SpecialEndermanEntity {
         addBaseLoot( loot );
     }
     
-    @SpecialMob.Constructor
+    @SpecialMob.Factory
+    public static EntityType.IFactory<MiniEndermanEntity> getVariantFactory() { return MiniEndermanEntity::new; }
+    
+    
+    //--------------- Variant-Specific Implementations ----------------
+    
     public MiniEndermanEntity( EntityType<? extends _SpecialEndermanEntity> entityType, World world ) {
         super( entityType, world );
         getSpecialData().setBaseScale( 0.35F );
         maxUpStep = 0.5F;
         xpReward += 1;
     }
-    
-    
-    //--------------- Variant-Specific Implementations ----------------
     
     // None
 }

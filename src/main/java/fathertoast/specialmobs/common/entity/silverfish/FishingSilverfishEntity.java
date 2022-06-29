@@ -59,7 +59,12 @@ public class FishingSilverfishEntity extends _SpecialSilverfishEntity implements
                 .toLootPool() );
     }
     
-    @SpecialMob.Constructor
+    @SpecialMob.Factory
+    public static EntityType.IFactory<FishingSilverfishEntity> getVariantFactory() { return FishingSilverfishEntity::new; }
+    
+    
+    //--------------- Variant-Specific Implementations ----------------
+    
     public FishingSilverfishEntity( EntityType<? extends _SpecialSilverfishEntity> entityType, World world ) {
         super( entityType, world );
         getSpecialData().setBaseScale( 1.2F );
@@ -67,9 +72,6 @@ public class FishingSilverfishEntity extends _SpecialSilverfishEntity implements
         getSpecialData().setIgnoreWaterPush( true );
         xpReward += 2;
     }
-    
-    
-    //--------------- Variant-Specific Implementations ----------------
     
     /** Override to change this entity's AI goals. */
     @Override

@@ -66,16 +66,18 @@ public class DrowningCreeperEntity extends _SpecialCreeperEntity {
         loot.addUncommonDrop( "uncommon", Items.GOLD_NUGGET, Items.PRISMARINE_SHARD, Items.PRISMARINE_CRYSTALS );
     }
     
-    @SpecialMob.Constructor
+    @SpecialMob.Factory
+    public static EntityType.IFactory<DrowningCreeperEntity> getVariantFactory() { return DrowningCreeperEntity::new; }
+    
+    
+    //--------------- Variant-Specific Implementations ----------------
+    
     public DrowningCreeperEntity( EntityType<? extends _SpecialCreeperEntity> entityType, World world ) {
         super( entityType, world );
         getSpecialData().setCanBreatheInWater( true );
         getSpecialData().setIgnoreWaterPush( true );
         xpReward += 2;
     }
-    
-    
-    //--------------- Variant-Specific Implementations ----------------
     
     /** Override to change this creeper's explosion power multiplier. */
     protected float getVariantExplosionPower( float radius ) { return super.getVariantExplosionPower( radius ) + 3.0F; }

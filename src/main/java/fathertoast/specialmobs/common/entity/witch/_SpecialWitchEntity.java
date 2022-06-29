@@ -58,14 +58,16 @@ public class _SpecialWitchEntity extends WitchEntity implements ISpecialMob<_Spe
         loot.addLootTable( "main", EntityType.WITCH.getDefaultLootTable() );
     }
     
-    @SpecialMob.Constructor
+    @SpecialMob.Factory
+    public static EntityType.IFactory<_SpecialWitchEntity> getFactory() { return _SpecialWitchEntity::new; }
+    
+    
+    //--------------- Variant-Specific Breakouts ----------------
+    
     public _SpecialWitchEntity( EntityType<? extends _SpecialWitchEntity> entityType, World world ) {
         super( entityType, world );
         getSpecialData().initialize();
     }
-    
-    
-    //--------------- Variant-Specific Breakouts ----------------
     
     /** Called in the MobEntity.class constructor to initialize AI goals. */
     @Override

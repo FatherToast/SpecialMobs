@@ -55,7 +55,12 @@ public class SpitfireSkeletonEntity extends _SpecialSkeletonEntity {
         loot.addCommonDrop( "common", Items.FIRE_CHARGE );
     }
     
-    @SpecialMob.Constructor
+    @SpecialMob.Factory
+    public static EntityType.IFactory<SpitfireSkeletonEntity> getVariantFactory() { return SpitfireSkeletonEntity::new; }
+    
+    
+    //--------------- Variant-Specific Implementations ----------------
+    
     public SpitfireSkeletonEntity( EntityType<? extends _SpecialSkeletonEntity> entityType, World world ) {
         super( entityType, world );
         getSpecialData().setBaseScale( 1.5F );
@@ -63,9 +68,6 @@ public class SpitfireSkeletonEntity extends _SpecialSkeletonEntity {
         maxUpStep = 1.0F;
         xpReward += 2;
     }
-    
-    
-    //--------------- Variant-Specific Implementations ----------------
     
     /** Override to change this entity's AI goals. */
     @Override

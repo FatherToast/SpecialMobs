@@ -56,15 +56,17 @@ public class ToughSilverfishEntity extends _SpecialSilverfishEntity {
         loot.addRareDrop( "rare", Items.IRON_INGOT );
     }
     
-    @SpecialMob.Constructor
+    @SpecialMob.Factory
+    public static EntityType.IFactory<ToughSilverfishEntity> getVariantFactory() { return ToughSilverfishEntity::new; }
+    
+    
+    //--------------- Variant-Specific Implementations ----------------
+    
     public ToughSilverfishEntity( EntityType<? extends _SpecialSilverfishEntity> entityType, World world ) {
         super( entityType, world );
         getSpecialData().setBaseScale( 1.5F );
         xpReward += 2;
     }
-    
-    
-    //--------------- Variant-Specific Implementations ----------------
     
     /** Override to change this entity's AI goals. */
     @Override

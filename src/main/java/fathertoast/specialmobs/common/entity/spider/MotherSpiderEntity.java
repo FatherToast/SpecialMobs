@@ -61,7 +61,12 @@ public class MotherSpiderEntity extends _SpecialSpiderEntity {
         loot.addUncommonDrop( "uncommon", Items.SPIDER_SPAWN_EGG );
     }
     
-    @SpecialMob.Constructor
+    @SpecialMob.Factory
+    public static EntityType.IFactory<MotherSpiderEntity> getVariantFactory() { return MotherSpiderEntity::new; }
+    
+    
+    //--------------- Variant-Specific Implementations ----------------
+    
     public MotherSpiderEntity( EntityType<? extends _SpecialSpiderEntity> entityType, World world ) {
         super( entityType, world );
         getSpecialData().setBaseScale( 1.2F );
@@ -71,9 +76,6 @@ public class MotherSpiderEntity extends _SpecialSpiderEntity {
         babies = 2 + random.nextInt( 3 );
         extraBabies = 2 + random.nextInt( 3 );
     }
-    
-    
-    //--------------- Variant-Specific Implementations ----------------
     
     /** The number of babies spawned on death. */
     private int babies;

@@ -68,16 +68,18 @@ public class FishingZombifiedPiglinEntity extends _SpecialZombifiedPiglinEntity 
                 .toLootPool() );
     }
     
-    @SpecialMob.Constructor
+    @SpecialMob.Factory
+    public static EntityType.IFactory<FishingZombifiedPiglinEntity> getVariantFactory() { return FishingZombifiedPiglinEntity::new; }
+    
+    
+    //--------------- Variant-Specific Implementations ----------------
+    
     public FishingZombifiedPiglinEntity( EntityType<? extends _SpecialZombifiedPiglinEntity> entityType, World world ) {
         super( entityType, world );
         getSpecialData().setCanBreatheInWater( true );
         getSpecialData().setIgnoreWaterPush( true );
         xpReward += 2;
     }
-    
-    
-    //--------------- Variant-Specific Implementations ----------------
     
     /** Override to change this entity's AI goals. */
     @Override

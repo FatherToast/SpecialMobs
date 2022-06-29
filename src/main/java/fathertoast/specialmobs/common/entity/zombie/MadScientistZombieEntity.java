@@ -60,14 +60,16 @@ public class MadScientistZombieEntity extends _SpecialZombieEntity {
         loot.addRareDrop( "rare", SMItems.SYRINGE.get() );
     }
     
-    @SpecialMob.Constructor
+    @SpecialMob.Factory
+    public static EntityType.IFactory<MadScientistZombieEntity> getVariantFactory() { return MadScientistZombieEntity::new; }
+    
+    
+    //--------------- Variant-Specific Implementations ----------------
+    
     public MadScientistZombieEntity( EntityType<? extends _SpecialZombieEntity> entityType, World world ) {
         super( entityType, world );
         xpReward += 2;
     }
-    
-    
-    //--------------- Variant-Specific Implementations ----------------
     
     /** Override to change this entity's AI goals. */
     @Override

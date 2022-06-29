@@ -61,15 +61,17 @@ public class HungryZombifiedPiglinEntity extends _SpecialZombifiedPiglinEntity {
         loot.addUncommonDrop( "uncommon", Items.BEEF, Items.CHICKEN, Items.MUTTON, Items.PORKCHOP, Items.RABBIT, Items.COOKIE );
     }
     
-    @SpecialMob.Constructor
+    @SpecialMob.Factory
+    public static EntityType.IFactory<HungryZombifiedPiglinEntity> getVariantFactory() { return HungryZombifiedPiglinEntity::new; }
+    
+    
+    //--------------- Variant-Specific Implementations ----------------
+    
     public HungryZombifiedPiglinEntity( EntityType<? extends _SpecialZombifiedPiglinEntity> entityType, World world ) {
         super( entityType, world );
         getSpecialData().setRegenerationTime( 30 );
         xpReward += 2;
     }
-    
-    
-    //--------------- Variant-Specific Implementations ----------------
     
     /** Override to change this entity's AI goals. */
     @Override

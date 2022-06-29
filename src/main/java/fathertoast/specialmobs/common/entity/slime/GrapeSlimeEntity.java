@@ -48,15 +48,17 @@ public class GrapeSlimeEntity extends _SpecialSlimeEntity {
         loot.addUncommonDrop( "uncommon", Items.PURPLE_DYE );
     }
     
-    @SpecialMob.Constructor
+    @SpecialMob.Factory
+    public static EntityType.IFactory<GrapeSlimeEntity> getVariantFactory() { return GrapeSlimeEntity::new; }
+    
+    
+    //--------------- Variant-Specific Implementations ----------------
+    
     public GrapeSlimeEntity( EntityType<? extends _SpecialSlimeEntity> entityType, World world ) {
         super( entityType, world );
         getSpecialData().setFallDamageMultiplier( 0.0F );
         slimeExperienceValue += 1;
     }
-    
-    
-    //--------------- Variant-Specific Implementations ----------------
     
     /** Override to modify this slime's base attributes by size. */
     @Override

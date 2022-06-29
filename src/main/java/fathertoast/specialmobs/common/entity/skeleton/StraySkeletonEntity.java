@@ -57,14 +57,16 @@ public class StraySkeletonEntity extends _SpecialSkeletonEntity {
         loot.addLootTable( "main", EntityType.STRAY.getDefaultLootTable() );
     }
     
-    @SpecialMob.Constructor
+    @SpecialMob.Factory
+    public static EntityType.IFactory<StraySkeletonEntity> getVariantFactory() { return StraySkeletonEntity::new; }
+    
+    
+    //--------------- Variant-Specific Implementations ----------------
+    
     public StraySkeletonEntity( EntityType<? extends _SpecialSkeletonEntity> entityType, World world ) {
         super( entityType, world );
         xpReward += 1;
     }
-    
-    
-    //--------------- Variant-Specific Implementations ----------------
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override

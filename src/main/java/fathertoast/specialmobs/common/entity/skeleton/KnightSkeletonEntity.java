@@ -55,14 +55,16 @@ public class KnightSkeletonEntity extends _SpecialSkeletonEntity {
         loot.addCommonDrop( "common", Items.IRON_NUGGET );
     }
     
-    @SpecialMob.Constructor
+    @SpecialMob.Factory
+    public static EntityType.IFactory<KnightSkeletonEntity> getVariantFactory() { return KnightSkeletonEntity::new; }
+    
+    
+    //--------------- Variant-Specific Implementations ----------------
+    
     public KnightSkeletonEntity( EntityType<? extends _SpecialSkeletonEntity> entityType, World world ) {
         super( entityType, world );
         xpReward += 2;
     }
-    
-    
-    //--------------- Variant-Specific Implementations ----------------
     
     /** Override to change this entity's AI goals. */
     @Override

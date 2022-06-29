@@ -62,14 +62,16 @@ public class _SpecialSlimeEntity extends SlimeEntity implements ISpecialMob<_Spe
         loot.addLootTable( "main", EntityType.SLIME.getDefaultLootTable() );
     }
     
-    @SpecialMob.Constructor
+    @SpecialMob.Factory
+    public static EntityType.IFactory<_SpecialSlimeEntity> getFactory() { return _SpecialSlimeEntity::new; }
+    
+    
+    //--------------- Variant-Specific Breakouts ----------------
+    
     public _SpecialSlimeEntity( EntityType<? extends _SpecialSlimeEntity> entityType, World world ) {
         super( entityType, world );
         getSpecialData().initialize();
     }
-    
-    
-    //--------------- Variant-Specific Breakouts ----------------
     
     /** Override to modify this slime's base attributes by size. */
     protected void modifyVariantAttributes( int size ) { }

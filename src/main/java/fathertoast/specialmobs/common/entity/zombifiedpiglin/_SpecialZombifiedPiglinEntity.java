@@ -75,15 +75,17 @@ public class _SpecialZombifiedPiglinEntity extends ZombifiedPiglinEntity impleme
         loot.addLootTable( "main", EntityType.ZOMBIFIED_PIGLIN.getDefaultLootTable() );
     }
     
-    @SpecialMob.Constructor
+    @SpecialMob.Factory
+    public static EntityType.IFactory<_SpecialZombifiedPiglinEntity> getFactory() { return _SpecialZombifiedPiglinEntity::new; }
+    
+    
+    //--------------- Variant-Specific Breakouts ----------------
+    
     public _SpecialZombifiedPiglinEntity( EntityType<? extends _SpecialZombifiedPiglinEntity> entityType, World world ) {
         super( entityType, world );
         reassessWeaponGoal();
         getSpecialData().initialize();
     }
-    
-    
-    //--------------- Variant-Specific Breakouts ----------------
     
     /** Called in the MobEntity.class constructor to initialize AI goals. */
     @Override

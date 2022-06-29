@@ -56,14 +56,16 @@ public class ThiefEndermanEntity extends _SpecialEndermanEntity {
         loot.addGuaranteedDrop( "base", Items.ENDER_PEARL, 1 );
     }
     
-    @SpecialMob.Constructor
+    @SpecialMob.Factory
+    public static EntityType.IFactory<ThiefEndermanEntity> getVariantFactory() { return ThiefEndermanEntity::new; }
+    
+    
+    //--------------- Variant-Specific Implementations ----------------
+    
     public ThiefEndermanEntity( EntityType<? extends _SpecialEndermanEntity> entityType, World world ) {
         super( entityType, world );
         xpReward += 2;
     }
-    
-    
-    //--------------- Variant-Specific Implementations ----------------
     
     private int teleportTargetDelay;
     

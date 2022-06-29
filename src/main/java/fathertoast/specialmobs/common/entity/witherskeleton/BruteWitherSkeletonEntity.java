@@ -61,15 +61,17 @@ public class BruteWitherSkeletonEntity extends _SpecialWitherSkeletonEntity {
         loot.addRareDrop( "rare", Items.IRON_INGOT );
     }
     
-    @SpecialMob.Constructor
+    @SpecialMob.Factory
+    public static EntityType.IFactory<BruteWitherSkeletonEntity> getVariantFactory() { return BruteWitherSkeletonEntity::new; }
+    
+    
+    //--------------- Variant-Specific Implementations ----------------
+    
     public BruteWitherSkeletonEntity( EntityType<? extends _SpecialWitherSkeletonEntity> entityType, World world ) {
         super( entityType, world );
         getSpecialData().setBaseScale( 1.44F );
         xpReward += 2;
     }
-    
-    
-    //--------------- Variant-Specific Implementations ----------------
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override

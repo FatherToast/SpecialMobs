@@ -52,16 +52,18 @@ public class GiantZombifiedPiglinEntity extends _SpecialZombifiedPiglinEntity {
         loot.addGuaranteedDrop( "base", Items.ROTTEN_FLESH, 2 );
     }
     
-    @SpecialMob.Constructor
+    @SpecialMob.Factory
+    public static EntityType.IFactory<GiantZombifiedPiglinEntity> getVariantFactory() { return GiantZombifiedPiglinEntity::new; }
+    
+    
+    //--------------- Variant-Specific Implementations ----------------
+    
     public GiantZombifiedPiglinEntity( EntityType<? extends _SpecialZombifiedPiglinEntity> entityType, World world ) {
         super( entityType, world );
         getSpecialData().setBaseScale( 1.5F );
         maxUpStep = 1.0F;
         xpReward += 1;
     }
-    
-    
-    //--------------- Variant-Specific Implementations ----------------
     
     /** Override to change this entity's AI goals. */
     @Override

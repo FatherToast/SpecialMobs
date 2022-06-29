@@ -55,7 +55,12 @@ public class StrawberrySlimeEntity extends _SpecialSlimeEntity {
         loot.addUncommonDrop( "uncommon", Items.RED_DYE );
     }
     
-    @SpecialMob.Constructor
+    @SpecialMob.Factory
+    public static EntityType.IFactory<StrawberrySlimeEntity> getVariantFactory() { return StrawberrySlimeEntity::new; }
+    
+    
+    //--------------- Variant-Specific Implementations ----------------
+    
     public StrawberrySlimeEntity( EntityType<? extends _SpecialSlimeEntity> entityType, World world ) {
         super( entityType, world );
         getSpecialData().setDamagedByWater( true );
@@ -63,9 +68,6 @@ public class StrawberrySlimeEntity extends _SpecialSlimeEntity {
         
         setPathfindingMalus( PathNodeType.LAVA, PathNodeType.WALKABLE.getMalus() );
     }
-    
-    
-    //--------------- Variant-Specific Implementations ----------------
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override

@@ -49,14 +49,16 @@ public class MiniCreeperEntity extends _SpecialCreeperEntity {
         addBaseLoot( loot );
     }
     
-    @SpecialMob.Constructor
+    @SpecialMob.Factory
+    public static EntityType.IFactory<MiniCreeperEntity> getVariantFactory() { return MiniCreeperEntity::new; }
+    
+    
+    //--------------- Variant-Specific Implementations ----------------
+    
     public MiniCreeperEntity( EntityType<? extends _SpecialCreeperEntity> entityType, World world ) {
         super( entityType, world );
         getSpecialData().setBaseScale( 0.5F );
     }
-    
-    
-    //--------------- Variant-Specific Implementations ----------------
     
     /** Override to change this creeper's explosion power multiplier. */
     protected float getVariantExplosionPower( float radius ) { return super.getVariantExplosionPower( radius / 2.0F ); }

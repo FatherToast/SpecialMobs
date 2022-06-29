@@ -76,15 +76,17 @@ public class _SpecialZombieEntity extends ZombieEntity implements IRangedAttackM
         loot.addLootTable( "main", EntityType.ZOMBIE.getDefaultLootTable() );
     }
     
-    @SpecialMob.Constructor
+    @SpecialMob.Factory
+    public static EntityType.IFactory<_SpecialZombieEntity> getFactory() { return _SpecialZombieEntity::new; }
+    
+    
+    //--------------- Variant-Specific Breakouts ----------------
+    
     public _SpecialZombieEntity( EntityType<? extends _SpecialZombieEntity> entityType, World world ) {
         super( entityType, world );
         reassessWeaponGoal();
         getSpecialData().initialize();
     }
-    
-    
-    //--------------- Variant-Specific Breakouts ----------------
     
     /** Called in the MobEntity.class constructor to initialize AI goals. */
     @Override

@@ -57,14 +57,16 @@ public class KnightZombifiedPiglinEntity extends _SpecialZombifiedPiglinEntity {
         loot.addUncommonDrop( "uncommon", Items.GOLD_INGOT );
     }
     
-    @SpecialMob.Constructor
+    @SpecialMob.Factory
+    public static EntityType.IFactory<KnightZombifiedPiglinEntity> getVariantFactory() { return KnightZombifiedPiglinEntity::new; }
+    
+    
+    //--------------- Variant-Specific Implementations ----------------
+    
     public KnightZombifiedPiglinEntity( EntityType<? extends _SpecialZombifiedPiglinEntity> entityType, World world ) {
         super( entityType, world );
         xpReward += 2;
     }
-    
-    
-    //--------------- Variant-Specific Implementations ----------------
     
     /** Override to change this entity's AI goals. */
     @Override

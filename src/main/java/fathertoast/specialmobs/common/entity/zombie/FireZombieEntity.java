@@ -50,15 +50,17 @@ public class FireZombieEntity extends _SpecialZombieEntity {
         loot.addUncommonDrop( "uncommon", Items.COAL );
     }
     
-    @SpecialMob.Constructor
+    @SpecialMob.Factory
+    public static EntityType.IFactory<FireZombieEntity> getVariantFactory() { return FireZombieEntity::new; }
+    
+    
+    //--------------- Variant-Specific Implementations ----------------
+    
     public FireZombieEntity( EntityType<? extends _SpecialZombieEntity> entityType, World world ) {
         super( entityType, world );
         getSpecialData().setDamagedByWater( true );
         xpReward += 1;
     }
-    
-    
-    //--------------- Variant-Specific Implementations ----------------
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override

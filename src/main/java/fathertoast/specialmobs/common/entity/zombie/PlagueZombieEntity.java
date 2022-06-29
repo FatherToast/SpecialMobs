@@ -59,14 +59,16 @@ public class PlagueZombieEntity extends _SpecialZombieEntity {
                 Blocks.RED_MUSHROOM, Blocks.BROWN_MUSHROOM );
     }
     
-    @SpecialMob.Constructor
+    @SpecialMob.Factory
+    public static EntityType.IFactory<PlagueZombieEntity> getVariantFactory() { return PlagueZombieEntity::new; }
+    
+    
+    //--------------- Variant-Specific Implementations ----------------
+    
     public PlagueZombieEntity( EntityType<? extends _SpecialZombieEntity> entityType, World world ) {
         super( entityType, world );
         xpReward += 1;
     }
-    
-    
-    //--------------- Variant-Specific Implementations ----------------
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override

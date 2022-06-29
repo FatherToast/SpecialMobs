@@ -53,15 +53,17 @@ public class FlyingSilverfishEntity extends _SpecialSilverfishEntity {
         loot.addCommonDrop( "common", Items.FEATHER, 1 );
     }
     
-    @SpecialMob.Constructor
+    @SpecialMob.Factory
+    public static EntityType.IFactory<FlyingSilverfishEntity> getVariantFactory() { return FlyingSilverfishEntity::new; }
+    
+    
+    //--------------- Variant-Specific Implementations ----------------
+    
     public FlyingSilverfishEntity( EntityType<? extends _SpecialSilverfishEntity> entityType, World world ) {
         super( entityType, world );
         getSpecialData().setFallDamageMultiplier( 0.0F );
         xpReward += 2;
     }
-    
-    
-    //--------------- Variant-Specific Implementations ----------------
     
     /** Override to change this entity's AI goals. */
     @Override

@@ -65,14 +65,16 @@ public class SkeletonCreeperEntity extends _SpecialCreeperEntity {
         loot.addLootTable( "common", EntityType.SKELETON.getDefaultLootTable() );
     }
     
-    @SpecialMob.Constructor
+    @SpecialMob.Factory
+    public static EntityType.IFactory<SkeletonCreeperEntity> getVariantFactory() { return SkeletonCreeperEntity::new; }
+    
+    
+    //--------------- Variant-Specific Implementations ----------------
+    
     public SkeletonCreeperEntity( EntityType<? extends _SpecialCreeperEntity> entityType, World world ) {
         super( entityType, world );
         xpReward += 1;
     }
-    
-    
-    //--------------- Variant-Specific Implementations ----------------
     
     /** Override to change this entity's AI goals. */
     @Override
@@ -96,8 +98,7 @@ public class SkeletonCreeperEntity extends _SpecialCreeperEntity {
         final float shootPower = explosionPower * 2.0F + 4.0F;
         final int count = (int) Math.ceil( shootPower * shootPower * 3.5F );
         for( int i = 0; i < count; i++ ) {
-            AbstractArrowEntity arrow = ProjectileHelper.getMobArrow( this, arrowItem, explosionPower );
-            arrow.setBaseDamage( arrow.getBaseDamage() + 3.0 );
+            AbstractArrowEntity arrow = ProjectileHelper.getMobArrow( this, arrowItem, shootPower );
             if( getMainHandItem().getItem() instanceof BowItem )
                 arrow = ((BowItem) getMainHandItem().getItem()).customArrow( arrow );
             
