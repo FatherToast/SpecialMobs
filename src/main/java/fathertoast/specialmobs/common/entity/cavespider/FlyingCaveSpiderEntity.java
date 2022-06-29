@@ -53,15 +53,17 @@ public class FlyingCaveSpiderEntity extends _SpecialCaveSpiderEntity {
         loot.addCommonDrop( "common", Items.FEATHER );
     }
     
-    @SpecialMob.Constructor
+    @SpecialMob.Factory
+    public static EntityType.IFactory<FlyingCaveSpiderEntity> getVariantFactory() { return FlyingCaveSpiderEntity::new; }
+    
+    
+    //--------------- Variant-Specific Implementations ----------------
+    
     public FlyingCaveSpiderEntity( EntityType<? extends _SpecialCaveSpiderEntity> entityType, World world ) {
         super( entityType, world );
         getSpecialData().setFallDamageMultiplier( 0.0F );
         xpReward += 2;
     }
-    
-    
-    //--------------- Variant-Specific Implementations ----------------
     
     /** Override to change this entity's AI goals. */
     @Override

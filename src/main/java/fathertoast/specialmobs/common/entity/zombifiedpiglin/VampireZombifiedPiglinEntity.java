@@ -64,14 +64,16 @@ public class VampireZombifiedPiglinEntity extends _SpecialZombifiedPiglinEntity 
         loot.addRareDrop( "rare", stake );
     }
     
-    @SpecialMob.Constructor
+    @SpecialMob.Factory
+    public static EntityType.IFactory<VampireZombifiedPiglinEntity> getVariantFactory() { return VampireZombifiedPiglinEntity::new; }
+    
+    
+    //--------------- Variant-Specific Implementations ----------------
+    
     public VampireZombifiedPiglinEntity( EntityType<? extends _SpecialZombifiedPiglinEntity> entityType, World world ) {
         super( entityType, world );
         xpReward += 4;
     }
-    
-    
-    //--------------- Variant-Specific Implementations ----------------
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override

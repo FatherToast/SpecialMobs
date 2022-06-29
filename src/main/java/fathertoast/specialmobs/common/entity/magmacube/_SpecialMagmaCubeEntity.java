@@ -61,14 +61,16 @@ public class _SpecialMagmaCubeEntity extends MagmaCubeEntity implements ISpecial
         loot.addLootTable( "main", EntityType.MAGMA_CUBE.getDefaultLootTable() );
     }
     
-    @SpecialMob.Constructor
+    @SpecialMob.Factory
+    public static EntityType.IFactory<_SpecialMagmaCubeEntity> getFactory() { return _SpecialMagmaCubeEntity::new; }
+    
+    
+    //--------------- Variant-Specific Breakouts ----------------
+    
     public _SpecialMagmaCubeEntity( EntityType<? extends _SpecialMagmaCubeEntity> entityType, World world ) {
         super( entityType, world );
         getSpecialData().initialize();
     }
-    
-    
-    //--------------- Variant-Specific Breakouts ----------------
     
     /** Override to modify this slime's base attributes by size. */
     protected void modifyVariantAttributes( int size ) { }

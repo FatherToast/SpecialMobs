@@ -46,15 +46,17 @@ public class BlindingSilverfishEntity extends _SpecialSilverfishEntity {
         loot.addCommonDrop( "common", Items.INK_SAC );
     }
     
-    @SpecialMob.Constructor
+    @SpecialMob.Factory
+    public static EntityType.IFactory<BlindingSilverfishEntity> getVariantFactory() { return BlindingSilverfishEntity::new; }
+    
+    
+    //--------------- Variant-Specific Implementations ----------------
+    
     public BlindingSilverfishEntity( EntityType<? extends _SpecialSilverfishEntity> entityType, World world ) {
         super( entityType, world );
         getSpecialData().addPotionImmunity( Effects.BLINDNESS );
         xpReward += 1;
     }
-    
-    
-    //--------------- Variant-Specific Implementations ----------------
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override

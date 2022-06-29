@@ -53,14 +53,16 @@ public class GatlingSkeletonEntity extends _SpecialSkeletonEntity {
         loot.addCommonDrop( "common", Items.GUNPOWDER );
     }
     
-    @SpecialMob.Constructor
+    @SpecialMob.Factory
+    public static EntityType.IFactory<GatlingSkeletonEntity> getVariantFactory() { return GatlingSkeletonEntity::new; }
+    
+    
+    //--------------- Variant-Specific Implementations ----------------
+    
     public GatlingSkeletonEntity( EntityType<? extends _SpecialSkeletonEntity> entityType, World world ) {
         super( entityType, world );
         xpReward += 2;
     }
-    
-    
-    //--------------- Variant-Specific Implementations ----------------
     
     /** Override to change this entity's AI goals. */
     @Override

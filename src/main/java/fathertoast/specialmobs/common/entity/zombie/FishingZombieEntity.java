@@ -68,16 +68,18 @@ public class FishingZombieEntity extends _SpecialZombieEntity implements IAngler
                 .toLootPool() );
     }
     
-    @SpecialMob.Constructor
+    @SpecialMob.Factory
+    public static EntityType.IFactory<FishingZombieEntity> getVariantFactory() { return FishingZombieEntity::new; }
+    
+    
+    //--------------- Variant-Specific Implementations ----------------
+    
     public FishingZombieEntity( EntityType<? extends _SpecialZombieEntity> entityType, World world ) {
         super( entityType, world );
         getSpecialData().setCanBreatheInWater( true );
         getSpecialData().setIgnoreWaterPush( true );
         xpReward += 2;
     }
-    
-    
-    //--------------- Variant-Specific Implementations ----------------
     
     /** Override to change this entity's AI goals. */
     @Override

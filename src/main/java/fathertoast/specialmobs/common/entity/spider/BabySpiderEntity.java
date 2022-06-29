@@ -52,15 +52,17 @@ public class BabySpiderEntity extends _SpecialSpiderEntity {
         loot.addCommonDrop( "common", Items.STRING, 1 );
     }
     
-    @SpecialMob.Constructor
+    @SpecialMob.Factory
+    public static EntityType.IFactory<BabySpiderEntity> getVariantFactory() { return BabySpiderEntity::new; }
+    
+    
+    //--------------- Variant-Specific Implementations ----------------
+    
     public BabySpiderEntity( EntityType<? extends _SpecialSpiderEntity> entityType, World world ) {
         super( entityType, world );
         getSpecialData().setBaseScale( 0.4F );
         xpReward = 1;
     }
-    
-    
-    //--------------- Variant-Specific Implementations ----------------
     
     /** Override to change this entity's AI goals. */
     @Override

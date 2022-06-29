@@ -45,14 +45,16 @@ public class StickyMagmaCubeEntity extends _SpecialMagmaCubeEntity {
         loot.addCommonDrop( "common", Items.SLIME_BALL );
     }
     
-    @SpecialMob.Constructor
+    @SpecialMob.Factory
+    public static EntityType.IFactory<StickyMagmaCubeEntity> getVariantFactory() { return StickyMagmaCubeEntity::new; }
+    
+    
+    //--------------- Variant-Specific Implementations ----------------
+    
     public StickyMagmaCubeEntity( EntityType<? extends _SpecialMagmaCubeEntity> entityType, World world ) {
         super( entityType, world );
         slimeExperienceValue += 2;
     }
-    
-    
-    //--------------- Variant-Specific Implementations ----------------
     
     private final DamageSource grabDamageSource = DamageSource.mobAttack( this ).bypassArmor().bypassMagic();
     

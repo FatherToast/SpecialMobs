@@ -44,15 +44,17 @@ public class BlindingEndermanEntity extends _SpecialEndermanEntity {
         loot.addCommonDrop( "common", Items.INK_SAC );
     }
     
-    @SpecialMob.Constructor
+    @SpecialMob.Factory
+    public static EntityType.IFactory<BlindingEndermanEntity> getVariantFactory() { return BlindingEndermanEntity::new; }
+    
+    
+    //--------------- Variant-Specific Implementations ----------------
+    
     public BlindingEndermanEntity( EntityType<? extends _SpecialEndermanEntity> entityType, World world ) {
         super( entityType, world );
         getSpecialData().addPotionImmunity( Effects.BLINDNESS );
         xpReward += 1;
     }
-    
-    
-    //--------------- Variant-Specific Implementations ----------------
     
     /** Called each tick to update this entity's movement. */
     @Override

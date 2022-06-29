@@ -52,7 +52,12 @@ public class BabyCaveSpiderEntity extends _SpecialCaveSpiderEntity {
         loot.addCommonDrop( "common", Items.STRING, 1 );
     }
     
-    @SpecialMob.Constructor
+    @SpecialMob.Factory
+    public static EntityType.IFactory<BabyCaveSpiderEntity> getVariantFactory() { return BabyCaveSpiderEntity::new; }
+    
+    
+    //--------------- Variant-Specific Implementations ----------------
+    
     public BabyCaveSpiderEntity( EntityType<? extends _SpecialCaveSpiderEntity> entityType, World world ) {
         super( entityType, world );
         getSpecialData().setBaseScale( 0.4F );
@@ -60,9 +65,6 @@ public class BabyCaveSpiderEntity extends _SpecialCaveSpiderEntity {
         getSpecialData().rangedAttackMaxRange = 0.0F;
         xpReward = 1;
     }
-    
-    
-    //--------------- Variant-Specific Implementations ----------------
     
     /** Override to change this entity's AI goals. */
     @Override

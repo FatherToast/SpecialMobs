@@ -61,14 +61,16 @@ public class _SpecialSpiderEntity extends SpiderEntity implements ISpecialMob<_S
         loot.addLootTable( "main", EntityType.SPIDER.getDefaultLootTable() );
     }
     
-    @SpecialMob.Constructor
+    @SpecialMob.Factory
+    public static EntityType.IFactory<_SpecialSpiderEntity> getFactory() { return _SpecialSpiderEntity::new; }
+    
+    
+    //--------------- Variant-Specific Breakouts ----------------
+    
     public _SpecialSpiderEntity( EntityType<? extends _SpecialSpiderEntity> entityType, World world ) {
         super( entityType, world );
         getSpecialData().initialize();
     }
-    
-    
-    //--------------- Variant-Specific Breakouts ----------------
     
     /** Called in the MobEntity.class constructor to initialize AI goals. */
     @Override

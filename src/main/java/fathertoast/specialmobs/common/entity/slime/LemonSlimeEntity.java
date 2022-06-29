@@ -52,14 +52,16 @@ public class LemonSlimeEntity extends _SpecialSlimeEntity {
         loot.addUncommonDrop( "uncommon", Items.YELLOW_DYE );
     }
     
-    @SpecialMob.Constructor
+    @SpecialMob.Factory
+    public static EntityType.IFactory<LemonSlimeEntity> getVariantFactory() { return LemonSlimeEntity::new; }
+    
+    
+    //--------------- Variant-Specific Implementations ----------------
+    
     public LemonSlimeEntity( EntityType<? extends _SpecialSlimeEntity> entityType, World world ) {
         super( entityType, world );
         slimeExperienceValue += 2;
     }
-    
-    
-    //--------------- Variant-Specific Implementations ----------------
     
     /** Override to modify this slime's base attributes by size. */
     @Override

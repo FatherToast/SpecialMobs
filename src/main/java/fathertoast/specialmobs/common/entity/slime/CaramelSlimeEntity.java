@@ -49,14 +49,16 @@ public class CaramelSlimeEntity extends _SpecialSlimeEntity {
         loot.addUncommonDrop( "uncommon", Items.ORANGE_DYE );
     }
     
-    @SpecialMob.Constructor
+    @SpecialMob.Factory
+    public static EntityType.IFactory<CaramelSlimeEntity> getVariantFactory() { return CaramelSlimeEntity::new; }
+    
+    
+    //--------------- Variant-Specific Implementations ----------------
+    
     public CaramelSlimeEntity( EntityType<? extends _SpecialSlimeEntity> entityType, World world ) {
         super( entityType, world );
         slimeExperienceValue += 2;
     }
-    
-    
-    //--------------- Variant-Specific Implementations ----------------
     
     private final DamageSource grabDamageSource = DamageSource.mobAttack( this ).bypassArmor().bypassMagic();
     

@@ -53,7 +53,12 @@ public class BouncingMagmaCubeEntity extends _SpecialMagmaCubeEntity {
         loot.addCommonDrop( "base", Items.FEATHER );
     }
     
-    @SpecialMob.Constructor
+    @SpecialMob.Factory
+    public static EntityType.IFactory<BouncingMagmaCubeEntity> getVariantFactory() { return BouncingMagmaCubeEntity::new; }
+    
+    
+    //--------------- Variant-Specific Implementations ----------------
+    
     public BouncingMagmaCubeEntity( EntityType<? extends _SpecialMagmaCubeEntity> entityType, World world ) {
         super( entityType, world );
         getSpecialData().setFallDamageMultiplier( 0.0F );
@@ -61,9 +66,6 @@ public class BouncingMagmaCubeEntity extends _SpecialMagmaCubeEntity {
         
         setPathfindingMalus( PathNodeType.LAVA, PathNodeType.WALKABLE.getMalus() );
     }
-    
-    
-    //--------------- Variant-Specific Implementations ----------------
     
     /** Override to modify this slime's base attributes by size. */
     @Override

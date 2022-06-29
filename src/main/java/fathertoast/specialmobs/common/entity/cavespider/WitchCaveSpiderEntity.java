@@ -55,14 +55,16 @@ public class WitchCaveSpiderEntity extends _SpecialCaveSpiderEntity {
         loot.addLootTable( "common", EntityType.WITCH.getDefaultLootTable() );
     }
     
-    @SpecialMob.Constructor
+    @SpecialMob.Factory
+    public static EntityType.IFactory<WitchCaveSpiderEntity> getVariantFactory() { return WitchCaveSpiderEntity::new; }
+    
+    
+    //--------------- Variant-Specific Implementations ----------------
+    
     public WitchCaveSpiderEntity( EntityType<? extends _SpecialCaveSpiderEntity> entityType, World world ) {
         super( entityType, world );
         xpReward += 2;
     }
-    
-    
-    //--------------- Variant-Specific Implementations ----------------
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override

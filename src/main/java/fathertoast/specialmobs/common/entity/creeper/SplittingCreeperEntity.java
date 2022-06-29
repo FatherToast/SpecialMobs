@@ -59,7 +59,12 @@ public class SplittingCreeperEntity extends _SpecialCreeperEntity {
         loot.addUncommonDrop( "uncommon", Items.CREEPER_SPAWN_EGG );
     }
     
-    @SpecialMob.Constructor
+    @SpecialMob.Factory
+    public static EntityType.IFactory<SplittingCreeperEntity> getVariantFactory() { return SplittingCreeperEntity::new; }
+    
+    
+    //--------------- Variant-Specific Implementations ----------------
+    
     public SplittingCreeperEntity( EntityType<? extends _SpecialCreeperEntity> entityType, World world ) {
         super( entityType, world );
         getSpecialData().setBaseScale( 1.2F );
@@ -68,9 +73,6 @@ public class SplittingCreeperEntity extends _SpecialCreeperEntity {
         xpReward += 2;
         extraBabies = random.nextInt( 4 );
     }
-    
-    
-    //--------------- Variant-Specific Implementations ----------------
     
     /** The number of extra mini creepers spawned on explosion (in addition to the amount based on explosion power). */
     private int extraBabies;

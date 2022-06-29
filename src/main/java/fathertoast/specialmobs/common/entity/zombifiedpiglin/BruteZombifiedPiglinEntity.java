@@ -63,15 +63,17 @@ public class BruteZombifiedPiglinEntity extends _SpecialZombifiedPiglinEntity {
         loot.addRareDrop( "rare", Items.IRON_INGOT );
     }
     
-    @SpecialMob.Constructor
+    @SpecialMob.Factory
+    public static EntityType.IFactory<BruteZombifiedPiglinEntity> getVariantFactory() { return BruteZombifiedPiglinEntity::new; }
+    
+    
+    //--------------- Variant-Specific Implementations ----------------
+    
     public BruteZombifiedPiglinEntity( EntityType<? extends _SpecialZombifiedPiglinEntity> entityType, World world ) {
         super( entityType, world );
         getSpecialData().setBaseScale( 1.2F );
         xpReward += 2;
     }
-    
-    
-    //--------------- Variant-Specific Implementations ----------------
     
     /** Called during spawn finalization to set starting equipment. */
     @Override

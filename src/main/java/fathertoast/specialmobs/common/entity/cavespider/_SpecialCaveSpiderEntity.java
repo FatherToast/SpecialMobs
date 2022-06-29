@@ -61,14 +61,16 @@ public class _SpecialCaveSpiderEntity extends CaveSpiderEntity implements ISpeci
         loot.addLootTable( "main", EntityType.CAVE_SPIDER.getDefaultLootTable() );
     }
     
-    @SpecialMob.Constructor
+    @SpecialMob.Factory
+    public static EntityType.IFactory<_SpecialCaveSpiderEntity> getFactory() { return _SpecialCaveSpiderEntity::new; }
+    
+    
+    //--------------- Variant-Specific Breakouts ----------------
+    
     public _SpecialCaveSpiderEntity( EntityType<? extends _SpecialCaveSpiderEntity> entityType, World world ) {
         super( entityType, world );
         getSpecialData().initialize();
     }
-    
-    
-    //--------------- Variant-Specific Breakouts ----------------
     
     /** Called in the MobEntity.class constructor to initialize AI goals. */
     @Override

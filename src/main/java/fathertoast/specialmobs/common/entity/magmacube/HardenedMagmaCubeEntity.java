@@ -46,15 +46,17 @@ public class HardenedMagmaCubeEntity extends _SpecialMagmaCubeEntity {
         loot.addClusterDrop( "uncommon", Blocks.MAGMA_BLOCK );
     }
     
-    @SpecialMob.Constructor
+    @SpecialMob.Factory
+    public static EntityType.IFactory<HardenedMagmaCubeEntity> getVariantFactory() { return HardenedMagmaCubeEntity::new; }
+    
+    
+    //--------------- Variant-Specific Implementations ----------------
+    
     public HardenedMagmaCubeEntity( EntityType<? extends _SpecialMagmaCubeEntity> entityType, World world ) {
         super( entityType, world );
         getSpecialData().setBaseScale( 1.5F );
         slimeExperienceValue += 2;
     }
-    
-    
-    //--------------- Variant-Specific Implementations ----------------
     
     /** Override to modify this slime's base attributes by size. */
     @Override

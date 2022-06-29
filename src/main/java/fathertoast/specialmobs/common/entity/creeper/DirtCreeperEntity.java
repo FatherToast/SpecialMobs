@@ -58,15 +58,17 @@ public class DirtCreeperEntity extends _SpecialCreeperEntity {
         loot.addRareDrop( "rare", Items.CARROT, Items.POTATO );
     }
     
-    @SpecialMob.Constructor
+    @SpecialMob.Factory
+    public static EntityType.IFactory<DirtCreeperEntity> getVariantFactory() { return DirtCreeperEntity::new; }
+    
+    
+    //--------------- Variant-Specific Implementations ----------------
+    
     public DirtCreeperEntity( EntityType<? extends _SpecialCreeperEntity> entityType, World world ) {
         super( entityType, world );
         getSpecialData().setImmuneToBurning( true );
         xpReward += 1;
     }
-    
-    
-    //--------------- Variant-Specific Implementations ----------------
     
     /** Override to change this creeper's explosion. */
     @Override

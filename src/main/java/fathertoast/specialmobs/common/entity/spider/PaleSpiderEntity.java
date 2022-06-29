@@ -56,14 +56,16 @@ public class PaleSpiderEntity extends _SpecialSpiderEntity {
         loot.addSemicommonDrop( "semicommon", Items.FERMENTED_SPIDER_EYE );
     }
     
-    @SpecialMob.Constructor
+    @SpecialMob.Factory
+    public static EntityType.IFactory<PaleSpiderEntity> getVariantFactory() { return PaleSpiderEntity::new; }
+    
+    
+    //--------------- Variant-Specific Implementations ----------------
+    
     public PaleSpiderEntity( EntityType<? extends _SpecialSpiderEntity> entityType, World world ) {
         super( entityType, world );
         xpReward += 1;
     }
-    
-    
-    //--------------- Variant-Specific Implementations ----------------
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override

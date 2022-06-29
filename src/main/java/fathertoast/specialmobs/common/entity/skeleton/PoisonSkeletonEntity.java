@@ -51,15 +51,17 @@ public class PoisonSkeletonEntity extends _SpecialSkeletonEntity {
         loot.addUncommonDrop( "uncommon", PotionUtils.setPotion( new ItemStack( Items.TIPPED_ARROW ), Potions.POISON ) );
     }
     
-    @SpecialMob.Constructor
+    @SpecialMob.Factory
+    public static EntityType.IFactory<PoisonSkeletonEntity> getVariantFactory() { return PoisonSkeletonEntity::new; }
+    
+    
+    //--------------- Variant-Specific Implementations ----------------
+    
     public PoisonSkeletonEntity( EntityType<? extends _SpecialSkeletonEntity> entityType, World world ) {
         super( entityType, world );
         getSpecialData().addPotionImmunity( Effects.POISON );
         xpReward += 1;
     }
-    
-    
-    //--------------- Variant-Specific Implementations ----------------
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override

@@ -51,15 +51,17 @@ public class WatermelonSlimeEntity extends _SpecialSlimeEntity {
         loot.addUncommonDrop( "uncommon", Items.PINK_DYE, Items.LIME_DYE );
     }
     
-    @SpecialMob.Constructor
+    @SpecialMob.Factory
+    public static EntityType.IFactory<WatermelonSlimeEntity> getVariantFactory() { return WatermelonSlimeEntity::new; }
+    
+    
+    //--------------- Variant-Specific Implementations ----------------
+    
     public WatermelonSlimeEntity( EntityType<? extends _SpecialSlimeEntity> entityType, World world ) {
         super( entityType, world );
         getSpecialData().setBaseScale( 1.5F );
         slimeExperienceValue += 2;
     }
-    
-    
-    //--------------- Variant-Specific Implementations ----------------
     
     /** Override to modify this slime's base attributes by size. */
     @Override

@@ -46,14 +46,16 @@ public class LightningEndermanEntity extends _SpecialEndermanEntity {
         loot.addCommonDrop( "common", Items.REDSTONE );
     }
     
-    @SpecialMob.Constructor
+    @SpecialMob.Factory
+    public static EntityType.IFactory<LightningEndermanEntity> getVariantFactory() { return LightningEndermanEntity::new; }
+    
+    
+    //--------------- Variant-Specific Implementations ----------------
+    
     public LightningEndermanEntity( EntityType<? extends _SpecialEndermanEntity> entityType, World world ) {
         super( entityType, world );
         xpReward += 2;
     }
-    
-    
-    //--------------- Variant-Specific Implementations ----------------
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override

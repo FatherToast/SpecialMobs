@@ -36,24 +36,6 @@ public final class AnnotationHelper {
         }
     }
     
-    /** Creates an entity factory from a special mob species. Throws an exception if anything goes wrong. */
-    public static <T extends LivingEntity> EntityType.IFactory<T> getEntityFactory( MobFamily.Species<T> species ) {
-        try {
-            final Constructor<T> constructor = getConstructor( species.entityClass, SpecialMob.Constructor.class );
-            return ( entityType, world ) -> {
-                try {
-                    return constructor.newInstance( entityType, world );
-                }
-                catch( InstantiationException | IllegalAccessException | InvocationTargetException ex ) {
-                    throw new RuntimeException( "Caught exception during instantiation of " + constructor.getDeclaringClass().getName(), ex );
-                }
-            };
-        }
-        catch( NoSuchMethodException ex ) {
-            throw new RuntimeException( "Entity class for " + species.name + " has no valid constructors", ex );
-        }
-    }
-    
     /** Gets bestiary info from a special mob species. Throws an exception if anything goes wrong. */
     public static <T extends LivingEntity> BestiaryInfo getBestiaryInfo( MobFamily.Species<T> species, EntityType.Builder<T> entityType ) {
         try {
@@ -106,6 +88,17 @@ public final class AnnotationHelper {
         }
         catch( NoSuchMethodException | InvocationTargetException | IllegalAccessException ex ) {
             throw new RuntimeException( "Entity class for " + species.name + " has invalid loot table builder method", ex );
+        }
+    }
+    
+    /** Creates an entity factory from a special mob species. Throws an exception if anything goes wrong. */
+    public static <T extends LivingEntity> EntityType.IFactory<T> getEntityFactory( MobFamily.Species<T> species ) {
+        try {
+            //noinspection unchecked
+            return (EntityType.IFactory<T>) getMethod( species.entityClass, SpecialMob.Factory.class ).invoke( null );
+        }
+        catch( NoSuchMethodException | InvocationTargetException | IllegalAccessException ex ) {
+            throw new RuntimeException( "Entity class for " + species.name + " has invalid factory provider method", ex );
         }
     }
     

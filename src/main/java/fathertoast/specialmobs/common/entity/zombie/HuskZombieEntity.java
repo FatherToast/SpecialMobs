@@ -57,15 +57,17 @@ public class HuskZombieEntity extends _SpecialZombieEntity {
         loot.addLootTable( "main", EntityType.HUSK.getDefaultLootTable() );
     }
     
-    @SpecialMob.Constructor
+    @SpecialMob.Factory
+    public static EntityType.IFactory<HuskZombieEntity> getVariantFactory() { return HuskZombieEntity::new; }
+    
+    
+    //--------------- Variant-Specific Implementations ----------------
+    
     public HuskZombieEntity( EntityType<? extends _SpecialZombieEntity> entityType, World world ) {
         super( entityType, world );
         getSpecialData().setBaseScale( 1.0625F );
         xpReward += 1;
     }
-    
-    
-    //--------------- Variant-Specific Implementations ----------------
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override

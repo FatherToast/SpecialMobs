@@ -63,7 +63,12 @@ public class IcyEndermanEntity extends _SpecialEndermanEntity {
         loot.addUncommonDrop( "uncommon", Blocks.ICE );
     }
     
-    @SpecialMob.Constructor
+    @SpecialMob.Factory
+    public static EntityType.IFactory<IcyEndermanEntity> getVariantFactory() { return IcyEndermanEntity::new; }
+    
+    
+    //--------------- Variant-Specific Implementations ----------------
+    
     public IcyEndermanEntity( EntityType<? extends _SpecialEndermanEntity> entityType, World world ) {
         super( entityType, world );
         getSpecialData().addPotionImmunity( Effects.MOVEMENT_SLOWDOWN );
@@ -71,9 +76,6 @@ public class IcyEndermanEntity extends _SpecialEndermanEntity {
         
         setPathfindingMalus( PathNodeType.WATER, PathNodeType.WALKABLE.getMalus() );
     }
-    
-    
-    //--------------- Variant-Specific Implementations ----------------
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override

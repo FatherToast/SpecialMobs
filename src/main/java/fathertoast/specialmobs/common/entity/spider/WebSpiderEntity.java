@@ -58,15 +58,17 @@ public class WebSpiderEntity extends _SpecialSpiderEntity {
         loot.addUncommonDrop( "uncommon", Blocks.COBWEB );
     }
     
-    @SpecialMob.Constructor
+    @SpecialMob.Factory
+    public static EntityType.IFactory<WebSpiderEntity> getVariantFactory() { return WebSpiderEntity::new; }
+    
+    
+    //--------------- Variant-Specific Implementations ----------------
+    
     public WebSpiderEntity( EntityType<? extends _SpecialSpiderEntity> entityType, World world ) {
         super( entityType, world );
         xpReward += 2;
         webCount = 2 + random.nextInt( 5 );
     }
-    
-    
-    //--------------- Variant-Specific Implementations ----------------
     
     /** The number of cobwebs this spider can place. */
     private int webCount;

@@ -57,14 +57,16 @@ public class VolatileMagmaCubeEntity extends _SpecialMagmaCubeEntity {
         loot.addCommonDrop( "common", Items.GUNPOWDER );
     }
     
-    @SpecialMob.Constructor
+    @SpecialMob.Factory
+    public static EntityType.IFactory<VolatileMagmaCubeEntity> getVariantFactory() { return VolatileMagmaCubeEntity::new; }
+    
+    
+    //--------------- Variant-Specific Implementations ----------------
+    
     public VolatileMagmaCubeEntity( EntityType<? extends _SpecialMagmaCubeEntity> entityType, World world ) {
         super( entityType, world );
         slimeExperienceValue += 2;
     }
-    
-    
-    //--------------- Variant-Specific Implementations ----------------
     
     private static final byte MAX_FUSE = 30;
     

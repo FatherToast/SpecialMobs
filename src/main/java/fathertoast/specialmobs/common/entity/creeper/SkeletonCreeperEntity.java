@@ -65,14 +65,16 @@ public class SkeletonCreeperEntity extends _SpecialCreeperEntity {
         loot.addLootTable( "common", EntityType.SKELETON.getDefaultLootTable() );
     }
     
-    @SpecialMob.Constructor
+    @SpecialMob.Factory
+    public static EntityType.IFactory<SkeletonCreeperEntity> getVariantFactory() { return SkeletonCreeperEntity::new; }
+    
+    
+    //--------------- Variant-Specific Implementations ----------------
+    
     public SkeletonCreeperEntity( EntityType<? extends _SpecialCreeperEntity> entityType, World world ) {
         super( entityType, world );
         xpReward += 1;
     }
-    
-    
-    //--------------- Variant-Specific Implementations ----------------
     
     /** Override to change this entity's AI goals. */
     @Override

@@ -45,16 +45,18 @@ public class FireCreeperEntity extends _SpecialCreeperEntity {
         loot.addUncommonDrop( "uncommon", Items.COAL );
     }
     
-    @SpecialMob.Constructor
+    @SpecialMob.Factory
+    public static EntityType.IFactory<FireCreeperEntity> getVariantFactory() { return FireCreeperEntity::new; }
+    
+    
+    //--------------- Variant-Specific Implementations ----------------
+    
     public FireCreeperEntity( EntityType<? extends _SpecialCreeperEntity> entityType, World world ) {
         super( entityType, world );
         getSpecialData().setDamagedByWater( true );
         setCannotExplodeWhileWet( true );
         xpReward += 1;
     }
-    
-    
-    //--------------- Variant-Specific Implementations ----------------
     
     /** Override to change this creeper's explosion. */
     @Override

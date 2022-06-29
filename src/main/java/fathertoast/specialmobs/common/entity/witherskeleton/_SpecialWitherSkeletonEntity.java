@@ -77,14 +77,16 @@ public class _SpecialWitherSkeletonEntity extends WitherSkeletonEntity implement
         loot.addLootTable( "main", EntityType.WITHER_SKELETON.getDefaultLootTable() );
     }
     
-    @SpecialMob.Constructor
+    @SpecialMob.Factory
+    public static EntityType.IFactory<_SpecialWitherSkeletonEntity> getFactory() { return _SpecialWitherSkeletonEntity::new; }
+    
+    
+    //--------------- Variant-Specific Breakouts ----------------
+    
     public _SpecialWitherSkeletonEntity( EntityType<? extends _SpecialWitherSkeletonEntity> entityType, World world ) {
         super( entityType, world );
         getSpecialData().initialize();
     }
-    
-    
-    //--------------- Variant-Specific Breakouts ----------------
     
     /** Called in the MobEntity.class constructor to initialize AI goals. */
     @Override

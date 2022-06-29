@@ -59,15 +59,17 @@ public class _SpecialEndermanEntity extends EndermanEntity implements ISpecialMo
         loot.addLootTable( "main", EntityType.ENDERMAN.getDefaultLootTable() );
     }
     
-    @SpecialMob.Constructor
+    @SpecialMob.Factory
+    public static EntityType.IFactory<_SpecialEndermanEntity> getFactory() { return _SpecialEndermanEntity::new; }
+    
+    
+    //--------------- Variant-Specific Breakouts ----------------
+    
     public _SpecialEndermanEntity( EntityType<? extends _SpecialEndermanEntity> entityType, World world ) {
         super( entityType, world );
         getSpecialData().initialize();
         getSpecialData().setDamagedByWater( true );
     }
-    
-    
-    //--------------- Variant-Specific Breakouts ----------------
     
     /** Called in the MobEntity.class constructor to initialize AI goals. */
     @Override

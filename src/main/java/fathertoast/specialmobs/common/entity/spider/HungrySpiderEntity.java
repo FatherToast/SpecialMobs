@@ -65,16 +65,18 @@ public class HungrySpiderEntity extends _SpecialSpiderEntity {
         loot.addUncommonDrop( "uncommon", Items.APPLE, Items.BEETROOT, Items.ROTTEN_FLESH, Items.CHICKEN, Items.RABBIT, Items.COOKIE );
     }
     
-    @SpecialMob.Constructor
+    @SpecialMob.Factory
+    public static EntityType.IFactory<HungrySpiderEntity> getVariantFactory() { return HungrySpiderEntity::new; }
+    
+    
+    //--------------- Variant-Specific Implementations ----------------
+    
     public HungrySpiderEntity( EntityType<? extends _SpecialSpiderEntity> entityType, World world ) {
         super( entityType, world );
         getSpecialData().setBaseScale( 1.5F );
         getSpecialData().setRegenerationTime( 40 );
         xpReward += 2;
     }
-    
-    
-    //--------------- Variant-Specific Implementations ----------------
     
     /** The damage boost to apply from growth level. */
     private static final AttributeModifier DAMAGE_BOOST = new AttributeModifier( UUID.fromString( "70457CAB-AA09-4E1C-B44B-99DD4A2A836D" ),

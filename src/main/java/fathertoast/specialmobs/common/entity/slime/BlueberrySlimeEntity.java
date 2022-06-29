@@ -54,7 +54,12 @@ public class BlueberrySlimeEntity extends _SpecialSlimeEntity {
         loot.addUncommonDrop( "uncommon", Items.BLUE_DYE );
     }
     
-    @SpecialMob.Constructor
+    @SpecialMob.Factory
+    public static EntityType.IFactory<BlueberrySlimeEntity> getVariantFactory() { return BlueberrySlimeEntity::new; }
+    
+    
+    //--------------- Variant-Specific Implementations ----------------
+    
     public BlueberrySlimeEntity( EntityType<? extends _SpecialSlimeEntity> entityType, World world ) {
         super( entityType, world );
         getSpecialData().setCanBreatheInWater( true );
@@ -63,9 +68,6 @@ public class BlueberrySlimeEntity extends _SpecialSlimeEntity {
         
         setPathfindingMalus( PathNodeType.WATER, PathNodeType.WALKABLE.getMalus() );
     }
-    
-    
-    //--------------- Variant-Specific Implementations ----------------
     
     /** Override to modify this slime's base attributes by size. */
     @Override
