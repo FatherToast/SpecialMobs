@@ -1,4 +1,4 @@
-package fathertoast.specialmobs.common.entity.spider;
+package fathertoast.specialmobs.common.entity.blaze;
 
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
@@ -7,17 +7,12 @@ import fathertoast.specialmobs.common.util.AttributeHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import mcp.MethodsReturnNonnullByDefault;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.ILivingEntityData;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.SpawnReason;
+import net.minecraft.entity.*;
 import net.minecraft.entity.ai.attributes.AttributeModifierMap;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.DamageSource;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.SoundEvents;
 import net.minecraft.world.IServerWorld;
 import net.minecraft.world.World;
 
@@ -27,81 +22,88 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 @SpecialMob
-public class MotherSpiderEntity extends _SpecialSpiderEntity {
+public class WildfireBlazeEntity extends _SpecialBlazeEntity {
     
     //--------------- Static Special Mob Hooks ----------------
     
     @SpecialMob.SpeciesReference
-    public static MobFamily.Species<MotherSpiderEntity> SPECIES;
+    public static MobFamily.Species<WildfireBlazeEntity> SPECIES;
     
     @SpecialMob.BestiaryInfoSupplier
     public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
-        entityType.sized( 1.7F, 1.0F );
-        return new BestiaryInfo( 0xB300B3 );
+        entityType.sized( 0.9F, 2.7F );
+        return new BestiaryInfo( 0xF4EE32 );
     }
     
     @SpecialMob.AttributeCreator
     public static AttributeModifierMap.MutableAttribute createAttributes() {
-        return AttributeHelper.of( _SpecialSpiderEntity.createAttributes() )
-                .addAttribute( Attributes.MAX_HEALTH, 16.0 )
-                .addAttribute( Attributes.ARMOR, 6.0 )
-                .addAttribute( Attributes.ATTACK_DAMAGE, 3.0 )
+        return AttributeHelper.of( _SpecialBlazeEntity.createAttributes() )
+                .addAttribute( Attributes.MAX_HEALTH, 20.0 )
                 .build();
     }
     
     @SpecialMob.LanguageProvider
     public static String[] getTranslations( String langKey ) {
-        return References.translations( langKey, "Mother Spider",
+        return References.translations( langKey, "Wildfire",
                 "", "", "", "", "", "" );//TODO
     }
     
     @SpecialMob.LootTableProvider
     public static void buildLootTable( LootTableBuilder loot ) {
         addBaseLoot( loot );
-        loot.addUncommonDrop( "uncommon", Items.SPIDER_SPAWN_EGG );
+        loot.addCommonDrop( "common", Items.COAL, 1 );
+        loot.addUncommonDrop( "uncommon", Items.BLAZE_SPAWN_EGG );
     }
     
     @SpecialMob.Factory
-    public static EntityType.IFactory<MotherSpiderEntity> getVariantFactory() { return MotherSpiderEntity::new; }
+    public static EntityType.IFactory<WildfireBlazeEntity> getVariantFactory() { return WildfireBlazeEntity::new; }
     
     
     //--------------- Variant-Specific Implementations ----------------
     
-    public MotherSpiderEntity( EntityType<? extends _SpecialSpiderEntity> entityType, World world ) {
+    /** The number of babies spawned on death. */
+    private int babies;
+    /** The number of extra babies that can be spawned by attacks. */
+    private int extraBabies;
+    
+    public WildfireBlazeEntity( EntityType<? extends _SpecialBlazeEntity> entityType, World world ) {
         super( entityType, world );
-        getSpecialData().setBaseScale( 1.2F );
-        getSpecialData().setRegenerationTime( 30 );
-        xpReward += 1;
+        getSpecialData().setBaseScale( 1.5F );
+        getSpecialData().setRegenerationTime( 40 );
+        xpReward += 2;
         
         babies = 2 + random.nextInt( 3 );
         extraBabies = 3 + random.nextInt( 4 );
     }
     
-    /** The number of babies spawned on death. */
-    private int babies;
-    /** The number of extra babies that can be spawned from hits. */
-    private int extraBabies;
-    
     /** Override to change this entity's AI goals. */
     @Override
     protected void registerVariantGoals() {
-        getSpecialData().rangedAttackDamage += 1.5F;
+        getSpecialData().rangedAttackSpread *= 0.1F;
+        setRangedAI( 1, 0, 30, 50, 20.0F );
     }
     
-    /** @return Attempts to damage this entity; returns true if the hit was successful. */
+    /** Override to apply effects when this entity hits a target with a melee attack. */
+    protected void onVariantAttack( Entity target ) {
+        target.setSecondsOnFire( 8 );
+    }
+    
+    /** Called to attack the target with a ranged attack. */
     @Override
-    public boolean hurt( DamageSource source, float amount ) {
-        if( super.hurt( source, amount ) ) {
-            // Spawn babies when damaged
-            if( extraBabies > 0 && amount > 1.0F && level instanceof IServerWorld && random.nextFloat() < 0.33F ) {
-                extraBabies--;
-                spawnBaby( 0.66F, null );
-                spawnAnim();
-                playSound( SoundEvents.EGG_THROW, 1.0F, 2.0F / (random.nextFloat() * 0.4F + 0.8F) );
-            }
-            return true;
+    public void performRangedAttack( LivingEntity target, float damageMulti ) {
+        if( !level.isClientSide() && extraBabies > 0 && random.nextInt( 2 ) == 0 ) {
+            extraBabies--;
+            
+            final double vX = target.getX() - getX();
+            final double vZ = target.getZ() - getZ();
+            final double vH = Math.sqrt( vX * vX + vZ * vZ );
+            spawnBaby( vX / vH * 0.8 + getDeltaMovement().x * 0.2, vZ / vH * 0.8 + getDeltaMovement().z * 0.2, null );
+            spawnAnim();
+            if( !isSilent() ) level.levelEvent( null, 1018, blockPosition(), 0 );
         }
-        return false;
+        else {
+            super.performRangedAttack( target, damageMulti );
+        }
     }
     
     /** Called to remove this entity from the world. Includes death, unloading, interdimensional travel, etc. */
@@ -113,18 +115,18 @@ public class MotherSpiderEntity extends _SpecialSpiderEntity {
             final int babiesToSpawn = babies + extraBabies;
             ILivingEntityData groupData = null;
             for( int i = 0; i < babiesToSpawn; i++ ) {
-                groupData = spawnBaby( 0.33F, groupData );
+                groupData = spawnBaby( (random.nextDouble() - 0.5) * 0.3, (random.nextDouble() - 0.5) * 0.3, groupData );
             }
             spawnAnim();
-            playSound( SoundEvents.EGG_THROW, 1.0F, 2.0F / (random.nextFloat() * 0.4F + 0.8F) );
+            if( !isSilent() ) level.levelEvent( null, 1018, blockPosition(), 0 );
         }
         super.remove( keepData );
     }
     
     /** Helper method to simplify spawning babies. */
     @Nullable
-    private ILivingEntityData spawnBaby( float speed, @Nullable ILivingEntityData groupData ) {
-        final BabySpiderEntity baby = BabySpiderEntity.SPECIES.entityType.get().create( level );
+    private ILivingEntityData spawnBaby( double vX, double vZ, @Nullable ILivingEntityData groupData ) {
+        final CinderBlazeEntity baby = CinderBlazeEntity.SPECIES.entityType.get().create( level );
         if( baby == null ) return groupData;
         
         baby.copyPosition( this );
@@ -134,10 +136,7 @@ public class MotherSpiderEntity extends _SpecialSpiderEntity {
                 SpawnReason.MOB_SUMMONED, groupData, null );
         baby.setTarget( getTarget() );
         
-        baby.setDeltaMovement(
-                (random.nextDouble() - 0.5) * speed,
-                0.2 + 0.5 * random.nextDouble(), // Used to cause floor clip bug; remove if it happens again
-                (random.nextDouble() - 0.5) * speed );
+        baby.setDeltaMovement( vX, 0.0, vZ );
         baby.setOnGround( false );
         
         level.addFreshEntity( baby );
@@ -161,8 +160,7 @@ public class MotherSpiderEntity extends _SpecialSpiderEntity {
     }
     
     private static final ResourceLocation[] TEXTURES = {
-            GET_TEXTURE_PATH( "mother" ),
-            GET_TEXTURE_PATH( "mother_eyes" )
+            GET_TEXTURE_PATH( "wildfire" )
     };
     
     /** @return All default textures for this entity. */

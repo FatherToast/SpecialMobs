@@ -27,12 +27,12 @@ public class SpecialCreeperRenderer extends CreeperRenderer {
     public SpecialCreeperRenderer( EntityRendererManager rendererManager ) {
         super( rendererManager );
         baseShadowRadius = shadowRadius;
+        // Get rid of this one since we have our own implementation
+        layers.removeIf( ( layer ) -> layer instanceof CreeperChargeLayer );
+        
         addLayer( new SpecialMobEyesLayer<>( this ) );
         addLayer( new SpecialMobOverlayLayer<>( this, new CreeperModel<>( 0.25F ) ) );
-        addLayer( new SpecialCreeperChargeLayer<>(this, new CreeperModel<>( 2.0F )) );
-
-        // Get rid of this one since we have our own implementation
-        layers.removeIf((layer) -> layer instanceof CreeperChargeLayer);
+        addLayer( new SpecialCreeperChargeLayer<>( this, new CreeperModel<>( 2.0F ) ) );
     }
     
     @Override

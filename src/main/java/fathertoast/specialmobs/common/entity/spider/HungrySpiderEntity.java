@@ -71,13 +71,6 @@ public class HungrySpiderEntity extends _SpecialSpiderEntity {
     
     //--------------- Variant-Specific Implementations ----------------
     
-    public HungrySpiderEntity( EntityType<? extends _SpecialSpiderEntity> entityType, World world ) {
-        super( entityType, world );
-        getSpecialData().setBaseScale( 1.5F );
-        getSpecialData().setRegenerationTime( 40 );
-        xpReward += 2;
-    }
-    
     /** The damage boost to apply from growth level. */
     private static final AttributeModifier DAMAGE_BOOST = new AttributeModifier( UUID.fromString( "70457CAB-AA09-4E1C-B44B-99DD4A2A836D" ),
             "Feeding damage boost", 1.0, AttributeModifier.Operation.ADDITION );
@@ -89,6 +82,13 @@ public class HungrySpiderEntity extends _SpecialSpiderEntity {
     private int growthLevel;
     /** The level of increased max health gained. */
     private int maxHealthStacks;
+    
+    public HungrySpiderEntity( EntityType<? extends _SpecialSpiderEntity> entityType, World world ) {
+        super( entityType, world );
+        getSpecialData().setBaseScale( 1.5F );
+        getSpecialData().setRegenerationTime( 40 );
+        xpReward += 2;
+    }
     
     /** Override to change this entity's AI goals. */
     @Override
