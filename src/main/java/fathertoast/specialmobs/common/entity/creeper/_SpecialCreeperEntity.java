@@ -189,11 +189,11 @@ public class _SpecialCreeperEntity extends CreeperEntity implements ISpecialMob<
     /** Called when this entity is struck by lightning. */
     @Override
     public void thunderHit( ServerWorld world, LightningBoltEntity lightningBolt ) {
-        if (!isPowered() && random.nextDouble() < 0.1D)
-            setSupercharged(true);
-
+        if( !isPowered() && random.nextDouble() < 0.1D )
+            setSupercharged( true );
+        
         super.thunderHit( world, lightningBolt );
-
+        
         // Make it less likely for charged "explode while burning" creepers to immediately explode
         if( explodesWhileBurning() ) clearFire();
     }
@@ -222,13 +222,13 @@ public class _SpecialCreeperEntity extends CreeperEntity implements ISpecialMob<
     private static final byte EXPLODE_FLAG_ON_FIRE = 0b0010;
     /** The bit for "explodes when shot". */
     private static final byte EXPLODE_FLAG_WHEN_SHOT = 0b0100;
-
-
+    
+    
     /** @return True if this creeper is super charged. */
     public boolean isSupercharged() {
         return entityData.get( IS_SUPERCHARGED );
     }
-
+    
     /** Sets this creeper's supercharged state to the given value. */
     public void setSupercharged( boolean superCharged ) {
         entityData.set( IS_SUPERCHARGED, superCharged );
@@ -385,8 +385,9 @@ public class _SpecialCreeperEntity extends CreeperEntity implements ISpecialMob<
         super.addAdditionalSaveData( tag );
         
         final CompoundNBT saveTag = SpecialMobData.getSaveLocation( tag );
-
+        
         saveTag.putBoolean( References.TAG_SUPERCHARGED, isSupercharged() );
+        
         saveTag.putBoolean( References.TAG_DRY_EXPLODE, cannotExplodeWhileWet() );
         saveTag.putBoolean( References.TAG_WHEN_BURNING_EXPLODE, explodesWhileBurning() );
         saveTag.putBoolean( References.TAG_WHEN_SHOT_EXPLODE, explodesWhenShot() );
@@ -401,9 +402,10 @@ public class _SpecialCreeperEntity extends CreeperEntity implements ISpecialMob<
         super.readAdditionalSaveData( tag );
         
         final CompoundNBT saveTag = SpecialMobData.getSaveLocation( tag );
-
-        setSupercharged( saveTag.getBoolean(References.TAG_SUPERCHARGED) );
-
+        
+        if( saveTag.contains( References.TAG_SUPERCHARGED, References.NBT_TYPE_NUMERICAL ) )
+            setSupercharged( saveTag.getBoolean( References.TAG_SUPERCHARGED ) );
+        
         if( saveTag.contains( References.TAG_DRY_EXPLODE, References.NBT_TYPE_NUMERICAL ) )
             setCannotExplodeWhileWet( saveTag.getBoolean( References.TAG_DRY_EXPLODE ) );
         if( saveTag.contains( References.TAG_WHEN_BURNING_EXPLODE, References.NBT_TYPE_NUMERICAL ) )

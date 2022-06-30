@@ -22,8 +22,6 @@ public final class References {
     //--------------- ENTITY EVENTS ----------------
     // Used in World#broadcastEntityEvent(Entity, byte) then executed by Entity#handleEntityEvent(byte)
     
-    public static final byte EVENT_SHIELD_BLOCK_SOUND = 29;
-    public static final byte EVENT_SHIELD_BREAK_SOUND = 30;
     public static final byte EVENT_TELEPORT_TRAIL_PARTICLES = 46;
     
     
@@ -60,12 +58,16 @@ public final class References {
     public static final String TAG_WATER_DAMAGE = "WaterDamage";
     public static final String TAG_STICKY_IMMUNE = "StickyImmune";
     public static final String TAG_POTION_IMMUNE = "PotionImmune";
-    public static final String TAG_SUPERCHARGED = "Supercharged";
     
     // Creepers
+    public static final String TAG_SUPERCHARGED = "Supercharged";
     public static final String TAG_DRY_EXPLODE = "CannotExplodeWhileWet";
     public static final String TAG_WHEN_BURNING_EXPLODE = "ExplodesWhileBurning";
     public static final String TAG_WHEN_SHOT_EXPLODE = "ExplodesWhenShot";
+    
+    // Blazes
+    public static final String TAG_BURST_COUNT = "FireballBurstCount";
+    public static final String TAG_BURST_DELAY = "FireballBurstDelay";
     
     // Baby-able families - Skeletons, Wither Skeletons
     public static final String TAG_IS_BABY = "IsBaby";
@@ -75,13 +77,14 @@ public final class References {
     public static final String TAG_EXTRA_BABIES = "ExtraBabies"; // Splitting Creeper, Mother (Cave) Spider
     
     // Growing mobs
-    public static final String TAG_GROWTH_LEVEL = "GrowthLevel"; // Hungry Spider
+    public static final String TAG_GROWTH_LEVEL = "GrowthLevel"; // Hungry Spider, Conflagration Blaze
     public static final String TAG_HEALTH_STACKS = "HealthStacks"; // Hungry Spider
     
     // Misc.
     public static final String TAG_FUSE_TIME = "FuseTime"; // Blackberry Slime, Volatile Magma Cube
     public static final String TAG_AMMO = "Ammo"; // Web (Cave) Spider
     public static final String TAG_IS_FAKE = "IsFake"; // Mirage Enderman
+    public static final String TAG_EXPLOSION_POWER = "ExplosionPower"; // Hellfire Blaze
     
     
     //--------------- INTERNATIONALIZATION ----------------

@@ -7,6 +7,7 @@ import fathertoast.specialmobs.common.entity.ISpecialMob;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.client.renderer.entity.EndermanRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
+import net.minecraft.client.renderer.entity.layers.EndermanEyesLayer;
 import net.minecraft.client.renderer.entity.model.EndermanModel;
 import net.minecraft.entity.monster.EndermanEntity;
 import net.minecraft.util.ResourceLocation;
@@ -24,9 +25,11 @@ public class SpecialEndermanRenderer extends EndermanRenderer {
     
     public SpecialEndermanRenderer( EntityRendererManager rendererManager ) {
         super( rendererManager );
-        layers.remove( layers.size() - 2 ); // Remove vanilla eyes layer
+        // Get rid of this one since we have our own implementation
+        layers.removeIf( ( layer ) -> layer instanceof EndermanEyesLayer );
+        
         baseShadowRadius = shadowRadius;
-        //addLayer( new SpecialMobEyesLayer<>( this ) );//TODO temp until textures are fixed
+        addLayer( new SpecialMobEyesLayer<>( this ) );
         addLayer( new SpecialMobOverlayLayer<>( this, new EndermanModel<>( 0.25F ) ) );
     }
     

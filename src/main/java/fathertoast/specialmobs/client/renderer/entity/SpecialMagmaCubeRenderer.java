@@ -1,7 +1,6 @@
 package fathertoast.specialmobs.client.renderer.entity;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
-import fathertoast.specialmobs.client.renderer.entity.layers.SpecialMobEyesLayer;
 import fathertoast.specialmobs.common.entity.ISpecialMob;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
@@ -23,7 +22,8 @@ public class SpecialMagmaCubeRenderer extends MagmaCubeRenderer {
     public SpecialMagmaCubeRenderer( EntityRendererManager rendererManager ) {
         super( rendererManager );
         baseShadowRadius = shadowRadius;
-        addLayer( new SpecialMobEyesLayer<>( this ) );
+        // Unneeded, the whole model is full brightness
+        //addLayer( new SpecialMobEyesLayer<>( this ) );
         // Model doesn't support size parameter
         //addLayer( new SpecialMobOverlayLayer<>( this, new MagmaCubeModel<>( 0.25F ) ) );
     }

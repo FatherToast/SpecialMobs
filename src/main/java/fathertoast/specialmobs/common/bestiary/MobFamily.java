@@ -100,10 +100,10 @@ public class MobFamily<T extends LivingEntity> {
     //            "Baby", "Fighter", "King", "Queen", "Unholy"
     //    );
     
-    //    public static final MobFamily<BlazeEntity> BLAZE = new MobFamily<>(
-    //            "Blaze", "blazes", 0xF6B201, new EntityType[] { EntityType.BLAZE },
-    //            "Cinder", "Conflagration", "Ember", "Hellfire", "Inferno", "Jolt", "Wildfire"
-    //    );
+    public static final MobFamily<BlazeEntity> BLAZE = new MobFamily<>(
+            "Blaze", "blazes", 0xF6B201, new EntityType[] { EntityType.BLAZE },
+            "Cinder", "Conflagration", "Ember", "Hellfire", "Inferno", "Jolt", "Wildfire"
+    );
     
     static {
         final HashMap<EntityType<?>, MobFamily<?>> classToFamilyMap = new HashMap<>();
