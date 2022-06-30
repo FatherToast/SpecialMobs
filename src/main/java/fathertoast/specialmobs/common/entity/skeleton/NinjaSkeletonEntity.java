@@ -6,15 +6,12 @@ import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.entity.ai.INinja;
 import fathertoast.specialmobs.common.entity.ai.NinjaGoal;
-import fathertoast.specialmobs.common.network.NetworkHelper;
 import fathertoast.specialmobs.common.util.AttributeHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.client.renderer.BlockRendererDispatcher;
-import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -26,12 +23,12 @@ import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.Effects;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.World;
-import net.minecraftforge.client.model.data.IModelData;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -219,6 +216,7 @@ public class NinjaSkeletonEntity extends _SpecialSkeletonEntity implements INinj
     private static final DataParameter<Optional<BlockState>> HIDING_BLOCK = EntityDataManager.defineId( NinjaSkeletonEntity.class, DataSerializers.BLOCK_STATE );
     
     private boolean canHide = true;
+    private TileEntity cachedTileEntity = null;
     
     /** Called from the Entity.class constructor to define data watcher variables. */
     @Override
@@ -255,6 +253,22 @@ public class NinjaSkeletonEntity extends _SpecialSkeletonEntity implements INinj
         canHide = false;
         
         // Smoke puff when emerging from disguise
-        if( block == null ) spawnAnim();
+        if( block == null ) {
+            spawnAnim();
+        }
+    }
+
+    @Nullable
+    @Override
+    public TileEntity getOrCreateCachedTile () {
+        if (cachedTileEntity == null) {
+            BlockState disguise = getHiddenDragon();
+
+            if (disguise != null && disguise.hasTileEntity()) {
+                cachedTileEntity = disguise.createTileEntity(level);
+                cachedTileEntity.setLevelAndPosition(null, BlockPos.ZERO);
+            }
+        }
+        return cachedTileEntity;
     }
 }

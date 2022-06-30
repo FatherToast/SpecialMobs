@@ -33,7 +33,7 @@ public class NinjaGoal<T extends MobEntity & INinja> extends Goal {
     /** @return Returns true if this AI can be activated. */
     @Override
     public boolean canUse() {
-        if( ninja.getHiddenDragon() == null || ninja.getHiddenDragon().getRenderShape() != BlockRenderType.MODEL )
+        if( ninja.getHiddenDragon() == null || ninja.getHiddenDragon().getRenderShape() == BlockRenderType.INVISIBLE )
             return false;
         
         final List<PlayerEntity> players = new ArrayList<>( ninja.level.players() );
@@ -78,8 +78,7 @@ public class NinjaGoal<T extends MobEntity & INinja> extends Goal {
     /** Finds a nearby block for the entity to hide as and flags it to start hiding. */
     public static <T extends MobEntity & INinja> BlockState pickDisguise( T entity ) {
         final Random random = entity.getRandom();
-        
-        // Options available regardless of position
+
         switch( random.nextInt( 200 ) ) {
             case 0: return Blocks.CHEST.defaultBlockState().setValue( BlockStateProperties.HORIZONTAL_FACING,
                     Direction.Plane.HORIZONTAL.getRandomDirection( random ) );
@@ -94,7 +93,7 @@ public class NinjaGoal<T extends MobEntity & INinja> extends Goal {
             case 9: return Blocks.ANVIL.defaultBlockState();
             case 10: return Blocks.BREWING_STAND.defaultBlockState();
         }
-        
+
         final BlockPos posUnderFeet = entity.blockPosition().below();
         final BlockState blockUnderFeet = entity.level.getBlockState( posUnderFeet );
         if( !blockUnderFeet.getBlock().isAir( blockUnderFeet, entity.level, posUnderFeet ) ) {
@@ -177,7 +176,7 @@ public class NinjaGoal<T extends MobEntity & INinja> extends Goal {
                     posUnderFeet.getZ() + random.nextInt( 17 ) - 8 );
             
             final BlockState randBlock = entity.level.getBlockState( randPos );
-            if( randBlock.getRenderShape() == BlockRenderType.MODEL ) return randBlock;
+            if( randBlock.getRenderShape() != BlockRenderType.INVISIBLE ) return randBlock;
         }
         
         // Hide as a log if none of the other options are chosen

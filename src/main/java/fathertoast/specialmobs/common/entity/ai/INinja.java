@@ -1,6 +1,7 @@
 package fathertoast.specialmobs.common.entity.ai;
 
 import net.minecraft.block.BlockState;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.model.data.IModelData;
@@ -25,4 +26,7 @@ public interface INinja {
     
     /** Sets the block being hidden (rendered) as, set to null to cancel hiding. */
     void setHiddenDragon( @Nullable BlockState block );
+
+    @Nullable
+    TileEntity getOrCreateCachedTile();
 }
