@@ -13,6 +13,8 @@ import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.client.renderer.BlockRendererDispatcher;
+import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -250,7 +252,6 @@ public class NinjaSkeletonEntity extends _SpecialSkeletonEntity implements INinj
     @Override
     public void setHiddenDragon( @Nullable BlockState block ) {
         getEntityData().set( HIDING_BLOCK, Optional.ofNullable( block ) );
-        NetworkHelper.updateNinjaModelData( level, getId(), blockPosition().below() );
         canHide = false;
         
         // Smoke puff when emerging from disguise

@@ -1,7 +1,6 @@
 package fathertoast.specialmobs.common.network;
 
 import fathertoast.specialmobs.common.core.SpecialMobs;
-import fathertoast.specialmobs.common.network.message.S2CUpdateNinjaModelData;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.ResourceLocation;
@@ -34,7 +33,7 @@ public class PacketHandler {
     }
 
     public final void registerMessages() {
-        registerMessage(S2CUpdateNinjaModelData.class, S2CUpdateNinjaModelData::encode, S2CUpdateNinjaModelData::decode, S2CUpdateNinjaModelData::handle);
+
     }
 
     public <MSG> void registerMessage(Class<MSG> messageType, BiConsumer<MSG, PacketBuffer> encoder, Function<PacketBuffer, MSG> decoder, BiConsumer<MSG, Supplier<NetworkEvent.Context>> messageConsumer) {

@@ -1,27 +1,23 @@
 package fathertoast.specialmobs.client.renderer.entity;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
-import fathertoast.specialmobs.client.NinjaModelDataHolder;
 import fathertoast.specialmobs.common.entity.ai.INinja;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockRendererDispatcher;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
-import net.minecraft.client.renderer.chunk.ChunkRenderDispatcher;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
-import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.entity.monster.AbstractSkeletonEntity;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.world.IBlockDisplayReader;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.model.ModelDataManager;
 import net.minecraftforge.client.model.data.EmptyModelData;
-import net.minecraftforge.client.model.data.IModelData;
-import org.apache.commons.lang3.ThreadUtils;
 
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.Random;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -44,16 +40,15 @@ public class NinjaSkeletonRenderer extends SpecialSkeletonRenderer {
         }
         else {
             shadowRadius = 0.0F;
-            renderBlockDisguise( entity.getId(), disguiseBlock, matrixStack, buffer, packedLight );
+            renderBlockDisguise( disguiseBlock, entity.blockPosition(), entity.level, matrixStack, buffer, entity.getRandom() );
         }
     }
     
-    private void renderBlockDisguise( int entityId, BlockState block, MatrixStack matrixStack, IRenderTypeBuffer buffer, int packedLight ) {
+    private void renderBlockDisguise( BlockState block, BlockPos pos, IBlockDisplayReader displayReader, MatrixStack matrixStack, IRenderTypeBuffer buffer, Random random ) {
         matrixStack.pushPose();
         
         matrixStack.translate( -0.5, 0.0, -0.5 );
-        IModelData modelData = NinjaModelDataHolder.getModelData( entityId );
-        blockRenderer.renderBlock( block, matrixStack, buffer, packedLight, OverlayTexture.NO_OVERLAY, modelData );
+        blockRenderer.renderModel( block, pos, displayReader, matrixStack, buffer.getBuffer(RenderType.cutout()), false, random, EmptyModelData.INSTANCE );
         
         matrixStack.popPose();
     }
