@@ -78,7 +78,7 @@ public class _SpecialCaveSpiderEntity extends CaveSpiderEntity implements ISpeci
         super.registerGoals();
         
         getSpecialData().rangedAttackDamage = 1.0F;
-        getSpecialData().rangedAttackSpread = 18.0F;
+        getSpecialData().rangedAttackSpread = 1.3F;
         getSpecialData().rangedAttackCooldown = 40;
         getSpecialData().rangedAttackMaxCooldown = getSpecialData().rangedAttackCooldown;
         getSpecialData().rangedAttackMaxRange = 10.0F;

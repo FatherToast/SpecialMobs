@@ -76,7 +76,7 @@ public class FishingSilverfishEntity extends _SpecialSilverfishEntity implements
     /** Override to change this entity's AI goals. */
     @Override
     protected void registerVariantGoals() {
-        getSpecialData().rangedAttackSpread = 10.0F;
+        getSpecialData().rangedAttackSpread *= 0.7F;
         getSpecialData().rangedAttackCooldown = 32;
         getSpecialData().rangedAttackMaxCooldown = 48;
         getSpecialData().rangedAttackMaxRange = 10.0F;

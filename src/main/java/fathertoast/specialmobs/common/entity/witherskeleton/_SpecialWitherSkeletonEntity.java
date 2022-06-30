@@ -94,7 +94,6 @@ public class _SpecialWitherSkeletonEntity extends WitherSkeletonEntity implement
         super.registerGoals();
         
         getSpecialData().rangedAttackDamage = 2.0F;
-        getSpecialData().rangedAttackSpread = 14.0F;
         getSpecialData().rangedAttackCooldown = 20;
         getSpecialData().rangedAttackMaxCooldown = getSpecialData().rangedAttackCooldown;
         getSpecialData().rangedAttackMaxRange = 15.0F;
@@ -149,7 +148,7 @@ public class _SpecialWitherSkeletonEntity extends WitherSkeletonEntity implement
         final double dZ = target.getZ() - getZ();
         final double dH = MathHelper.sqrt( dX * dX + dZ * dZ );
         arrow.shoot( dX, dY + dH * 0.2, dZ, 1.6F,
-                getSpecialData().rangedAttackSpread * (1.0F - 0.2858F * level.getDifficulty().getId()) );
+                getSpecialData().rangedAttackSpread * (14 - 4 * level.getDifficulty().getId()) );
         
         playSound( SoundEvents.SKELETON_SHOOT, 1.0F, 1.0F / (random.nextFloat() * 0.4F + 0.8F) );
         level.addFreshEntity( arrow );

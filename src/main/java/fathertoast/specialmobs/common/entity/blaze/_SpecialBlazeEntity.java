@@ -86,6 +86,7 @@ public class _SpecialBlazeEntity extends BlazeEntity implements IRangedAttackMob
         goalSelector.addGoal( 4, new SpecialBlazeAttackGoal( this ) );
         AIHelper.replaceHurtByTarget( this, new SpecialHurtByTargetGoal( this, BlazeEntity.class ).setAlertOthers() );
         
+        getSpecialData().rangedAttackDamage = 2.0F;
         setRangedAI( 3, 6, 60, 100, 48.0F );
         registerVariantGoals();
     }
@@ -147,7 +148,7 @@ public class _SpecialBlazeEntity extends BlazeEntity implements IRangedAttackMob
     public void performRangedAttack( LivingEntity target, float damageMulti ) {
         if( !isSilent() ) level.levelEvent( null, 1018, blockPosition(), 0 );
         
-        final float accelVariance = MathHelper.sqrt( distanceTo( target ) ) * getSpecialData().rangedAttackSpread / 28.0F;
+        final float accelVariance = MathHelper.sqrt( distanceTo( target ) ) * 0.5F * getSpecialData().rangedAttackSpread;
         final double dX = target.getX() - getX() + getRandom().nextGaussian() * accelVariance;
         final double dY = target.getY( 0.5 ) - getY( 0.5 );
         final double dZ = target.getZ() - getZ() + getRandom().nextGaussian() * accelVariance;

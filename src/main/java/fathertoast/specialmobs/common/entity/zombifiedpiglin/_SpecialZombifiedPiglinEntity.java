@@ -95,7 +95,6 @@ public class _SpecialZombifiedPiglinEntity extends ZombifiedPiglinEntity impleme
         AIHelper.replaceHurtByTarget( this, new SpecialHurtByTargetGoal( this, ZombifiedPiglinEntity.class ).setAlertOthers() );
         
         getSpecialData().rangedAttackDamage = 2.0F;
-        getSpecialData().rangedAttackSpread = 14.0F;
         getSpecialData().rangedWalkSpeed = 0.8F;
         getSpecialData().rangedAttackCooldown = 20;
         getSpecialData().rangedAttackMaxCooldown = getSpecialData().rangedAttackCooldown;
@@ -157,7 +156,7 @@ public class _SpecialZombifiedPiglinEntity extends ZombifiedPiglinEntity impleme
         final double dZ = target.getZ() - getZ();
         final double dH = MathHelper.sqrt( dX * dX + dZ * dZ );
         arrow.shoot( dX, dY + dH * 0.2, dZ, 1.6F,
-                getSpecialData().rangedAttackSpread * (1.0F - 0.2858F * level.getDifficulty().getId()) );
+                getSpecialData().rangedAttackSpread * (14 - 4 * level.getDifficulty().getId()) );
         
         playSound( SoundEvents.SKELETON_SHOOT, 1.0F, 1.0F / (random.nextFloat() * 0.4F + 0.8F) );
         level.addFreshEntity( arrow );
