@@ -257,18 +257,4 @@ public class NinjaSkeletonEntity extends _SpecialSkeletonEntity implements INinj
             spawnAnim();
         }
     }
-
-    @Nullable
-    @Override
-    public TileEntity getOrCreateCachedTile () {
-        if (cachedTileEntity == null) {
-            BlockState disguise = getHiddenDragon();
-
-            if (disguise != null && disguise.hasTileEntity()) {
-                cachedTileEntity = disguise.createTileEntity(level);
-                cachedTileEntity.setLevelAndPosition(null, BlockPos.ZERO);
-            }
-        }
-        return cachedTileEntity;
-    }
 }

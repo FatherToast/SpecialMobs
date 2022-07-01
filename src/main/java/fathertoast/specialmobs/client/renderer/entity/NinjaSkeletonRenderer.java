@@ -54,29 +54,14 @@ public class NinjaSkeletonRenderer extends SpecialSkeletonRenderer {
         }
         else {
             shadowRadius = 0.0F;
-            renderBlockDisguise( ninja, disguiseBlock, entity.blockPosition(), partialTicks, entity.level, matrixStack, buffer, entity.getRandom() );
+            renderBlockDisguise( disguiseBlock, entity.blockPosition(), entity.level, matrixStack, buffer, entity.getRandom() );
         }
     }
     
-    private void renderBlockDisguise( INinja ninja, BlockState block, BlockPos pos, float partialTicks, IBlockDisplayReader displayReader, MatrixStack matrixStack, IRenderTypeBuffer buffer, Random random ) {
-        if (block.hasTileEntity()) {
-            TileEntity cachedTile = ninja.getOrCreateCachedTile();
-
-            if (cachedTile != null) {
-                renderTileEntityDisguise(cachedTile, partialTicks, matrixStack);
-            }
-        }
-        else {
-            matrixStack.pushPose();
-            matrixStack.translate( -0.5, 0.0, -0.5 );
-            blockRenderer.renderModel(block, pos, displayReader, matrixStack, buffer.getBuffer(RenderType.cutout()), false, random, EmptyModelData.INSTANCE);
-            matrixStack.popPose();
-        }
-    }
-
-    // TODO - Investigate or scrap? Currently does not work
-    private void renderTileEntityDisguise( TileEntity tileEntity, float partialTicks, MatrixStack matrixStack ) {
-        IRenderTypeBuffer renderTypeBuffer = Minecraft.getInstance().levelRenderer.renderBuffers.bufferSource();
-        TileEntityRendererDispatcher.instance.render(tileEntity, partialTicks, matrixStack, renderTypeBuffer);
+    private void renderBlockDisguise( BlockState block, BlockPos pos, IBlockDisplayReader displayReader, MatrixStack matrixStack, IRenderTypeBuffer buffer, Random random ) {
+        matrixStack.pushPose();
+        matrixStack.translate( -0.5, 0.0, -0.5 );
+        blockRenderer.renderModel(block, pos, displayReader, matrixStack, buffer.getBuffer(RenderType.cutout()), false, random, EmptyModelData.INSTANCE);
+        matrixStack.popPose();
     }
 }

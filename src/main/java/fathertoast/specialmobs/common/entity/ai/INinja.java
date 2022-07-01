@@ -26,7 +26,4 @@ public interface INinja {
     
     /** Sets the block being hidden (rendered) as, set to null to cancel hiding. */
     void setHiddenDragon( @Nullable BlockState block );
-
-    @Nullable
-    TileEntity getOrCreateCachedTile();
 }

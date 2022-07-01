@@ -6,7 +6,6 @@ import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.entity.ai.INinja;
 import fathertoast.specialmobs.common.entity.ai.NinjaGoal;
-import fathertoast.specialmobs.common.network.NetworkHelper;
 import fathertoast.specialmobs.common.util.AttributeHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
@@ -29,7 +28,6 @@ import net.minecraft.util.ActionResultType;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.Hand;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.World;
@@ -249,17 +247,5 @@ public class NinjaWitherSkeletonEntity extends _SpecialWitherSkeletonEntity impl
         if( block == null ) {
             spawnAnim();
         }
-    }
-
-    @Nullable
-    @Override
-    public TileEntity getOrCreateCachedTile () {
-        if (cachedTileEntity == null) {
-            if (getHiddenDragon().hasTileEntity()) {
-                cachedTileEntity = getHiddenDragon().createTileEntity(level);
-                cachedTileEntity.setLevelAndPosition(null, BlockPos.ZERO);
-            }
-        }
-        return cachedTileEntity;
     }
 }
