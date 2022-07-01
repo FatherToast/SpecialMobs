@@ -42,10 +42,12 @@ public class ToastTomlWriter implements ConfigWriter {
      */
     @Override
     public void write( UnmodifiableConfig config, Writer writer ) {
+        CONFIG_SPEC.writing = true;
         SpecialMobs.LOG.debug( "Writing config file! ({}{})", CONFIG_SPEC.NAME, ToastConfigFormat.FILE_EXT );
         CharacterOutput output = new WriterOutput( writer );
         currentIndentLevel = 0;
         CONFIG_SPEC.write( this, output );
+        CONFIG_SPEC.writing = false;
     }
     
     /** Increases the indent level by 1. */

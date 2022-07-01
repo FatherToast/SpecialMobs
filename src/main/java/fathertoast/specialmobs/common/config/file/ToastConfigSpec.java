@@ -2,12 +2,16 @@ package fathertoast.specialmobs.common.config.file;
 
 import com.electronwill.nightconfig.core.file.FileConfig;
 import com.electronwill.nightconfig.core.file.FileConfigBuilder;
+import com.electronwill.nightconfig.core.file.FileWatcher;
 import com.electronwill.nightconfig.core.io.CharacterOutput;
+import com.electronwill.nightconfig.core.io.ParsingException;
+import com.electronwill.nightconfig.core.io.WritingException;
 import fathertoast.specialmobs.common.config.field.AbstractConfigField;
 import fathertoast.specialmobs.common.config.field.GenericField;
 import fathertoast.specialmobs.common.core.SpecialMobs;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -34,6 +38,8 @@ public class ToastConfigSpec {
     
     /** Used to make sure the file is always rewritten when the config is initialized. */
     private boolean firstLoad;
+    /** True while this config spec is currently writing. */
+    boolean writing;
     
     /** Creates a new config spec at a specified location with only the basic 'start of file' action. */
     public ToastConfigSpec( File dir, String fileName ) {
@@ -49,7 +55,7 @@ public class ToastConfigSpec {
         // Create the config file format
         final FileConfigBuilder builder = FileConfig.builder( new File( dir, fileName + ToastConfigFormat.FILE_EXT ),
                 new ToastConfigFormat( this ) );
-        builder.sync().autoreload();
+        builder.sync();//.autoreload(); TODO test alternative reloading
         CONFIG_FILE = builder.build();
     }
     
@@ -57,7 +63,39 @@ public class ToastConfigSpec {
     public void initialize() {
         SpecialMobs.LOG.info( "First-time loading config file {}", CONFIG_FILE.getFile() );
         firstLoad = true;
-        CONFIG_FILE.load();
+        try {
+            CONFIG_FILE.load();
+        }
+        catch( ParsingException ex ) {
+            SpecialMobs.LOG.error( "Failed first-time loading of config file {} - this is bad!", CONFIG_FILE.getFile() );
+        }
+        
+        //TODO test alternative reloading
+        try {
+            FileWatcher.defaultInstance().addWatch( CONFIG_FILE.getFile(), this::onFileChanged );
+            SpecialMobs.LOG.info( "Started watching config file {} for updates", CONFIG_FILE.getFile() );
+        }
+        catch( IOException ex ) {
+            SpecialMobs.LOG.error( "Failed to watch config file {} - this file will NOT update in-game until restarted!",
+                    CONFIG_FILE.getFile() );
+        }
+    }
+    
+    /** Called when a change to the config file is detected. */
+    public void onFileChanged() {
+        if( writing ) {
+            SpecialMobs.LOG.info( "Attempted to reload config file {} while it was still saving - this is probably okay",
+                    CONFIG_FILE.getFile() );
+        }
+        else {
+            try {
+                SpecialMobs.LOG.info( "Reloading config file {}", CONFIG_FILE.getFile() );
+                CONFIG_FILE.load();
+            }
+            catch( ParsingException ex ) {
+                SpecialMobs.LOG.error( "Failed to reload config file {}", CONFIG_FILE.getFile() );
+            }
+        }
     }
     
     /** Called after the config is loaded to update cached values. */
@@ -70,7 +108,12 @@ public class ToastConfigSpec {
         // Only rewrite on first load or if one of the load actions requests it
         if( rewrite || firstLoad ) {
             firstLoad = false;
-            CONFIG_FILE.save();
+            try {
+                CONFIG_FILE.save();
+            }
+            catch( WritingException ex ) {
+                SpecialMobs.LOG.error( "Failed to save config file {}", CONFIG_FILE.getFile() );
+            }
         }
     }
     
@@ -209,7 +252,7 @@ public class ToastConfigSpec {
         
         /** Called when the config is saved. */
         @Override
-        public final void write( ToastTomlWriter writer, CharacterOutput output ) {} // Read callback actions do not affect file writing
+        public final void write( ToastTomlWriter writer, CharacterOutput output ) { } // Read callback actions do not affect file writing
     }
     
     /** Represents a spec action that reads and writes to a field. */
@@ -294,15 +337,15 @@ public class ToastConfigSpec {
     
     /** @param comment The file comment to insert. */
     public void header( List<String> comment ) { ACTIONS.add( new Header( this, comment ) ); }
-
+    
     /** Inserts a detailed description of how to use the given field. */
-    public void verboseFieldDesc(GenericField<?> field) {
+    public void verboseFieldDesc( GenericField<?> field ) {
         final List<String> description = field.verboseDescription();
-
-        if (description != null && !description.isEmpty())
-            ACTIONS.add(new Comment(field.verboseDescription()));
+        
+        if( description != null && !description.isEmpty() )
+            ACTIONS.add( new Comment( field.verboseDescription() ) );
     }
-
+    
     /**
      * @param name    The category name.
      * @param comment The category comment to insert.
