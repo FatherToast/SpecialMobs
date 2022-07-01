@@ -247,7 +247,8 @@ public class WindWitchEntity extends _SpecialWitchEntity {
     }
     
     private static final ResourceLocation[] TEXTURES = {
-            GET_TEXTURE_PATH( "wind" )
+            GET_TEXTURE_PATH( "wind" ),
+            GET_TEXTURE_PATH( "wind_eyes" )
     };
     
     /** @return All default textures for this entity. */

@@ -73,7 +73,8 @@ public class FireSkeletonEntity extends _SpecialSkeletonEntity {
     }
     
     private static final ResourceLocation[] TEXTURES = {
-            GET_TEXTURE_PATH( "fire" )
+            GET_TEXTURE_PATH( "fire" ),
+            GET_TEXTURE_PATH( "fire_eyes" )
     };
     
     /** @return All default textures for this entity. */

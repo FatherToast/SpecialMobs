@@ -113,7 +113,8 @@ public class SpitfireWitherSkeletonEntity extends _SpecialWitherSkeletonEntity {
     public boolean isBaby() { return false; }
     
     private static final ResourceLocation[] TEXTURES = {
-            GET_TEXTURE_PATH( "fire" )
+            GET_TEXTURE_PATH( "fire" ),
+            GET_TEXTURE_PATH( "fire_eyes" )
     };
     
     /** @return All default textures for this entity. */

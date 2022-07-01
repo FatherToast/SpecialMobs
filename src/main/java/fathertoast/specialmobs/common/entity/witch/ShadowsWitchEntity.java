@@ -87,7 +87,8 @@ public class ShadowsWitchEntity extends _SpecialWitchEntity {
     }
     
     private static final ResourceLocation[] TEXTURES = {
-            GET_TEXTURE_PATH( "shadows" )
+            GET_TEXTURE_PATH( "shadows" ),
+            GET_TEXTURE_PATH( "shadows_eyes" )
     };
     
     /** @return All default textures for this entity. */

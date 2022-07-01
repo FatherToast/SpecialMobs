@@ -112,7 +112,8 @@ public class DominationWitchEntity extends _SpecialWitchEntity {
     }
     
     private static final ResourceLocation[] TEXTURES = {
-            GET_TEXTURE_PATH( "domination" )
+            GET_TEXTURE_PATH( "domination" ),
+            GET_TEXTURE_PATH( "domination_eyes" )
     };
     
     /** @return All default textures for this entity. */
