@@ -83,7 +83,6 @@ public class _SpecialSilverfishEntity extends SilverfishEntity implements ISpeci
         AIHelper.replaceHurtByTarget( this, new SpecialHurtByTargetGoal( this, SilverfishEntity.class ).setAlertOthers() );
         
         getSpecialData().rangedAttackDamage = 1.0F;
-        getSpecialData().rangedAttackSpread = 14.0F;
         getSpecialData().rangedAttackCooldown = 40;
         getSpecialData().rangedAttackMaxCooldown = getSpecialData().rangedAttackCooldown;
         getSpecialData().rangedAttackMaxRange = 10.0F;

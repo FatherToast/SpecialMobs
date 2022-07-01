@@ -6,6 +6,7 @@ import net.minecraft.block.Blocks;
 import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.state.properties.AttachFace;
 import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
@@ -80,18 +81,20 @@ public class NinjaGoal<T extends MobEntity & INinja> extends Goal {
         final Random random = entity.getRandom();
 
         switch( random.nextInt( 200 ) ) {
-            case 0: return Blocks.CHEST.defaultBlockState().setValue( BlockStateProperties.HORIZONTAL_FACING,
-                    Direction.Plane.HORIZONTAL.getRandomDirection( random ) );
+            case 0: return Blocks.TNT.defaultBlockState();
             case 1: return Blocks.OAK_LOG.defaultBlockState();
             case 2: return Blocks.SPONGE.defaultBlockState();
             case 3: return Blocks.DEAD_BUSH.defaultBlockState();
             case 4: return Blocks.OAK_LEAVES.defaultBlockState();
-            case 5: return Blocks.BEE_NEST.defaultBlockState();
+            case 5: return randomRotation( Blocks.BEE_NEST.defaultBlockState(), random );
             case 6: return Blocks.CAKE.defaultBlockState();
             case 7: return Blocks.CRAFTING_TABLE.defaultBlockState();
-            case 8: return Blocks.FURNACE.defaultBlockState();
-            case 9: return Blocks.ANVIL.defaultBlockState();
+            case 8: return randomRotation( Blocks.FURNACE.defaultBlockState(), random );
+            case 9: return randomRotation( Blocks.ANVIL.defaultBlockState(), random );
             case 10: return Blocks.BREWING_STAND.defaultBlockState();
+            case 11: return randomRotation( Blocks.LEVER.defaultBlockState()
+                    .setValue( BlockStateProperties.ATTACH_FACE, AttachFace.FLOOR ), random );
+            case 12: return randomPottedFlower( random );
         }
 
         final BlockPos posUnderFeet = entity.blockPosition().below();
@@ -102,8 +105,8 @@ public class NinjaGoal<T extends MobEntity & INinja> extends Goal {
             if( blockUnderFeet.is( Blocks.STONE ) || blockUnderFeet.is( Blocks.STONE_BRICKS ) ) {
                 // Cave theme
                 switch( random.nextInt( 30 ) ) {
-                    case 0: return blockUnderFeet;
-                    case 1: return Blocks.MOSSY_COBBLESTONE.defaultBlockState();
+                    case 0: return Blocks.BROWN_MUSHROOM.defaultBlockState();
+                    case 1: return Blocks.RED_MUSHROOM.defaultBlockState();
                     case 2: return Blocks.CLAY.defaultBlockState();
                     case 3: return Blocks.GRAVEL.defaultBlockState();
                     case 4: return Blocks.COAL_ORE.defaultBlockState();
@@ -113,11 +116,12 @@ public class NinjaGoal<T extends MobEntity & INinja> extends Goal {
                     case 8: return Blocks.REDSTONE_ORE.defaultBlockState();
                     case 9: return Blocks.DIAMOND_ORE.defaultBlockState();
                     case 10: return Blocks.EMERALD_ORE.defaultBlockState();
+                    case 11: return Blocks.MOSSY_COBBLESTONE.defaultBlockState();
                 }
             }
             else if( blockUnderFeet.is( Blocks.GRASS ) || blockUnderFeet.is( Blocks.DIRT ) || blockUnderFeet.is( Blocks.PODZOL ) ) {
                 // Field theme
-                switch( random.nextInt( 15 ) ) {
+                switch( random.nextInt( 20 ) ) {
                     case 0: return blockUnderFeet;
                     case 1: return Blocks.OAK_LOG.defaultBlockState();
                     case 2: return Blocks.OAK_LEAVES.defaultBlockState();
@@ -125,16 +129,19 @@ public class NinjaGoal<T extends MobEntity & INinja> extends Goal {
                     case 4: return Blocks.MELON.defaultBlockState();
                     case 5: return Blocks.TALL_GRASS.defaultBlockState();
                     case 6: return Blocks.FERN.defaultBlockState();
-                    case 7: return Blocks.BEE_NEST.defaultBlockState();
+                    case 7: return randomRotation( Blocks.BEE_NEST.defaultBlockState(), random );
+                    case 8: return randomFlower( random );
+                    case 9: return randomPottedFlower( random );
+                    case 10: return randomPottedPlant( random );
                 }
             }
             else if( blockUnderFeet.is( Blocks.SAND ) || blockUnderFeet.is( Blocks.RED_SAND ) ||
                     blockUnderFeet.is( Blocks.SANDSTONE ) || blockUnderFeet.is( Blocks.RED_SANDSTONE ) ) {
                 // Desert theme
                 switch( random.nextInt( 5 ) ) {
-                    case 0: return blockUnderFeet;
-                    case 1: return Blocks.CACTUS.defaultBlockState();
-                    case 2: return Blocks.DEAD_BUSH.defaultBlockState();
+                    case 0: return Blocks.CACTUS.defaultBlockState();
+                    case 1: return Blocks.DEAD_BUSH.defaultBlockState();
+                    case 2: return randomPottedDesertPlant( random );
                 }
             }
             else if( blockUnderFeet.is( Blocks.NETHERRACK ) || blockUnderFeet.is( Blocks.NETHER_BRICKS ) ||
@@ -144,25 +151,27 @@ public class NinjaGoal<T extends MobEntity & INinja> extends Goal {
                 switch( random.nextInt( 25 ) ) {
                     case 0: return blockUnderFeet;
                     case 1: return Blocks.GRAVEL.defaultBlockState();
-                    case 2: return Blocks.SOUL_SAND.defaultBlockState();
-                    case 3: return Blocks.GLOWSTONE.defaultBlockState();
-                    case 4: return Blocks.NETHER_QUARTZ_ORE.defaultBlockState();
-                    case 5: return Blocks.NETHER_GOLD_ORE.defaultBlockState();
-                    case 6: return Blocks.ANCIENT_DEBRIS.defaultBlockState();
-                    case 7: return Blocks.BROWN_MUSHROOM.defaultBlockState();
-                    case 8: return Blocks.RED_MUSHROOM.defaultBlockState();
-                    case 9: return Blocks.CRIMSON_STEM.defaultBlockState();
-                    case 10: return Blocks.WARPED_STEM.defaultBlockState();
+                    case 2: return Blocks.NETHER_QUARTZ_ORE.defaultBlockState();
+                    case 3: return Blocks.NETHER_GOLD_ORE.defaultBlockState();
+                    case 4: return Blocks.ANCIENT_DEBRIS.defaultBlockState();
+                    case 5: return Blocks.BROWN_MUSHROOM.defaultBlockState();
+                    case 6: return Blocks.RED_MUSHROOM.defaultBlockState();
+                    case 7: return Blocks.CRIMSON_STEM.defaultBlockState();
+                    case 8: return Blocks.WARPED_STEM.defaultBlockState();
+                    case 9: return Blocks.CRIMSON_ROOTS.defaultBlockState();
+                    case 10: return Blocks.WARPED_ROOTS.defaultBlockState();
+                    case 11: return Blocks.CRIMSON_FUNGUS.defaultBlockState();
+                    case 12: return Blocks.WARPED_FUNGUS.defaultBlockState();
+                    case 13: return randomPottedNetherThing( random );
                 }
             }
             else if( blockUnderFeet.is( Blocks.END_STONE ) || blockUnderFeet.is( Blocks.END_STONE_BRICKS ) ||
                     blockUnderFeet.is( Blocks.PURPUR_BLOCK ) ) {
                 // End theme
                 switch( random.nextInt( 10 ) ) {
-                    case 0: return blockUnderFeet;
-                    case 1: return Blocks.CHORUS_PLANT.defaultBlockState();
-                    case 2: return Blocks.PURPUR_PILLAR.defaultBlockState();
-                    case 3: return Blocks.END_ROD.defaultBlockState();
+                    case 0: return Blocks.CHORUS_PLANT.defaultBlockState();
+                    case 1: return Blocks.PURPUR_PILLAR.defaultBlockState();
+                    case 2: return randomPottedEndThing( random );
                 }
             }
         }
@@ -181,5 +190,93 @@ public class NinjaGoal<T extends MobEntity & INinja> extends Goal {
         
         // Hide as a log if none of the other options are chosen
         return Blocks.OAK_LOG.defaultBlockState();
+    }
+    
+    /** @return The block state with a random rotation (horizontal facing). */
+    private static BlockState randomRotation( BlockState block, Random random ) {
+        return block.setValue( BlockStateProperties.HORIZONTAL_FACING, Direction.Plane.HORIZONTAL.getRandomDirection( random ) );
+    }
+    
+    /** @return A random flower. */
+    private static BlockState randomFlower( Random random ) {
+        switch( random.nextInt( 12 ) ) {
+            case 0: return Blocks.DANDELION.defaultBlockState();
+            case 1: return Blocks.POPPY.defaultBlockState();
+            case 2: return Blocks.BLUE_ORCHID.defaultBlockState();
+            case 3: return Blocks.ALLIUM.defaultBlockState();
+            case 4: return Blocks.AZURE_BLUET.defaultBlockState();
+            case 5: return Blocks.RED_TULIP.defaultBlockState();
+            case 6: return Blocks.ORANGE_TULIP.defaultBlockState();
+            case 7: return Blocks.WHITE_TULIP.defaultBlockState();
+            case 8: return Blocks.PINK_TULIP.defaultBlockState();
+            case 9: return Blocks.OXEYE_DAISY.defaultBlockState();
+            case 10: return Blocks.CORNFLOWER.defaultBlockState();
+            default: return Blocks.LILY_OF_THE_VALLEY.defaultBlockState();
+        }
+    }
+    
+    /** @return A random potted flower. */
+    private static BlockState randomPottedFlower( Random random ) {
+        switch( random.nextInt( 12 ) ) {
+            case 0: return Blocks.POTTED_DANDELION.defaultBlockState();
+            case 1: return Blocks.POTTED_POPPY.defaultBlockState();
+            case 2: return Blocks.POTTED_BLUE_ORCHID.defaultBlockState();
+            case 3: return Blocks.POTTED_ALLIUM.defaultBlockState();
+            case 4: return Blocks.POTTED_AZURE_BLUET.defaultBlockState();
+            case 5: return Blocks.POTTED_RED_TULIP.defaultBlockState();
+            case 6: return Blocks.POTTED_ORANGE_TULIP.defaultBlockState();
+            case 7: return Blocks.POTTED_WHITE_TULIP.defaultBlockState();
+            case 8: return Blocks.POTTED_PINK_TULIP.defaultBlockState();
+            case 9: return Blocks.POTTED_OXEYE_DAISY.defaultBlockState();
+            case 10: return Blocks.POTTED_CORNFLOWER.defaultBlockState();
+            default: return Blocks.POTTED_LILY_OF_THE_VALLEY.defaultBlockState();
+        }
+    }
+    
+    /** @return A random potted non-flower plant. */
+    private static BlockState randomPottedPlant( Random random ) {
+        switch( random.nextInt( 8 ) ) {
+            case 0: return Blocks.POTTED_OAK_SAPLING.defaultBlockState();
+            case 1: return Blocks.POTTED_SPRUCE_SAPLING.defaultBlockState();
+            case 2: return Blocks.POTTED_BIRCH_SAPLING.defaultBlockState();
+            case 3: return Blocks.POTTED_JUNGLE_SAPLING.defaultBlockState();
+            case 4: return Blocks.POTTED_ACACIA_SAPLING.defaultBlockState();
+            case 5: return Blocks.POTTED_DARK_OAK_SAPLING.defaultBlockState();
+            case 6: return Blocks.POTTED_FERN.defaultBlockState();
+            default: return Blocks.POTTED_BAMBOO.defaultBlockState();
+        }
+    }
+    
+    /** @return A random potted desert plant. */
+    private static BlockState randomPottedDesertPlant( Random random ) {
+        //noinspection SwitchStatementWithTooFewBranches
+        switch( random.nextInt( 2 ) ) {
+            case 0: return Blocks.POTTED_DEAD_BUSH.defaultBlockState();
+            default: return Blocks.POTTED_CACTUS.defaultBlockState();
+        }
+    }
+    
+    /** @return A random potted Nether plant/fungus. */
+    private static BlockState randomPottedNetherThing( Random random ) {
+        switch( random.nextInt( 7 ) ) {
+            case 0: return Blocks.POTTED_WITHER_ROSE.defaultBlockState();
+            case 1: return Blocks.POTTED_RED_MUSHROOM.defaultBlockState();
+            case 2: return Blocks.POTTED_BROWN_MUSHROOM.defaultBlockState();
+            case 3: return Blocks.POTTED_CRIMSON_FUNGUS.defaultBlockState();
+            case 4: return Blocks.POTTED_WARPED_FUNGUS.defaultBlockState();
+            case 5: return Blocks.POTTED_CRIMSON_ROOTS.defaultBlockState();
+            default: return Blocks.POTTED_WARPED_ROOTS.defaultBlockState();
+        }
+    }
+    
+    /** @return A random potted End-themed plant. */
+    private static BlockState randomPottedEndThing( Random random ) {
+        switch( random.nextInt( 5 ) ) {
+            case 0: return Blocks.POTTED_WITHER_ROSE.defaultBlockState();
+            case 1: return Blocks.POTTED_ALLIUM.defaultBlockState();
+            case 2: return Blocks.POTTED_AZURE_BLUET.defaultBlockState();
+            case 3: return Blocks.POTTED_OXEYE_DAISY.defaultBlockState();
+            default: return Blocks.POTTED_LILY_OF_THE_VALLEY.defaultBlockState();
+        }
     }
 }

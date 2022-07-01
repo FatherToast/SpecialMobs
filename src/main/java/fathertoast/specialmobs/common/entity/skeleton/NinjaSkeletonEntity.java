@@ -141,18 +141,18 @@ public class NinjaSkeletonEntity extends _SpecialSkeletonEntity implements INinj
         }
         super.tick();
     }
-
+    
     @Override
-    protected void playStepSound(BlockPos pos, BlockState state) {
+    protected void playStepSound( BlockPos pos, BlockState state ) {
         // Nope
     }
-
+    
     /** @return The sound this entity makes idly. */
     @Override
     protected SoundEvent getAmbientSound() {
-        return getHiddenDragon() == null ? null: SoundEvents.SKELETON_AMBIENT;
+        return getHiddenDragon() == null ? null : SoundEvents.SKELETON_AMBIENT;
     }
-
+    
     /** Moves this entity to a new position and rotation. */
     @Override
     public void moveTo( double x, double y, double z, float yaw, float pitch ) {

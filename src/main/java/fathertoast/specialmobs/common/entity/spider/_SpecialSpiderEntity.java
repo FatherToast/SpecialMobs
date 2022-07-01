@@ -78,7 +78,7 @@ public class _SpecialSpiderEntity extends SpiderEntity implements ISpecialMob<_S
         super.registerGoals();
         
         getSpecialData().rangedAttackDamage = 2.0F;
-        getSpecialData().rangedAttackSpread = 18.0F;
+        getSpecialData().rangedAttackSpread = 1.3F;
         getSpecialData().rangedAttackCooldown = 40;
         getSpecialData().rangedAttackMaxCooldown = getSpecialData().rangedAttackCooldown;
         getSpecialData().rangedAttackMaxRange = 10.0F;

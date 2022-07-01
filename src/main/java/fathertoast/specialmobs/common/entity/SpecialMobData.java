@@ -64,7 +64,7 @@ public class SpecialMobData<T extends LivingEntity & ISpecialMob<T>> {
     /** The damage the entity uses for its ranged attacks, when applicable. */
     public float rangedAttackDamage;
     /** The spread (inaccuracy) of the entity's ranged attacks. */
-    public float rangedAttackSpread;
+    public float rangedAttackSpread = 1.0F;
     /** The movement speed multiplier the entity uses during its ranged attack ai. Requires an AI reload to take effect. */
     public float rangedWalkSpeed = 1.0F;
     /** The delay (in ticks) before a new ranged attack can begin after firing. Requires an AI reload to take effect. */

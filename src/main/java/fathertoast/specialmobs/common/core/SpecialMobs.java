@@ -78,8 +78,8 @@ public class SpecialMobs {
      *          o ability to equip held items
      *      o ghasts
      *          o melee attack AI
-     *      o blazes
-     *          o melee attack AI
+     *      - blazes
+     *          - melee attack AI
      *      ? piglins
      *      ? hoglins
      *      ? zoglins
@@ -122,10 +122,10 @@ public class SpecialMobs {
         
         MobFamily.initBestiary();
     }
-
-    public void sendIMCMessages(InterModEnqueueEvent event) {
-        if (ModList.get().isLoaded("theoneprobe")) {
-            InterModComms.sendTo("theoneprobe", "getTheOneProbe", SMTheOneProbe::new);
+    
+    public void sendIMCMessages( InterModEnqueueEvent event ) {
+        if( ModList.get().isLoaded( "theoneprobe" ) ) {
+            InterModComms.sendTo( "theoneprobe", "getTheOneProbe", SMTheOneProbe::new );
         }
     }
     
