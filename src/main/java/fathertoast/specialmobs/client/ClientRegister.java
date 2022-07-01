@@ -39,7 +39,7 @@ public class ClientRegister {
         registerFamilyRenderers( MobFamily.CAVE_SPIDER, SpecialSpiderRenderer::new );
         registerFamilyRenderers( MobFamily.SILVERFISH, SpecialSilverfishRenderer::new );
         registerFamilyRenderers( MobFamily.ENDERMAN, SpecialEndermanRenderer::new );
-        //registerFamilyRenderers( MobFamily.WITCH, SpecialWitchRenderer::new );
+        registerFamilyRenderers( MobFamily.WITCH, SpecialWitchRenderer::new );
         registerFamilyRenderers( MobFamily.BLAZE, SpecialBlazeRenderer::new );
         
         // Species overrides

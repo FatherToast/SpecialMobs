@@ -65,6 +65,10 @@ public final class References {
     public static final String TAG_WHEN_BURNING_EXPLODE = "ExplodesWhileBurning";
     public static final String TAG_WHEN_SHOT_EXPLODE = "ExplodesWhenShot";
     
+    // Witches
+    public static final String TAG_SHEATHED_ITEM = "SheathedItem";
+    public static final String TAG_POTION_USE_TIME = "PotionUseTimer";
+    
     // Blazes
     public static final String TAG_BURST_COUNT = "FireballBurstCount";
     public static final String TAG_BURST_DELAY = "FireballBurstDelay";
@@ -73,8 +77,9 @@ public final class References {
     public static final String TAG_IS_BABY = "IsBaby";
     
     // Spawner mobs TODO drowning creeper pufferfish cap?
-    public static final String TAG_BABIES = "Babies"; // Mother (Cave) Spider
-    public static final String TAG_EXTRA_BABIES = "ExtraBabies"; // Splitting Creeper, Mother (Cave) Spider
+    public static final String TAG_BABIES = "Babies"; // Mother (Cave) Spider, Wilds Witch, Wildfire Blaze
+    public static final String TAG_EXTRA_BABIES = "ExtraBabies"; // Splitting Creeper, Mother (Cave) Spider, Wilds Witch
+    public static final String TAG_SUMMONS = "Summons"; // Undead Witch, Wilds Witch, Wildfire Blaze
     
     // Growing mobs
     public static final String TAG_GROWTH_LEVEL = "GrowthLevel"; // Hungry Spider, Conflagration Blaze

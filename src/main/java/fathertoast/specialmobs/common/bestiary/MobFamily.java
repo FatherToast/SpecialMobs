@@ -90,10 +90,10 @@ public class MobFamily<T extends LivingEntity> {
             "Blinding", "Icy", "Lightning", "Mini", "Mirage", "Thief"
     );
     
-    //    public static final MobFamily<WitchEntity> WITCH = new MobFamily<>(
-    //            "Witch", "witches", 0x340000, new EntityType[] { EntityType.WITCH },
-    //            "Domination"//, "Shadows", "Undead", "Wilds", "Wind"//Note - should wind be able to walk on water?
-    //    );
+    public static final MobFamily<WitchEntity> WITCH = new MobFamily<>(
+            "Witch", "witches", 0x340000, new EntityType[] { EntityType.WITCH },
+            "Domination", "Shadows", "Undead", "Wilds", "Wind"
+    );
     
     //    public static final MobFamily<GhastEntity> GHAST = new MobFamily<>(
     //            "Ghast", "ghasts", 0xF9F9F9, new EntityType[] { EntityType.GHAST },

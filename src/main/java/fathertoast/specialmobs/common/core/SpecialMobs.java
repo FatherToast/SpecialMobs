@@ -81,6 +81,7 @@ public class SpecialMobs {
      *      - endermen
      *      o witches
      *          o ability to equip held items
+     *          - uses splash speed instead of regular
      *      o ghasts
      *          o melee attack AI
      *      - blazes
