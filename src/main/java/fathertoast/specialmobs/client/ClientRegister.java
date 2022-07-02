@@ -23,6 +23,7 @@ public class ClientRegister {
     
     @SubscribeEvent
     public static void onClientSetup( FMLClientSetupEvent event ) {
+        ClientEventHandler.registerConfigGUIFactory();
         registerEntityRenderers();
     }
     
