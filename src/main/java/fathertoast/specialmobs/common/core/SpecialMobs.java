@@ -10,15 +10,11 @@ import fathertoast.specialmobs.common.network.PacketHandler;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.fml.DeferredWorkQueue;
 import net.minecraftforge.fml.InterModComms;
 import net.minecraftforge.fml.ModList;
-import net.minecraftforge.fml.ModLoader;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLConstructModEvent;
 import net.minecraftforge.fml.event.lifecycle.InterModEnqueueEvent;
-import net.minecraftforge.fml.event.lifecycle.ParallelDispatchEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 import org.apache.logging.log4j.LogManager;
@@ -79,8 +75,8 @@ public class SpecialMobs {
      *          ? ranged attack AI
      *          + puffer
      *      - endermen
-     *      o witches
-     *          o ability to equip held items
+     *      - witches
+     *          - ability to equip held items
      *          - uses splash speed instead of regular
      *      o ghasts
      *          o melee attack AI
@@ -128,12 +124,12 @@ public class SpecialMobs {
         
         MobFamily.initBestiary();
     }
-
+    
     // TODO - This could very well help out the config malformation issue
     //        Only problem here is that this event is never fired apparently.
     //        Perhaps DeferredWorkQueue.runLater() could work (ignore deprecation, simply marked for removal)
-    public void onParallelDispatch(FMLConstructModEvent event) {
-        event.enqueueWork(Config::initialize);
+    public void onParallelDispatch( FMLConstructModEvent event ) {
+        event.enqueueWork( Config::initialize );
     }
     
     public void sendIMCMessages( InterModEnqueueEvent event ) {

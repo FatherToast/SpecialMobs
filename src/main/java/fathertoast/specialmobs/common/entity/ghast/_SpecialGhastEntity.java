@@ -1,4 +1,4 @@
-package fathertoast.specialmobs.common.entity.blaze;
+package fathertoast.specialmobs.common.entity.ghast;
 
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
@@ -6,19 +6,20 @@ import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.core.SpecialMobs;
 import fathertoast.specialmobs.common.entity.ISpecialMob;
 import fathertoast.specialmobs.common.entity.SpecialMobData;
-import fathertoast.specialmobs.common.entity.ai.AIHelper;
-import fathertoast.specialmobs.common.entity.ai.SpecialBlazeAttackGoal;
-import fathertoast.specialmobs.common.entity.ai.SpecialHurtByTargetGoal;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.*;
 import net.minecraft.entity.ai.attributes.AttributeModifierMap;
-import net.minecraft.entity.monster.BlazeEntity;
+import net.minecraft.entity.ai.attributes.Attributes;
+import net.minecraft.entity.ai.goal.Goal;
+import net.minecraft.entity.monster.GhastEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.projectile.SmallFireballEntity;
+import net.minecraft.entity.projectile.FireballEntity;
 import net.minecraft.entity.projectile.SnowballEntity;
+import net.minecraft.inventory.EquipmentSlotType;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
@@ -38,56 +39,57 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 @SpecialMob
-public class _SpecialBlazeEntity extends BlazeEntity implements IRangedAttackMob, ISpecialMob<_SpecialBlazeEntity> {
+public class _SpecialGhastEntity extends GhastEntity implements IRangedAttackMob, ISpecialMob<_SpecialGhastEntity> {
     
     //--------------- Static Special Mob Hooks ----------------
     
     @SpecialMob.SpeciesReference
-    public static MobFamily.Species<_SpecialBlazeEntity> SPECIES;
+    public static MobFamily.Species<_SpecialGhastEntity> SPECIES;
     
     @SpecialMob.BestiaryInfoSupplier
     public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
-        return new BestiaryInfo( 0xFFF87E );
+        return new BestiaryInfo( 0xBCBCBC );
     }
     
     @SpecialMob.AttributeCreator
     public static AttributeModifierMap.MutableAttribute createAttributes() {
-        return BlazeEntity.createAttributes();
+        return GhastEntity.createAttributes().add( Attributes.ATTACK_DAMAGE, 4.0 );
     }
     
     @SpecialMob.LanguageProvider
     public static String[] getTranslations( String langKey ) {
-        return References.translations( langKey, "Blaze",
+        return References.translations( langKey, "Ghast",
                 "", "", "", "", "", "" );//TODO
     }
     
     @SpecialMob.LootTableProvider
     public static void addBaseLoot( LootTableBuilder loot ) {
-        loot.addLootTable( "main", EntityType.BLAZE.getDefaultLootTable() );
+        loot.addLootTable( "main", EntityType.GHAST.getDefaultLootTable() );
     }
     
     @SpecialMob.Factory
-    public static EntityType.IFactory<_SpecialBlazeEntity> getFactory() { return _SpecialBlazeEntity::new; }
+    public static EntityType.IFactory<_SpecialGhastEntity> getFactory() { return _SpecialGhastEntity::new; }
     
     
     //--------------- Variant-Specific Breakouts ----------------
     
-    public _SpecialBlazeEntity( EntityType<? extends _SpecialBlazeEntity> entityType, World world ) {
+    public _SpecialGhastEntity( EntityType<? extends _SpecialGhastEntity> entityType, World world ) {
         super( entityType, world );
+        reassessWeaponGoal();
         getSpecialData().initialize();
-        getSpecialData().setDamagedByWater( true );
     }
     
     /** Called in the MobEntity.class constructor to initialize AI goals. */
     @Override
     protected void registerGoals() {
         super.registerGoals();
-        AIHelper.removeGoals( goalSelector, 4 ); // BlazeEntity.FireballAttackGoal
-        goalSelector.addGoal( 4, new SpecialBlazeAttackGoal( this ) );
-        AIHelper.replaceHurtByTarget( this, new SpecialHurtByTargetGoal( this, BlazeEntity.class ).setAlertOthers() );
+        //TODO replace vanilla ai with our own
         
         getSpecialData().rangedAttackDamage = 2.0F;
-        setRangedAI( 3, 6, 60, 100, 48.0F );
+        getSpecialData().rangedAttackSpread = 0.0F;
+        getSpecialData().rangedAttackCooldown = 20;
+        getSpecialData().rangedAttackMaxCooldown = 60;
+        getSpecialData().rangedAttackMaxRange = 64.0F;
         registerVariantGoals();
     }
     
@@ -96,18 +98,11 @@ public class _SpecialBlazeEntity extends BlazeEntity implements IRangedAttackMob
     
     /** Helper method to set the ranged attack AI more easily. */
     protected void disableRangedAI() {
-        setRangedAI( 0, 6, 60, 100, 0.0F );
+        getSpecialData().rangedAttackMaxRange = 0.0F;
     }
     
-    /** Helper method to set the ranged attack AI more easily. */
-    protected void setRangedAI( int burstCount, int burstDelay, int chargeTime, int cooldownTime, float range ) {
-        fireballBurstCount = burstCount;
-        fireballBurstDelay = burstDelay;
-        
-        getSpecialData().rangedAttackCooldown = cooldownTime;
-        getSpecialData().rangedAttackMaxCooldown = cooldownTime + chargeTime;
-        getSpecialData().rangedAttackMaxRange = range;
-    }
+    /** Override to change this entity's attack goal priority. */
+    protected int getVariantAttackPriority() { return 7; }
     
     /** Called when this entity successfully damages a target to apply on-hit effects. */
     @Override
@@ -129,12 +124,10 @@ public class _SpecialBlazeEntity extends BlazeEntity implements IRangedAttackMob
     //--------------- Family-Specific Implementations ----------------
     
     /** The parameter for special mob render scale. */
-    private static final DataParameter<Float> SCALE = EntityDataManager.defineId( _SpecialBlazeEntity.class, DataSerializers.FLOAT );
+    private static final DataParameter<Float> SCALE = EntityDataManager.defineId( _SpecialGhastEntity.class, DataSerializers.FLOAT );
     
-    /** The amount of fireballs in each burst. */
-    public int fireballBurstCount;
-    /** The ticks between each shot in a burst. */
-    public int fireballBurstDelay;
+    /** This entity's attack AI. */
+    private Goal currentAttackAI;
     
     /** Called from the Entity.class constructor to define data watcher variables. */
     @Override
@@ -146,15 +139,20 @@ public class _SpecialBlazeEntity extends BlazeEntity implements IRangedAttackMob
     /** Called to attack the target with a ranged attack. */
     @Override
     public void performRangedAttack( LivingEntity target, float damageMulti ) {
-        if( !isSilent() ) level.levelEvent( null, References.EVENT_BLAZE_SHOOT, blockPosition(), 0 );
+        if( !isSilent() ) level.levelEvent( null, References.EVENT_GHAST_SHOOT, blockPosition(), 0 );
         
         final float accelVariance = MathHelper.sqrt( distanceTo( target ) ) * 0.5F * getSpecialData().rangedAttackSpread;
-        final double dX = target.getX() - getX() + getRandom().nextGaussian() * accelVariance;
-        final double dY = target.getY( 0.5 ) - getY( 0.5 );
-        final double dZ = target.getZ() - getZ() + getRandom().nextGaussian() * accelVariance;
+        final Vector3d lookVec = getViewVector( 1.0F ).scale( getBbWidth() );
+        double dX = target.getX() - (getX() + lookVec.x) + getRandom().nextGaussian() * accelVariance;
+        double dY = target.getY( 0.5 ) - (0.5 + getY( 0.5 ));
+        double dZ = target.getZ() - (getZ() + lookVec.z) + getRandom().nextGaussian() * accelVariance;
         
-        final SmallFireballEntity fireball = new SmallFireballEntity( level, this, dX, dY, dZ );
-        fireball.setPos( getX(), getY( 0.5 ) + 0.5, getZ() );
+        final FireballEntity fireball = new FireballEntity( level, this, dX, dY, dZ );
+        fireball.explosionPower = getExplosionPower();
+        fireball.setPos(
+                getX() + lookVec.x,
+                getY( 0.5 ) + 0.5,
+                getZ() + lookVec.z );
         level.addFreshEntity( fireball );
     }
     
@@ -163,18 +161,42 @@ public class _SpecialBlazeEntity extends BlazeEntity implements IRangedAttackMob
     public ILivingEntityData finalizeSpawn( IServerWorld world, DifficultyInstance difficulty, SpawnReason spawnReason,
                                             @Nullable ILivingEntityData groupData, @Nullable CompoundNBT eggTag ) {
         groupData = super.finalizeSpawn( world, difficulty, spawnReason, groupData, eggTag );
-        // TODO ranged attack
+        reassessWeaponGoal();
         return groupData;
+    }
+    
+    /** Called to set the item equipped in a particular slot. */
+    @Override
+    public void setItemSlot( EquipmentSlotType slot, ItemStack item ) {
+        super.setItemSlot( slot, item );
+        if( !level.isClientSide ) reassessWeaponGoal();
+    }
+    
+    /** Called to set this entity's attack AI based on current equipment. */
+    public void reassessWeaponGoal() {
+        //        if( level != null && !level.isClientSide ) { TODO
+        //            if( currentAttackAI != null ) goalSelector.removeGoal( currentAttackAI );
+        //
+        //            final SpecialMobData<_SpecialGhastEntity> data = getSpecialData();
+        //            if( data.rangedAttackMaxRange > 0.0F ) {
+        //                currentAttackAI = new RangedBowAttackGoal<>( this, data.rangedWalkSpeed,
+        //                        data.rangedAttackCooldown, data.rangedAttackMaxRange );
+        //            }
+        //            else {
+        //                currentAttackAI = new ZombieAttackGoal( this, 1.0, false );
+        //            }
+        //            goalSelector.addGoal( getVariantAttackPriority(), currentAttackAI );
+        //        }
     }
     
     
     //--------------- ISpecialMob Implementation ----------------
     
-    private SpecialMobData<_SpecialBlazeEntity> specialData;
+    private SpecialMobData<_SpecialGhastEntity> specialData;
     
     /** @return This mob's special data. */
     @Override
-    public SpecialMobData<_SpecialBlazeEntity> getSpecialData() { return specialData; }
+    public SpecialMobData<_SpecialGhastEntity> getSpecialData() { return specialData; }
     
     /** @return The experience that should be dropped by this entity. */
     @Override
@@ -185,10 +207,14 @@ public class _SpecialBlazeEntity extends BlazeEntity implements IRangedAttackMob
     public final void setExperience( int xp ) { xpReward = xp; }
     
     static ResourceLocation GET_TEXTURE_PATH( String type ) {
-        return SpecialMobs.resourceLoc( SpecialMobs.TEXTURE_PATH + "blaze/" + type + ".png" );
+        return SpecialMobs.resourceLoc( SpecialMobs.TEXTURE_PATH + "ghast/" + type + ".png" );
     }
     
-    private static final ResourceLocation[] TEXTURES = { new ResourceLocation( "textures/entity/blaze.png" ) };
+    private static final ResourceLocation[] TEXTURES = {
+            new ResourceLocation( "textures/entity/ghast/ghast.png" ),
+            null,
+            new ResourceLocation( "textures/entity/ghast/ghast_shooting.png" )
+    };
     
     /** @return All default textures for this entity. */
     @Override
@@ -255,9 +281,8 @@ public class _SpecialBlazeEntity extends BlazeEntity implements IRangedAttackMob
     /** @return Attempts to damage this entity; returns true if the hit was successful. */
     @Override
     public boolean hurt( DamageSource source, float amount ) {
-        if( source.getDirectEntity() instanceof SnowballEntity ) {
-            if( isSensitiveToWater() ) amount = Math.max( 3.0F, amount );
-            else amount = 0.0F; // Allow blazes to be insensitive to snowballs
+        if( isSensitiveToWater() && source.getDirectEntity() instanceof SnowballEntity ) {
+            amount = Math.max( 3.0F, amount );
         }
         return super.hurt( source, amount );
     }
@@ -273,9 +298,6 @@ public class _SpecialBlazeEntity extends BlazeEntity implements IRangedAttackMob
         
         final CompoundNBT saveTag = SpecialMobData.getSaveLocation( tag );
         
-        saveTag.putByte( References.TAG_BURST_COUNT, (byte) fireballBurstCount );
-        saveTag.putByte( References.TAG_BURST_DELAY, (byte) fireballBurstDelay );
-        
         getSpecialData().writeToNBT( saveTag );
         addVariantSaveData( saveTag );
     }
@@ -287,12 +309,9 @@ public class _SpecialBlazeEntity extends BlazeEntity implements IRangedAttackMob
         
         final CompoundNBT saveTag = SpecialMobData.getSaveLocation( tag );
         
-        if( saveTag.contains( References.TAG_BURST_COUNT, References.NBT_TYPE_NUMERICAL ) )
-            fireballBurstCount = saveTag.getByte( References.TAG_BURST_COUNT );
-        if( saveTag.contains( References.TAG_BURST_DELAY, References.NBT_TYPE_NUMERICAL ) )
-            fireballBurstDelay = saveTag.getByte( References.TAG_BURST_DELAY );
-        
         getSpecialData().readFromNBT( saveTag );
         readVariantSaveData( saveTag );
+        
+        reassessWeaponGoal();
     }
 }

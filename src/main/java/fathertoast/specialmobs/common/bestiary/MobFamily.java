@@ -95,10 +95,10 @@ public class MobFamily<T extends LivingEntity> {
             "Domination", "Shadows", "Undead", "Wilds", "Wind"
     );
     
-    //    public static final MobFamily<GhastEntity> GHAST = new MobFamily<>(
-    //            "Ghast", "ghasts", 0xF9F9F9, new EntityType[] { EntityType.GHAST },
-    //            "Baby", "Fighter", "King", "Queen", "Unholy"
-    //    );
+    public static final MobFamily<GhastEntity> GHAST = new MobFamily<>(
+            "Ghast", "ghasts", 0xF9F9F9, new EntityType[] { EntityType.GHAST },
+            "Baby"//, "Fighter", "King", "Queen", "Unholy"
+    );
     
     public static final MobFamily<BlazeEntity> BLAZE = new MobFamily<>(
             "Blaze", "blazes", 0xF6B201, new EntityType[] { EntityType.BLAZE },

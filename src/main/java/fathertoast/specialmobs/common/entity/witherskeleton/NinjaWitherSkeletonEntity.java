@@ -23,11 +23,8 @@ import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.Effects;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.Hand;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.*;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.World;
@@ -144,6 +141,14 @@ public class NinjaWitherSkeletonEntity extends _SpecialWitherSkeletonEntity impl
         super.tick();
     }
     
+    /** Plays an appropriate step sound for this entity based on the floor block. */
+    @Override
+    protected void playStepSound( BlockPos pos, BlockState state ) { } // Disable
+    
+    /** @return The sound this entity makes idly. */
+    @Override
+    protected SoundEvent getAmbientSound() { return isCrouchingTiger() ? null : super.getAmbientSound(); }
+    
     /** Moves this entity to a new position and rotation. */
     @Override
     public void moveTo( double x, double y, double z, float yaw, float pitch ) {
@@ -207,7 +212,6 @@ public class NinjaWitherSkeletonEntity extends _SpecialWitherSkeletonEntity impl
     private static final DataParameter<Optional<BlockState>> HIDING_BLOCK = EntityDataManager.defineId( NinjaWitherSkeletonEntity.class, DataSerializers.BLOCK_STATE );
     
     private boolean canHide = true;
-    private TileEntity cachedTileEntity = null;
     
     /** Called from the Entity.class constructor to define data watcher variables. */
     @Override
@@ -242,7 +246,7 @@ public class NinjaWitherSkeletonEntity extends _SpecialWitherSkeletonEntity impl
     public void setHiddenDragon( @Nullable BlockState block ) {
         getEntityData().set( HIDING_BLOCK, Optional.ofNullable( block ) );
         canHide = false;
-
+        
         // Smoke puff when emerging from disguise
         if( block == null ) {
             spawnAnim();

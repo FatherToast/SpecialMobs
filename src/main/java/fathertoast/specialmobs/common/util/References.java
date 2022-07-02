@@ -19,10 +19,14 @@ public final class References {
     public static final int SET_BLOCK_FLAGS = 0b00000011;
     
     
-    //--------------- ENTITY EVENTS ----------------
-    // Used in World#broadcastEntityEvent(Entity, byte) then executed by Entity#handleEntityEvent(byte)
+    //--------------- EVENT CODES ----------------
     
+    // Entity events; used in World#broadcastEntityEvent(Entity, byte) then executed by Entity#handleEntityEvent(byte)
     public static final byte EVENT_TELEPORT_TRAIL_PARTICLES = 46;
+    
+    // Level events; used in World#levelEvent(PlayerEntity, int, BlockPos, int) then executed by WorldRenderer#levelEvent(PlayerEntity, int, BlockPos, int)
+    public static final int EVENT_GHAST_SHOOT = 1016;
+    public static final int EVENT_BLAZE_SHOOT = 1018;
     
     
     //--------------- NBT STUFF ----------------
