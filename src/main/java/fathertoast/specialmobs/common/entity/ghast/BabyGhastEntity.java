@@ -3,7 +3,6 @@ package fathertoast.specialmobs.common.entity.ghast;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
-import fathertoast.specialmobs.common.entity.spider._SpecialSpiderEntity;
 import fathertoast.specialmobs.common.util.AttributeHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
@@ -36,9 +35,8 @@ public class BabyGhastEntity extends _SpecialGhastEntity {
     
     @SpecialMob.AttributeCreator
     public static AttributeModifierMap.MutableAttribute createAttributes() {
-        return AttributeHelper.of( _SpecialSpiderEntity.createAttributes() )
+        return AttributeHelper.of( _SpecialGhastEntity.createAttributes() )
                 .addAttribute( Attributes.ATTACK_DAMAGE, -1.0 )
-                .multAttribute( Attributes.MOVEMENT_SPEED, 1.3 )
                 .build();
     }
     

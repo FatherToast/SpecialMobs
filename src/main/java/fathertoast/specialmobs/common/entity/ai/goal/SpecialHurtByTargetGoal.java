@@ -1,4 +1,4 @@
-package fathertoast.specialmobs.common.entity.ai;
+package fathertoast.specialmobs.common.entity.ai.goal;
 
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.entity.CreatureEntity;

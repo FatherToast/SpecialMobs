@@ -1,19 +1,20 @@
-package fathertoast.specialmobs.common.entity.magmacube;
+package fathertoast.specialmobs.common.entity.ghast;
 
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
-import fathertoast.specialmobs.common.entity.ai.goal.SpecialLeapAtTargetGoal;
+import fathertoast.specialmobs.common.entity.MobHelper;
+import fathertoast.specialmobs.common.util.AttributeHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import mcp.MethodsReturnNonnullByDefault;
-import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.ai.attributes.AttributeModifierMap;
 import net.minecraft.entity.ai.attributes.Attributes;
+import net.minecraft.item.Items;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -21,74 +22,71 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 @SpecialMob
-public class HardenedMagmaCubeEntity extends _SpecialMagmaCubeEntity {
+public class FighterGhastEntity extends _SpecialGhastEntity {
     
     //--------------- Static Special Mob Hooks ----------------
     
     @SpecialMob.SpeciesReference
-    public static MobFamily.Species<HardenedMagmaCubeEntity> SPECIES;
+    public static MobFamily.Species<FighterGhastEntity> SPECIES;
     
     @SpecialMob.BestiaryInfoSupplier
     public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
-        entityType.sized( 3.06F, 3.06F );
-        return new BestiaryInfo( 0xDF7679, BestiaryInfo.BaseWeight.LOW );
+        entityType.sized( 2.0F, 2.0F );
+        return new BestiaryInfo( 0x7A1300 );
+    }
+    
+    @SpecialMob.AttributeCreator
+    public static AttributeModifierMap.MutableAttribute createAttributes() {
+        return AttributeHelper.of( _SpecialGhastEntity.createAttributes() )
+                .addAttribute( Attributes.MAX_HEALTH, 20.0 )
+                .addAttribute( Attributes.ARMOR, 10.0 )
+                .addAttribute( Attributes.ATTACK_DAMAGE, 2.0 )
+                .multAttribute( Attributes.MOVEMENT_SPEED, 0.8 )
+                .build();
     }
     
     @SpecialMob.LanguageProvider
     public static String[] getTranslations( String langKey ) {
-        return References.translations( langKey, "Hardened Magma Cube",
+        return References.translations( langKey, "Fighter Ghast",
                 "", "", "", "", "", "" );//TODO
     }
     
     @SpecialMob.LootTableProvider
     public static void buildLootTable( LootTableBuilder loot ) {
         addBaseLoot( loot );
-        loot.addClusterDrop( "uncommon", Blocks.MAGMA_BLOCK );
+        loot.addUncommonDrop( "uncommon", Items.IRON_INGOT );
     }
     
     @SpecialMob.Factory
-    public static EntityType.IFactory<HardenedMagmaCubeEntity> getVariantFactory() { return HardenedMagmaCubeEntity::new; }
+    public static EntityType.IFactory<FighterGhastEntity> getVariantFactory() { return FighterGhastEntity::new; }
     
     
     //--------------- Variant-Specific Implementations ----------------
     
-    public HardenedMagmaCubeEntity( EntityType<? extends _SpecialMagmaCubeEntity> entityType, World world ) {
+    public FighterGhastEntity( EntityType<? extends _SpecialGhastEntity> entityType, World world ) {
         super( entityType, world );
-        getSpecialData().setBaseScale( 1.5F );
-        slimeExperienceValue += 2;
-    }
-    
-    /** Override to modify this slime's base attributes by size. */
-    @Override
-    protected void modifyVariantAttributes( int size ) {
-        addAttribute( Attributes.MAX_HEALTH, 2.0 * size + 8.0 );
-        addAttribute( Attributes.ARMOR, 8.0 );
+        getSpecialData().setBaseScale( 0.5F );
+        xpReward += 1;
     }
     
     /** Override to change this entity's AI goals. */
     @Override
     protected void registerVariantGoals() {
-        goalSelector.addGoal( 0, new SpecialLeapAtTargetGoal(
-                this, 10, 0.0F, 5.0F, 1.16F, 1.0F ) );
+        getSpecialData().rangedAttackDamage += 2.0F;
+        disableRangedAI();
     }
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
-    @Override
     protected void onVariantAttack( Entity target ) {
         if( target instanceof LivingEntity ) {
-            final float forwardPower = 0.8F;
-            final float upwardPower = 0.5F;
-            final Vector3d vKnockback = new Vector3d( target.getX() - getX(), 0.0, target.getZ() - getZ() )
-                    .normalize().scale( forwardPower ).add( getDeltaMovement().scale( 0.2F ) );
-            target.setDeltaMovement( vKnockback.x, 0.4 * upwardPower, vKnockback.z );
-            target.hurtMarked = true;
-            
-            setDeltaMovement( getDeltaMovement().multiply( 0.2, 1.0, 0.2 ) );
+            MobHelper.causeLifeLoss( (LivingEntity) target, 2.0F );
         }
     }
     
     private static final ResourceLocation[] TEXTURES = {
-            GET_TEXTURE_PATH( "hardened" )
+            GET_TEXTURE_PATH( "fighter" ),
+            null,
+            GET_TEXTURE_PATH( "fighter_shooting" )
     };
     
     /** @return All default textures for this entity. */

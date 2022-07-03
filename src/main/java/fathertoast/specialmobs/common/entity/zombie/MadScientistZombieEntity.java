@@ -6,7 +6,7 @@ import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.core.register.SMItems;
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.entity.ai.AIHelper;
-import fathertoast.specialmobs.common.entity.ai.SpecialInjectCreeperGoal;
+import fathertoast.specialmobs.common.entity.ai.goal.ChargeCreeperGoal;
 import fathertoast.specialmobs.common.util.AttributeHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
@@ -76,8 +76,8 @@ public class MadScientistZombieEntity extends _SpecialZombieEntity {
     protected void registerVariantGoals() {
         disableRangedAI();
         
-        AIHelper.insertGoal( goalSelector, 2, new SpecialInjectCreeperGoal<>(
-                this, getAttributeValue(Attributes.MOVEMENT_SPEED) * 1.25D, 20.0D,
+        AIHelper.insertGoal( goalSelector, 2, new ChargeCreeperGoal<>(
+                this, getAttributeValue( Attributes.MOVEMENT_SPEED ) * 1.25D, 20.0D,
                 ( madman, creeper ) -> creeper.isAlive() && !creeper.isPowered() && madman.getSensing().canSee( creeper ) ) );
     }
     

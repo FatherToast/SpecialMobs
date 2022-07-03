@@ -25,6 +25,7 @@ public final class References {
     public static final byte EVENT_TELEPORT_TRAIL_PARTICLES = 46;
     
     // Level events; used in World#levelEvent(PlayerEntity, int, BlockPos, int) then executed by WorldRenderer#levelEvent(PlayerEntity, int, BlockPos, int)
+    public static final int EVENT_GHAST_WARN = 1015;
     public static final int EVENT_GHAST_SHOOT = 1016;
     public static final int EVENT_BLAZE_SHOOT = 1018;
     
@@ -81,9 +82,9 @@ public final class References {
     public static final String TAG_IS_BABY = "IsBaby";
     
     // Spawner mobs TODO drowning creeper pufferfish cap?
-    public static final String TAG_BABIES = "Babies"; // Mother (Cave) Spider, Wilds Witch, Wildfire Blaze
+    public static final String TAG_BABIES = "Babies"; // Mother (Cave) Spider, Wilds Witch, Queen Ghast, Wildfire Blaze
     public static final String TAG_EXTRA_BABIES = "ExtraBabies"; // Splitting Creeper, Mother (Cave) Spider, Wilds Witch
-    public static final String TAG_SUMMONS = "Summons"; // Undead Witch, Wilds Witch, Wildfire Blaze
+    public static final String TAG_SUMMONS = "Summons"; // Undead Witch, Wilds Witch, Queen Ghast, Wildfire Blaze
     
     // Growing mobs
     public static final String TAG_GROWTH_LEVEL = "GrowthLevel"; // Hungry Spider, Conflagration Blaze

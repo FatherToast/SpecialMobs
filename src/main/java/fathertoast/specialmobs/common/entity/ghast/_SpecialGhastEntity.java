@@ -6,6 +6,11 @@ import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.core.SpecialMobs;
 import fathertoast.specialmobs.common.entity.ISpecialMob;
 import fathertoast.specialmobs.common.entity.SpecialMobData;
+import fathertoast.specialmobs.common.entity.ai.AIHelper;
+import fathertoast.specialmobs.common.entity.ai.SimpleFlyingMovementController;
+import fathertoast.specialmobs.common.entity.ai.goal.SpecialGhastFireballAttackGoal;
+import fathertoast.specialmobs.common.entity.ai.goal.SpecialGhastLookAroundGoal;
+import fathertoast.specialmobs.common.entity.ai.goal.SpecialGhastMeleeAttackGoal;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import mcp.MethodsReturnNonnullByDefault;
@@ -14,6 +19,7 @@ import net.minecraft.entity.*;
 import net.minecraft.entity.ai.attributes.AttributeModifierMap;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.ai.goal.Goal;
+import net.minecraft.entity.ai.goal.NearestAttackableTargetGoal;
 import net.minecraft.entity.monster.GhastEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.FireballEntity;
@@ -75,7 +81,8 @@ public class _SpecialGhastEntity extends GhastEntity implements IRangedAttackMob
     
     public _SpecialGhastEntity( EntityType<? extends _SpecialGhastEntity> entityType, World world ) {
         super( entityType, world );
-        reassessWeaponGoal();
+        moveControl = new SimpleFlyingMovementController( this );
+        reassessAttackGoal();
         getSpecialData().initialize();
     }
     
@@ -83,7 +90,13 @@ public class _SpecialGhastEntity extends GhastEntity implements IRangedAttackMob
     @Override
     protected void registerGoals() {
         super.registerGoals();
-        //TODO replace vanilla ai with our own
+        // We actually do want to replace both of these, even though we don't have the option of only replacing one
+        AIHelper.removeGoals( goalSelector, 7 ); // GhastEntity.LookAroundGoal & GhastEntity.FireballAttackGoal
+        goalSelector.addGoal( 7, new SpecialGhastLookAroundGoal( this ) );
+        
+        // Allow ghasts to target things not directly horizontal to them (why was this ever added?) TODO config
+        AIHelper.removeGoals( targetSelector, NearestAttackableTargetGoal.class );
+        targetSelector.addGoal( 1, new NearestAttackableTargetGoal<>( this, PlayerEntity.class, true ) );
         
         getSpecialData().rangedAttackDamage = 2.0F;
         getSpecialData().rangedAttackSpread = 0.0F;
@@ -97,12 +110,33 @@ public class _SpecialGhastEntity extends GhastEntity implements IRangedAttackMob
     protected void registerVariantGoals() { }
     
     /** Helper method to set the ranged attack AI more easily. */
-    protected void disableRangedAI() {
-        getSpecialData().rangedAttackMaxRange = 0.0F;
-    }
+    protected void disableRangedAI() { getSpecialData().rangedAttackMaxRange = 0.0F; }
     
     /** Override to change this entity's attack goal priority. */
-    protected int getVariantAttackPriority() { return 7; }
+    protected int getVariantAttackPriority() { return 4; }
+    
+    /** Called to attack the target with a ranged attack. */
+    @Override
+    public void performRangedAttack( LivingEntity target, float damageMulti ) {
+        if( !isSilent() ) level.levelEvent( null, References.EVENT_GHAST_SHOOT, blockPosition(), 0 );
+        
+        final float accelVariance = MathHelper.sqrt( distanceTo( target ) ) * 0.5F * getSpecialData().rangedAttackSpread;
+        final Vector3d lookVec = getViewVector( 1.0F ).scale( getBbWidth() );
+        double dX = target.getX() - (getX() + lookVec.x) + getRandom().nextGaussian() * accelVariance;
+        double dY = target.getY( 0.5 ) - (0.5 + getY( 0.5 ));
+        double dZ = target.getZ() - (getZ() + lookVec.z) + getRandom().nextGaussian() * accelVariance;
+        
+        final FireballEntity fireball = new FireballEntity( level, this, dX, dY, dZ );
+        fireball.explosionPower = getVariantExplosionPower( getExplosionPower() );
+        fireball.setPos(
+                getX() + lookVec.x,
+                getY( 0.5 ) + 0.5,
+                getZ() + lookVec.z );
+        level.addFreshEntity( fireball );
+    }
+    
+    /** Override to change this ghast's explosion power multiplier. */
+    protected int getVariantExplosionPower( int radius ) { return radius; }
     
     /** Called when this entity successfully damages a target to apply on-hit effects. */
     @Override
@@ -136,32 +170,12 @@ public class _SpecialGhastEntity extends GhastEntity implements IRangedAttackMob
         specialData = new SpecialMobData<>( this, SCALE, 1.0F );
     }
     
-    /** Called to attack the target with a ranged attack. */
-    @Override
-    public void performRangedAttack( LivingEntity target, float damageMulti ) {
-        if( !isSilent() ) level.levelEvent( null, References.EVENT_GHAST_SHOOT, blockPosition(), 0 );
-        
-        final float accelVariance = MathHelper.sqrt( distanceTo( target ) ) * 0.5F * getSpecialData().rangedAttackSpread;
-        final Vector3d lookVec = getViewVector( 1.0F ).scale( getBbWidth() );
-        double dX = target.getX() - (getX() + lookVec.x) + getRandom().nextGaussian() * accelVariance;
-        double dY = target.getY( 0.5 ) - (0.5 + getY( 0.5 ));
-        double dZ = target.getZ() - (getZ() + lookVec.z) + getRandom().nextGaussian() * accelVariance;
-        
-        final FireballEntity fireball = new FireballEntity( level, this, dX, dY, dZ );
-        fireball.explosionPower = getExplosionPower();
-        fireball.setPos(
-                getX() + lookVec.x,
-                getY( 0.5 ) + 0.5,
-                getZ() + lookVec.z );
-        level.addFreshEntity( fireball );
-    }
-    
     /** Called on spawn to initialize properties based on the world, difficulty, and the group it spawns with. */
     @Nullable
     public ILivingEntityData finalizeSpawn( IServerWorld world, DifficultyInstance difficulty, SpawnReason spawnReason,
                                             @Nullable ILivingEntityData groupData, @Nullable CompoundNBT eggTag ) {
         groupData = super.finalizeSpawn( world, difficulty, spawnReason, groupData, eggTag );
-        reassessWeaponGoal();
+        reassessAttackGoal();
         return groupData;
     }
     
@@ -169,24 +183,20 @@ public class _SpecialGhastEntity extends GhastEntity implements IRangedAttackMob
     @Override
     public void setItemSlot( EquipmentSlotType slot, ItemStack item ) {
         super.setItemSlot( slot, item );
-        if( !level.isClientSide ) reassessWeaponGoal();
+        if( !level.isClientSide ) reassessAttackGoal();
     }
     
     /** Called to set this entity's attack AI based on current equipment. */
-    public void reassessWeaponGoal() {
-        //        if( level != null && !level.isClientSide ) { TODO
-        //            if( currentAttackAI != null ) goalSelector.removeGoal( currentAttackAI );
-        //
-        //            final SpecialMobData<_SpecialGhastEntity> data = getSpecialData();
-        //            if( data.rangedAttackMaxRange > 0.0F ) {
-        //                currentAttackAI = new RangedBowAttackGoal<>( this, data.rangedWalkSpeed,
-        //                        data.rangedAttackCooldown, data.rangedAttackMaxRange );
-        //            }
-        //            else {
-        //                currentAttackAI = new ZombieAttackGoal( this, 1.0, false );
-        //            }
-        //            goalSelector.addGoal( getVariantAttackPriority(), currentAttackAI );
-        //        }
+    public void reassessAttackGoal() {
+        if( level != null && !level.isClientSide ) {
+            if( currentAttackAI != null ) goalSelector.removeGoal( currentAttackAI );
+            
+            currentAttackAI = getSpecialData().rangedAttackMaxRange > 0.0F ?
+                    new SpecialGhastFireballAttackGoal( this ) :
+                    new SpecialGhastMeleeAttackGoal( this );
+            
+            goalSelector.addGoal( getVariantAttackPriority(), currentAttackAI );
+        }
     }
     
     
@@ -312,6 +322,6 @@ public class _SpecialGhastEntity extends GhastEntity implements IRangedAttackMob
         getSpecialData().readFromNBT( saveTag );
         readVariantSaveData( saveTag );
         
-        reassessWeaponGoal();
+        reassessAttackGoal();
     }
 }

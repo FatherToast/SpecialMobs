@@ -1,6 +1,7 @@
 package fathertoast.specialmobs.common.entity.ai;
 
 import fathertoast.specialmobs.common.core.SpecialMobs;
+import fathertoast.specialmobs.common.entity.ai.goal.SpecialHurtByTargetGoal;
 import net.minecraft.entity.CreatureEntity;
 import net.minecraft.entity.ai.goal.*;
 

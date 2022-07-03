@@ -78,8 +78,8 @@ public class SpecialMobs {
      *      - witches
      *          - ability to equip held items
      *          - uses splash speed instead of regular
-     *      o ghasts
-     *          o melee attack AI
+     *      - ghasts
+     *          - melee attack AI
      *      - blazes
      *          - melee attack AI
      *      ? piglins

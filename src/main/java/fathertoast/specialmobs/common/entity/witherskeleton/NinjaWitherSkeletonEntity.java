@@ -5,7 +5,7 @@ import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.entity.ai.INinja;
-import fathertoast.specialmobs.common.entity.ai.NinjaGoal;
+import fathertoast.specialmobs.common.entity.ai.goal.NinjaGoal;
 import fathertoast.specialmobs.common.util.AttributeHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;

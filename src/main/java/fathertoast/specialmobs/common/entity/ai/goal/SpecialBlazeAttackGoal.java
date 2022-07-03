@@ -1,4 +1,4 @@
-package fathertoast.specialmobs.common.entity.ai;
+package fathertoast.specialmobs.common.entity.ai.goal;
 
 import fathertoast.specialmobs.common.entity.SpecialMobData;
 import fathertoast.specialmobs.common.entity.blaze._SpecialBlazeEntity;
