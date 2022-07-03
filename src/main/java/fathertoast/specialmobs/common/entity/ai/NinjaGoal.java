@@ -3,6 +3,7 @@ package fathertoast.specialmobs.common.entity.ai;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.block.SweetBerryBushBlock;
 import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.entity.player.PlayerEntity;
@@ -97,14 +98,14 @@ public class NinjaGoal<T extends MobEntity & INinja> extends Goal {
             case 11: return randomRotation( Blocks.LEVER.defaultBlockState()
                     .setValue( BlockStateProperties.ATTACH_FACE, AttachFace.FLOOR ), random );
             case 12: return randomPottedFlower( random );
-            case 13: return Blocks.SWEET_BERRY_BUSH.defaultBlockState();
+            case 13: return Blocks.SWEET_BERRY_BUSH.defaultBlockState().setValue(SweetBerryBushBlock.AGE, 3);
         }
 
         final BlockPos posUnderFeet = entity.blockPosition().below();
         final BlockState blockUnderFeet = entity.level.getBlockState( posUnderFeet );
         if( !blockUnderFeet.getBlock().isAir( blockUnderFeet, entity.level, posUnderFeet ) ) {
             // Options available based on the block we are standing on
-            
+
             if( blockUnderFeet.is( Blocks.STONE ) || blockUnderFeet.is( Blocks.STONE_BRICKS ) ) {
                 // Cave theme
                 switch( random.nextInt( 30 ) ) {
