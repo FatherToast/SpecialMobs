@@ -1,4 +1,4 @@
-package fathertoast.specialmobs.common.entity.ai;
+package fathertoast.specialmobs.common.entity.ai.goal;
 
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MobEntity;

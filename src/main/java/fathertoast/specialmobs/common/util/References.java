@@ -19,10 +19,15 @@ public final class References {
     public static final int SET_BLOCK_FLAGS = 0b00000011;
     
     
-    //--------------- ENTITY EVENTS ----------------
-    // Used in World#broadcastEntityEvent(Entity, byte) then executed by Entity#handleEntityEvent(byte)
+    //--------------- EVENT CODES ----------------
     
+    // Entity events; used in World#broadcastEntityEvent(Entity, byte) then executed by Entity#handleEntityEvent(byte)
     public static final byte EVENT_TELEPORT_TRAIL_PARTICLES = 46;
+    
+    // Level events; used in World#levelEvent(PlayerEntity, int, BlockPos, int) then executed by WorldRenderer#levelEvent(PlayerEntity, int, BlockPos, int)
+    public static final int EVENT_GHAST_WARN = 1015;
+    public static final int EVENT_GHAST_SHOOT = 1016;
+    public static final int EVENT_BLAZE_SHOOT = 1018;
     
     
     //--------------- NBT STUFF ----------------
@@ -65,6 +70,10 @@ public final class References {
     public static final String TAG_WHEN_BURNING_EXPLODE = "ExplodesWhileBurning";
     public static final String TAG_WHEN_SHOT_EXPLODE = "ExplodesWhenShot";
     
+    // Witches
+    public static final String TAG_SHEATHED_ITEM = "SheathedItem";
+    public static final String TAG_POTION_USE_TIME = "PotionUseTimer";
+    
     // Blazes
     public static final String TAG_BURST_COUNT = "FireballBurstCount";
     public static final String TAG_BURST_DELAY = "FireballBurstDelay";
@@ -73,8 +82,9 @@ public final class References {
     public static final String TAG_IS_BABY = "IsBaby";
     
     // Spawner mobs TODO drowning creeper pufferfish cap?
-    public static final String TAG_BABIES = "Babies"; // Mother (Cave) Spider
-    public static final String TAG_EXTRA_BABIES = "ExtraBabies"; // Splitting Creeper, Mother (Cave) Spider
+    public static final String TAG_BABIES = "Babies"; // Mother (Cave) Spider, Wilds Witch, Queen Ghast, Wildfire Blaze
+    public static final String TAG_EXTRA_BABIES = "ExtraBabies"; // Splitting Creeper, Mother (Cave) Spider, Wilds Witch
+    public static final String TAG_SUMMONS = "Summons"; // Undead Witch, Wilds Witch, Queen Ghast, Wildfire Blaze
     
     // Growing mobs
     public static final String TAG_GROWTH_LEVEL = "GrowthLevel"; // Hungry Spider, Conflagration Blaze

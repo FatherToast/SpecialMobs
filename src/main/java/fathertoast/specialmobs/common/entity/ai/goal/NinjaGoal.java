@@ -1,5 +1,6 @@
-package fathertoast.specialmobs.common.entity.ai;
+package fathertoast.specialmobs.common.entity.ai.goal;
 
+import fathertoast.specialmobs.common.entity.ai.INinja;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -81,7 +82,7 @@ public class NinjaGoal<T extends MobEntity & INinja> extends Goal {
     /** Finds a nearby block for the entity to hide as and flags it to start hiding. */
     public static <T extends MobEntity & INinja> BlockState pickDisguise( T entity ) {
         final Random random = entity.getRandom();
-
+        
         // Random blocks to be picked regardless of position
         switch( random.nextInt( 200 ) ) {
             case 0: return Blocks.TNT.defaultBlockState();
@@ -100,7 +101,7 @@ public class NinjaGoal<T extends MobEntity & INinja> extends Goal {
             case 12: return randomPottedFlower( random );
             case 13: return Blocks.SWEET_BERRY_BUSH.defaultBlockState().setValue(SweetBerryBushBlock.AGE, 3);
         }
-
+        
         final BlockPos posUnderFeet = entity.blockPosition().below();
         final BlockState blockUnderFeet = entity.level.getBlockState( posUnderFeet );
         if( !blockUnderFeet.getBlock().isAir( blockUnderFeet, entity.level, posUnderFeet ) ) {
@@ -203,12 +204,12 @@ public class NinjaGoal<T extends MobEntity & INinja> extends Goal {
     
     /** @return A random flower. */
     private static BlockState randomFlower( Random random ) {
-        return BlockTags.SMALL_FLOWERS.getRandomElement(random).defaultBlockState();
+        return BlockTags.SMALL_FLOWERS.getRandomElement( random ).defaultBlockState();
     }
     
     /** @return A random potted flower. */
     private static BlockState randomPottedFlower( Random random ) {
-
+        
         switch( random.nextInt( 12 ) ) {
             case 0: return Blocks.POTTED_DANDELION.defaultBlockState();
             case 1: return Blocks.POTTED_POPPY.defaultBlockState();

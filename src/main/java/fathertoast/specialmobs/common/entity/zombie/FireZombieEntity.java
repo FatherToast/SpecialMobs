@@ -75,6 +75,10 @@ public class FireZombieEntity extends _SpecialZombieEntity {
         return arrow;
     }
     
+    /** @return True if this entity should appear to be on fire. */
+    @Override
+    public boolean isOnFire() { return isAlive() && !isInWaterRainOrBubble(); }
+    
     /** @return The sound this entity makes idly. */
     @Override
     protected SoundEvent getAmbientSound() { return SoundEvents.HUSK_AMBIENT; }

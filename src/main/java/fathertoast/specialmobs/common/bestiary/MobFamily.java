@@ -55,11 +55,11 @@ public class MobFamily<T extends LivingEntity> {
     
     public static final MobFamily<AbstractSkeletonEntity> SKELETON = new MobFamily<>(
             "Skeleton", "skeletons", 0xC1C1C1, new EntityType[] { EntityType.SKELETON, EntityType.STRAY },
-            "Brute", "Fire", "Gatling", "Giant", "Knight", "Ninja", "Poison", "Sniper", /*"Spitfire",*/ "Stray"
+            "Brute", "Fire", "Gatling", "Giant", "Knight", "Ninja", "Poison", "Sniper", "Spitfire", "Stray"
     );
     public static final MobFamily<AbstractSkeletonEntity> WITHER_SKELETON = new MobFamily<>(
             "WitherSkeleton", "wither skeletons", 0x141414, new EntityType[] { EntityType.WITHER_SKELETON },
-            "Brute", "Gatling", "Giant", "Knight", "Ninja", "Sniper"//, "Spitfire"
+            "Brute", "Gatling", "Giant", "Knight", "Ninja", "Sniper", "Spitfire"
     );
     
     public static final MobFamily<SlimeEntity> SLIME = new MobFamily<>(
@@ -90,15 +90,15 @@ public class MobFamily<T extends LivingEntity> {
             "Blinding", "Icy", "Lightning", "Mini", "Mirage", "Thief"
     );
     
-    //    public static final MobFamily<WitchEntity> WITCH = new MobFamily<>(
-    //            "Witch", "witches", 0x340000, new EntityType[] { EntityType.WITCH },
-    //            "Domination"//, "Shadows", "Undead", "Wilds", "Wind"//Note - should wind be able to walk on water?
-    //    );
+    public static final MobFamily<WitchEntity> WITCH = new MobFamily<>(
+            "Witch", "witches", 0x340000, new EntityType[] { EntityType.WITCH },
+            "Domination", "Shadows", "Undead", "Wilds", "Wind"
+    );
     
-    //    public static final MobFamily<GhastEntity> GHAST = new MobFamily<>(
-    //            "Ghast", "ghasts", 0xF9F9F9, new EntityType[] { EntityType.GHAST },
-    //            "Baby", "Fighter", "King", "Queen", "Unholy"
-    //    );
+    public static final MobFamily<GhastEntity> GHAST = new MobFamily<>(
+            "Ghast", "ghasts", 0xF9F9F9, new EntityType[] { EntityType.GHAST },
+            "Baby", "Fighter", "King", "Queen", "Unholy"
+    );
     
     public static final MobFamily<BlazeEntity> BLAZE = new MobFamily<>(
             "Blaze", "blazes", 0xF6B201, new EntityType[] { EntityType.BLAZE },

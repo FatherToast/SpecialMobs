@@ -7,8 +7,8 @@ import fathertoast.specialmobs.common.core.SpecialMobs;
 import fathertoast.specialmobs.common.entity.ISpecialMob;
 import fathertoast.specialmobs.common.entity.SpecialMobData;
 import fathertoast.specialmobs.common.entity.ai.AIHelper;
-import fathertoast.specialmobs.common.entity.ai.SpecialBlazeAttackGoal;
-import fathertoast.specialmobs.common.entity.ai.SpecialHurtByTargetGoal;
+import fathertoast.specialmobs.common.entity.ai.goal.SpecialBlazeAttackGoal;
+import fathertoast.specialmobs.common.entity.ai.goal.SpecialHurtByTargetGoal;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import mcp.MethodsReturnNonnullByDefault;
@@ -47,7 +47,7 @@ public class _SpecialBlazeEntity extends BlazeEntity implements IRangedAttackMob
     
     @SpecialMob.BestiaryInfoSupplier
     public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
-        return new BestiaryInfo( 0xFFF87E ); //TODO - TEMP: base size = 0.6F, 1.8F
+        return new BestiaryInfo( 0xFFF87E );
     }
     
     @SpecialMob.AttributeCreator
@@ -131,9 +131,9 @@ public class _SpecialBlazeEntity extends BlazeEntity implements IRangedAttackMob
     /** The parameter for special mob render scale. */
     private static final DataParameter<Float> SCALE = EntityDataManager.defineId( _SpecialBlazeEntity.class, DataSerializers.FLOAT );
     
-    // The amount of fireballs in each burst.
+    /** The amount of fireballs in each burst. */
     public int fireballBurstCount;
-    // The ticks between each shot in a burst.
+    /** The ticks between each shot in a burst. */
     public int fireballBurstDelay;
     
     /** Called from the Entity.class constructor to define data watcher variables. */
@@ -146,7 +146,7 @@ public class _SpecialBlazeEntity extends BlazeEntity implements IRangedAttackMob
     /** Called to attack the target with a ranged attack. */
     @Override
     public void performRangedAttack( LivingEntity target, float damageMulti ) {
-        if( !isSilent() ) level.levelEvent( null, 1018, blockPosition(), 0 );
+        if( !isSilent() ) level.levelEvent( null, References.EVENT_BLAZE_SHOOT, blockPosition(), 0 );
         
         final float accelVariance = MathHelper.sqrt( distanceTo( target ) ) * 0.5F * getSpecialData().rangedAttackSpread;
         final double dX = target.getX() - getX() + getRandom().nextGaussian() * accelVariance;
@@ -154,7 +154,7 @@ public class _SpecialBlazeEntity extends BlazeEntity implements IRangedAttackMob
         final double dZ = target.getZ() - getZ() + getRandom().nextGaussian() * accelVariance;
         
         final SmallFireballEntity fireball = new SmallFireballEntity( level, this, dX, dY, dZ );
-        fireball.setPos( fireball.getX(), getY( 0.5 ) + 0.5, fireball.getZ() );
+        fireball.setPos( getX(), getY( 0.5 ) + 0.5, getZ() );
         level.addFreshEntity( fireball );
     }
     

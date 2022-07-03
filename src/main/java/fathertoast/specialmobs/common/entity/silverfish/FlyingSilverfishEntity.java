@@ -3,7 +3,7 @@ package fathertoast.specialmobs.common.entity.silverfish;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
-import fathertoast.specialmobs.common.entity.ai.SpecialLeapAtTargetGoal;
+import fathertoast.specialmobs.common.entity.ai.goal.SpecialLeapAtTargetGoal;
 import fathertoast.specialmobs.common.util.AttributeHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;

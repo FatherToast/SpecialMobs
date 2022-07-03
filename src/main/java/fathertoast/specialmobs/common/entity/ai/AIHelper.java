@@ -1,8 +1,11 @@
 package fathertoast.specialmobs.common.entity.ai;
 
+import fathertoast.specialmobs.common.core.SpecialMobs;
+import fathertoast.specialmobs.common.entity.ai.goal.SpecialHurtByTargetGoal;
 import net.minecraft.entity.CreatureEntity;
 import net.minecraft.entity.ai.goal.*;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 
 /**
@@ -40,6 +43,26 @@ public final class AIHelper {
         }
     }
     
+    /** @return A goal with the specified priority; null if none are found. */
+    @Nullable
+    public static Goal getGoal( GoalSelector ai, int priority ) {
+        for( PrioritizedGoal task : new ArrayList<>( ai.availableGoals ) ) {
+            if( task.getPriority() == priority ) return task.getGoal();
+        }
+        SpecialMobs.LOG.warn( "Attempted to get '{}'-priority goal, but none exists!", priority );
+        return null;
+    }
+    
+    /** @return A goal of the specified type; null if none are found. */
+    @Nullable
+    public static Goal getGoal( GoalSelector ai, Class<? extends Goal> goalType ) {
+        for( PrioritizedGoal task : new ArrayList<>( ai.availableGoals ) ) {
+            if( task.getGoal().getClass().equals( goalType ) ) return task.getGoal();
+        }
+        SpecialMobs.LOG.warn( "Attempted to get '{}' goal, but none exists!", goalType.getSimpleName() );
+        return null;
+    }
+    
     /** Replaces the entity's water avoiding random walking goal with an equivalent non-water-avoiding goal. */
     public static void replaceWaterAvoidingRandomWalking( CreatureEntity entity, double speedModifier ) {
         for( PrioritizedGoal task : new ArrayList<>( entity.goalSelector.availableGoals ) ) {
@@ -50,6 +73,7 @@ public final class AIHelper {
                 return;
             }
         }
+        SpecialMobs.LOG.warn( "Attempted to replace random walking goal for {}, but none exists!", entity.getClass().getSimpleName() );
     }
     
     /** Replaces the entity's hurt by target goal with an equivalent replacement more compatible with special mobs. */
@@ -62,5 +86,6 @@ public final class AIHelper {
                 return;
             }
         }
+        SpecialMobs.LOG.warn( "Attempted to replace hurt by target goal for {}, but none exists!", entity.getClass().getSimpleName() );
     }
 }

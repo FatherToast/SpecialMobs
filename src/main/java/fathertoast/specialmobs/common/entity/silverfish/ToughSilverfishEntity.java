@@ -75,7 +75,8 @@ public class ToughSilverfishEntity extends _SpecialSilverfishEntity {
     }
     
     private static final ResourceLocation[] TEXTURES = {
-            GET_TEXTURE_PATH( "tough" )
+            GET_TEXTURE_PATH( "tough" ),
+            GET_TEXTURE_PATH( "tough_eyes" )
     };
     
     /** @return All default textures for this entity. */

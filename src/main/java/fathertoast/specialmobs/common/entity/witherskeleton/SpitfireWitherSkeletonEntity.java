@@ -12,8 +12,10 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.AttributeModifierMap;
 import net.minecraft.entity.ai.attributes.Attributes;
+import net.minecraft.entity.projectile.SmallFireballEntity;
 import net.minecraft.item.Items;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -62,7 +64,7 @@ public class SpitfireWitherSkeletonEntity extends _SpecialWitherSkeletonEntity {
     
     public SpitfireWitherSkeletonEntity( EntityType<? extends _SpecialWitherSkeletonEntity> entityType, World world ) {
         super( entityType, world );
-        getSpecialData().setBaseScale( 1.5F );
+        getSpecialData().setBaseScale( 1.8F );
         getSpecialData().setDamagedByWater( true );
         maxUpStep = 1.0F;
         xpReward += 2;
@@ -72,8 +74,11 @@ public class SpitfireWitherSkeletonEntity extends _SpecialWitherSkeletonEntity {
     @Override
     protected void registerVariantGoals() {
         getSpecialData().rangedAttackDamage += 2.0F;
-        getSpecialData().rangedAttackSpread *= 0.5F;
     }
+    
+    /** Override to change this entity's chance to spawn with a bow. */
+    @Override
+    protected double getVariantBowChance() { return 1.0; }
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override
@@ -84,11 +89,32 @@ public class SpitfireWitherSkeletonEntity extends _SpecialWitherSkeletonEntity {
     /** Called to attack the target with a ranged attack. */
     @Override
     public void performRangedAttack( LivingEntity target, float damageMulti ) {
-        //TODO
+        if( !isSilent() ) level.levelEvent( null, References.EVENT_BLAZE_SHOOT, blockPosition(), 0 );
+        
+        final float accelVariance = MathHelper.sqrt( distanceTo( target ) ) * 0.5F * getSpecialData().rangedAttackSpread;
+        
+        for( int i = 0; i < 4; i++ ) {
+            final double dX = target.getX() - getX() + getRandom().nextGaussian() * accelVariance;
+            final double dY = target.getEyeY() - getEyeY();
+            final double dZ = target.getZ() - getZ() + getRandom().nextGaussian() * accelVariance;
+            
+            final SmallFireballEntity fireball = new SmallFireballEntity( level, this, dX, dY, dZ );
+            fireball.setPos( fireball.getX(), getEyeY() - 0.1, fireball.getZ() );
+            level.addFreshEntity( fireball );
+        }
     }
     
+    /** Sets this entity as a baby. */
+    @Override
+    public void setBaby( boolean value ) { }
+    
+    /** @return True if this entity is a baby. */
+    @Override
+    public boolean isBaby() { return false; }
+    
     private static final ResourceLocation[] TEXTURES = {
-            GET_TEXTURE_PATH( "fire" )
+            GET_TEXTURE_PATH( "fire" ),
+            GET_TEXTURE_PATH( "fire_eyes" )
     };
     
     /** @return All default textures for this entity. */

@@ -11,11 +11,9 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.AttributeModifierMap;
 import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.FireballEntity;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.DamageSource;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
@@ -82,7 +80,7 @@ public class HellfireBlazeEntity extends _SpecialBlazeEntity {
     /** Called to attack the target with a ranged attack. */
     @Override
     public void performRangedAttack( LivingEntity target, float damageMulti ) {
-        if( !isSilent() ) level.levelEvent( null, 1018, blockPosition(), 0 );
+        if( !isSilent() ) level.levelEvent( null, References.EVENT_BLAZE_SHOOT, blockPosition(), 0 );
         
         final float accelVariance = MathHelper.sqrt( distanceTo( target ) ) * 0.5F * getSpecialData().rangedAttackSpread;
         final double dX = target.getX() - getX() + getRandom().nextGaussian() * accelVariance;
@@ -93,18 +91,6 @@ public class HellfireBlazeEntity extends _SpecialBlazeEntity {
         fireball.explosionPower = explosionPower;
         fireball.setPos( fireball.getX(), getY( 0.5 ) + 0.5, fireball.getZ() );
         level.addFreshEntity( fireball );
-    }
-    
-    /** @return Attempts to damage this entity; returns true if the hit was successful. */
-    @Override
-    public boolean hurt( DamageSource source, float amount ) {
-        if( isInvulnerableTo( source ) ) return false;
-        
-        if( source.getDirectEntity() instanceof FireballEntity && source.getEntity() instanceof PlayerEntity ) {
-            super.hurt( source, 1000.0F ); // Die from returned fireballs (like ghasts)
-            return true;
-        }
-        return super.hurt( source, amount );
     }
     
     /** Override to save data to this entity's NBT data. */

@@ -18,7 +18,7 @@ public class ToastTomlParser implements ConfigParser<CommentedConfig> {
     /** The actual parser. */
     private final TomlParser WRAPPED_PARSER = new TomlParser();
     
-    /** The config spec that drives this writer. */
+    /** The config spec that drives this parser. */
     private final ToastConfigSpec CONFIG_SPEC;
     
     ToastTomlParser( ToastConfigSpec spec ) { CONFIG_SPEC = spec; }

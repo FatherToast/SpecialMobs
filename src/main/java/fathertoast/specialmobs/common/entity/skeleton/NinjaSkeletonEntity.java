@@ -5,7 +5,7 @@ import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.entity.ai.INinja;
-import fathertoast.specialmobs.common.entity.ai.NinjaGoal;
+import fathertoast.specialmobs.common.entity.ai.goal.NinjaGoal;
 import fathertoast.specialmobs.common.util.AttributeHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
@@ -23,7 +23,6 @@ import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.Effects;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.vector.Vector3d;
@@ -142,16 +141,13 @@ public class NinjaSkeletonEntity extends _SpecialSkeletonEntity implements INinj
         super.tick();
     }
     
+    /** Plays an appropriate step sound for this entity based on the floor block. */
     @Override
-    protected void playStepSound( BlockPos pos, BlockState state ) {
-        // Nope
-    }
+    protected void playStepSound( BlockPos pos, BlockState state ) { } // Disable
     
     /** @return The sound this entity makes idly. */
     @Override
-    protected SoundEvent getAmbientSound() {
-        return getHiddenDragon() == null ? null : SoundEvents.SKELETON_AMBIENT;
-    }
+    protected SoundEvent getAmbientSound() { return isCrouchingTiger() ? null : super.getAmbientSound(); }
     
     /** Moves this entity to a new position and rotation. */
     @Override
@@ -216,7 +212,6 @@ public class NinjaSkeletonEntity extends _SpecialSkeletonEntity implements INinj
     private static final DataParameter<Optional<BlockState>> HIDING_BLOCK = EntityDataManager.defineId( NinjaSkeletonEntity.class, DataSerializers.BLOCK_STATE );
     
     private boolean canHide = true;
-    private TileEntity cachedTileEntity = null;
     
     /** Called from the Entity.class constructor to define data watcher variables. */
     @Override

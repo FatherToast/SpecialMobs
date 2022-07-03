@@ -64,7 +64,7 @@ public class WildfireBlazeEntity extends _SpecialBlazeEntity {
     /** The number of babies spawned on death. */
     private int babies;
     /** The number of extra babies that can be spawned by attacks. */
-    private int extraBabies;
+    private int summons;
     
     public WildfireBlazeEntity( EntityType<? extends _SpecialBlazeEntity> entityType, World world ) {
         super( entityType, world );
@@ -72,8 +72,8 @@ public class WildfireBlazeEntity extends _SpecialBlazeEntity {
         getSpecialData().setRegenerationTime( 40 );
         xpReward += 2;
         
-        babies = 2 + random.nextInt( 3 );
-        extraBabies = 3 + random.nextInt( 4 );
+        babies = 3 + random.nextInt( 4 );
+        summons = 4 + random.nextInt( 7 );
     }
     
     /** Override to change this entity's AI goals. */
@@ -91,15 +91,15 @@ public class WildfireBlazeEntity extends _SpecialBlazeEntity {
     /** Called to attack the target with a ranged attack. */
     @Override
     public void performRangedAttack( LivingEntity target, float damageMulti ) {
-        if( !level.isClientSide() && extraBabies > 0 && random.nextInt( 2 ) == 0 ) {
-            extraBabies--;
+        if( !level.isClientSide() && summons > 0 && random.nextInt( 2 ) == 0 ) {
+            summons--;
             
             final double vX = target.getX() - getX();
             final double vZ = target.getZ() - getZ();
             final double vH = Math.sqrt( vX * vX + vZ * vZ );
             spawnBaby( vX / vH * 0.8 + getDeltaMovement().x * 0.2, vZ / vH * 0.8 + getDeltaMovement().z * 0.2, null );
             spawnAnim();
-            if( !isSilent() ) level.levelEvent( null, 1018, blockPosition(), 0 );
+            if( !isSilent() ) level.levelEvent( null, References.EVENT_BLAZE_SHOOT, blockPosition(), 0 );
         }
         else {
             super.performRangedAttack( target, damageMulti );
@@ -112,13 +112,12 @@ public class WildfireBlazeEntity extends _SpecialBlazeEntity {
         //noinspection deprecation
         if( isDeadOrDying() && !removed && level instanceof IServerWorld ) { // Same conditions as slime splitting
             // Spawn babies on death
-            final int babiesToSpawn = babies + extraBabies;
             ILivingEntityData groupData = null;
-            for( int i = 0; i < babiesToSpawn; i++ ) {
+            for( int i = 0; i < babies; i++ ) {
                 groupData = spawnBaby( (random.nextDouble() - 0.5) * 0.3, (random.nextDouble() - 0.5) * 0.3, groupData );
             }
             spawnAnim();
-            if( !isSilent() ) level.levelEvent( null, 1018, blockPosition(), 0 );
+            if( !isSilent() ) level.levelEvent( null, References.EVENT_BLAZE_SHOOT, blockPosition(), 0 );
         }
         super.remove( keepData );
     }
@@ -147,7 +146,7 @@ public class WildfireBlazeEntity extends _SpecialBlazeEntity {
     @Override
     public void addVariantSaveData( CompoundNBT saveTag ) {
         saveTag.putByte( References.TAG_BABIES, (byte) babies );
-        saveTag.putByte( References.TAG_EXTRA_BABIES, (byte) extraBabies );
+        saveTag.putByte( References.TAG_SUMMONS, (byte) summons );
     }
     
     /** Override to load data from this entity's NBT data. */
@@ -155,8 +154,8 @@ public class WildfireBlazeEntity extends _SpecialBlazeEntity {
     public void readVariantSaveData( CompoundNBT saveTag ) {
         if( saveTag.contains( References.TAG_BABIES, References.NBT_TYPE_NUMERICAL ) )
             babies = saveTag.getByte( References.TAG_BABIES );
-        if( saveTag.contains( References.TAG_EXTRA_BABIES, References.NBT_TYPE_NUMERICAL ) )
-            extraBabies = saveTag.getByte( References.TAG_EXTRA_BABIES );
+        if( saveTag.contains( References.TAG_SUMMONS, References.NBT_TYPE_NUMERICAL ) )
+            summons = saveTag.getByte( References.TAG_SUMMONS );
     }
     
     private static final ResourceLocation[] TEXTURES = {

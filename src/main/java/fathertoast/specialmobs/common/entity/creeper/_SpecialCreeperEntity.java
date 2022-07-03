@@ -30,7 +30,6 @@ import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.IServerWorld;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
-import net.minecraftforge.common.util.Constants;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -189,7 +188,7 @@ public class _SpecialCreeperEntity extends CreeperEntity implements ISpecialMob<
     /** Called when this entity is struck by lightning. */
     @Override
     public void thunderHit( ServerWorld world, LightningBoltEntity lightningBolt ) {
-        if( !isPowered() && random.nextDouble() < 0.1D )
+        if( !isPowered() && random.nextDouble() < 0.1 ) // TODO config
             setSupercharged( true );
         
         super.thunderHit( world, lightningBolt );
