@@ -17,8 +17,8 @@ public class SMEntities {
     public static final DeferredRegister<EntityType<?>> REGISTRY = DeferredRegister.create( ForgeRegistries.ENTITIES, SpecialMobs.MOD_ID );
 
     /** Misc entities */
-    public static final RegistryObject<EntityType<CorporealShiftFireballEntity>> CORPOREAL_FIREBALL = register("corporeal_fireball",
-            EntityType.Builder.<CorporealShiftFireballEntity>of(CorporealShiftFireballEntity::new, EntityClassification.MISC).sized(1.0F, 1.0F).clientTrackingRange(4).updateInterval(10));
+    public static final RegistryObject<EntityType<CorporealShiftFireballEntity>> CORPOREAL_FIREBALL = register("corporeal_shift_fireball",
+            EntityType.Builder.<CorporealShiftFireballEntity>of(CorporealShiftFireballEntity::new, EntityClassification.MISC).sized(1.0F, 1.0F).clientTrackingRange(4).updateInterval(3));
     
     /** Registers an entity type to the deferred register. */
     public static <T extends Entity> RegistryObject<EntityType<T>> register( String name, EntityType.Builder<T> builder ) {

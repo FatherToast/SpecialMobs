@@ -1,4 +1,4 @@
-package fathertoast.specialmobs.client.renderer.entity.misc;
+package fathertoast.specialmobs.client.misc;
 
 import net.minecraft.client.renderer.RenderState;
 import net.minecraft.client.renderer.RenderType;
@@ -12,7 +12,7 @@ public class SMRenderTypes {
     public static RenderType entityCutoutNoCullBlend(ResourceLocation resourceLocation, RenderState.AlphaState alphaState) {
         RenderType.State state = RenderType.State.builder()
                 .setTextureState(new RenderState.TextureState(resourceLocation, false, false))
-                .setTransparencyState(RenderState.ADDITIVE_TRANSPARENCY)
+                .setTransparencyState(RenderState.TRANSLUCENT_TRANSPARENCY)
                 .setDiffuseLightingState(RenderState.DIFFUSE_LIGHTING)
                 .setAlphaState(alphaState)
                 .setLightmapState(RenderState.LIGHTMAP)

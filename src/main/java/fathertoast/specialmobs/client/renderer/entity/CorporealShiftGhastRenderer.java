@@ -2,8 +2,7 @@ package fathertoast.specialmobs.client.renderer.entity;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import fathertoast.specialmobs.client.renderer.entity.layers.SpecialGhastEyesLayer;
-import fathertoast.specialmobs.client.renderer.entity.layers.SpecialMobEyesLayer;
-import fathertoast.specialmobs.client.renderer.entity.misc.SMRenderTypes;
+import fathertoast.specialmobs.client.misc.SMRenderTypes;
 import fathertoast.specialmobs.common.core.SpecialMobs;
 import fathertoast.specialmobs.common.entity.ISpecialMob;
 import fathertoast.specialmobs.common.entity.SpecialMobData;

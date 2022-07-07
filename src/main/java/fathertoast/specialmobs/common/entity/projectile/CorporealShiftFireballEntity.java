@@ -8,19 +8,28 @@ import fathertoast.specialmobs.common.util.References;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.AbstractFireballEntity;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.IPacket;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.util.DamageSource;
+import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.EntityRayTraceResult;
 import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.World;
+import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.fml.network.NetworkHooks;
+
+import javax.annotation.Nullable;
 
 public class CorporealShiftFireballEntity extends AbstractFireballEntity {
 
@@ -28,6 +37,9 @@ public class CorporealShiftFireballEntity extends AbstractFireballEntity {
 
     public int explosionPower = 1;
     private boolean shouldExplode = false;
+
+    @Nullable
+    private LivingEntity target;
 
 
     public CorporealShiftFireballEntity(EntityType<? extends AbstractFireballEntity> entityType, World world) {
@@ -37,6 +49,8 @@ public class CorporealShiftFireballEntity extends AbstractFireballEntity {
     public CorporealShiftFireballEntity(World world, CorporealShiftGhastEntity ghast, double x, double y, double z) {
         super(SMEntities.CORPOREAL_FIREBALL.get(), ghast, x, y, z, world);
         setCorporeal(ghast.isCorporeal());
+        target = ghast.getTarget();
+        setItem(isCorporeal() ? new ItemStack(Items.FIRE_CHARGE) : new ItemStack(Items.ENDER_PEARL));
     }
 
     @SpecialMob.LanguageProvider
@@ -61,7 +75,13 @@ public class CorporealShiftFireballEntity extends AbstractFireballEntity {
 
     @Override
     public void tick() {
+        // Follow target
         super.tick();
+
+        if (!isCorporeal() && target != null) {
+            Vector3d vector3d = new Vector3d(target.getX() - this.getX(), target.getEyeY() - this.getY(), target.getZ() - this.getZ());
+            setDeltaMovement(vector3d.normalize().scale(0.5));
+        }
 
         if ( !level.isClientSide && shouldExplode )
             explode();
@@ -75,6 +95,10 @@ public class CorporealShiftFireballEntity extends AbstractFireballEntity {
         remove();
     }
 
+    @Override
+    protected boolean shouldBurn() {
+        return isCorporeal();
+    }
 
     @Override
     protected void onHit(RayTraceResult traceResult) {
@@ -97,8 +121,14 @@ public class CorporealShiftFireballEntity extends AbstractFireballEntity {
                 // TODO - Figure out why this is cringe
                 SpecialMobs.LOG.info("X={}, XO={}", target.getX(), target.xo);
                 SpecialMobs.LOG.info("Z={}, ZO={}", target.getZ(), target.zo);
-                if (target.getX() != target.xo || target.getY() != target.yo || target.getZ() != target.zo)
+
+                if (target.getX() != target.xo || target.getY() != target.yo || target.getZ() != target.zo) {
                     explode();
+                }
+                else {
+                    playSound(SoundEvents.FIRE_EXTINGUISH, 1.0F, 1.0F);
+                    remove();
+                }
             }
             else {
                 target.hurt(DamageSource.fireball(this, owner), 6.0F);
@@ -129,15 +159,24 @@ public class CorporealShiftFireballEntity extends AbstractFireballEntity {
         super.addAdditionalSaveData(compoundNBT);
         compoundNBT.putInt("ExplosionPower", explosionPower);
         compoundNBT.putBoolean("Corporeal", isCorporeal());
+        compoundNBT.putInt("TargetId", target == null ? -1 : target.getId());
     }
 
     @Override
     public void readAdditionalSaveData(CompoundNBT compoundNBT) {
         super.readAdditionalSaveData(compoundNBT);
-        if (compoundNBT.contains("ExplosionPower", 99)) {
+        if (compoundNBT.contains("ExplosionPower", Constants.NBT.TAG_ANY_NUMERIC)) {
             explosionPower = compoundNBT.getInt("ExplosionPower");
         }
         entityData.set(CORPOREAL, compoundNBT.getBoolean("Corporeal"));
+
+        if (compoundNBT.contains("TargetId", Constants.NBT.TAG_ANY_NUMERIC)) {
+            Entity entity = level.getEntity(compoundNBT.getInt("TargetId"));
+
+            if (entity instanceof LivingEntity) {
+                target = (LivingEntity) entity;
+            }
+        }
     }
 
     @Override
