@@ -32,13 +32,14 @@ public class IncorporealFireChargeItem extends Item {
     @Override
     public ActionResult<ItemStack> use(World world, PlayerEntity player, Hand hand) {
         if (world.isClientSide) {
-            Entity entity = EntityUtil.getClientMouseOver(player);
+            Entity entity = EntityUtil.getClientPickEntity(player, 340.0D);
 
             if (entity instanceof LivingEntity) {
                 NetworkHelper.spawnIncorporealFireball(player, (LivingEntity) entity);
+                world.playSound(player, player.blockPosition(), SoundEvents.FIRECHARGE_USE, SoundCategory.BLOCKS, 1.0F, (random.nextFloat() - random.nextFloat()) * 0.2F + 1.0F);
+                return ActionResult.consume(player.getItemInHand(hand));
             }
-            world.playSound(null, player.blockPosition(), SoundEvents.FIRECHARGE_USE, SoundCategory.BLOCKS, 1.0F, (random.nextFloat() - random.nextFloat()) * 0.2F + 1.0F);
         }
-        return ActionResult.sidedSuccess(player.getItemInHand(hand), world.isClientSide);
+        return ActionResult.pass(player.getItemInHand(hand));
     }
 }

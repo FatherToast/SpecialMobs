@@ -83,11 +83,18 @@ public class CorporealShiftFireballEntity extends AbstractFireballEntity {
 
     @Override
     public void tick() {
-        // Follow target
         super.tick();
 
-        if (!isCorporeal() && target != null) {
-            Vector3d vector3d = new Vector3d(target.getX() - this.getX(), target.getEyeY() - this.getY(), target.getZ() - this.getZ());
+        if ( !level.isClientSide && !isCorporeal() ) {
+            // Fizzle out and die when the target is dead or lost,
+            // or else the fireball goes bonkers.
+            if ( target == null || !target.isAlive() ) {
+                playSound(SoundEvents.FIRE_EXTINGUISH, 1.0F, 1.0F);
+                remove();
+                return;
+            }
+            // Follow target
+            Vector3d vector3d = new Vector3d( target.getX() - this.getX(), (target.getY() + (target.getEyeHeight() / 2)) - this.getY(), target.getZ() - this.getZ() );
             setDeltaMovement(vector3d.normalize().scale(0.5));
         }
 
@@ -96,10 +103,11 @@ public class CorporealShiftFireballEntity extends AbstractFireballEntity {
     }
 
     private void explode() {
-        boolean mobGrief = ForgeEventFactory.getMobGriefingEvent(level, getOwner());
+        boolean mobGrief = ForgeEventFactory.getMobGriefingEvent( level, getOwner() );
         Explosion.Mode mode = mobGrief ? Explosion.Mode.DESTROY : Explosion.Mode.NONE;
 
-        level.explode(null, this.getX(), this.getY(), this.getZ(), (float)explosionPower, mobGrief, mode);
+        level.explode( null, this.getX(), this.getY(), this.getZ(), (float)explosionPower, mobGrief, mode );
+        target = null;
         remove();
     }
 
@@ -110,21 +118,21 @@ public class CorporealShiftFireballEntity extends AbstractFireballEntity {
     }
 
     @Override
-    protected void onHit(RayTraceResult traceResult) {
-        super.onHit(traceResult);
+    protected void onHit( RayTraceResult traceResult ) {
+        super.onHit( traceResult );
 
         // Only go boom if the fireball is corporeal.
         // If not, pass through blocks to be a menace.
-        if (!level.isClientSide && isCorporeal()) {
+        if ( !level.isClientSide && isCorporeal() ) {
             shouldExplode = true;
         }
     }
 
     @Override
-    protected void onHitEntity(EntityRayTraceResult traceResult) {
+    protected void onHitEntity( EntityRayTraceResult traceResult ) {
         super.onHitEntity(traceResult);
 
-        if (!this.level.isClientSide) {
+        if ( !this.level.isClientSide ) {
             Entity target = traceResult.getEntity();
             Entity owner = getOwner();
 
