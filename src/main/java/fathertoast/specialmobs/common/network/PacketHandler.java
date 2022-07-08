@@ -1,6 +1,7 @@
 package fathertoast.specialmobs.common.network;
 
 import fathertoast.specialmobs.common.core.SpecialMobs;
+import fathertoast.specialmobs.common.network.message.C2SSpawnIncorporealFireball;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.ResourceLocation;
@@ -33,11 +34,11 @@ public class PacketHandler {
     }
 
     public final void registerMessages() {
-
+        registerMessage(C2SSpawnIncorporealFireball.class, C2SSpawnIncorporealFireball::encode, C2SSpawnIncorporealFireball::decode, C2SSpawnIncorporealFireball::handle);
     }
 
-    public <MSG> void registerMessage(Class<MSG> messageType, BiConsumer<MSG, PacketBuffer> encoder, Function<PacketBuffer, MSG> decoder, BiConsumer<MSG, Supplier<NetworkEvent.Context>> messageConsumer) {
-        CHANNEL.registerMessage(this.messageIndex++, messageType, encoder, decoder, messageConsumer, Optional.empty());
+    public <MSG> void registerMessage(Class<MSG> messageType, BiConsumer<MSG, PacketBuffer> encoder, Function<PacketBuffer, MSG> decoder, BiConsumer<MSG, Supplier<NetworkEvent.Context>> handler) {
+        CHANNEL.registerMessage(this.messageIndex++, messageType, encoder, decoder, handler, Optional.empty());
     }
 
     /**

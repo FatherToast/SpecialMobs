@@ -3,6 +3,7 @@ package fathertoast.specialmobs.common.entity.projectile;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.core.SpecialMobs;
 import fathertoast.specialmobs.common.core.register.SMEntities;
+import fathertoast.specialmobs.common.core.register.SMItems;
 import fathertoast.specialmobs.common.entity.ghast.CorporealShiftGhastEntity;
 import fathertoast.specialmobs.common.util.References;
 import net.minecraft.entity.Entity;
@@ -50,7 +51,14 @@ public class CorporealShiftFireballEntity extends AbstractFireballEntity {
         super(SMEntities.CORPOREAL_FIREBALL.get(), ghast, x, y, z, world);
         setCorporeal(ghast.isCorporeal());
         target = ghast.getTarget();
-        setItem(isCorporeal() ? new ItemStack(Items.FIRE_CHARGE) : new ItemStack(Items.ENDER_PEARL));
+        setItem(isCorporeal() ? new ItemStack(Items.FIRE_CHARGE) : new ItemStack(SMItems.INCORPOREAL_FIREBALL.get()));
+    }
+
+    public CorporealShiftFireballEntity(World world, PlayerEntity owner, LivingEntity target, double x, double y, double z) {
+        super(SMEntities.CORPOREAL_FIREBALL.get(), owner, x, y, z, world);
+        setCorporeal(false);
+        this.target = target;
+        setItem(new ItemStack(SMItems.INCORPOREAL_FIREBALL.get()));
     }
 
     @SpecialMob.LanguageProvider
@@ -97,6 +105,7 @@ public class CorporealShiftFireballEntity extends AbstractFireballEntity {
 
     @Override
     protected boolean shouldBurn() {
+        // Hee hee hee haw
         return isCorporeal();
     }
 
@@ -104,6 +113,8 @@ public class CorporealShiftFireballEntity extends AbstractFireballEntity {
     protected void onHit(RayTraceResult traceResult) {
         super.onHit(traceResult);
 
+        // Only go boom if the fireball is corporeal.
+        // If not, pass through blocks to be a menace.
         if (!level.isClientSide && isCorporeal()) {
             shouldExplode = true;
         }
@@ -119,6 +130,8 @@ public class CorporealShiftFireballEntity extends AbstractFireballEntity {
 
             if (!isCorporeal()) {
                 // TODO - Figure out why this is cringe
+                // TODO part 2. - What the fuck
+                // TODO part 3. - HELP
                 SpecialMobs.LOG.info("X={}, XO={}", target.getX(), target.xo);
                 SpecialMobs.LOG.info("Z={}, ZO={}", target.getZ(), target.zo);
 

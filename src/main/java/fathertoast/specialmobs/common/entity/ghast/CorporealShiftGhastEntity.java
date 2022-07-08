@@ -3,6 +3,7 @@ package fathertoast.specialmobs.common.entity.ghast;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
+import fathertoast.specialmobs.common.core.register.SMItems;
 import fathertoast.specialmobs.common.entity.SpecialMobData;
 import fathertoast.specialmobs.common.entity.projectile.CorporealShiftFireballEntity;
 import fathertoast.specialmobs.common.util.AttributeHelper;
@@ -60,7 +61,7 @@ public class CorporealShiftGhastEntity extends _SpecialGhastEntity {
     public static void buildLootTable( LootTableBuilder loot ) {
         addBaseLoot( loot );
         // TODO - Uh uhm uhhhhh hmmm..
-        loot.addSemicommonDrop( "semicommon", Items.POISONOUS_POTATO );
+        loot.addSemicommonDrop( "semicommon", SMItems.INCORPOREAL_FIREBALL.get() );
     }
 
     @SpecialMob.Factory
