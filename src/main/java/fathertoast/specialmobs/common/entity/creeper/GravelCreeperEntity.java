@@ -9,11 +9,9 @@ import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.item.FallingBlockEntity;
 import net.minecraft.item.Items;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.Explosion;
@@ -32,8 +30,10 @@ public class GravelCreeperEntity extends _SpecialCreeperEntity {
     public static MobFamily.Species<GravelCreeperEntity> SPECIES;
     
     @SpecialMob.BestiaryInfoSupplier
-    public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
-        return new BestiaryInfo( 0x908884 );
+    public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
+        bestiaryInfo.color( 0x908884 )
+                .uniqueTextureBaseOnly()
+                .addExperience( 1 ).burnImmune();
     }
     
     @SpecialMob.LanguageProvider
@@ -52,14 +52,15 @@ public class GravelCreeperEntity extends _SpecialCreeperEntity {
     @SpecialMob.Factory
     public static EntityType.IFactory<GravelCreeperEntity> getVariantFactory() { return GravelCreeperEntity::new; }
     
+    /** @return This entity's mob species. */
+    @SpecialMob.SpeciesSupplier
+    @Override
+    public MobFamily.Species<? extends GravelCreeperEntity> getSpecies() { return SPECIES; }
+    
     
     //--------------- Variant-Specific Implementations ----------------
     
-    public GravelCreeperEntity( EntityType<? extends _SpecialCreeperEntity> entityType, World world ) {
-        super( entityType, world );
-        getSpecialData().setImmuneToBurning( true );
-        xpReward += 1;
-    }
+    public GravelCreeperEntity( EntityType<? extends _SpecialCreeperEntity> entityType, World world ) { super( entityType, world ); }
     
     /** Override to change this creeper's explosion power multiplier. */
     protected float getVariantExplosionPower( float radius ) { return super.getVariantExplosionPower( radius / 2.0F ); }
@@ -106,12 +107,4 @@ public class GravelCreeperEntity extends _SpecialCreeperEntity {
         }
         return super.hurt( source, amount );
     }
-    
-    private static final ResourceLocation[] TEXTURES = {
-            GET_TEXTURE_PATH( "gravel" )
-    };
-    
-    /** @return All default textures for this entity. */
-    @Override
-    public ResourceLocation[] getDefaultTextures() { return TEXTURES; }
 }

@@ -3,13 +3,10 @@ package fathertoast.specialmobs.common.entity.cavespider;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
-import fathertoast.specialmobs.common.util.AttributeHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.AttributeModifierMap;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.item.Items;
 import net.minecraft.world.World;
@@ -27,18 +24,13 @@ public class BabyCaveSpiderEntity extends _SpecialCaveSpiderEntity {
     public static MobFamily.Species<BabyCaveSpiderEntity> SPECIES;
     
     @SpecialMob.BestiaryInfoSupplier
-    public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
-        entityType.sized( 0.6F, 0.4F );
-        return new BestiaryInfo( 0xFFC0CB, BestiaryInfo.BaseWeight.DISABLED );
-    }
-    
-    @SpecialMob.AttributeCreator
-    public static AttributeModifierMap.MutableAttribute createAttributes() {
-        return AttributeHelper.of( _SpecialCaveSpiderEntity.createAttributes() )
-                .multAttribute( Attributes.MAX_HEALTH, 1.0 / 3.0 )
-                .addAttribute( Attributes.ATTACK_DAMAGE, -1.0 )
-                .multAttribute( Attributes.MOVEMENT_SPEED, 1.3 )
-                .build();
+    public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
+        bestiaryInfo.color( 0xFFC0CB ).weight( BestiaryInfo.DefaultWeight.DISABLED )
+                .size( 0.4F, 0.6F, 0.4F )
+                .experience( 1 ).disableRangedAttack()
+                .multiplyAttribute( Attributes.MAX_HEALTH, 0.33 )
+                .addToAttribute( Attributes.ATTACK_DAMAGE, -1.0 )
+                .multiplyAttribute( Attributes.MOVEMENT_SPEED, 1.3 );
     }
     
     @SpecialMob.LanguageProvider
@@ -55,21 +47,13 @@ public class BabyCaveSpiderEntity extends _SpecialCaveSpiderEntity {
     @SpecialMob.Factory
     public static EntityType.IFactory<BabyCaveSpiderEntity> getVariantFactory() { return BabyCaveSpiderEntity::new; }
     
+    /** @return This entity's mob species. */
+    @SpecialMob.SpeciesSupplier
+    @Override
+    public MobFamily.Species<? extends BabyCaveSpiderEntity> getSpecies() { return SPECIES; }
+    
     
     //--------------- Variant-Specific Implementations ----------------
     
-    public BabyCaveSpiderEntity( EntityType<? extends _SpecialCaveSpiderEntity> entityType, World world ) {
-        super( entityType, world );
-        getSpecialData().setBaseScale( 0.4F );
-        getSpecialData().rangedAttackDamage -= 1.0F;
-        getSpecialData().rangedAttackMaxRange = 0.0F;
-        xpReward = 1;
-    }
-    
-    /** Override to change this entity's AI goals. */
-    @Override
-    protected void registerVariantGoals() {
-        getSpecialData().rangedAttackDamage -= 1.0F;
-        getSpecialData().rangedAttackMaxRange = 0.0F;
-    }
+    public BabyCaveSpiderEntity( EntityType<? extends _SpecialCaveSpiderEntity> entityType, World world ) { super( entityType, world ); }
 }

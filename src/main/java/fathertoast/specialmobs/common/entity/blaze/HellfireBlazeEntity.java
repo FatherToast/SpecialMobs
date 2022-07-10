@@ -3,18 +3,17 @@ package fathertoast.specialmobs.common.entity.blaze;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
-import fathertoast.specialmobs.common.util.AttributeHelper;
+import fathertoast.specialmobs.common.config.species.BlazeSpeciesConfig;
+import fathertoast.specialmobs.common.config.species.SpeciesConfig;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.AttributeModifierMap;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.projectile.FireballEntity;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 
@@ -31,16 +30,18 @@ public class HellfireBlazeEntity extends _SpecialBlazeEntity {
     public static MobFamily.Species<HellfireBlazeEntity> SPECIES;
     
     @SpecialMob.BestiaryInfoSupplier
-    public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
-        entityType.sized( 0.7F, 1.99F );
-        return new BestiaryInfo( 0xDDDDDD );
+    public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
+        bestiaryInfo.color( 0xDDDDDD )
+                .uniqueTextureBaseOnly()
+                .size( 1.1F, 0.7F, 1.99F )
+                .addExperience( 2 )
+                .fireballAttack( 0.05, 60, 100, 40.0 )
+                .addToAttribute( Attributes.MAX_HEALTH, 10.0 );
     }
     
-    @SpecialMob.AttributeCreator
-    public static AttributeModifierMap.MutableAttribute createAttributes() {
-        return AttributeHelper.of( _SpecialBlazeEntity.createAttributes() )
-                .addAttribute( Attributes.MAX_HEALTH, 10.0 )
-                .build();
+    @SpecialMob.ConfigSupplier
+    public static SpeciesConfig createConfig( MobFamily.Species<?> species ) {
+        return new BlazeSpeciesConfig( species, 1, 0 );
     }
     
     @SpecialMob.LanguageProvider
@@ -58,31 +59,25 @@ public class HellfireBlazeEntity extends _SpecialBlazeEntity {
     @SpecialMob.Factory
     public static EntityType.IFactory<HellfireBlazeEntity> getVariantFactory() { return HellfireBlazeEntity::new; }
     
+    /** @return This entity's mob species. */
+    @SpecialMob.SpeciesSupplier
+    @Override
+    public MobFamily.Species<? extends HellfireBlazeEntity> getSpecies() { return SPECIES; }
+    
     
     //--------------- Variant-Specific Implementations ----------------
     
     /** The base explosion strength of this blaze's fireballs. */
     private int explosionPower = 2;
     
-    public HellfireBlazeEntity( EntityType<? extends _SpecialBlazeEntity> entityType, World world ) {
-        super( entityType, world );
-        getSpecialData().setBaseScale( 1.1F );
-        xpReward += 2;
-    }
-    
-    /** Override to change this entity's AI goals. */
-    @Override
-    protected void registerVariantGoals() {
-        getSpecialData().rangedAttackSpread *= 0.05F;
-        setRangedAI( 1, 0, 60, 100, 40.0F );
-    }
+    public HellfireBlazeEntity( EntityType<? extends _SpecialBlazeEntity> entityType, World world ) { super( entityType, world ); }
     
     /** Called to attack the target with a ranged attack. */
     @Override
     public void performRangedAttack( LivingEntity target, float damageMulti ) {
         if( !isSilent() ) level.levelEvent( null, References.EVENT_BLAZE_SHOOT, blockPosition(), 0 );
         
-        final float accelVariance = MathHelper.sqrt( distanceTo( target ) ) * 0.5F * getSpecialData().rangedAttackSpread;
+        final float accelVariance = MathHelper.sqrt( distanceTo( target ) ) * 0.5F * getSpecialData().getRangedAttackSpread();
         final double dX = target.getX() - getX() + getRandom().nextGaussian() * accelVariance;
         final double dY = target.getY( 0.5 ) - getY( 0.5 );
         final double dZ = target.getZ() - getZ() + getRandom().nextGaussian() * accelVariance;
@@ -105,12 +100,4 @@ public class HellfireBlazeEntity extends _SpecialBlazeEntity {
         if( saveTag.contains( References.TAG_EXPLOSION_POWER, References.NBT_TYPE_NUMERICAL ) )
             explosionPower = saveTag.getByte( References.TAG_EXPLOSION_POWER );
     }
-    
-    private static final ResourceLocation[] TEXTURES = {
-            GET_TEXTURE_PATH( "hellfire" )
-    };
-    
-    /** @return All default textures for this entity. */
-    @Override
-    public ResourceLocation[] getDefaultTextures() { return TEXTURES; }
 }

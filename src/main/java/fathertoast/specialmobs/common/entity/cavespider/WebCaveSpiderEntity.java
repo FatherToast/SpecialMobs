@@ -3,7 +3,8 @@ package fathertoast.specialmobs.common.entity.cavespider;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
-import fathertoast.specialmobs.common.util.AttributeHelper;
+import fathertoast.specialmobs.common.config.species.SpeciesConfig;
+import fathertoast.specialmobs.common.config.species.WebSpiderSpeciesConfig;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import mcp.MethodsReturnNonnullByDefault;
@@ -11,12 +12,10 @@ import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.AttributeModifierMap;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.monster.SpiderEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -33,18 +32,23 @@ public class WebCaveSpiderEntity extends _SpecialCaveSpiderEntity {
     public static MobFamily.Species<WebCaveSpiderEntity> SPECIES;
     
     @SpecialMob.BestiaryInfoSupplier
-    public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
-        return new BestiaryInfo( 0xE7E7E7, BestiaryInfo.BaseWeight.LOW );
-        //TODO theme - forest
+    public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
+        bestiaryInfo.color( 0xE7E7E7 ).weight( BestiaryInfo.DefaultWeight.LOW ).theme( BestiaryInfo.Theme.FOREST )
+                .uniqueTextureWithEyes()
+                .addExperience( 2 )
+                .spitAttackMultiplied( 0.1, 1.0, 2.0F, 1.0 )
+                .addToAttribute( Attributes.MAX_HEALTH, 4.0 )
+                .multiplyAttribute( Attributes.MOVEMENT_SPEED, 1.2 );
     }
     
-    @SpecialMob.AttributeCreator
-    public static AttributeModifierMap.MutableAttribute createAttributes() {
-        return AttributeHelper.of( _SpecialCaveSpiderEntity.createAttributes() )
-                .addAttribute( Attributes.MAX_HEALTH, 4.0 )
-                .multAttribute( Attributes.MOVEMENT_SPEED, 1.2 )
-                .build();
+    @SpecialMob.ConfigSupplier
+    public static SpeciesConfig createConfig( MobFamily.Species<?> species ) {
+        return new WebSpiderSpeciesConfig( species, 0.01, 2, 6 );
     }
+    
+    /** @return This entity's species config. */
+    @Override
+    public WebSpiderSpeciesConfig getConfig() { return (WebSpiderSpeciesConfig) getSpecies().config; }
     
     @SpecialMob.LanguageProvider
     public static String[] getTranslations( String langKey ) {
@@ -61,17 +65,21 @@ public class WebCaveSpiderEntity extends _SpecialCaveSpiderEntity {
     @SpecialMob.Factory
     public static EntityType.IFactory<WebCaveSpiderEntity> getVariantFactory() { return WebCaveSpiderEntity::new; }
     
+    /** @return This entity's mob species. */
+    @SpecialMob.SpeciesSupplier
+    @Override
+    public MobFamily.Species<? extends WebCaveSpiderEntity> getSpecies() { return SPECIES; }
+    
     
     //--------------- Variant-Specific Implementations ----------------
     
-    public WebCaveSpiderEntity( EntityType<? extends _SpecialCaveSpiderEntity> entityType, World world ) {
-        super( entityType, world );
-        xpReward += 2;
-        webCount = 2 + random.nextInt( 5 );
-    }
-    
     /** The number of cobwebs this spider can place. */
     private int webCount;
+    
+    public WebCaveSpiderEntity( EntityType<? extends _SpecialCaveSpiderEntity> entityType, World world ) {
+        super( entityType, world );
+        webCount = getConfig().WEB.webCount.next( random );
+    }
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override
@@ -113,13 +121,4 @@ public class WebCaveSpiderEntity extends _SpecialCaveSpiderEntity {
         if( saveTag.contains( References.TAG_AMMO, References.NBT_TYPE_NUMERICAL ) )
             webCount = saveTag.getByte( References.TAG_AMMO );
     }
-    
-    private static final ResourceLocation[] TEXTURES = {
-            GET_TEXTURE_PATH( "web" ),
-            GET_TEXTURE_PATH( "web_eyes" )
-    };
-    
-    /** @return All default textures for this entity. */
-    @Override
-    public ResourceLocation[] getDefaultTextures() { return TEXTURES; }
 }

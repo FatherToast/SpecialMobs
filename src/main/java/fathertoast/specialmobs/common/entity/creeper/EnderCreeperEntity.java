@@ -3,15 +3,15 @@ package fathertoast.specialmobs.common.entity.creeper;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
+import fathertoast.specialmobs.common.config.species.CreeperSpeciesConfig;
+import fathertoast.specialmobs.common.config.species.SpeciesConfig;
 import fathertoast.specialmobs.common.core.SpecialMobs;
 import fathertoast.specialmobs.common.entity.ai.AIHelper;
-import fathertoast.specialmobs.common.util.AttributeHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.*;
-import net.minecraft.entity.ai.attributes.AttributeModifierMap;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.entity.ai.goal.NearestAttackableTargetGoal;
@@ -49,16 +49,16 @@ public class EnderCreeperEntity extends _SpecialCreeperEntity implements IAngera
     public static MobFamily.Species<EnderCreeperEntity> SPECIES;
     
     @SpecialMob.BestiaryInfoSupplier
-    public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
-        return new BestiaryInfo( 0xCC00FA, BestiaryInfo.BaseWeight.LOW );
-        //TODO theme - the end
+    public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
+        bestiaryInfo.color( 0xCC00FA ).weight( BestiaryInfo.DefaultWeight.LOW )
+                .uniqueTextureWithEyes()
+                .addExperience( 2 ).waterSensitive()
+                .addToAttribute( Attributes.MAX_HEALTH, 20.0 );
     }
     
-    @SpecialMob.AttributeCreator
-    public static AttributeModifierMap.MutableAttribute createAttributes() {
-        return AttributeHelper.of( _SpecialCreeperEntity.createAttributes() )
-                .addAttribute( Attributes.MAX_HEALTH, 20.0 )
-                .build();
+    @SpecialMob.ConfigSupplier
+    public static SpeciesConfig createConfig( MobFamily.Species<?> species ) {
+        return new CreeperSpeciesConfig( species, true, false, false );
     }
     
     @SpecialMob.LanguageProvider
@@ -76,15 +76,15 @@ public class EnderCreeperEntity extends _SpecialCreeperEntity implements IAngera
     @SpecialMob.Factory
     public static EntityType.IFactory<EnderCreeperEntity> getVariantFactory() { return EnderCreeperEntity::new; }
     
+    /** @return This entity's mob species. */
+    @SpecialMob.SpeciesSupplier
+    @Override
+    public MobFamily.Species<? extends EnderCreeperEntity> getSpecies() { return SPECIES; }
+    
     
     //--------------- Variant-Specific Implementations ----------------
     
-    public EnderCreeperEntity( EntityType<? extends _SpecialCreeperEntity> entityType, World world ) {
-        super( entityType, world );
-        getSpecialData().setDamagedByWater( true );
-        setCannotExplodeWhileWet( true );
-        xpReward += 2;
-    }
+    public EnderCreeperEntity( EntityType<? extends _SpecialCreeperEntity> entityType, World world ) { super( entityType, world ); }
     
     /** Override to change this entity's AI goals. */
     @Override
@@ -106,15 +106,6 @@ public class EnderCreeperEntity extends _SpecialCreeperEntity implements IAngera
         if( !level.isClientSide )
             readPersistentAngerSaveData( (ServerWorld) level, saveTag );
     }
-    
-    private static final ResourceLocation[] TEXTURES = {
-            GET_TEXTURE_PATH( "ender" ),
-            GET_TEXTURE_PATH( "ender_eyes" )
-    };
-    
-    /** @return All default textures for this entity. */
-    @Override
-    public ResourceLocation[] getDefaultTextures() { return TEXTURES; }
     
     
     //--------------- IAngerable Implementations ----------------

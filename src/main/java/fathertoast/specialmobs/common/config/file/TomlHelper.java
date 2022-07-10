@@ -2,16 +2,16 @@ package fathertoast.specialmobs.common.config.file;
 
 import com.electronwill.nightconfig.core.NullObject;
 import com.electronwill.nightconfig.core.utils.StringUtils;
-import fathertoast.specialmobs.common.config.Config;
 import fathertoast.specialmobs.common.config.field.DoubleField;
 import fathertoast.specialmobs.common.config.field.IntField;
+import fathertoast.specialmobs.common.config.util.ConfigUtil;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 public final class TomlHelper {
-    private TomlHelper() {} // This is a static access only class that cannot be instantiated
+    private TomlHelper() { } // This is a static access only class that cannot be instantiated
     
     /** Attempts to convert a toml literal to a string list. May or may not be accurate. */
     public static List<String> parseStringList( Object value ) {
@@ -184,10 +184,10 @@ public final class TomlHelper {
     private static String fieldRangeNoLimit() { return "Any Value"; }
     
     /** @return A range representation of toml literals with only an upper limit. */
-    private static String fieldRangeUpperLimit( Number max ) { return Config.LESS_OR_EQUAL + " " + toLiteral( max ); }
+    private static String fieldRangeUpperLimit( Number max ) { return ConfigUtil.LESS_OR_EQUAL + " " + toLiteral( max ); }
     
     /** @return A range representation of toml literals with only a lower limit. */
-    private static String fieldRangeLowerLimit( Number min ) { return Config.GREATER_OR_EQUAL + " " + toLiteral( min ); }
+    private static String fieldRangeLowerLimit( Number min ) { return ConfigUtil.GREATER_OR_EQUAL + " " + toLiteral( min ); }
     
     /** @return A range representation of toml literals with both a lower and upper limit. */
     private static String fieldRangeInterval( Number min, Number max ) { return toLiteral( min ) + " ~ " + toLiteral( max ); }

@@ -31,7 +31,6 @@ import net.minecraft.potion.*;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.IItemProvider;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.vector.Vector3d;
@@ -53,14 +52,14 @@ public class _SpecialWitchEntity extends WitchEntity implements ISpecialMob<_Spe
     public static MobFamily.Species<_SpecialWitchEntity> SPECIES;
     
     @SpecialMob.BestiaryInfoSupplier
-    public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
-        return new BestiaryInfo( 0xA80E0E );
+    public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
+        bestiaryInfo.color( 0xA80E0E )
+                .vanillaTextureBaseOnly( "textures/entity/witch.png" )
+                .experience( 5 );
     }
     
-    @SpecialMob.AttributeCreator
-    public static AttributeModifierMap.MutableAttribute createAttributes() {
-        return WitchEntity.createAttributes();
-    }
+    @SpecialMob.AttributeSupplier
+    public static AttributeModifierMap.MutableAttribute createAttributes() { return WitchEntity.createAttributes(); }
     
     @SpecialMob.LanguageProvider
     public static String[] getTranslations( String langKey ) {
@@ -79,16 +78,11 @@ public class _SpecialWitchEntity extends WitchEntity implements ISpecialMob<_Spe
     
     //--------------- Variant-Specific Breakouts ----------------
     
-    public _SpecialWitchEntity( EntityType<? extends _SpecialWitchEntity> entityType, World world ) {
-        super( entityType, world );
-        usingTime = Integer.MAX_VALUE; // Effectively disable vanilla witch potion drinking logic in combo with "fake drinking"
-        getSpecialData().initialize();
-    }
-    
     /** Called in the MobEntity.class constructor to initialize AI goals. */
     @Override
     protected void registerGoals() {
         super.registerGoals();
+        //TODO reapply vanilla attack AI to use SMD ranged attack stats
         registerVariantGoals();
     }
     
@@ -195,8 +189,8 @@ public class _SpecialWitchEntity extends WitchEntity implements ISpecialMob<_Spe
         }
         else if( random.nextFloat() < 0.5F && getTarget() != null && !hasEffect( Effects.MOVEMENT_SPEED ) &&
                 getTarget().distanceToSqr( this ) > 121.0 ) {
-            //usePotion( ____ ? makeSplashPotion( Potions.SWIFTNESS ) : makePotion( Potions.SWIFTNESS ) );
-            usePotion( makeSplashPotion( Potions.SWIFTNESS ) ); // TODO config
+            usePotion( MobFamily.WITCH.config.WITCHES.useSplashSwiftness.get() ? makeSplashPotion( Potions.SWIFTNESS ) :
+                    makePotion( Potions.SWIFTNESS ) );
         }
         else {
             tryVariantUsingPotion();
@@ -233,11 +227,17 @@ public class _SpecialWitchEntity extends WitchEntity implements ISpecialMob<_Spe
     /** While the witch is drinking a potion, it stores its 'actual' held item here. */
     public ItemStack sheathedItem = ItemStack.EMPTY;
     
+    public _SpecialWitchEntity( EntityType<? extends _SpecialWitchEntity> entityType, World world ) {
+        super( entityType, world );
+        usingTime = Integer.MAX_VALUE; // Effectively disable vanilla witch potion drinking logic in combo with "fake drinking"
+        getSpecialData().initialize();
+    }
+    
     /** Called from the Entity.class constructor to define data watcher variables. */
     @Override
     protected void defineSynchedData() {
         super.defineSynchedData();
-        specialData = new SpecialMobData<>( this, SCALE, 1.0F );
+        specialData = new SpecialMobData<>( this, SCALE );
     }
     
     /** Called each AI tick to update potion-drinking behavior. */
@@ -356,6 +356,11 @@ public class _SpecialWitchEntity extends WitchEntity implements ISpecialMob<_Spe
     @Override
     public SpecialMobData<_SpecialWitchEntity> getSpecialData() { return specialData; }
     
+    /** @return This entity's mob species. */
+    @SpecialMob.SpeciesSupplier
+    @Override
+    public MobFamily.Species<? extends _SpecialWitchEntity> getSpecies() { return SPECIES; }
+    
     /** @return The experience that should be dropped by this entity. */
     @Override
     public final int getExperience() { return xpReward; }
@@ -363,18 +368,6 @@ public class _SpecialWitchEntity extends WitchEntity implements ISpecialMob<_Spe
     /** Sets the experience that should be dropped by this entity. */
     @Override
     public final void setExperience( int xp ) { xpReward = xp; }
-    
-    static ResourceLocation GET_TEXTURE_PATH( String type ) {
-        return SpecialMobs.resourceLoc( SpecialMobs.TEXTURE_PATH + "witch/" + type + ".png" );
-    }
-    
-    private static final ResourceLocation[] TEXTURES = {
-            new ResourceLocation( "textures/entity/witch.png" )
-    };
-    
-    /** @return All default textures for this entity. */
-    @Override
-    public ResourceLocation[] getDefaultTextures() { return TEXTURES; }
     
     
     //--------------- SpecialMobData Hooks ----------------

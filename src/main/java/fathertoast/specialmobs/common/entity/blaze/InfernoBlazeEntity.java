@@ -3,18 +3,17 @@ package fathertoast.specialmobs.common.entity.blaze;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
+import fathertoast.specialmobs.common.config.species.BlazeSpeciesConfig;
+import fathertoast.specialmobs.common.config.species.SpeciesConfig;
 import fathertoast.specialmobs.common.entity.MobHelper;
-import fathertoast.specialmobs.common.util.AttributeHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.AttributeModifierMap;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.item.Items;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -30,15 +29,17 @@ public class InfernoBlazeEntity extends _SpecialBlazeEntity {
     public static MobFamily.Species<InfernoBlazeEntity> SPECIES;
     
     @SpecialMob.BestiaryInfoSupplier
-    public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
-        return new BestiaryInfo( 0xF14F00 );
+    public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
+        bestiaryInfo.color( 0xF14F00 )
+                .uniqueTextureBaseOnly()
+                .addExperience( 2 )
+                .fireballAttack( 3.0, 80, 100, 20.0 )
+                .addToAttribute( Attributes.MAX_HEALTH, 10.0 );
     }
     
-    @SpecialMob.AttributeCreator
-    public static AttributeModifierMap.MutableAttribute createAttributes() {
-        return AttributeHelper.of( _SpecialBlazeEntity.createAttributes() )
-                .addAttribute( Attributes.MAX_HEALTH, 10.0 )
-                .build();
+    @SpecialMob.ConfigSupplier
+    public static SpeciesConfig createConfig( MobFamily.Species<?> species ) {
+        return new BlazeSpeciesConfig( species, 12, 2 );
     }
     
     @SpecialMob.LanguageProvider
@@ -57,33 +58,21 @@ public class InfernoBlazeEntity extends _SpecialBlazeEntity {
     @SpecialMob.Factory
     public static EntityType.IFactory<InfernoBlazeEntity> getVariantFactory() { return InfernoBlazeEntity::new; }
     
+    /** @return This entity's mob species. */
+    @SpecialMob.SpeciesSupplier
+    @Override
+    public MobFamily.Species<? extends InfernoBlazeEntity> getSpecies() { return SPECIES; }
+    
     
     //--------------- Variant-Specific Implementations ----------------
     
-    public InfernoBlazeEntity( EntityType<? extends _SpecialBlazeEntity> entityType, World world ) {
-        super( entityType, world );
-        xpReward += 2;
-    }
-    
-    /** Override to change this entity's AI goals. */
-    @Override
-    protected void registerVariantGoals() {
-        getSpecialData().rangedAttackSpread *= 3.0F;
-        setRangedAI( 12, 2, 80, 100, 20.0F );
-    }
+    public InfernoBlazeEntity( EntityType<? extends _SpecialBlazeEntity> entityType, World world ) { super( entityType, world ); }
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
+    @Override
     protected void onVariantAttack( Entity target ) {
         if( target instanceof LivingEntity ) {
             MobHelper.causeLifeLoss( (LivingEntity) target, 2.0F );
         }
     }
-    
-    private static final ResourceLocation[] TEXTURES = {
-            GET_TEXTURE_PATH( "inferno" )
-    };
-    
-    /** @return All default textures for this entity. */
-    @Override
-    public ResourceLocation[] getDefaultTextures() { return TEXTURES; }
 }

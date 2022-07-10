@@ -3,8 +3,10 @@ package fathertoast.specialmobs.common.entity.zombie;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
+import fathertoast.specialmobs.common.config.Config;
+import fathertoast.specialmobs.common.config.species.SpeciesConfig;
+import fathertoast.specialmobs.common.config.species.ZombieSpeciesConfig;
 import fathertoast.specialmobs.common.entity.ai.IAngler;
-import fathertoast.specialmobs.common.util.AttributeHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootEntryItemBuilder;
 import fathertoast.specialmobs.datagen.loot.LootHelper;
@@ -12,8 +14,6 @@ import fathertoast.specialmobs.datagen.loot.LootPoolBuilder;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.AttributeModifierMap;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.FishingRodItem;
@@ -39,16 +39,16 @@ public class FishingZombieEntity extends _SpecialZombieEntity implements IAngler
     public static MobFamily.Species<FishingZombieEntity> SPECIES;
     
     @SpecialMob.BestiaryInfoSupplier
-    public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
-        return new BestiaryInfo( 0x2D41F4 );
-        //TODO theme - fishing
+    public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
+        bestiaryInfo.color( 0x2D41F4 ).theme( BestiaryInfo.Theme.FISHING )
+                .addExperience( 2 ).drownImmune().fluidPushImmune()
+                .bowAttack( 0.0, 1.0, 1.0, 40, 10.0 )
+                .multiplyAttribute( Attributes.MOVEMENT_SPEED, 0.8 );
     }
     
-    @SpecialMob.AttributeCreator
-    public static AttributeModifierMap.MutableAttribute createAttributes() {
-        return AttributeHelper.of( _SpecialZombieEntity.createAttributes() )
-                .multAttribute( Attributes.MOVEMENT_SPEED, 0.8 )
-                .build();
+    @SpecialMob.ConfigSupplier
+    public static SpeciesConfig createConfig( MobFamily.Species<?> species ) {
+        return new ZombieSpeciesConfig( species, 0.0, 0.0 );
     }
     
     @SpecialMob.LanguageProvider
@@ -71,24 +71,19 @@ public class FishingZombieEntity extends _SpecialZombieEntity implements IAngler
     @SpecialMob.Factory
     public static EntityType.IFactory<FishingZombieEntity> getVariantFactory() { return FishingZombieEntity::new; }
     
+    /** @return This entity's mob species. */
+    @SpecialMob.SpeciesSupplier
+    @Override
+    public MobFamily.Species<? extends FishingZombieEntity> getSpecies() { return SPECIES; }
+    
     
     //--------------- Variant-Specific Implementations ----------------
     
-    public FishingZombieEntity( EntityType<? extends _SpecialZombieEntity> entityType, World world ) {
-        super( entityType, world );
-        getSpecialData().setCanBreatheInWater( true );
-        getSpecialData().setIgnoreWaterPush( true );
-        xpReward += 2;
-    }
+    public FishingZombieEntity( EntityType<? extends _SpecialZombieEntity> entityType, World world ) { super( entityType, world ); }
     
     /** Override to change this entity's AI goals. */
     @Override
     protected void registerVariantGoals() {
-        getSpecialData().rangedAttackSpread *= 0.7F;
-        getSpecialData().rangedAttackCooldown = 32;
-        getSpecialData().rangedAttackMaxCooldown = 48;
-        getSpecialData().rangedAttackMaxRange = 10.0F;
-        
         //TODO add angler AI @ attack priority
     }
     
@@ -105,10 +100,6 @@ public class FishingZombieEntity extends _SpecialZombieEntity implements IAngler
         }
         setCanPickUpLoot( false );
     }
-    
-    /** Override to change this entity's chance to spawn with a bow. */
-    @Override
-    protected double getVariantBowChance() { return 0.0; }
     
     
     //--------------- IAngler Implementations ----------------
@@ -135,7 +126,7 @@ public class FishingZombieEntity extends _SpecialZombieEntity implements IAngler
     @Override
     public ItemStack getItemBySlot( EquipmentSlotType slot ) {
         // Display a stick in place of the "cast fishing rod" when the fancy render is disabled
-        if( level.isClientSide() && /*!Config.get().GENERAL.FANCY_FISHING_MOBS &&*/ EquipmentSlotType.MAINHAND.equals( slot ) ) {
+        if( level.isClientSide() && !Config.MAIN.GENERAL.fancyFishingMobs.get() && EquipmentSlotType.MAINHAND.equals( slot ) ) {
             final ItemStack held = super.getItemBySlot( slot );
             if( !held.isEmpty() && held.getItem() instanceof FishingRodItem && isLineOut() ) {
                 return new ItemStack( Items.STICK );

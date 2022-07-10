@@ -3,15 +3,14 @@ package fathertoast.specialmobs.common.entity.witch;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
+import fathertoast.specialmobs.common.config.species.SpeciesConfig;
+import fathertoast.specialmobs.common.config.species.WildsWitchSpeciesConfig;
 import fathertoast.specialmobs.common.entity.spider.BabySpiderEntity;
 import fathertoast.specialmobs.common.entity.spider._SpecialSpiderEntity;
-import fathertoast.specialmobs.common.util.AttributeHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import mcp.MethodsReturnNonnullByDefault;
-import net.minecraft.block.Blocks;
 import net.minecraft.entity.*;
-import net.minecraft.entity.ai.attributes.AttributeModifierMap;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -21,7 +20,6 @@ import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionUtils;
 import net.minecraft.potion.Potions;
 import net.minecraft.tags.FluidTags;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvents;
 import net.minecraft.world.IServerWorld;
 import net.minecraft.world.World;
@@ -40,17 +38,21 @@ public class WildsWitchEntity extends _SpecialWitchEntity {
     public static MobFamily.Species<WildsWitchEntity> SPECIES;
     
     @SpecialMob.BestiaryInfoSupplier
-    public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
-        return new BestiaryInfo( 0xA80E0E );
-        //TODO theme - forest
+    public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
+        bestiaryInfo.color( 0xA80E0E ).theme( BestiaryInfo.Theme.FOREST )
+                .uniqueTextureBaseOnly()
+                .addExperience( 1 ).spider()
+                .multiplyAttribute( Attributes.MOVEMENT_SPEED, 0.7 );
     }
     
-    @SpecialMob.AttributeCreator
-    public static AttributeModifierMap.MutableAttribute createAttributes() {
-        return AttributeHelper.of( _SpecialWitchEntity.createAttributes() )
-                .multAttribute( Attributes.MOVEMENT_SPEED, 0.7 )
-                .build();
+    @SpecialMob.ConfigSupplier
+    public static SpeciesConfig createConfig( MobFamily.Species<?> species ) {
+        return new WildsWitchSpeciesConfig( species, 1, 3,
+                3, 6, 3, 4 );
     }
+    
+    /** @return This entity's species config. */
+    public WildsWitchSpeciesConfig getConfig() { return (WildsWitchSpeciesConfig) getSpecies().config; }
     
     @SpecialMob.LanguageProvider
     public static String[] getTranslations( String langKey ) {
@@ -67,6 +69,11 @@ public class WildsWitchEntity extends _SpecialWitchEntity {
     @SpecialMob.Factory
     public static EntityType.IFactory<WildsWitchEntity> getVariantFactory() { return WildsWitchEntity::new; }
     
+    /** @return This entity's mob species. */
+    @SpecialMob.SpeciesSupplier
+    @Override
+    public MobFamily.Species<? extends WildsWitchEntity> getSpecies() { return SPECIES; }
+    
     
     //--------------- Variant-Specific Implementations ----------------
     
@@ -79,13 +86,9 @@ public class WildsWitchEntity extends _SpecialWitchEntity {
     
     public WildsWitchEntity( EntityType<? extends _SpecialWitchEntity> entityType, World world ) {
         super( entityType, world );
-        getSpecialData().addStickyBlockImmunity( Blocks.COBWEB );
-        getSpecialData().addPotionImmunity( Effects.POISON );
-        xpReward += 1;
-        
-        spiderMounts = 1 + random.nextInt( 3 );
-        spiderSwarms = 3 + random.nextInt( 4 );
-        spiderSwarmSize = 3;
+        spiderMounts = getConfig().WILDS.mounts.next( random );
+        spiderSwarms = getConfig().WILDS.swarms.next( random );
+        spiderSwarmSize = getConfig().WILDS.swarmSize.next( random );
     }
     
     /** Override to modify potion attacks. Return an empty item stack to cancel the potion throw. */
@@ -154,10 +157,10 @@ public class WildsWitchEntity extends _SpecialWitchEntity {
                 mount.getHealth() < mount.getMaxHealth() ) {
             usePotion( makeSplashPotion( Potions.HEALING ) );
         }
-        //        else if( mount != null && random.nextFloat() < 0.5F && getTarget() != null && !mount.hasEffect( Effects.MOVEMENT_SPEED ) &&
-        //                getTarget().distanceToSqr( this ) > 121.0 ) {
-        //            usePotion( makeSplashPotion( Potions.SWIFTNESS ) ); // TODO config
-        //        }
+        else if( !MobFamily.WITCH.config.WITCHES.useSplashSwiftness.get() && mount != null && random.nextFloat() < 0.5F && getTarget() != null &&
+                !mount.hasEffect( Effects.MOVEMENT_SPEED ) && getTarget().distanceToSqr( this ) > 121.0 ) {
+            usePotion( makeSplashPotion( Potions.SWIFTNESS ) );
+        }
         else if( spiderMounts > 0 && random.nextFloat() < 0.15F && getVehicle() == null && getTarget() != null &&
                 getTarget().distanceToSqr( this ) > 100.0 ) {
             final _SpecialSpiderEntity spider = _SpecialSpiderEntity.SPECIES.entityType.get().create( level );
@@ -215,12 +218,4 @@ public class WildsWitchEntity extends _SpecialWitchEntity {
         if( saveTag.contains( References.TAG_EXTRA_BABIES, References.NBT_TYPE_NUMERICAL ) )
             spiderSwarmSize = saveTag.getByte( References.TAG_EXTRA_BABIES );
     }
-    
-    private static final ResourceLocation[] TEXTURES = {
-            GET_TEXTURE_PATH( "wilds" )
-    };
-    
-    /** @return All default textures for this entity. */
-    @Override
-    public ResourceLocation[] getDefaultTextures() { return TEXTURES; }
 }

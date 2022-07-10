@@ -12,7 +12,6 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.LightningBoltEntity;
 import net.minecraft.item.Items;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 
@@ -29,9 +28,10 @@ public class LightningEndermanEntity extends _SpecialEndermanEntity {
     public static MobFamily.Species<LightningEndermanEntity> SPECIES;
     
     @SpecialMob.BestiaryInfoSupplier
-    public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
-        entityType.fireImmune();
-        return new BestiaryInfo( 0x4BB4B5 );
+    public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
+        bestiaryInfo.color( 0x4BB4B5 )
+                .uniqueTextureWithEyes()
+                .addExperience( 2 ).fireImmune();
     }
     
     @SpecialMob.LanguageProvider
@@ -49,13 +49,15 @@ public class LightningEndermanEntity extends _SpecialEndermanEntity {
     @SpecialMob.Factory
     public static EntityType.IFactory<LightningEndermanEntity> getVariantFactory() { return LightningEndermanEntity::new; }
     
+    /** @return This entity's mob species. */
+    @SpecialMob.SpeciesSupplier
+    @Override
+    public MobFamily.Species<? extends LightningEndermanEntity> getSpecies() { return SPECIES; }
+    
     
     //--------------- Variant-Specific Implementations ----------------
     
-    public LightningEndermanEntity( EntityType<? extends _SpecialEndermanEntity> entityType, World world ) {
-        super( entityType, world );
-        xpReward += 2;
-    }
+    public LightningEndermanEntity( EntityType<? extends _SpecialEndermanEntity> entityType, World world ) { super( entityType, world ); }
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override
@@ -71,13 +73,4 @@ public class LightningEndermanEntity extends _SpecialEndermanEntity {
     /** Called when this entity is struck by lightning. */
     @Override
     public void thunderHit( ServerWorld world, LightningBoltEntity lightningBolt ) { }
-    
-    private static final ResourceLocation[] TEXTURES = {
-            GET_TEXTURE_PATH( "lightning" ),
-            GET_TEXTURE_PATH( "lightning_eyes" )
-    };
-    
-    /** @return All default textures for this entity. */
-    @Override
-    public ResourceLocation[] getDefaultTextures() { return TEXTURES; }
 }

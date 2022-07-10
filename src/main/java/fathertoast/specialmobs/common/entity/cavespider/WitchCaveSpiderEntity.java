@@ -4,18 +4,15 @@ import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.entity.MobHelper;
-import fathertoast.specialmobs.common.util.AttributeHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.AttributeModifierMap;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.EffectType;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -31,16 +28,12 @@ public class WitchCaveSpiderEntity extends _SpecialCaveSpiderEntity {
     public static MobFamily.Species<WitchCaveSpiderEntity> SPECIES;
     
     @SpecialMob.BestiaryInfoSupplier
-    public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
-        return new BestiaryInfo( 0xDD0E0E, BestiaryInfo.BaseWeight.LOW );
-        //TODO theme - forest
-    }
-    
-    @SpecialMob.AttributeCreator
-    public static AttributeModifierMap.MutableAttribute createAttributes() {
-        return AttributeHelper.of( _SpecialCaveSpiderEntity.createAttributes() )
-                .addAttribute( Attributes.ARMOR, 15.0 )
-                .build();
+    public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
+        bestiaryInfo.color( 0xDD0E0E ).weight( BestiaryInfo.DefaultWeight.LOW ).theme( BestiaryInfo.Theme.FOREST )
+                .uniqueTextureWithEyes()
+                .addExperience( 2 )
+                .spitAttackMultiplied( 0.1, 1.0, 2.0F, 1.0 )
+                .addToAttribute( Attributes.ARMOR, 15.0 );
     }
     
     @SpecialMob.LanguageProvider
@@ -58,13 +51,15 @@ public class WitchCaveSpiderEntity extends _SpecialCaveSpiderEntity {
     @SpecialMob.Factory
     public static EntityType.IFactory<WitchCaveSpiderEntity> getVariantFactory() { return WitchCaveSpiderEntity::new; }
     
+    /** @return This entity's mob species. */
+    @SpecialMob.SpeciesSupplier
+    @Override
+    public MobFamily.Species<? extends WitchCaveSpiderEntity> getSpecies() { return SPECIES; }
+    
     
     //--------------- Variant-Specific Implementations ----------------
     
-    public WitchCaveSpiderEntity( EntityType<? extends _SpecialCaveSpiderEntity> entityType, World world ) {
-        super( entityType, world );
-        xpReward += 2;
-    }
+    public WitchCaveSpiderEntity( EntityType<? extends _SpecialCaveSpiderEntity> entityType, World world ) { super( entityType, world ); }
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override
@@ -81,13 +76,4 @@ public class WitchCaveSpiderEntity extends _SpecialCaveSpiderEntity {
         // Witch spider is immune to debuffs
         return effect.getEffect().getCategory() != EffectType.HARMFUL && super.canBeAffected( effect );
     }
-    
-    private static final ResourceLocation[] TEXTURES = {
-            GET_TEXTURE_PATH( "witch" ),
-            GET_TEXTURE_PATH( "witch_eyes" )
-    };
-    
-    /** @return All default textures for this entity. */
-    @Override
-    public ResourceLocation[] getDefaultTextures() { return TEXTURES; }
 }

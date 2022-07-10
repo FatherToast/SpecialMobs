@@ -4,14 +4,12 @@ import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.entity.MobHelper;
-import fathertoast.specialmobs.common.util.AttributeHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.AttributeModifierMap;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.projectile.AbstractArrowEntity;
 import net.minecraft.entity.projectile.ArrowEntity;
@@ -20,7 +18,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.Effects;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.World;
 
@@ -37,17 +34,12 @@ public class BruteZombifiedPiglinEntity extends _SpecialZombifiedPiglinEntity {
     public static MobFamily.Species<BruteZombifiedPiglinEntity> SPECIES;
     
     @SpecialMob.BestiaryInfoSupplier
-    public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
-        entityType.sized( 0.7F, 2.35F );
-        return new BestiaryInfo( 0xFFF87E );
-    }
-    
-    @SpecialMob.AttributeCreator
-    public static AttributeModifierMap.MutableAttribute createAttributes() {
-        return AttributeHelper.of( _SpecialZombifiedPiglinEntity.createAttributes() )
-                .addAttribute( Attributes.MAX_HEALTH, 10.0 )
-                .addAttribute( Attributes.ARMOR, 10.0 )
-                .build();
+    public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
+        bestiaryInfo.color( 0xFFF87E )
+                .uniqueTextureWithOverlay()
+                .size( 1.2F, 0.7F, 2.35F )
+                .addExperience( 2 )
+                .addToAttribute( Attributes.MAX_HEALTH, 10.0 ).addToAttribute( Attributes.ARMOR, 10.0 );
     }
     
     @SpecialMob.LanguageProvider
@@ -66,14 +58,15 @@ public class BruteZombifiedPiglinEntity extends _SpecialZombifiedPiglinEntity {
     @SpecialMob.Factory
     public static EntityType.IFactory<BruteZombifiedPiglinEntity> getVariantFactory() { return BruteZombifiedPiglinEntity::new; }
     
+    /** @return This entity's mob species. */
+    @SpecialMob.SpeciesSupplier
+    @Override
+    public MobFamily.Species<? extends BruteZombifiedPiglinEntity> getSpecies() { return SPECIES; }
+    
     
     //--------------- Variant-Specific Implementations ----------------
     
-    public BruteZombifiedPiglinEntity( EntityType<? extends _SpecialZombifiedPiglinEntity> entityType, World world ) {
-        super( entityType, world );
-        getSpecialData().setBaseScale( 1.2F );
-        xpReward += 2;
-    }
+    public BruteZombifiedPiglinEntity( EntityType<? extends _SpecialZombifiedPiglinEntity> entityType, World world ) { super( entityType, world ); }
     
     /** Called during spawn finalization to set starting equipment. */
     @Override
@@ -101,14 +94,4 @@ public class BruteZombifiedPiglinEntity extends _SpecialZombifiedPiglinEntity {
         }
         return arrow;
     }
-    
-    private static final ResourceLocation[] TEXTURES = {
-            GET_TEXTURE_PATH( "brute" ),
-            null,
-            GET_TEXTURE_PATH( "brute_overlay" )
-    };
-    
-    /** @return All default textures for this entity. */
-    @Override
-    public ResourceLocation[] getDefaultTextures() { return TEXTURES; }
 }

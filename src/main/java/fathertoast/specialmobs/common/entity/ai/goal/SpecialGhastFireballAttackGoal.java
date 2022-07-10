@@ -38,19 +38,19 @@ public class SpecialGhastFireballAttackGoal extends Goal {
         
         final SpecialMobData<_SpecialGhastEntity> data = ghast.getSpecialData();
         
-        if( target.distanceToSqr( ghast ) < data.rangedAttackMaxRange * data.rangedAttackMaxRange && ghast.canSee( target ) ) {
+        if( target.distanceToSqr( ghast ) < data.getRangedAttackMaxRange() * data.getRangedAttackMaxRange() && ghast.canSee( target ) ) {
             chargeTime++;
-            if( chargeTime == (data.rangedAttackCooldown >> 1) && !ghast.isSilent() ) {
+            if( chargeTime == (data.getRangedAttackCooldown() >> 1) && !ghast.isSilent() ) {
                 ghast.level.levelEvent( null, References.EVENT_GHAST_WARN, ghast.blockPosition(), 0 );
             }
-            if( chargeTime >= data.rangedAttackCooldown ) {
+            if( chargeTime >= data.getRangedAttackCooldown() ) {
                 ghast.performRangedAttack( target, 1.0F );
-                chargeTime = data.rangedAttackCooldown - data.rangedAttackMaxCooldown;
+                chargeTime = data.getRangedAttackCooldown() - data.getRangedAttackMaxCooldown();
             }
         }
         else if( chargeTime > 0 ) {
             chargeTime--;
         }
-        ghast.setCharging( chargeTime > (data.rangedAttackCooldown >> 1) );
+        ghast.setCharging( chargeTime > (data.getRangedAttackCooldown() >> 1) );
     }
 }

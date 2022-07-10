@@ -28,8 +28,8 @@ public class SpecialGhastLookAroundGoal extends Goal {
     public void tick() {
         final LivingEntity target = ghast.getTarget();
         if( target != null ) {
-            final float range = ghast.getSpecialData().rangedAttackMaxRange > 0.0F ?
-                    ghast.getSpecialData().rangedAttackMaxRange :
+            final float range = ghast.getSpecialData().getRangedAttackMaxRange() > 0.0F ?
+                    ghast.getSpecialData().getRangedAttackMaxRange() :
                     16.0F; // Range for melee ghast to face target
             
             if( target.distanceToSqr( ghast ) < range * range ) {

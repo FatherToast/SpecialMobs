@@ -13,7 +13,6 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.Items;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.Effects;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -29,9 +28,10 @@ public class PoisonSpiderEntity extends _SpecialSpiderEntity {
     public static MobFamily.Species<PoisonSpiderEntity> SPECIES;
     
     @SpecialMob.BestiaryInfoSupplier
-    public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
-        return new BestiaryInfo( 0x0C424E );
-        //TODO theme - forest
+    public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
+        bestiaryInfo.color( 0x0C424E ).theme( BestiaryInfo.Theme.FOREST )
+                .vanillaTextureWithEyes( "textures/entity/spider/cave_spider.png", "textures/entity/spider_eyes.png" )
+                .addExperience( 1 );
     }
     
     @SpecialMob.LanguageProvider
@@ -49,13 +49,15 @@ public class PoisonSpiderEntity extends _SpecialSpiderEntity {
     @SpecialMob.Factory
     public static EntityType.IFactory<PoisonSpiderEntity> getVariantFactory() { return PoisonSpiderEntity::new; }
     
+    /** @return This entity's mob species. */
+    @SpecialMob.SpeciesSupplier
+    @Override
+    public MobFamily.Species<? extends PoisonSpiderEntity> getSpecies() { return SPECIES; }
+    
     
     //--------------- Variant-Specific Implementations ----------------
     
-    public PoisonSpiderEntity( EntityType<? extends _SpecialSpiderEntity> entityType, World world ) {
-        super( entityType, world );
-        xpReward += 1;
-    }
+    public PoisonSpiderEntity( EntityType<? extends _SpecialSpiderEntity> entityType, World world ) { super( entityType, world ); }
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override
@@ -67,13 +69,4 @@ public class PoisonSpiderEntity extends _SpecialSpiderEntity {
             livingTarget.addEffect( new EffectInstance( Effects.POISON, duration ) );
         }
     }
-    
-    private static final ResourceLocation[] TEXTURES = {
-            new ResourceLocation( "textures/entity/spider/cave_spider.png" ),
-            new ResourceLocation( "textures/entity/spider_eyes.png" )
-    };
-    
-    /** @return All default textures for this entity. */
-    @Override
-    public ResourceLocation[] getDefaultTextures() { return TEXTURES; }
 }

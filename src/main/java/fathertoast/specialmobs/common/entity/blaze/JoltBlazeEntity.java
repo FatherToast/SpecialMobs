@@ -4,7 +4,6 @@ import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.entity.MobHelper;
-import fathertoast.specialmobs.common.util.AttributeHelper;
 import fathertoast.specialmobs.common.util.ExplosionHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
@@ -13,7 +12,6 @@ import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.AttributeModifierMap;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.effect.LightningBoltEntity;
 import net.minecraft.item.Items;
@@ -21,7 +19,6 @@ import net.minecraft.tags.FluidTags;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.Direction;
 import net.minecraft.util.IndirectEntityDamageSource;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
@@ -42,17 +39,12 @@ public class JoltBlazeEntity extends _SpecialBlazeEntity {
     public static MobFamily.Species<JoltBlazeEntity> SPECIES;
     
     @SpecialMob.BestiaryInfoSupplier
-    public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
-        return new BestiaryInfo( 0x499CAE );
-    }
-    
-    @SpecialMob.AttributeCreator
-    public static AttributeModifierMap.MutableAttribute createAttributes() {
-        return AttributeHelper.of( _SpecialBlazeEntity.createAttributes() )
-                .addAttribute( Attributes.MAX_HEALTH, 10.0 )
-                .addAttribute( Attributes.ARMOR, 10.0 )
-                .multAttribute( Attributes.MOVEMENT_SPEED, 1.3 )
-                .build();
+    public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
+        bestiaryInfo.color( 0x499CAE )
+                .uniqueTextureBaseOnly()
+                .addExperience( 2 ).disableRangedAttack()
+                .addToAttribute( Attributes.MAX_HEALTH, 10.0 ).addToAttribute( Attributes.ARMOR, 10.0 )
+                .multiplyAttribute( Attributes.MOVEMENT_SPEED, 1.3 );
     }
     
     @SpecialMob.LanguageProvider
@@ -70,21 +62,18 @@ public class JoltBlazeEntity extends _SpecialBlazeEntity {
     @SpecialMob.Factory
     public static EntityType.IFactory<JoltBlazeEntity> getVariantFactory() { return JoltBlazeEntity::new; }
     
+    /** @return This entity's mob species. */
+    @SpecialMob.SpeciesSupplier
+    @Override
+    public MobFamily.Species<? extends JoltBlazeEntity> getSpecies() { return SPECIES; }
+    
     
     //--------------- Variant-Specific Implementations ----------------
     
-    public JoltBlazeEntity( EntityType<? extends _SpecialBlazeEntity> entityType, World world ) {
-        super( entityType, world );
-        xpReward += 2;
-    }
-    
-    /** Override to change this entity's AI goals. */
-    @Override
-    protected void registerVariantGoals() {
-        disableRangedAI();
-    }
+    public JoltBlazeEntity( EntityType<? extends _SpecialBlazeEntity> entityType, World world ) { super( entityType, world ); }
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
+    @Override
     protected void onVariantAttack( Entity target ) {
         if( target instanceof LivingEntity ) {
             MobHelper.causeLifeLoss( (LivingEntity) target, 2.0F );
@@ -128,6 +117,10 @@ public class JoltBlazeEntity extends _SpecialBlazeEntity {
         }
         return success;
     }
+    
+    /** Called when this entity is struck by lightning. */
+    @Override
+    public void thunderHit( ServerWorld world, LightningBoltEntity lightningBolt ) { }
     
     /** @return Teleports this "enderman" to a random nearby position; returns true if successful. */
     protected boolean teleport() {
@@ -174,16 +167,4 @@ public class JoltBlazeEntity extends _SpecialBlazeEntity {
         }
         return success;
     }
-    
-    /** Called when this entity is struck by lightning. */
-    @Override
-    public void thunderHit( ServerWorld world, LightningBoltEntity lightningBolt ) { }
-    
-    private static final ResourceLocation[] TEXTURES = {
-            GET_TEXTURE_PATH( "jolt" )
-    };
-    
-    /** @return All default textures for this entity. */
-    @Override
-    public ResourceLocation[] getDefaultTextures() { return TEXTURES; }
 }

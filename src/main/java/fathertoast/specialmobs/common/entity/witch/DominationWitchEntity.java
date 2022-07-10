@@ -3,20 +3,17 @@ package fathertoast.specialmobs.common.entity.witch;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
-import fathertoast.specialmobs.common.util.AttributeHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.AttributeModifierMap;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.Effects;
 import net.minecraft.potion.Potions;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 
@@ -35,15 +32,11 @@ public class DominationWitchEntity extends _SpecialWitchEntity {
     public static MobFamily.Species<DominationWitchEntity> SPECIES;
     
     @SpecialMob.BestiaryInfoSupplier
-    public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
-        return new BestiaryInfo( 0xFFF87E, BestiaryInfo.BaseWeight.LOW );
-    }
-    
-    @SpecialMob.AttributeCreator
-    public static AttributeModifierMap.MutableAttribute createAttributes() {
-        return AttributeHelper.of( _SpecialWitchEntity.createAttributes() )
-                .multAttribute( Attributes.MOVEMENT_SPEED, 0.8 )
-                .build();
+    public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
+        bestiaryInfo.color( 0xFFF87E ).weight( BestiaryInfo.DefaultWeight.LOW )
+                .uniqueTextureWithEyes()
+                .addExperience( 2 )
+                .multiplyAttribute( Attributes.MOVEMENT_SPEED, 0.8 );
     }
     
     @SpecialMob.LanguageProvider
@@ -61,6 +54,11 @@ public class DominationWitchEntity extends _SpecialWitchEntity {
     @SpecialMob.Factory
     public static EntityType.IFactory<DominationWitchEntity> getVariantFactory() { return DominationWitchEntity::new; }
     
+    /** @return This entity's mob species. */
+    @SpecialMob.SpeciesSupplier
+    @Override
+    public MobFamily.Species<? extends DominationWitchEntity> getSpecies() { return SPECIES; }
+    
     
     //--------------- Variant-Specific Implementations ----------------
     
@@ -70,10 +68,7 @@ public class DominationWitchEntity extends _SpecialWitchEntity {
     /** Ticks before this witch can use its pull ability. */
     private int pullDelay;
     
-    public DominationWitchEntity( EntityType<? extends _SpecialWitchEntity> entityType, World world ) {
-        super( entityType, world );
-        xpReward += 2;
-    }
+    public DominationWitchEntity( EntityType<? extends _SpecialWitchEntity> entityType, World world ) { super( entityType, world ); }
     
     /** Override to modify potion attacks. Return an empty item stack to cancel the potion throw. */
     @Override
@@ -110,13 +105,4 @@ public class DominationWitchEntity extends _SpecialWitchEntity {
         }
         super.aiStep();
     }
-    
-    private static final ResourceLocation[] TEXTURES = {
-            GET_TEXTURE_PATH( "domination" ),
-            GET_TEXTURE_PATH( "domination_eyes" )
-    };
-    
-    /** @return All default textures for this entity. */
-    @Override
-    public ResourceLocation[] getDefaultTextures() { return TEXTURES; }
 }

@@ -11,7 +11,6 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.Items;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.Effects;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -27,9 +26,10 @@ public class BlindingEndermanEntity extends _SpecialEndermanEntity {
     public static MobFamily.Species<BlindingEndermanEntity> SPECIES;
     
     @SpecialMob.BestiaryInfoSupplier
-    public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
-        return new BestiaryInfo( 0xFFFFFF );
-        //TODO theme - forest
+    public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
+        bestiaryInfo.color( 0xFFFFFF ).theme( BestiaryInfo.Theme.FOREST )
+                .uniqueTextureWithEyes()
+                .addExperience( 1 ).effectImmune( Effects.BLINDNESS );
     }
     
     @SpecialMob.LanguageProvider
@@ -47,14 +47,15 @@ public class BlindingEndermanEntity extends _SpecialEndermanEntity {
     @SpecialMob.Factory
     public static EntityType.IFactory<BlindingEndermanEntity> getVariantFactory() { return BlindingEndermanEntity::new; }
     
+    /** @return This entity's mob species. */
+    @SpecialMob.SpeciesSupplier
+    @Override
+    public MobFamily.Species<? extends BlindingEndermanEntity> getSpecies() { return SPECIES; }
+    
     
     //--------------- Variant-Specific Implementations ----------------
     
-    public BlindingEndermanEntity( EntityType<? extends _SpecialEndermanEntity> entityType, World world ) {
-        super( entityType, world );
-        getSpecialData().addPotionImmunity( Effects.BLINDNESS );
-        xpReward += 1;
-    }
+    public BlindingEndermanEntity( EntityType<? extends _SpecialEndermanEntity> entityType, World world ) { super( entityType, world ); }
     
     /** Called each tick to update this entity's movement. */
     @Override
@@ -68,13 +69,4 @@ public class BlindingEndermanEntity extends _SpecialEndermanEntity {
             target.removeEffect( Effects.NIGHT_VISION ); // Prevent blind + night vision combo (black screen)
         }
     }
-    
-    private static final ResourceLocation[] TEXTURES = {
-            GET_TEXTURE_PATH( "blinding" ),
-            GET_TEXTURE_PATH( "blinding_eyes" )
-    };
-    
-    /** @return All default textures for this entity. */
-    @Override
-    public ResourceLocation[] getDefaultTextures() { return TEXTURES; }
 }

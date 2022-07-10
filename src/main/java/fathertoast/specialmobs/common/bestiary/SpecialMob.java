@@ -1,5 +1,7 @@
 package fathertoast.specialmobs.common.bestiary;
 
+import fathertoast.specialmobs.common.entity.ISpecialMob;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -14,50 +16,77 @@ import java.lang.annotation.Target;
  */
 @Target( ElementType.TYPE )
 public @interface SpecialMob {
-    
     /**
      * REQUIRED. This is injected with a reference to the species during registration so you may access it later, as needed.
      * <p>
      * The annotated field must have a signature that follows the pattern:
      * <p>
-     * public static MobFamily.Species<T> FIELD_NAME;
+     * {@code public static MobFamily.Species<T> FIELD_NAME;}
      */
     @Retention( RetentionPolicy.RUNTIME )
     @Target( ElementType.FIELD )
     @interface SpeciesReference { }
     
     /**
-     * REQUIRED. This is called during registration to collect static properties of the mob needed for the bestiary
-     * and for building the species's entity type.
-     * This is not 'overridable' because all species must have unique info in the bestiary.
+     * REQUIRED. This is used to enforce overriding {@link ISpecialMob#getSpecies()} in every species entity class.
      * <p>
      * The annotated method must have a signature that follows the pattern:
      * <p>
-     * public static BestiaryInfo METHOD_NAME( EntityType.Builder<LivingEntity> entityType )
+     * {@code public MobFamily.Species<? extends T> getSpecies();}
      * <p>
-     * The returned bestiary info will be used to describe the mob species.
-     * The builder passed in is a copy of the vanilla 'base' entity type. Common uses of the entity type builder are
-     * modifying entity size and fire/hazard immunities.
+     * The returned species should be the field annotated with {@link SpecialMob.SpeciesReference}.
+     */
+    @Retention( RetentionPolicy.RUNTIME )
+    @Target( ElementType.METHOD )
+    @interface SpeciesSupplier { }
+    
+    /**
+     * REQUIRED. This is called during registration to collect static properties of the mob needed for the bestiary
+     * and for building the species's entity type.
+     * This is not 'overridable' because all species must have unique info in the bestiary, however some info in the
+     * builder is automatically inherited.
+     * <p>
+     * The annotated method must have a signature that follows the pattern:
+     * <p>
+     * {@code public static void METHOD_NAME( BestiaryInfo.Builder bestiaryInfo )}
+     * <p>
+     * The provided bestiary info builder is initialized with as much data from the parent entity as possible.
+     * The only builder method that absolutely must be called is #color( int ). This will likely later expand to desc.
      */
     @Retention( RetentionPolicy.RUNTIME )
     @Target( ElementType.METHOD )
     @interface BestiaryInfoSupplier { }
     
     /**
-     * OVERRIDABLE. This is called during registration to build the base attributes for the species.
-     * 'Overridable' static methods inherit from their superclass if not defined in a subclass, but must be defined somewhere.
-     * This is 'overridable' because not all species need to have different attributes from their parent vanilla mob.
+     * OPTIONAL-OVERRIDABLE. This is called during registration to generate the species config.
+     * 'Overridable' static methods inherit from their superclass if not defined in a subclass.
+     * This is 'overridable' because not all species (or even families) require unique config categories.
      * <p>
      * The annotated method must have a signature that follows the pattern:
      * <p>
-     * public static AttributeModifierMap.MutableAttribute METHOD_NAME()
+     * {@code public static SpeciesConfig METHOD_NAME( MobFamily.Species<?> species )}
+     * <p>
+     * The returned config will be loaded immediately after the call and a reference will be stored in the species.
+     */
+    @Retention( RetentionPolicy.RUNTIME )
+    @Target( ElementType.METHOD )
+    @interface ConfigSupplier { }
+    
+    /**
+     * OVERRIDABLE. This is called during registration to build the base attributes for the species.
+     * 'Overridable' static methods inherit from their superclass if not defined in a subclass, but must be defined somewhere.
+     * This is 'overridable' because a few species have a different parent vanilla mob from the rest of their family.
+     * <p>
+     * The annotated method must have a signature that follows the pattern:
+     * <p>
+     * {@code public static AttributeModifierMap.MutableAttribute METHOD_NAME()}
      * <p>
      * The returned attribute modifier map builder will be 'built' immediately after the call and registered to be
      * applied to all entity class instances of the mob species.
      */
     @Retention( RetentionPolicy.RUNTIME )
     @Target( ElementType.METHOD )
-    @interface AttributeCreator { }
+    @interface AttributeSupplier { }
     
     /**
      * REQUIRED. This is called during data generation to build the mod's default lang files.
@@ -65,7 +94,7 @@ public @interface SpecialMob {
      * <p>
      * The annotated method must have a signature that follows the pattern:
      * <p>
-     * public static String[] METHOD_NAME( String langKey )
+     * {@code public static String[] METHOD_NAME( String langKey )}
      * <p>
      * The returned string array should be created by References#translations using the given lang key as the first
      * argument. Always be sure that any non-ASCII characters used are properly handled by the translations method.
@@ -83,7 +112,7 @@ public @interface SpecialMob {
      * <p>
      * The annotated method must have a signature that follows the pattern:
      * <p>
-     * public static void METHOD_NAME( LootTableBuilder loot )
+     * {@code public static void METHOD_NAME( LootTableBuilder loot )}
      * <p>
      * The builder passed in is a new empty instance and will be 'built' immediately after the call.
      */
@@ -98,7 +127,7 @@ public @interface SpecialMob {
      * <p>
      * The annotated method must have a signature that follows the pattern:
      * <p>
-     * public static EntityType.IFactory<T> METHOD_NAME()
+     * {@code public static EntityType.IFactory<T> METHOD_NAME()}
      */
     @Retention( RetentionPolicy.RUNTIME )
     @Target( ElementType.METHOD )

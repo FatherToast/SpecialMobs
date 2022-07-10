@@ -13,7 +13,6 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.Items;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.Effects;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -29,9 +28,10 @@ public class BlindingSilverfishEntity extends _SpecialSilverfishEntity {
     public static MobFamily.Species<BlindingSilverfishEntity> SPECIES;
     
     @SpecialMob.BestiaryInfoSupplier
-    public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
-        return new BestiaryInfo( 0x000000 );
-        //TODO theme - forest
+    public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
+        bestiaryInfo.color( 0x000000 ).theme( BestiaryInfo.Theme.FOREST )
+                .uniqueTextureBaseOnly()
+                .addExperience( 1 ).effectImmune( Effects.BLINDNESS );
     }
     
     @SpecialMob.LanguageProvider
@@ -49,14 +49,15 @@ public class BlindingSilverfishEntity extends _SpecialSilverfishEntity {
     @SpecialMob.Factory
     public static EntityType.IFactory<BlindingSilverfishEntity> getVariantFactory() { return BlindingSilverfishEntity::new; }
     
+    /** @return This entity's mob species. */
+    @SpecialMob.SpeciesSupplier
+    @Override
+    public MobFamily.Species<? extends BlindingSilverfishEntity> getSpecies() { return SPECIES; }
+    
     
     //--------------- Variant-Specific Implementations ----------------
     
-    public BlindingSilverfishEntity( EntityType<? extends _SpecialSilverfishEntity> entityType, World world ) {
-        super( entityType, world );
-        getSpecialData().addPotionImmunity( Effects.BLINDNESS );
-        xpReward += 1;
-    }
+    public BlindingSilverfishEntity( EntityType<? extends _SpecialSilverfishEntity> entityType, World world ) { super( entityType, world ); }
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override
@@ -69,12 +70,4 @@ public class BlindingSilverfishEntity extends _SpecialSilverfishEntity {
             livingTarget.removeEffect( Effects.NIGHT_VISION ); // Prevent blind + night vision combo (black screen)
         }
     }
-    
-    private static final ResourceLocation[] TEXTURES = {
-            GET_TEXTURE_PATH( "blinding" )
-    };
-    
-    /** @return All default textures for this entity. */
-    @Override
-    public ResourceLocation[] getDefaultTextures() { return TEXTURES; }
 }

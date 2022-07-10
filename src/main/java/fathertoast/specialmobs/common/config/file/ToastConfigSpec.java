@@ -6,8 +6,7 @@ import com.electronwill.nightconfig.core.file.FileWatcher;
 import com.electronwill.nightconfig.core.io.CharacterOutput;
 import com.electronwill.nightconfig.core.io.ParsingException;
 import com.electronwill.nightconfig.core.io.WritingException;
-import fathertoast.specialmobs.common.config.field.AbstractConfigField;
-import fathertoast.specialmobs.common.config.field.GenericField;
+import fathertoast.specialmobs.common.config.field.*;
 import fathertoast.specialmobs.common.core.SpecialMobs;
 
 import java.io.File;
@@ -338,13 +337,17 @@ public class ToastConfigSpec {
     /** @param comment The file comment to insert. */
     public void header( List<String> comment ) { ACTIONS.add( new Header( this, comment ) ); }
     
-    /** Inserts a detailed description of how to use the given field. */
-    public void verboseFieldDesc( GenericField<?> field ) {
-        final List<String> description = field.verboseDescription();
-        
-        if( description != null && !description.isEmpty() )
-            ACTIONS.add( new Comment( field.verboseDescription() ) );
-    }
+    /** Inserts a detailed description of how to use the registry entry list field. */
+    public void describeRegistryEntryList() { ACTIONS.add( new Comment( RegistryEntryListField.verboseDescription() ) ); }
+    
+    /** Inserts a detailed description of how to use the entity list field. */
+    public void describeEntityList() { ACTIONS.add( new Comment( EntityListField.verboseDescription() ) ); }
+    
+    /** Inserts a detailed description of how to use the attribute list field. */
+    public void describeAttributeList() { ACTIONS.add( new Comment( AttributeListField.verboseDescription() ) ); }
+    
+    /** Inserts a detailed description of how to use the block list field. */
+    public void describeBlockList() { ACTIONS.add( new Comment( BlockListField.verboseDescription() ) ); }
     
     /**
      * @param name    The category name.

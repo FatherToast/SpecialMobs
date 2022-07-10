@@ -8,12 +8,10 @@ import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.projectile.AbstractArrowEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.SoundEvents;
 import net.minecraft.world.World;
@@ -31,10 +29,10 @@ public class FireZombieEntity extends _SpecialZombieEntity {
     public static MobFamily.Species<FireZombieEntity> SPECIES;
     
     @SpecialMob.BestiaryInfoSupplier
-    public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
-        entityType.fireImmune();
-        return new BestiaryInfo( 0xDC1A00 );
-        //TODO theme - fire
+    public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
+        bestiaryInfo.color( 0xDC1A00 ).theme( BestiaryInfo.Theme.FIRE )
+                .uniqueTextureBaseOnly()
+                .addExperience( 1 ).fireImmune().waterSensitive();
     }
     
     @SpecialMob.LanguageProvider
@@ -53,14 +51,15 @@ public class FireZombieEntity extends _SpecialZombieEntity {
     @SpecialMob.Factory
     public static EntityType.IFactory<FireZombieEntity> getVariantFactory() { return FireZombieEntity::new; }
     
+    /** @return This entity's mob species. */
+    @SpecialMob.SpeciesSupplier
+    @Override
+    public MobFamily.Species<? extends FireZombieEntity> getSpecies() { return SPECIES; }
+    
     
     //--------------- Variant-Specific Implementations ----------------
     
-    public FireZombieEntity( EntityType<? extends _SpecialZombieEntity> entityType, World world ) {
-        super( entityType, world );
-        getSpecialData().setDamagedByWater( true );
-        xpReward += 1;
-    }
+    public FireZombieEntity( EntityType<? extends _SpecialZombieEntity> entityType, World world ) { super( entityType, world ); }
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override
@@ -94,12 +93,4 @@ public class FireZombieEntity extends _SpecialZombieEntity {
     /** @return The sound this entity makes while walking. */
     @Override
     protected SoundEvent getStepSound() { return SoundEvents.HUSK_STEP; }
-    
-    private static final ResourceLocation[] TEXTURES = {
-            GET_TEXTURE_PATH( "fire" )
-    };
-    
-    /** @return All default textures for this entity. */
-    @Override
-    public ResourceLocation[] getDefaultTextures() { return TEXTURES; }
 }

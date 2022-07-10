@@ -3,13 +3,12 @@ package fathertoast.specialmobs.common.entity.zombifiedpiglin;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
-import fathertoast.specialmobs.common.util.AttributeHelper;
+import fathertoast.specialmobs.common.config.species.SpeciesConfig;
+import fathertoast.specialmobs.common.config.species.ZombieSpeciesConfig;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.AttributeModifierMap;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.ItemStack;
@@ -30,18 +29,17 @@ public class KnightZombifiedPiglinEntity extends _SpecialZombifiedPiglinEntity {
     public static MobFamily.Species<KnightZombifiedPiglinEntity> SPECIES;
     
     @SpecialMob.BestiaryInfoSupplier
-    public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
-        return new BestiaryInfo( 0xFDEF28 );
+    public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
+        bestiaryInfo.color( 0xFDEF28 )
+                .addExperience( 2 ).multiplyRangedSpread( 1.2 )
+                .addToAttribute( Attributes.MAX_HEALTH, 10.0 ).addToAttribute( Attributes.ARMOR, 10.0 )
+                .addToAttribute( Attributes.ATTACK_DAMAGE, 6.0 ).addToRangedDamage( 6.0 )
+                .multiplyAttribute( Attributes.MOVEMENT_SPEED, 0.8 );
     }
     
-    @SpecialMob.AttributeCreator
-    public static AttributeModifierMap.MutableAttribute createAttributes() {
-        return AttributeHelper.of( _SpecialZombifiedPiglinEntity.createAttributes() )
-                .addAttribute( Attributes.MAX_HEALTH, 10.0 )
-                .addAttribute( Attributes.ARMOR, 10.0 )
-                .addAttribute( Attributes.ATTACK_DAMAGE, 6.0 )
-                .multAttribute( Attributes.MOVEMENT_SPEED, 0.8 )
-                .build();
+    @SpecialMob.ConfigSupplier
+    public static SpeciesConfig createConfig( MobFamily.Species<?> species ) {
+        return new ZombieSpeciesConfig( species, 0.1, 1.0 );
     }
     
     @SpecialMob.LanguageProvider
@@ -60,36 +58,24 @@ public class KnightZombifiedPiglinEntity extends _SpecialZombifiedPiglinEntity {
     @SpecialMob.Factory
     public static EntityType.IFactory<KnightZombifiedPiglinEntity> getVariantFactory() { return KnightZombifiedPiglinEntity::new; }
     
+    /** @return This entity's mob species. */
+    @SpecialMob.SpeciesSupplier
+    @Override
+    public MobFamily.Species<? extends KnightZombifiedPiglinEntity> getSpecies() { return SPECIES; }
+    
     
     //--------------- Variant-Specific Implementations ----------------
     
-    public KnightZombifiedPiglinEntity( EntityType<? extends _SpecialZombifiedPiglinEntity> entityType, World world ) {
-        super( entityType, world );
-        xpReward += 2;
-    }
-    
-    /** Override to change this entity's AI goals. */
-    @Override
-    protected void registerVariantGoals() {
-        getSpecialData().rangedAttackDamage += 4.0F;
-        getSpecialData().rangedAttackSpread *= 1.2F;
-    }
+    public KnightZombifiedPiglinEntity( EntityType<? extends _SpecialZombifiedPiglinEntity> entityType, World world ) { super( entityType, world ); }
     
     /** Called during spawn finalization to set starting equipment. */
     @Override
     protected void populateDefaultEquipmentSlots( DifficultyInstance difficulty ) {
         super.populateDefaultEquipmentSlots( difficulty );
+        
         setItemSlot( EquipmentSlotType.HEAD, new ItemStack( Items.GOLDEN_HELMET ) );
         setItemSlot( EquipmentSlotType.CHEST, new ItemStack( Items.GOLDEN_CHESTPLATE ) );
         setItemSlot( EquipmentSlotType.LEGS, new ItemStack( Items.GOLDEN_LEGGINGS ) );
         setItemSlot( EquipmentSlotType.FEET, new ItemStack( Items.GOLDEN_BOOTS ) );
     }
-    
-    /** Override to change this entity's chance to spawn with a bow. */
-    @Override
-    protected double getVariantBowChance() { return 0.1; }
-    
-    /** Override to change this entity's chance to spawn with a shield. */
-    @Override
-    protected double getVariantShieldChance() { return 1.0; }
 }

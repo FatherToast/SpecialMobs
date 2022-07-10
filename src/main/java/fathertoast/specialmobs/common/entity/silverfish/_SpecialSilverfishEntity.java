@@ -3,7 +3,8 @@ package fathertoast.specialmobs.common.entity.silverfish;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
-import fathertoast.specialmobs.common.core.SpecialMobs;
+import fathertoast.specialmobs.common.config.species.SilverfishSpeciesConfig;
+import fathertoast.specialmobs.common.config.species.SpeciesConfig;
 import fathertoast.specialmobs.common.entity.ISpecialMob;
 import fathertoast.specialmobs.common.entity.SpecialMobData;
 import fathertoast.specialmobs.common.entity.ai.AIHelper;
@@ -24,7 +25,6 @@ import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.IServerWorld;
@@ -45,14 +45,25 @@ public class _SpecialSilverfishEntity extends SilverfishEntity implements ISpeci
     public static MobFamily.Species<_SpecialSilverfishEntity> SPECIES;
     
     @SpecialMob.BestiaryInfoSupplier
-    public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
-        return new BestiaryInfo( 0x303030 );
+    public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
+        bestiaryInfo.color( 0x303030 )
+                .vanillaTextureBaseOnly( "textures/entity/silverfish.png" )
+                .experience( 5 )
+                .spitAttack( 1.0, 1.3, 40, 40, 10.0 );
     }
     
-    @SpecialMob.AttributeCreator
-    public static AttributeModifierMap.MutableAttribute createAttributes() {
-        return SilverfishEntity.createAttributes();
+    protected static final double DEFAULT_SPIT_CHANCE = 0.05;
+    
+    @SpecialMob.ConfigSupplier
+    public static SpeciesConfig createConfig( MobFamily.Species<?> species ) {
+        return new SilverfishSpeciesConfig( species, DEFAULT_SPIT_CHANCE );
     }
+    
+    /** @return This entity's species config. */
+    public SilverfishSpeciesConfig getConfig() { return (SilverfishSpeciesConfig) getSpecies().config; }
+    
+    @SpecialMob.AttributeSupplier
+    public static AttributeModifierMap.MutableAttribute createAttributes() { return SilverfishEntity.createAttributes(); }
     
     @SpecialMob.LanguageProvider
     public static String[] getTranslations( String langKey ) {
@@ -71,21 +82,12 @@ public class _SpecialSilverfishEntity extends SilverfishEntity implements ISpeci
     
     //--------------- Variant-Specific Breakouts ----------------
     
-    public _SpecialSilverfishEntity( EntityType<? extends _SpecialSilverfishEntity> entityType, World world ) {
-        super( entityType, world );
-        getSpecialData().initialize();
-    }
-    
     /** Called in the MobEntity.class constructor to initialize AI goals. */
     @Override
     protected void registerGoals() {
         super.registerGoals();
         AIHelper.replaceHurtByTarget( this, new SpecialHurtByTargetGoal( this, SilverfishEntity.class ).setAlertOthers() );
         
-        getSpecialData().rangedAttackDamage = 1.0F;
-        getSpecialData().rangedAttackCooldown = 40;
-        getSpecialData().rangedAttackMaxCooldown = getSpecialData().rangedAttackCooldown;
-        getSpecialData().rangedAttackMaxRange = 10.0F;
         registerVariantGoals();
     }
     
@@ -114,11 +116,18 @@ public class _SpecialSilverfishEntity extends SilverfishEntity implements ISpeci
     /** The parameter for special mob render scale. */
     private static final DataParameter<Float> SCALE = EntityDataManager.defineId( _SpecialSilverfishEntity.class, DataSerializers.FLOAT );
     
+    public _SpecialSilverfishEntity( EntityType<? extends _SpecialSilverfishEntity> entityType, World world ) {
+        super( entityType, world );
+        if( !getConfig().SILVERFISH.spitterChance.rollChance( random ) ) getSpecialData().disableRangedAttack();
+        
+        getSpecialData().initialize();
+    }
+    
     /** Called from the Entity.class constructor to define data watcher variables. */
     @Override
     protected void defineSynchedData() {
         super.defineSynchedData();
-        specialData = new SpecialMobData<>( this, SCALE, 1.0F );
+        specialData = new SpecialMobData<>( this, SCALE );
     }
     
     /** Called on spawn to initialize properties based on the world, difficulty, and the group it spawns with. */
@@ -127,9 +136,11 @@ public class _SpecialSilverfishEntity extends SilverfishEntity implements ISpeci
                                             @Nullable ILivingEntityData groupData, @Nullable CompoundNBT eggTag ) {
         groupData = super.finalizeSpawn( world, difficulty, spawnReason, groupData, eggTag );
         
-        // TODO ranged attack
+        final double aggressiveChance = getConfig().SILVERFISH.aggressiveChance.get() < 0.0 ?
+                MobFamily.SILVERFISH.config.SILVERFISH.familyAggressiveChance.get() :
+                getConfig().SILVERFISH.aggressiveChance.get();
         
-        if( random.nextFloat() < 0.05 ) { //TODO config
+        if( random.nextDouble() < aggressiveChance ) {
             // Immediately start calling for reinforcements if it can find a player
             if( getTarget() == null ) {
                 final double followRange = getAttributeValue( Attributes.FOLLOW_RANGE );
@@ -160,6 +171,11 @@ public class _SpecialSilverfishEntity extends SilverfishEntity implements ISpeci
     @Override
     public SpecialMobData<_SpecialSilverfishEntity> getSpecialData() { return specialData; }
     
+    /** @return This entity's mob species. */
+    @SpecialMob.SpeciesSupplier
+    @Override
+    public MobFamily.Species<? extends _SpecialSilverfishEntity> getSpecies() { return SPECIES; }
+    
     /** @return The experience that should be dropped by this entity. */
     @Override
     public final int getExperience() { return xpReward; }
@@ -167,16 +183,6 @@ public class _SpecialSilverfishEntity extends SilverfishEntity implements ISpeci
     /** Sets the experience that should be dropped by this entity. */
     @Override
     public final void setExperience( int xp ) { xpReward = xp; }
-    
-    static ResourceLocation GET_TEXTURE_PATH( String type ) {
-        return SpecialMobs.resourceLoc( SpecialMobs.TEXTURE_PATH + "silverfish/" + type + ".png" );
-    }
-    
-    private static final ResourceLocation[] TEXTURES = { new ResourceLocation( "textures/entity/silverfish.png" ) };
-    
-    /** @return All default textures for this entity. */
-    @Override
-    public ResourceLocation[] getDefaultTextures() { return TEXTURES; }
     
     
     //--------------- SpecialMobData Hooks ----------------

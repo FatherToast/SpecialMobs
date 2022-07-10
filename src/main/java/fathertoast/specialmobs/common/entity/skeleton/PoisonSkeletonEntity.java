@@ -18,7 +18,6 @@ import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.Effects;
 import net.minecraft.potion.PotionUtils;
 import net.minecraft.potion.Potions;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -34,9 +33,10 @@ public class PoisonSkeletonEntity extends _SpecialSkeletonEntity {
     public static MobFamily.Species<PoisonSkeletonEntity> SPECIES;
     
     @SpecialMob.BestiaryInfoSupplier
-    public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
-        return new BestiaryInfo( 0x779C68 );
-        //TODO theme - forest
+    public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
+        bestiaryInfo.color( 0x779C68 ).theme( BestiaryInfo.Theme.FOREST )
+                .uniqueTextureWithOverlay()
+                .addExperience( 1 );
     }
     
     @SpecialMob.LanguageProvider
@@ -54,14 +54,15 @@ public class PoisonSkeletonEntity extends _SpecialSkeletonEntity {
     @SpecialMob.Factory
     public static EntityType.IFactory<PoisonSkeletonEntity> getVariantFactory() { return PoisonSkeletonEntity::new; }
     
+    /** @return This entity's mob species. */
+    @SpecialMob.SpeciesSupplier
+    @Override
+    public MobFamily.Species<? extends PoisonSkeletonEntity> getSpecies() { return SPECIES; }
+    
     
     //--------------- Variant-Specific Implementations ----------------
     
-    public PoisonSkeletonEntity( EntityType<? extends _SpecialSkeletonEntity> entityType, World world ) {
-        super( entityType, world );
-        getSpecialData().addPotionImmunity( Effects.POISON );
-        xpReward += 1;
-    }
+    public PoisonSkeletonEntity( EntityType<? extends _SpecialSkeletonEntity> entityType, World world ) { super( entityType, world ); }
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override
@@ -84,14 +85,4 @@ public class PoisonSkeletonEntity extends _SpecialSkeletonEntity {
         }
         return arrow;
     }
-    
-    private static final ResourceLocation[] TEXTURES = {
-            GET_TEXTURE_PATH( "poison" ),
-            null,
-            GET_TEXTURE_PATH( "poison_overlay" )
-    };
-    
-    /** @return All default textures for this entity. */
-    @Override
-    public ResourceLocation[] getDefaultTextures() { return TEXTURES; }
 }

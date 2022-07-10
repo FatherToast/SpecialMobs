@@ -3,7 +3,8 @@ package fathertoast.specialmobs.common.entity.spider;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
-import fathertoast.specialmobs.common.core.SpecialMobs;
+import fathertoast.specialmobs.common.config.species.SpeciesConfig;
+import fathertoast.specialmobs.common.config.species.SpiderSpeciesConfig;
 import fathertoast.specialmobs.common.entity.ISpecialMob;
 import fathertoast.specialmobs.common.entity.SpecialMobData;
 import fathertoast.specialmobs.common.util.References;
@@ -21,13 +22,9 @@ import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.DifficultyInstance;
-import net.minecraft.world.IServerWorld;
 import net.minecraft.world.World;
 
-import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
@@ -41,14 +38,25 @@ public class _SpecialSpiderEntity extends SpiderEntity implements ISpecialMob<_S
     public static MobFamily.Species<_SpecialSpiderEntity> SPECIES;
     
     @SpecialMob.BestiaryInfoSupplier
-    public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
-        return new BestiaryInfo( 0xA80E0E );
+    public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
+        bestiaryInfo.color( 0xA80E0E )
+                .vanillaTextureWithEyes( "textures/entity/spider/spider.png", "textures/entity/spider_eyes.png" )
+                .experience( 5 ).spider()
+                .spitAttack( 2.0, 1.0, 20, 40, 10.0 );
     }
     
-    @SpecialMob.AttributeCreator
-    public static AttributeModifierMap.MutableAttribute createAttributes() {
-        return SpiderEntity.createAttributes();
+    protected static final double DEFAULT_SPIT_CHANCE = 0.1;
+    
+    @SpecialMob.ConfigSupplier
+    public static SpeciesConfig createConfig( MobFamily.Species<?> species ) {
+        return new SpiderSpeciesConfig( species, DEFAULT_SPIT_CHANCE );
     }
+    
+    /** @return This entity's species config. */
+    public SpiderSpeciesConfig getConfig() { return (SpiderSpeciesConfig) getSpecies().config; }
+    
+    @SpecialMob.AttributeSupplier
+    public static AttributeModifierMap.MutableAttribute createAttributes() { return SpiderEntity.createAttributes(); }
     
     @SpecialMob.LanguageProvider
     public static String[] getTranslations( String langKey ) {
@@ -67,21 +75,10 @@ public class _SpecialSpiderEntity extends SpiderEntity implements ISpecialMob<_S
     
     //--------------- Variant-Specific Breakouts ----------------
     
-    public _SpecialSpiderEntity( EntityType<? extends _SpecialSpiderEntity> entityType, World world ) {
-        super( entityType, world );
-        getSpecialData().initialize();
-    }
-    
     /** Called in the MobEntity.class constructor to initialize AI goals. */
     @Override
     protected void registerGoals() {
         super.registerGoals();
-        
-        getSpecialData().rangedAttackDamage = 2.0F;
-        getSpecialData().rangedAttackSpread = 1.3F;
-        getSpecialData().rangedAttackCooldown = 40;
-        getSpecialData().rangedAttackMaxCooldown = getSpecialData().rangedAttackCooldown;
-        getSpecialData().rangedAttackMaxRange = 10.0F;
         registerVariantGoals();
     }
     
@@ -110,20 +107,18 @@ public class _SpecialSpiderEntity extends SpiderEntity implements ISpecialMob<_S
     /** The parameter for special mob render scale. */
     private static final DataParameter<Float> SCALE = EntityDataManager.defineId( _SpecialSpiderEntity.class, DataSerializers.FLOAT );
     
+    public _SpecialSpiderEntity( EntityType<? extends _SpecialSpiderEntity> entityType, World world ) {
+        super( entityType, world );
+        if( !getConfig().SPIDERS.spitterChance.rollChance( random ) ) getSpecialData().disableRangedAttack();
+        
+        getSpecialData().initialize();
+    }
+    
     /** Called from the Entity.class constructor to define data watcher variables. */
     @Override
     protected void defineSynchedData() {
         super.defineSynchedData();
-        specialData = new SpecialMobData<>( this, SCALE, 1.0F );
-    }
-    
-    /** Called on spawn to initialize properties based on the world, difficulty, and the group it spawns with. */
-    @Nullable
-    public ILivingEntityData finalizeSpawn( IServerWorld world, DifficultyInstance difficulty, SpawnReason spawnReason,
-                                            @Nullable ILivingEntityData groupData, @Nullable CompoundNBT eggTag ) {
-        groupData = super.finalizeSpawn( world, difficulty, spawnReason, groupData, eggTag );
-        // TODO ranged attack
-        return groupData;
+        specialData = new SpecialMobData<>( this, SCALE );
     }
     
     
@@ -133,7 +128,12 @@ public class _SpecialSpiderEntity extends SpiderEntity implements ISpecialMob<_S
     
     /** @return This mob's special data. */
     @Override
-    public SpecialMobData<_SpecialSpiderEntity> getSpecialData() { return specialData; }
+    public final SpecialMobData<_SpecialSpiderEntity> getSpecialData() { return specialData; }
+    
+    /** @return This entity's mob species. */
+    @SpecialMob.SpeciesSupplier
+    @Override
+    public MobFamily.Species<? extends _SpecialSpiderEntity> getSpecies() { return SPECIES; }
     
     /** @return The experience that should be dropped by this entity. */
     @Override
@@ -142,19 +142,6 @@ public class _SpecialSpiderEntity extends SpiderEntity implements ISpecialMob<_S
     /** Sets the experience that should be dropped by this entity. */
     @Override
     public final void setExperience( int xp ) { xpReward = xp; }
-    
-    static ResourceLocation GET_TEXTURE_PATH( String type ) {
-        return SpecialMobs.resourceLoc( SpecialMobs.TEXTURE_PATH + "spider/" + type + ".png" );
-    }
-    
-    private static final ResourceLocation[] TEXTURES = {
-            new ResourceLocation( "textures/entity/spider/spider.png" ),
-            new ResourceLocation( "textures/entity/spider_eyes.png" )
-    };
-    
-    /** @return All default textures for this entity. */
-    @Override
-    public ResourceLocation[] getDefaultTextures() { return TEXTURES; }
     
     
     //--------------- SpecialMobData Hooks ----------------

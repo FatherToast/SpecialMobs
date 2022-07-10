@@ -10,7 +10,6 @@ import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.item.Items;
@@ -20,7 +19,6 @@ import net.minecraft.particles.ParticleTypes;
 import net.minecraft.pathfinding.PathNavigator;
 import net.minecraft.pathfinding.PathNodeType;
 import net.minecraft.tags.FluidTags;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -36,9 +34,11 @@ public class BlueberrySlimeEntity extends _SpecialSlimeEntity {
     public static MobFamily.Species<BlueberrySlimeEntity> SPECIES;
     
     @SpecialMob.BestiaryInfoSupplier
-    public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
-        return new BestiaryInfo( 0x766BBC );
-        //TODO theme - water
+    public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
+        bestiaryInfo.color( 0x766BBC ).theme( BestiaryInfo.Theme.WATER )
+                .uniqueTextureBaseOnly()
+                .addExperience( 1 ).drownImmune().fluidPushImmune()
+                .addToAttribute( Attributes.ATTACK_DAMAGE, 2.0 );
     }
     
     @SpecialMob.LanguageProvider
@@ -57,22 +57,17 @@ public class BlueberrySlimeEntity extends _SpecialSlimeEntity {
     @SpecialMob.Factory
     public static EntityType.IFactory<BlueberrySlimeEntity> getVariantFactory() { return BlueberrySlimeEntity::new; }
     
+    /** @return This entity's mob species. */
+    @SpecialMob.SpeciesSupplier
+    @Override
+    public MobFamily.Species<? extends BlueberrySlimeEntity> getSpecies() { return SPECIES; }
+    
     
     //--------------- Variant-Specific Implementations ----------------
     
     public BlueberrySlimeEntity( EntityType<? extends _SpecialSlimeEntity> entityType, World world ) {
         super( entityType, world );
-        getSpecialData().setCanBreatheInWater( true );
-        getSpecialData().setIgnoreWaterPush( true );
-        slimeExperienceValue += 1;
-        
         setPathfindingMalus( PathNodeType.WATER, PathNodeType.WALKABLE.getMalus() );
-    }
-    
-    /** Override to modify this slime's base attributes by size. */
-    @Override
-    protected void modifyVariantAttributes( int size ) {
-        addAttribute( Attributes.ATTACK_DAMAGE, 1.0 * size );
     }
     
     /** Override to change this entity's AI goals. */
@@ -113,12 +108,4 @@ public class BlueberrySlimeEntity extends _SpecialSlimeEntity {
     /** @return This slime's particle type for jump effects. */
     @Override
     protected IParticleData getParticleType() { return ParticleTypes.SPLASH; }
-    
-    private static final ResourceLocation[] TEXTURES = {
-            GET_TEXTURE_PATH( "blueberry" )
-    };
-    
-    /** @return All default textures for this entity. */
-    @Override
-    public ResourceLocation[] getDefaultTextures() { return TEXTURES; }
 }

@@ -3,20 +3,18 @@ package fathertoast.specialmobs.common.entity.spider;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
-import fathertoast.specialmobs.common.util.AttributeHelper;
+import fathertoast.specialmobs.common.config.species.MotherSpiderSpeciesConfig;
+import fathertoast.specialmobs.common.config.species.SpeciesConfig;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ILivingEntityData;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SpawnReason;
-import net.minecraft.entity.ai.attributes.AttributeModifierMap;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvents;
 import net.minecraft.world.IServerWorld;
 import net.minecraft.world.World;
@@ -35,19 +33,24 @@ public class MotherSpiderEntity extends _SpecialSpiderEntity {
     public static MobFamily.Species<MotherSpiderEntity> SPECIES;
     
     @SpecialMob.BestiaryInfoSupplier
-    public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
-        entityType.sized( 1.7F, 1.0F );
-        return new BestiaryInfo( 0xB300B3 );
+    public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
+        bestiaryInfo.color( 0xB300B3 )
+                .uniqueTextureWithEyes()
+                .size( 1.2F, 1.7F, 1.0F )
+                .addExperience( 1 ).regen( 30 )
+                .addToAttribute( Attributes.MAX_HEALTH, 16.0 ).addToAttribute( Attributes.ARMOR, 6.0 )
+                .addToAttribute( Attributes.ATTACK_DAMAGE, 3.0 ).addToRangedDamage( 1.5 );
     }
     
-    @SpecialMob.AttributeCreator
-    public static AttributeModifierMap.MutableAttribute createAttributes() {
-        return AttributeHelper.of( _SpecialSpiderEntity.createAttributes() )
-                .addAttribute( Attributes.MAX_HEALTH, 16.0 )
-                .addAttribute( Attributes.ARMOR, 6.0 )
-                .addAttribute( Attributes.ATTACK_DAMAGE, 3.0 )
-                .build();
+    @SpecialMob.ConfigSupplier
+    public static SpeciesConfig createConfig( MobFamily.Species<?> species ) {
+        return new MotherSpiderSpeciesConfig( species, DEFAULT_SPIT_CHANCE,
+                2, 4, 3, 6 );
     }
+    
+    /** @return This entity's species config. */
+    @Override
+    public MotherSpiderSpeciesConfig getConfig() { return (MotherSpiderSpeciesConfig) getSpecies().config; }
     
     @SpecialMob.LanguageProvider
     public static String[] getTranslations( String langKey ) {
@@ -64,28 +67,23 @@ public class MotherSpiderEntity extends _SpecialSpiderEntity {
     @SpecialMob.Factory
     public static EntityType.IFactory<MotherSpiderEntity> getVariantFactory() { return MotherSpiderEntity::new; }
     
+    /** @return This entity's mob species. */
+    @SpecialMob.SpeciesSupplier
+    @Override
+    public MobFamily.Species<? extends MotherSpiderEntity> getSpecies() { return SPECIES; }
+    
     
     //--------------- Variant-Specific Implementations ----------------
-    
-    public MotherSpiderEntity( EntityType<? extends _SpecialSpiderEntity> entityType, World world ) {
-        super( entityType, world );
-        getSpecialData().setBaseScale( 1.2F );
-        getSpecialData().setRegenerationTime( 30 );
-        xpReward += 1;
-        
-        babies = 2 + random.nextInt( 3 );
-        extraBabies = 3 + random.nextInt( 4 );
-    }
     
     /** The number of babies spawned on death. */
     private int babies;
     /** The number of extra babies that can be spawned from hits. */
     private int extraBabies;
     
-    /** Override to change this entity's AI goals. */
-    @Override
-    protected void registerVariantGoals() {
-        getSpecialData().rangedAttackDamage += 1.5F;
+    public MotherSpiderEntity( EntityType<? extends _SpecialSpiderEntity> entityType, World world ) {
+        super( entityType, world );
+        babies = getConfig().MOTHER.babies.next( random );
+        extraBabies = getConfig().MOTHER.extraBabies.next( random );
     }
     
     /** @return Attempts to damage this entity; returns true if the hit was successful. */
@@ -159,13 +157,4 @@ public class MotherSpiderEntity extends _SpecialSpiderEntity {
         if( saveTag.contains( References.TAG_EXTRA_BABIES, References.NBT_TYPE_NUMERICAL ) )
             extraBabies = saveTag.getByte( References.TAG_EXTRA_BABIES );
     }
-    
-    private static final ResourceLocation[] TEXTURES = {
-            GET_TEXTURE_PATH( "mother" ),
-            GET_TEXTURE_PATH( "mother_eyes" )
-    };
-    
-    /** @return All default textures for this entity. */
-    @Override
-    public ResourceLocation[] getDefaultTextures() { return TEXTURES; }
 }

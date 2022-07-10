@@ -16,7 +16,6 @@ import net.minecraft.item.Items;
 import net.minecraft.particles.IParticleData;
 import net.minecraft.particles.ItemParticleData;
 import net.minecraft.particles.ParticleTypes;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
@@ -34,9 +33,11 @@ public class LemonSlimeEntity extends _SpecialSlimeEntity {
     public static MobFamily.Species<LemonSlimeEntity> SPECIES;
     
     @SpecialMob.BestiaryInfoSupplier
-    public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
-        entityType.fireImmune();
-        return new BestiaryInfo( 0xE6E861 );
+    public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
+        bestiaryInfo.color( 0xE6E861 )
+                .uniqueTextureBaseOnly()
+                .addExperience( 2 ).fireImmune()
+                .addToAttribute( Attributes.MAX_HEALTH, 4.0 );
     }
     
     @SpecialMob.LanguageProvider
@@ -55,19 +56,15 @@ public class LemonSlimeEntity extends _SpecialSlimeEntity {
     @SpecialMob.Factory
     public static EntityType.IFactory<LemonSlimeEntity> getVariantFactory() { return LemonSlimeEntity::new; }
     
+    /** @return This entity's mob species. */
+    @SpecialMob.SpeciesSupplier
+    @Override
+    public MobFamily.Species<? extends LemonSlimeEntity> getSpecies() { return SPECIES; }
+    
     
     //--------------- Variant-Specific Implementations ----------------
     
-    public LemonSlimeEntity( EntityType<? extends _SpecialSlimeEntity> entityType, World world ) {
-        super( entityType, world );
-        slimeExperienceValue += 2;
-    }
-    
-    /** Override to modify this slime's base attributes by size. */
-    @Override
-    protected void modifyVariantAttributes( int size ) {
-        addAttribute( Attributes.MAX_HEALTH, 2.0 * size );
-    }
+    public LemonSlimeEntity( EntityType<? extends _SpecialSlimeEntity> entityType, World world ) { super( entityType, world ); }
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override
@@ -93,12 +90,4 @@ public class LemonSlimeEntity extends _SpecialSlimeEntity {
     /** @return This slime's particle type for jump effects. */
     @Override
     protected IParticleData getParticleType() { return JUMP_PARTICLE; }
-    
-    private static final ResourceLocation[] TEXTURES = {
-            GET_TEXTURE_PATH( "lemon" )
-    };
-    
-    /** @return All default textures for this entity. */
-    @Override
-    public ResourceLocation[] getDefaultTextures() { return TEXTURES; }
 }

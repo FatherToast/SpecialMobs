@@ -18,7 +18,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.Effects;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.SoundEvents;
 import net.minecraft.world.World;
@@ -36,15 +35,15 @@ public class HuskZombieEntity extends _SpecialZombieEntity {
     public static MobFamily.Species<HuskZombieEntity> SPECIES;
     
     @SpecialMob.BestiaryInfoSupplier
-    public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
-        return new BestiaryInfo( 0xE6CC94, BestiaryInfo.BaseWeight.LOW );
-        //TODO theme - desert
+    public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
+        bestiaryInfo.color( 0xE6CC94 ).weight( BestiaryInfo.DefaultWeight.LOW ).theme( BestiaryInfo.Theme.DESERT )
+                .vanillaTextureBaseOnly( "textures/entity/zombie/husk.png" )
+                .size( 1.0625F, 0.6F, 1.95F )
+                .addExperience( 1 );
     }
     
-    @SpecialMob.AttributeCreator
-    public static AttributeModifierMap.MutableAttribute createAttributes() {
-        return HuskEntity.createAttributes();
-    }
+    @SpecialMob.AttributeSupplier
+    public static AttributeModifierMap.MutableAttribute createAttributes() { return HuskEntity.createAttributes(); }
     
     @SpecialMob.LanguageProvider
     public static String[] getTranslations( String langKey ) {
@@ -60,14 +59,15 @@ public class HuskZombieEntity extends _SpecialZombieEntity {
     @SpecialMob.Factory
     public static EntityType.IFactory<HuskZombieEntity> getVariantFactory() { return HuskZombieEntity::new; }
     
+    /** @return This entity's mob species. */
+    @SpecialMob.SpeciesSupplier
+    @Override
+    public MobFamily.Species<? extends HuskZombieEntity> getSpecies() { return SPECIES; }
+    
     
     //--------------- Variant-Specific Implementations ----------------
     
-    public HuskZombieEntity( EntityType<? extends _SpecialZombieEntity> entityType, World world ) {
-        super( entityType, world );
-        getSpecialData().setBaseScale( 1.0625F );
-        xpReward += 1;
-    }
+    public HuskZombieEntity( EntityType<? extends _SpecialZombieEntity> entityType, World world ) { super( entityType, world ); }
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override
@@ -90,14 +90,6 @@ public class HuskZombieEntity extends _SpecialZombieEntity {
         }
         return arrow;
     }
-    
-    private static final ResourceLocation[] TEXTURES = {
-            new ResourceLocation( "textures/entity/zombie/husk.png" )
-    };
-    
-    /** @return All default textures for this entity. */
-    @Override
-    public ResourceLocation[] getDefaultTextures() { return TEXTURES; }
     
     
     //--------------- Husk Implementations ----------------

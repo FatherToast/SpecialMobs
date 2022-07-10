@@ -4,17 +4,14 @@ import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.entity.MobHelper;
-import fathertoast.specialmobs.common.util.AttributeHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.AttributeModifierMap;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.item.Items;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -30,19 +27,14 @@ public class FighterGhastEntity extends _SpecialGhastEntity {
     public static MobFamily.Species<FighterGhastEntity> SPECIES;
     
     @SpecialMob.BestiaryInfoSupplier
-    public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
-        entityType.sized( 2.0F, 2.0F );
-        return new BestiaryInfo( 0x7A1300 );
-    }
-    
-    @SpecialMob.AttributeCreator
-    public static AttributeModifierMap.MutableAttribute createAttributes() {
-        return AttributeHelper.of( _SpecialGhastEntity.createAttributes() )
-                .addAttribute( Attributes.MAX_HEALTH, 20.0 )
-                .addAttribute( Attributes.ARMOR, 10.0 )
-                .addAttribute( Attributes.ATTACK_DAMAGE, 2.0 )
-                .multAttribute( Attributes.MOVEMENT_SPEED, 0.8 )
-                .build();
+    public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
+        bestiaryInfo.color( 0x7A1300 )
+                .uniqueTextureWithAnimation()
+                .size( 0.5F, .0F, 2.0F )
+                .addExperience( 1 ).disableRangedAttack()
+                .addToAttribute( Attributes.MAX_HEALTH, 20.0 ).addToAttribute( Attributes.ARMOR, 10.0 )
+                .addToAttribute( Attributes.ATTACK_DAMAGE, 2.0 )
+                .multiplyAttribute( Attributes.MOVEMENT_SPEED, 0.8 );
     }
     
     @SpecialMob.LanguageProvider
@@ -60,21 +52,15 @@ public class FighterGhastEntity extends _SpecialGhastEntity {
     @SpecialMob.Factory
     public static EntityType.IFactory<FighterGhastEntity> getVariantFactory() { return FighterGhastEntity::new; }
     
+    /** @return This entity's mob species. */
+    @SpecialMob.SpeciesSupplier
+    @Override
+    public MobFamily.Species<? extends FighterGhastEntity> getSpecies() { return SPECIES; }
+    
     
     //--------------- Variant-Specific Implementations ----------------
     
-    public FighterGhastEntity( EntityType<? extends _SpecialGhastEntity> entityType, World world ) {
-        super( entityType, world );
-        getSpecialData().setBaseScale( 0.5F );
-        xpReward += 1;
-    }
-    
-    /** Override to change this entity's AI goals. */
-    @Override
-    protected void registerVariantGoals() {
-        getSpecialData().rangedAttackDamage += 2.0F;
-        disableRangedAI();
-    }
+    public FighterGhastEntity( EntityType<? extends _SpecialGhastEntity> entityType, World world ) { super( entityType, world ); }
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
     protected void onVariantAttack( Entity target ) {
@@ -82,14 +68,4 @@ public class FighterGhastEntity extends _SpecialGhastEntity {
             MobHelper.causeLifeLoss( (LivingEntity) target, 2.0F );
         }
     }
-    
-    private static final ResourceLocation[] TEXTURES = {
-            GET_TEXTURE_PATH( "fighter" ),
-            null,
-            GET_TEXTURE_PATH( "fighter_shooting" )
-    };
-    
-    /** @return All default textures for this entity. */
-    @Override
-    public ResourceLocation[] getDefaultTextures() { return TEXTURES; }
 }

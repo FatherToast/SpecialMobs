@@ -58,7 +58,7 @@ public class SpecialBlazeAttackGoal extends Goal {
         else lastSeen++;
         
         final double distanceSqr = blaze.distanceToSqr( target );
-        final float rangeSq = data.rangedAttackMaxRange * data.rangedAttackMaxRange;
+        final float rangeSq = data.getRangedAttackMaxRange() * data.getRangedAttackMaxRange();
         if( distanceSqr < getAttackReachSqr( target ) ) {
             if( canSee && attackTime <= 0 ) {
                 attackTime = 20;
@@ -71,14 +71,14 @@ public class SpecialBlazeAttackGoal extends Goal {
                 attackStep++;
                 
                 if( attackStep == 1 ) {
-                    attackTime = data.rangedAttackMaxCooldown - data.rangedAttackCooldown;
+                    attackTime = data.getRangedAttackCooldown();
                     blaze.setCharged( true );
                 }
                 else if( attackStep <= 1 + blaze.fireballBurstCount ) {
                     attackTime = blaze.fireballBurstDelay;
                 }
                 else {
-                    attackTime = data.rangedAttackCooldown;
+                    attackTime = data.getRangedAttackMaxCooldown() - data.getRangedAttackCooldown();
                     attackStep = 0;
                     blaze.setCharged( false );
                 }

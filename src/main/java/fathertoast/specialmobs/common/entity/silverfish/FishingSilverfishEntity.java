@@ -3,19 +3,17 @@ package fathertoast.specialmobs.common.entity.silverfish;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
+import fathertoast.specialmobs.common.config.species.SilverfishSpeciesConfig;
+import fathertoast.specialmobs.common.config.species.SpeciesConfig;
 import fathertoast.specialmobs.common.entity.ai.IAngler;
-import fathertoast.specialmobs.common.util.AttributeHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootEntryItemBuilder;
 import fathertoast.specialmobs.datagen.loot.LootPoolBuilder;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.AttributeModifierMap;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.item.Items;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -31,18 +29,19 @@ public class FishingSilverfishEntity extends _SpecialSilverfishEntity implements
     public static MobFamily.Species<FishingSilverfishEntity> SPECIES;
     
     @SpecialMob.BestiaryInfoSupplier
-    public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
-        entityType.sized( 0.5F, 0.4F );
-        return new BestiaryInfo( 0x2D41F4 );
-        //TODO theme - fishing
+    public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
+        bestiaryInfo.color( 0x2D41F4 ).theme( BestiaryInfo.Theme.FISHING )
+                .uniqueTextureBaseOnly()
+                .size( 1.2F, 0.5F, 0.4F )
+                .addExperience( 2 ).drownImmune().fluidPushImmune()
+                .spitAttack( 0.0, 1.0, 40, 40, 10.0 )
+                .addToAttribute( Attributes.MAX_HEALTH, 4.0 )
+                .multiplyAttribute( Attributes.MOVEMENT_SPEED, 0.9 );
     }
     
-    @SpecialMob.AttributeCreator
-    public static AttributeModifierMap.MutableAttribute createAttributes() {
-        return AttributeHelper.of( _SpecialSilverfishEntity.createAttributes() )
-                .addAttribute( Attributes.MAX_HEALTH, 4.0 )
-                .multAttribute( Attributes.MOVEMENT_SPEED, 0.9 )
-                .build();
+    @SpecialMob.ConfigSupplier
+    public static SpeciesConfig createConfig( MobFamily.Species<?> species ) {
+        return new SilverfishSpeciesConfig( species, 1.0 );
     }
     
     @SpecialMob.LanguageProvider
@@ -62,35 +61,21 @@ public class FishingSilverfishEntity extends _SpecialSilverfishEntity implements
     @SpecialMob.Factory
     public static EntityType.IFactory<FishingSilverfishEntity> getVariantFactory() { return FishingSilverfishEntity::new; }
     
+    /** @return This entity's mob species. */
+    @SpecialMob.SpeciesSupplier
+    @Override
+    public MobFamily.Species<? extends FishingSilverfishEntity> getSpecies() { return SPECIES; }
+    
     
     //--------------- Variant-Specific Implementations ----------------
     
-    public FishingSilverfishEntity( EntityType<? extends _SpecialSilverfishEntity> entityType, World world ) {
-        super( entityType, world );
-        getSpecialData().setBaseScale( 1.2F );
-        getSpecialData().setCanBreatheInWater( true );
-        getSpecialData().setIgnoreWaterPush( true );
-        xpReward += 2;
-    }
+    public FishingSilverfishEntity( EntityType<? extends _SpecialSilverfishEntity> entityType, World world ) { super( entityType, world ); }
     
     /** Override to change this entity's AI goals. */
     @Override
     protected void registerVariantGoals() {
-        getSpecialData().rangedAttackSpread *= 0.7F;
-        getSpecialData().rangedAttackCooldown = 32;
-        getSpecialData().rangedAttackMaxCooldown = 48;
-        getSpecialData().rangedAttackMaxRange = 10.0F;
-        
         //TODO add angler AI @ 4
     }
-    
-    private static final ResourceLocation[] TEXTURES = {
-            GET_TEXTURE_PATH( "fishing" )
-    };
-    
-    /** @return All default textures for this entity. */
-    @Override
-    public ResourceLocation[] getDefaultTextures() { return TEXTURES; }
     
     
     //--------------- IAngler Implementations ----------------

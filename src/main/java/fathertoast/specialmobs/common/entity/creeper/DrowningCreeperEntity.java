@@ -3,7 +3,6 @@ package fathertoast.specialmobs.common.entity.creeper;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
-import fathertoast.specialmobs.common.util.AttributeHelper;
 import fathertoast.specialmobs.common.util.ExplosionHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootEntryItemBuilder;
@@ -13,14 +12,11 @@ import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.AttributeModifierMap;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.passive.fish.PufferfishEntity;
 import net.minecraft.item.Items;
 import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.tags.BlockTags;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.IServerWorld;
@@ -39,16 +35,11 @@ public class DrowningCreeperEntity extends _SpecialCreeperEntity {
     public static MobFamily.Species<DrowningCreeperEntity> SPECIES;
     
     @SpecialMob.BestiaryInfoSupplier
-    public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
-        return new BestiaryInfo( 0x2D41F4, BestiaryInfo.BaseWeight.LOW );
-        //TODO theme - water
-    }
-    
-    @SpecialMob.AttributeCreator
-    public static AttributeModifierMap.MutableAttribute createAttributes() {
-        return AttributeHelper.of( _SpecialCreeperEntity.createAttributes() )
-                .addAttribute( Attributes.MAX_HEALTH, 10.0 )
-                .build();
+    public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
+        bestiaryInfo.color( 0x2D41F4 ).weight( BestiaryInfo.DefaultWeight.LOW ).theme( BestiaryInfo.Theme.WATER )
+                .uniqueTextureWithEyes()
+                .addExperience( 2 ).drownImmune().fluidPushImmune()
+                .addToAttribute( Attributes.MAX_HEALTH, 10.0 );
     }
     
     @SpecialMob.LanguageProvider
@@ -69,15 +60,15 @@ public class DrowningCreeperEntity extends _SpecialCreeperEntity {
     @SpecialMob.Factory
     public static EntityType.IFactory<DrowningCreeperEntity> getVariantFactory() { return DrowningCreeperEntity::new; }
     
+    /** @return This entity's mob species. */
+    @SpecialMob.SpeciesSupplier
+    @Override
+    public MobFamily.Species<? extends DrowningCreeperEntity> getSpecies() { return SPECIES; }
+    
     
     //--------------- Variant-Specific Implementations ----------------
     
-    public DrowningCreeperEntity( EntityType<? extends _SpecialCreeperEntity> entityType, World world ) {
-        super( entityType, world );
-        getSpecialData().setCanBreatheInWater( true );
-        getSpecialData().setIgnoreWaterPush( true );
-        xpReward += 2;
-    }
+    public DrowningCreeperEntity( EntityType<? extends _SpecialCreeperEntity> entityType, World world ) { super( entityType, world ); }
     
     /** Override to change this creeper's explosion power multiplier. */
     protected float getVariantExplosionPower( float radius ) { return super.getVariantExplosionPower( radius ) + 3.0F; }
@@ -147,7 +138,6 @@ public class DrowningCreeperEntity extends _SpecialCreeperEntity {
         }
     }
     
-    
     /** Helper method to simplify spawning pufferfish. */
     private void spawnPufferfish( BlockPos pos ) {
         if( !(level instanceof IServerWorld) ) return;
@@ -164,13 +154,4 @@ public class DrowningCreeperEntity extends _SpecialCreeperEntity {
     
     @Override
     public boolean isInWaterRainOrBubble() { return true; }
-    
-    private static final ResourceLocation[] TEXTURES = {
-            GET_TEXTURE_PATH( "drowning" ),
-            GET_TEXTURE_PATH( "drowning_eyes" )
-    };
-    
-    /** @return All default textures for this entity. */
-    @Override
-    public ResourceLocation[] getDefaultTextures() { return TEXTURES; }
 }

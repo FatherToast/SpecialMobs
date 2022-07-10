@@ -3,16 +3,12 @@ package fathertoast.specialmobs.common.entity.silverfish;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
-import fathertoast.specialmobs.common.util.AttributeHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.AttributeModifierMap;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.item.Items;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -28,19 +24,14 @@ public class ToughSilverfishEntity extends _SpecialSilverfishEntity {
     public static MobFamily.Species<ToughSilverfishEntity> SPECIES;
     
     @SpecialMob.BestiaryInfoSupplier
-    public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
-        entityType.sized( 0.6F, 0.45F );
-        return new BestiaryInfo( 0xDD0E0E, BestiaryInfo.BaseWeight.LOW );
-    }
-    
-    @SpecialMob.AttributeCreator
-    public static AttributeModifierMap.MutableAttribute createAttributes() {
-        return AttributeHelper.of( _SpecialSilverfishEntity.createAttributes() )
-                .addAttribute( Attributes.MAX_HEALTH, 16.0 )
-                .addAttribute( Attributes.ARMOR, 15.0 )
-                .addAttribute( Attributes.ATTACK_DAMAGE, 2.0 )
-                .multAttribute( Attributes.MOVEMENT_SPEED, 0.7 )
-                .build();
+    public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
+        bestiaryInfo.color( 0xDD0E0E ).weight( BestiaryInfo.DefaultWeight.LOW )
+                .uniqueTextureWithEyes()
+                .size( 1.5F, 0.6F, 0.45F )
+                .addExperience( 2 )
+                .addToAttribute( Attributes.MAX_HEALTH, 16.0 ).addToAttribute( Attributes.ARMOR, 15.0 )
+                .addToAttribute( Attributes.ATTACK_DAMAGE, 2.0 ).addToRangedDamage( 1.0 )
+                .multiplyAttribute( Attributes.MOVEMENT_SPEED, 0.7 );
     }
     
     @SpecialMob.LanguageProvider
@@ -59,27 +50,13 @@ public class ToughSilverfishEntity extends _SpecialSilverfishEntity {
     @SpecialMob.Factory
     public static EntityType.IFactory<ToughSilverfishEntity> getVariantFactory() { return ToughSilverfishEntity::new; }
     
+    /** @return This entity's mob species. */
+    @SpecialMob.SpeciesSupplier
+    @Override
+    public MobFamily.Species<? extends ToughSilverfishEntity> getSpecies() { return SPECIES; }
+    
     
     //--------------- Variant-Specific Implementations ----------------
     
-    public ToughSilverfishEntity( EntityType<? extends _SpecialSilverfishEntity> entityType, World world ) {
-        super( entityType, world );
-        getSpecialData().setBaseScale( 1.5F );
-        xpReward += 2;
-    }
-    
-    /** Override to change this entity's AI goals. */
-    @Override
-    protected void registerVariantGoals() {
-        getSpecialData().rangedAttackDamage += 1.0F;
-    }
-    
-    private static final ResourceLocation[] TEXTURES = {
-            GET_TEXTURE_PATH( "tough" ),
-            GET_TEXTURE_PATH( "tough_eyes" )
-    };
-    
-    /** @return All default textures for this entity. */
-    @Override
-    public ResourceLocation[] getDefaultTextures() { return TEXTURES; }
+    public ToughSilverfishEntity( EntityType<? extends _SpecialSilverfishEntity> entityType, World world ) { super( entityType, world ); }
 }

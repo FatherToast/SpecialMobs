@@ -22,8 +22,7 @@ public class EntityListField extends GenericField<EntityList> {
     public static final String REG_KEY_DEFAULT = "default";
     
     /** Provides a detailed description of how to use entity lists. Recommended to put at the top of any file using entity lists. */
-    @Override
-    public List<String> verboseDescription() {
+    public static List<String> verboseDescription() {
         List<String> comment = new ArrayList<>();
         comment.add( "Entity List fields: General format = [ \"namespace:entity_type value1 value2 ...\", ... ]" );
         comment.add( "  Entity lists are arrays of entity types. Some entity lists specify a number of values linked to each entity type." );

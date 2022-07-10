@@ -18,7 +18,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.Effects;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.SoundEvents;
 import net.minecraft.world.World;
@@ -36,15 +35,14 @@ public class StraySkeletonEntity extends _SpecialSkeletonEntity {
     public static MobFamily.Species<StraySkeletonEntity> SPECIES;
     
     @SpecialMob.BestiaryInfoSupplier
-    public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
-        return new BestiaryInfo( 0xDDEAEA, BestiaryInfo.BaseWeight.LOW );
-        //TODO theme - ice
+    public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
+        bestiaryInfo.color( 0xDDEAEA ).weight( BestiaryInfo.DefaultWeight.LOW ).theme( BestiaryInfo.Theme.ICE )
+                .vanillaTextureWithOverlay( "textures/entity/skeleton/stray.png", "textures/entity/skeleton/stray_overlay.png" )
+                .addExperience( 1 ).effectImmune( Effects.MOVEMENT_SLOWDOWN );
     }
     
-    @SpecialMob.AttributeCreator
-    public static AttributeModifierMap.MutableAttribute createAttributes() {
-        return StrayEntity.createAttributes();
-    }
+    @SpecialMob.AttributeSupplier
+    public static AttributeModifierMap.MutableAttribute createAttributes() { return StrayEntity.createAttributes(); }
     
     @SpecialMob.LanguageProvider
     public static String[] getTranslations( String langKey ) {
@@ -60,13 +58,15 @@ public class StraySkeletonEntity extends _SpecialSkeletonEntity {
     @SpecialMob.Factory
     public static EntityType.IFactory<StraySkeletonEntity> getVariantFactory() { return StraySkeletonEntity::new; }
     
+    /** @return This entity's mob species. */
+    @SpecialMob.SpeciesSupplier
+    @Override
+    public MobFamily.Species<? extends StraySkeletonEntity> getSpecies() { return SPECIES; }
+    
     
     //--------------- Variant-Specific Implementations ----------------
     
-    public StraySkeletonEntity( EntityType<? extends _SpecialSkeletonEntity> entityType, World world ) {
-        super( entityType, world );
-        xpReward += 1;
-    }
+    public StraySkeletonEntity( EntityType<? extends _SpecialSkeletonEntity> entityType, World world ) { super( entityType, world ); }
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override
@@ -89,16 +89,6 @@ public class StraySkeletonEntity extends _SpecialSkeletonEntity {
         }
         return arrow;
     }
-    
-    private static final ResourceLocation[] TEXTURES = {
-            new ResourceLocation( "textures/entity/skeleton/stray.png" ),
-            null,
-            new ResourceLocation( "textures/entity/skeleton/stray_overlay.png" )
-    };
-    
-    /** @return All default textures for this entity. */
-    @Override
-    public ResourceLocation[] getDefaultTextures() { return TEXTURES; }
     
     
     //--------------- Stray Implementations ----------------

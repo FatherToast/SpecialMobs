@@ -103,6 +103,8 @@ public class DoubleField extends AbstractConfigField {
         NON_NEGATIVE( 0.0, Double.POSITIVE_INFINITY ),
         /** Accepts any value between 0 and 1. */
         PERCENT( 0.0, 1.0 ),
+        /** Accepts any value between -1 and 1. */
+        SIGNED_PERCENT( -1.0, 1.0 ),
         /** Accepts any value between -1 and 2. */
         DROP_CHANCE( -1.0, 2.0 );
         

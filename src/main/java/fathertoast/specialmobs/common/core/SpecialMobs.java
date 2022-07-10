@@ -39,17 +39,19 @@ public class SpecialMobs {
      *      o dimension-sensitive configs
      *      o environment-sensitive configs
      *      ? natural spawning
+     *  + potions
+     *      + vulnerability (opposite of resistance)
      *  o entities
      *      - nbt-driven capabilities (special mob data)
      *      o fish hook
-     *      o bug projectile
+     *      o bug spit
      *      + bestiary
-     *      ? configurable stats
+     *      - configurable stats
      *  - monster families (see doc for specifics)
      *      - creepers
      *          - chance to spawn charged during thunderstorms
      *          + scope
-     *      - zombies
+     *      - zombies TODO zombie villager renderer
      *          o villager infection
      *          + transformations
      *          - ranged attack AI (using bow)
@@ -57,25 +59,28 @@ public class SpecialMobs {
      *      + drowned
      *      - zombified piglins
      *          - ranged attack AI (using bow)
+     *          + ranged attack AI (using crossbow)
      *          - use shields
      *      - skeletons
      *          - use shields
+     *          - melee chance
      *          - babies
      *      - wither skeletons
      *          - use shields
+     *          - bow chance
      *          - babies
      *      - slimes
      *          - smallest size can deal damage
      *      - magma cubes
      *      - spiders
-     *          o ranged attack AI
+     *          o ranged attack AI (spitter)
      *      - cave spiders
-     *          o ranged attack AI
+     *          o ranged attack AI (spitter)
      *      - silverfish
-     *          ? ranged attack AI
+     *          + ranged attack AI (spitter)
      *          + puffer
      *      - endermen
-     *      - witches
+     *      - witches TODO inject ranged attack stats
      *          - ability to equip held items
      *          - uses splash speed instead of regular
      *      - ghasts
@@ -109,6 +114,8 @@ public class SpecialMobs {
     
     public SpecialMobs() {
         Config.initialize();
+        MobFamily.initBestiary();
+        
         packetHandler.registerMessages();
         
         //MinecraftForge.EVENT_BUS.register( new SMEventListener() );
@@ -121,8 +128,6 @@ public class SpecialMobs {
         
         SMEntities.REGISTRY.register( eventBus );
         SMItems.REGISTRY.register( eventBus );
-        
-        MobFamily.initBestiary();
     }
     
     // TODO - This could very well help out the config malformation issue

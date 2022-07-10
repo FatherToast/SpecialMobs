@@ -9,10 +9,8 @@ import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.entity.AreaEffectCloudEntity;
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.Effects;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -29,9 +27,10 @@ public class DoomCreeperEntity extends _SpecialCreeperEntity {
     public static MobFamily.Species<DoomCreeperEntity> SPECIES;
     
     @SpecialMob.BestiaryInfoSupplier
-    public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
-        return new BestiaryInfo( 0x494949 );
-        //TODO theme - forest
+    public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
+        bestiaryInfo.color( 0x494949 ).theme( BestiaryInfo.Theme.FOREST )
+                .uniqueTextureWithOverlay()
+                .addExperience( 1 ).effectImmune( Effects.HARM, Effects.WITHER );
     }
     
     @SpecialMob.LanguageProvider
@@ -49,14 +48,15 @@ public class DoomCreeperEntity extends _SpecialCreeperEntity {
     @SpecialMob.Factory
     public static EntityType.IFactory<DoomCreeperEntity> getVariantFactory() { return DoomCreeperEntity::new; }
     
+    /** @return This entity's mob species. */
+    @SpecialMob.SpeciesSupplier
+    @Override
+    public MobFamily.Species<? extends DoomCreeperEntity> getSpecies() { return SPECIES; }
+    
     
     //--------------- Variant-Specific Implementations ----------------
     
-    public DoomCreeperEntity( EntityType<? extends _SpecialCreeperEntity> entityType, World world ) {
-        super( entityType, world );
-        getSpecialData().addPotionImmunity( Effects.HARM, Effects.WITHER );
-        xpReward += 1;
-    }
+    public DoomCreeperEntity( EntityType<? extends _SpecialCreeperEntity> entityType, World world ) { super( entityType, world ); }
     
     /** Override to change this creeper's explosion power multiplier. */
     protected float getVariantExplosionPower( float radius ) { return super.getVariantExplosionPower( radius / 2.0F ); }
@@ -82,14 +82,4 @@ public class DoomCreeperEntity extends _SpecialCreeperEntity {
     protected void modifyVariantLingeringCloud( AreaEffectCloudEntity potionCloud ) {
         potionCloud.setRadius( (float) explosionRadius * (isPowered() ? 2.0F : 1.0F) );
     }
-    
-    private static final ResourceLocation[] TEXTURES = {
-            GET_TEXTURE_PATH( "doom" ),
-            null,
-            GET_TEXTURE_PATH( "doom_overlay" )
-    };
-    
-    /** @return All default textures for this entity. */
-    @Override
-    public ResourceLocation[] getDefaultTextures() { return TEXTURES; }
 }

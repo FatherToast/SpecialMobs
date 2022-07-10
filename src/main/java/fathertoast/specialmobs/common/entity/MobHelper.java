@@ -1,11 +1,13 @@
 package fathertoast.specialmobs.common.entity;
 
-import fathertoast.specialmobs.common.util.References;
+import fathertoast.specialmobs.common.config.Config;
+import fathertoast.specialmobs.common.entity.creeper._SpecialCreeperEntity;
 import net.minecraft.block.FlowingFluidBlock;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.CreatureAttribute;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.monster.CreeperEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.AbstractArrowEntity;
 import net.minecraft.fluid.Fluid;
@@ -51,6 +53,16 @@ public final class MobHelper {
             new EffectInstance( Effects.LEVITATION, 1, 1 ),
             new EffectInstance( Effects.POISON, 1, 0 ) // Keep this option last for easy disable (by cave spiders)
     };
+    
+    /** Charges a creeper, potentially supercharging it. */
+    public static void charge( CreeperEntity creeper ) {
+        if( creeper instanceof _SpecialCreeperEntity ) {
+            ((_SpecialCreeperEntity) creeper).charge();
+        }
+        else {
+            creeper.getEntityData().set( CreeperEntity.DATA_IS_POWERED, true );
+        }
+    }
     
     /** @return True if the damage source can deal normal damage to vampire-type mobs (e.g., wooden or smiting weapons). */
     public static boolean isDamageSourceIneffectiveAgainstVampires( DamageSource source ) {
@@ -184,8 +196,8 @@ public final class MobHelper {
     public static EffectInstance nextPlagueEffect( Random random, World world ) {
         final int duration = MobHelper.getDebuffDuration( world.getDifficulty() );
         
-        //final EffectInstance potion = PLAGUE_EFFECTS[random.nextInt( PLAGUE_EFFECTS.length - (Config.get().GENERAL.DISABLE_NAUSEA ? 1 : 0) )]; TODO config
-        final EffectInstance potion = PLAGUE_EFFECTS[random.nextInt( PLAGUE_EFFECTS.length )];
+        final EffectInstance potion = PLAGUE_EFFECTS[random.nextInt( PLAGUE_EFFECTS.length -
+                (Config.MAIN.GENERAL.enableNausea.get() ? 0 : 1) )];
         return new EffectInstance( potion.getEffect(), duration * potion.getDuration(), potion.getAmplifier() );
     }
     
@@ -248,7 +260,7 @@ public final class MobHelper {
             Vector3d targetVec = sourcePos.vectorTo( blocker.position() ).normalize();
             targetVec = new Vector3d( targetVec.x, 0.0, targetVec.z );
             if( targetVec.dot( lookVec ) < 0.0 ) {
-                blocker.level.playSound(null, blocker.getX() + 0.5D, blocker.getY(), blocker.getZ() + 0.5D, SoundEvents.SHIELD_BLOCK, SoundCategory.NEUTRAL, 0.9F, 1.0F);
+                blocker.level.playSound( null, blocker.getX() + 0.5D, blocker.getY(), blocker.getZ() + 0.5D, SoundEvents.SHIELD_BLOCK, SoundCategory.NEUTRAL, 0.9F, 1.0F );
                 if( needsShield && entity instanceof PlayerEntity ) {
                     maybeDestroyShield( blocker, shield, shieldHand, ((PlayerEntity) entity).getMainHandItem() );
                 }
@@ -268,7 +280,7 @@ public final class MobHelper {
     private static void maybeDestroyShield( LivingEntity blocker, ItemStack shield, Hand shieldHand, ItemStack weapon ) {
         if( !weapon.isEmpty() && !shield.isEmpty() && weapon.getItem() instanceof AxeItem && shield.getItem() == Items.SHIELD &&
                 blocker.getRandom().nextFloat() < 0.25F - EnchantmentHelper.getBlockEfficiency( blocker ) * 0.05F ) {
-            blocker.level.playSound(null, blocker.getX() + 0.5D, blocker.getY(), blocker.getZ() + 0.5D, SoundEvents.SHIELD_BREAK, SoundCategory.NEUTRAL, 0.9F, 1.0F);
+            blocker.level.playSound( null, blocker.getX() + 0.5D, blocker.getY(), blocker.getZ() + 0.5D, SoundEvents.SHIELD_BREAK, SoundCategory.NEUTRAL, 0.9F, 1.0F );
             blocker.broadcastBreakEvent( shieldHand );
             blocker.setItemInHand( shieldHand, ItemStack.EMPTY );
         }

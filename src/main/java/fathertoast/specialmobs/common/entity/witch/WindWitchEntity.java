@@ -6,7 +6,6 @@ import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.entity.ai.AIHelper;
 import fathertoast.specialmobs.common.entity.ai.FluidPathNavigator;
-import fathertoast.specialmobs.common.util.AttributeHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import mcp.MethodsReturnNonnullByDefault;
@@ -14,7 +13,6 @@ import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.AttributeModifierMap;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.item.Items;
@@ -24,7 +22,10 @@ import net.minecraft.pathfinding.PathNodeType;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.Effects;
 import net.minecraft.tags.FluidTags;
-import net.minecraft.util.*;
+import net.minecraft.util.DamageSource;
+import net.minecraft.util.Direction;
+import net.minecraft.util.IndirectEntityDamageSource;
+import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
@@ -44,17 +45,12 @@ public class WindWitchEntity extends _SpecialWitchEntity {
     public static MobFamily.Species<WindWitchEntity> SPECIES;
     
     @SpecialMob.BestiaryInfoSupplier
-    public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
-        return new BestiaryInfo( 0x6388B2 );
-        //TODO theme - mountain
-    }
-    
-    @SpecialMob.AttributeCreator
-    public static AttributeModifierMap.MutableAttribute createAttributes() {
-        return AttributeHelper.of( _SpecialWitchEntity.createAttributes() )
-                .addAttribute( Attributes.ATTACK_DAMAGE, 2.0 )
-                .multAttribute( Attributes.MOVEMENT_SPEED, 1.2 )
-                .build();
+    public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
+        bestiaryInfo.color( 0x6388B2 ).theme( BestiaryInfo.Theme.MOUNTAIN )
+                .uniqueTextureWithEyes()
+                .addExperience( 2 ).fallImmune()
+                .addToAttribute( Attributes.ATTACK_DAMAGE, 2.0 )
+                .multiplyAttribute( Attributes.MOVEMENT_SPEED, 1.2 );
     }
     
     @SpecialMob.LanguageProvider
@@ -73,6 +69,11 @@ public class WindWitchEntity extends _SpecialWitchEntity {
     @SpecialMob.Factory
     public static EntityType.IFactory<WindWitchEntity> getVariantFactory() { return WindWitchEntity::new; }
     
+    /** @return This entity's mob species. */
+    @SpecialMob.SpeciesSupplier
+    @Override
+    public MobFamily.Species<? extends WindWitchEntity> getSpecies() { return SPECIES; }
+    
     
     //--------------- Variant-Specific Implementations ----------------
     
@@ -81,9 +82,6 @@ public class WindWitchEntity extends _SpecialWitchEntity {
     
     public WindWitchEntity( EntityType<? extends _SpecialWitchEntity> entityType, World world ) {
         super( entityType, world );
-        getSpecialData().setFallDamageMultiplier( 0.0F );
-        xpReward += 2;
-        
         setPathfindingMalus( PathNodeType.WATER, PathNodeType.WALKABLE.getMalus() );
     }
     
@@ -245,13 +243,4 @@ public class WindWitchEntity extends _SpecialWitchEntity {
     public void readVariantSaveData( CompoundNBT saveTag ) {
         setPathfindingMalus( PathNodeType.WATER, PathNodeType.WALKABLE.getMalus() );
     }
-    
-    private static final ResourceLocation[] TEXTURES = {
-            GET_TEXTURE_PATH( "wind" ),
-            GET_TEXTURE_PATH( "wind_eyes" )
-    };
-    
-    /** @return All default textures for this entity. */
-    @Override
-    public ResourceLocation[] getDefaultTextures() { return TEXTURES; }
 }

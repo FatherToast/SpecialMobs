@@ -1,8 +1,5 @@
 package fathertoast.specialmobs.common.config.field;
 
-import javax.annotation.Nullable;
-import java.util.List;
-
 /**
  * Represents a config field with an object value.
  * <p>
@@ -22,11 +19,6 @@ public abstract class GenericField<T> extends AbstractConfigField {
     public GenericField( String key, T defaultValue, String... description ) {
         super( key, description );
         valueDefault = defaultValue;
-    }
-
-    @Nullable
-    public List<String> verboseDescription() {
-        return null;
     }
     
     /** @return Returns the config field's value. */

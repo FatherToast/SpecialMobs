@@ -14,7 +14,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 import java.util.*;
 
 /**
- * One entity-value entry in an entity list.
+ * One block state entry in a block list.
  */
 @SuppressWarnings( "unused" )
 public class BlockEntry implements Cloneable {

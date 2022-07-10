@@ -3,16 +3,12 @@ package fathertoast.specialmobs.common.entity.ghast;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
-import fathertoast.specialmobs.common.util.AttributeHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.AttributeModifierMap;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.item.Items;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -28,19 +24,14 @@ public class KingGhastEntity extends _SpecialGhastEntity {
     public static MobFamily.Species<KingGhastEntity> SPECIES;
     
     @SpecialMob.BestiaryInfoSupplier
-    public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
-        entityType.sized( 6.0F, 6.0F );
-        return new BestiaryInfo( 0xE8C51A, BestiaryInfo.BaseWeight.LOW );
-    }
-    
-    @SpecialMob.AttributeCreator
-    public static AttributeModifierMap.MutableAttribute createAttributes() {
-        return AttributeHelper.of( _SpecialGhastEntity.createAttributes() )
-                .addAttribute( Attributes.MAX_HEALTH, 20.0 )
-                .addAttribute( Attributes.ARMOR, 10.0 )
-                .addAttribute( Attributes.ATTACK_DAMAGE, 4.0 )
-                .multAttribute( Attributes.MOVEMENT_SPEED, 0.6 )
-                .build();
+    public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
+        bestiaryInfo.color( 0xE8C51A ).weight( BestiaryInfo.DefaultWeight.LOW )
+                .uniqueTextureWithAnimation()
+                .size( 1.5F, 6.0F, 6.0F )
+                .addExperience( 4 ).regen( 30 )
+                .addToAttribute( Attributes.MAX_HEALTH, 20.0 ).addToAttribute( Attributes.ARMOR, 10.0 )
+                .addToAttribute( Attributes.ATTACK_DAMAGE, 4.0 )
+                .multiplyAttribute( Attributes.MOVEMENT_SPEED, 0.6 );
     }
     
     @SpecialMob.LanguageProvider
@@ -59,33 +50,17 @@ public class KingGhastEntity extends _SpecialGhastEntity {
     @SpecialMob.Factory
     public static EntityType.IFactory<KingGhastEntity> getVariantFactory() { return KingGhastEntity::new; }
     
+    /** @return This entity's mob species. */
+    @SpecialMob.SpeciesSupplier
+    @Override
+    public MobFamily.Species<? extends KingGhastEntity> getSpecies() { return SPECIES; }
+    
     
     //--------------- Variant-Specific Implementations ----------------
     
-    public KingGhastEntity( EntityType<? extends _SpecialGhastEntity> entityType, World world ) {
-        super( entityType, world );
-        getSpecialData().setBaseScale( 1.5F );
-        getSpecialData().setRegenerationTime( 30 );
-        xpReward += 4;
-    }
-    
-    /** Override to change this entity's AI goals. */
-    @Override
-    protected void registerVariantGoals() {
-        getSpecialData().rangedAttackDamage += 4.0F;
-    }
+    public KingGhastEntity( EntityType<? extends _SpecialGhastEntity> entityType, World world ) { super( entityType, world ); }
     
     /** Override to change this ghast's explosion power multiplier. */
     @Override
     protected int getVariantExplosionPower( int radius ) { return Math.round( radius * 2.5F ); }
-    
-    private static final ResourceLocation[] TEXTURES = {
-            GET_TEXTURE_PATH( "king" ),
-            null,
-            GET_TEXTURE_PATH( "king_shooting" )
-    };
-    
-    /** @return All default textures for this entity. */
-    @Override
-    public ResourceLocation[] getDefaultTextures() { return TEXTURES; }
 }
