@@ -46,7 +46,7 @@ public class SpecialMobs {
      *      o fish hook
      *      o bug spit
      *      + bestiary
-     *      - configurable stats
+     *      - configurable stats TODO make sure the registries we use don't explode
      *  - monster families (see doc for specifics)
      *      - creepers
      *          - chance to spawn charged during thunderstorms
