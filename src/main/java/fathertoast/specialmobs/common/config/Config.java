@@ -1,5 +1,6 @@
 package fathertoast.specialmobs.common.config;
 
+import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.config.field.AbstractConfigField;
 import fathertoast.specialmobs.common.config.file.ToastConfigSpec;
 import fathertoast.specialmobs.common.config.file.TomlHelper;
@@ -24,7 +25,10 @@ public class Config {
     public static void initialize() {
         AbstractConfigField.loadingCategory = null;
         
+        ToastConfigSpec.freezeFileWatcher = true;
         MAIN.SPEC.initialize();
+        MobFamily.initBestiary();
+        ToastConfigSpec.freezeFileWatcher = false;
     }
     
     /**

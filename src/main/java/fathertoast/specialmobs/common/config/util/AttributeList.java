@@ -8,6 +8,11 @@ import net.minecraft.entity.ai.attributes.AttributeModifierMap;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * A list of attribute-operation-value entries used to describe a set of attribute changes.
+ * <p>
+ * See also {@link ConfigDrivenAttributeModifierMap}
+ */
 public class AttributeList implements IStringArray {
     /** The attribute-operation-value entries in this list. */
     private final AttributeEntry[] ENTRIES;

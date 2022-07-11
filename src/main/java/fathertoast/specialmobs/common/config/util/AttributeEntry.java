@@ -1,6 +1,7 @@
 package fathertoast.specialmobs.common.config.util;
 
-import net.minecraft.entity.Entity;
+import fathertoast.specialmobs.common.config.field.AbstractConfigField;
+import fathertoast.specialmobs.common.core.SpecialMobs;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.Attribute;
 import net.minecraft.entity.ai.attributes.AttributeModifierMap;
@@ -10,19 +11,25 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.registries.ForgeRegistries;
 
 /**
- * One attribute-operation-value entry in an attribute list.
+ * One attribute-operation-value entry in an attribute list. Uses a 'lazy' implementation so the attribute registry is
+ * not polled until this entry is actually used.
+ * <p>
+ * See also {@link ConfigDrivenAttributeModifierMap}
  */
 @SuppressWarnings( "unused" )
 public class AttributeEntry {
-    /** The attribute this entry is defined for. */
-    public final Attribute ATTRIBUTE;
+    /** The field containing this entry. We save a reference to help improve error/warning reports. */
+    private final AbstractConfigField FIELD;
+    
+    /** The registry key for this entry's attribute. */
+    public final ResourceLocation ATTRIBUTE_KEY;
     /** True if the value should be multiplied to the base attribute value (as opposed to added). */
     public final boolean MULTIPLY;
     /** The value given to this entry. */
     public final double VALUE;
     
-    /** The class this entry is defined for. This is not assigned until a world has been loaded. */
-    Class<? extends Entity> entityClass;
+    /** The attribute this entry is defined for. */
+    private Attribute attribute;
     
     /** Creates an entry with the specified values using the addition operation. Incompatible with move speed. Used for creating default configs. */
     public static AttributeEntry add( Attribute attribute, double value ) {
@@ -35,10 +42,30 @@ public class AttributeEntry {
     public static AttributeEntry mult( Attribute attribute, double value ) { return new AttributeEntry( attribute, true, value ); }
     
     /** Creates an entry with the specified values. */
-    private AttributeEntry( Attribute attribute, boolean multiply, double value ) {
-        ATTRIBUTE = attribute;
+    private AttributeEntry( Attribute attrib, boolean multiply, double value ) {
+        this( null, ForgeRegistries.ATTRIBUTES.getKey( attrib ), multiply, value );
+        attribute = attrib;
+    }
+    
+    /** Creates an entry with the specified values. */
+    public AttributeEntry( AbstractConfigField field, ResourceLocation regKey, boolean multiply, double value ) {
+        FIELD = field;
+        ATTRIBUTE_KEY = regKey;
         MULTIPLY = multiply;
         VALUE = value;
+    }
+    
+    /** @return Loads the attribute from registry. Returns true if successful. */
+    private boolean validate() {
+        if( attribute != null ) return true;
+        
+        if( !ForgeRegistries.ATTRIBUTES.containsKey( ATTRIBUTE_KEY ) ) {
+            SpecialMobs.LOG.warn( "Invalid entry for {} \"{}\"! Invalid entry: {}",
+                    FIELD.getClass(), FIELD.getKey(), ATTRIBUTE_KEY.toString() );
+            return false;
+        }
+        attribute = ForgeRegistries.ATTRIBUTES.getValue( ATTRIBUTE_KEY );
+        return true;
     }
     
     /**
@@ -49,8 +76,7 @@ public class AttributeEntry {
     @Override
     public String toString() {
         // Start with the attribute registry key
-        ResourceLocation resource = ForgeRegistries.ATTRIBUTES.getKey( ATTRIBUTE );
-        StringBuilder str = new StringBuilder( resource == null ? "null" : resource.toString() ).append( ' ' );
+        StringBuilder str = new StringBuilder( ATTRIBUTE_KEY.toString() ).append( ' ' );
         // Append operation and value
         if( MULTIPLY ) str.append( "* " ).append( VALUE );
         else if( VALUE < 0.0 ) str.append( "- " ).append( -VALUE );
@@ -59,15 +85,19 @@ public class AttributeEntry {
     }
     
     /** Applies this attribute change to the entity attribute builder. */
-    public void apply( AttributeModifierMap.MutableAttribute builder ) { apply( builder.builder.get( ATTRIBUTE ) ); }
+    public void apply( AttributeModifierMap.MutableAttribute builder ) {
+        if( validate() ) apply( builder.builder.get( attribute ) );
+    }
     
     /** Applies this attribute change to the entity. */
-    public void apply( LivingEntity entity ) { apply( entity.getAttribute( ATTRIBUTE ) ); }
+    public void apply( LivingEntity entity ) {
+        if( validate() ) apply( entity.getAttribute( attribute ) );
+    }
     
     /** Applies this attribute change to the attribute instance. Assumes that the instance is for this entry's target attribute. */
     private void apply( ModifiableAttributeInstance attributeInstance ) {
         if( attributeInstance == null )
-            throw new IllegalStateException( "Attempted to modify non-registered attribute " + ATTRIBUTE.getDescriptionId() );
+            throw new IllegalStateException( "Attempted to modify non-registered attribute " + ATTRIBUTE_KEY );
         
         if( MULTIPLY ) attributeInstance.setBaseValue( attributeInstance.getBaseValue() * VALUE );
         else attributeInstance.setBaseValue( attributeInstance.getBaseValue() + VALUE );

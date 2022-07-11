@@ -37,10 +37,9 @@ public class SpeciesConfig extends Config.AbstractConfig {
     public SpeciesConfig( MobFamily.Species<?> species ) {
         super( FamilyConfig.dir( species.family ), fileName( species ),
                 String.format( "This config contains options that apply only to the %s %s species.",
-                        species.specialVariantName, ConfigUtil.camelCaseToLowerSpace( species.family.name ) ) );
+                        variantName( species ), ConfigUtil.camelCaseToLowerSpace( species.family.name ) ) );
         SPEC.newLine();
-        SPEC.describeAttributeList();
-        SPEC.describeRegistryEntryList();
+        SPEC.comment( "See the main mod config for common terms and how to use special field types like Attribute List or Registry List." );
         
         speciesName = variantName( species ) + " " + species.family.configName;
         
@@ -113,31 +112,32 @@ public class SpeciesConfig extends Config.AbstractConfig {
                     "If true, " + speciesName + " can be leashed. (Note: Leashed mobs can still attack you.)" ) );
             ignorePressurePlates = SPEC.define( new BooleanField( SPECIAL_DATA_SUBCAT + "immune_to_pressure_plates", info.ignorePressurePlates,
                     "If true, " + speciesName + " will not trigger pressure plates." ) );
-            immuneToStickyBlocks = SPEC.define( new RegistryEntryListField<>( SPECIAL_DATA_SUBCAT + "immune_to_sticky_blocks", info.immuneToStickyBlocks,
+            immuneToStickyBlocks = SPEC.define( new LazyRegistryEntryListField<>( SPECIAL_DATA_SUBCAT + "immune_to_sticky_blocks", info.immuneToStickyBlocks,
                     ConfigUtil.properCase( speciesName ) + " will not be 'trapped' in any blocks specified here (e.g. \"cobweb\" or \"sweet_berry_bush\")." ) );
-            immuneToPotions = SPEC.define( new RegistryEntryListField<>( SPECIAL_DATA_SUBCAT + "immune_to_effects", info.immuneToPotions,
+            immuneToPotions = SPEC.define( new LazyRegistryEntryListField<>( SPECIAL_DATA_SUBCAT + "immune_to_effects", info.immuneToPotions,
                     ConfigUtil.properCase( speciesName ) + " cannot be inflicted with any effects specified here (e.g. \"instant_damage\" or \"regeneration\")." ) );
             
             SPEC.newLine();
             
             rangedAttackDamage = info.rangedAttackDamage < 0.0F ? null :
                     SPEC.define( new DoubleField( SPECIAL_DATA_SUBCAT + "ranged_attack.damage", info.rangedAttackDamage, DoubleField.Range.NON_NEGATIVE,
-                            "" ) );
+                            "The base ranged attack damage for " + speciesName + " (in half-hearts)." ) );
             rangedAttackSpread = info.rangedAttackSpread < 0.0F ? null :
                     SPEC.define( new DoubleField( SPECIAL_DATA_SUBCAT + "ranged_attack.spread", info.rangedAttackSpread, DoubleField.Range.NON_NEGATIVE,
-                            "." ) );
+                            "The ranged attack spread (inaccuracy) for " + speciesName + ". 0 is perfect accuracy." ) );
             rangedWalkSpeed = info.rangedWalkSpeed < 0.0F ? null :
                     SPEC.define( new DoubleField( SPECIAL_DATA_SUBCAT + "ranged_attack.walk_speed", info.rangedWalkSpeed, DoubleField.Range.NON_NEGATIVE,
-                            "." ) );
+                            "The walk speed multiplier for " + speciesName + " while using their ranged attack AI." ) );
             rangedAttackCooldown = info.rangedAttackCooldown < 0 ? null :
                     SPEC.define( new IntField( SPECIAL_DATA_SUBCAT + "ranged_attack.charge_time", info.rangedAttackCooldown, IntField.Range.NON_NEGATIVE,
-                            "The delay (in ticks) to 'charge up' and perform a ranged attack. (20 ticks = 1 second)" ) );
+                            "The delay (in ticks) for " + speciesName + " to perform a ranged attack from rest. (20 ticks = 1 second)" ) );
             rangedAttackMaxCooldown = info.rangedAttackMaxCooldown < 0 ? null :
                     SPEC.define( new IntField( SPECIAL_DATA_SUBCAT + "ranged_attack.refire_time", info.rangedAttackMaxCooldown, IntField.Range.NON_NEGATIVE,
-                            "The total delay (in ticks) between each ranged attack. (20 ticks = 1 second)" ) );
+                            "The total delay (in ticks) " + speciesName + " wait between each ranged attack. (20 ticks = 1 second)" ) );
             rangedAttackMaxRange = info.rangedAttackMaxRange < 0.0F ? null :
                     SPEC.define( new DoubleField( SPECIAL_DATA_SUBCAT + "ranged_attack.max_range", info.rangedAttackMaxRange, DoubleField.Range.NON_NEGATIVE,
-                            "" ) );
+                            "The maximum distance (in blocks) at which " + speciesName + " can use their ranged attacks.",
+                            "0 disables ranged attacks." ) );
         }
     }
 }

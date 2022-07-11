@@ -7,6 +7,7 @@ import com.electronwill.nightconfig.core.io.CharacterOutput;
 import com.electronwill.nightconfig.core.io.ParsingException;
 import com.electronwill.nightconfig.core.io.WritingException;
 import fathertoast.specialmobs.common.config.field.*;
+import fathertoast.specialmobs.common.config.util.ConfigUtil;
 import fathertoast.specialmobs.common.core.SpecialMobs;
 
 import java.io.File;
@@ -23,6 +24,8 @@ import java.util.Objects;
  */
 @SuppressWarnings( "unused" )
 public class ToastConfigSpec {
+    /** It's a good idea to freeze the file watcher while loading a large number of files; can prevent a few unneeded reloads. */
+    public static volatile boolean freezeFileWatcher;
     
     /** The directory containing this config's file. */
     public final File DIR;
@@ -35,10 +38,8 @@ public class ToastConfigSpec {
     /** The list of actions to perform, in a specific order, when reading or writing the config file. */
     private final List<Action> ACTIONS = new ArrayList<>();
     
-    /** Used to make sure the file is always rewritten when the config is initialized. */
-    private boolean firstLoad;
     /** True while this config spec is currently writing. */
-    boolean writing;
+    volatile boolean writing;
     
     /** Creates a new config spec at a specified location with only the basic 'start of file' action. */
     public ToastConfigSpec( File dir, String fileName ) {
@@ -54,45 +55,60 @@ public class ToastConfigSpec {
         // Create the config file format
         final FileConfigBuilder builder = FileConfig.builder( new File( dir, fileName + ToastConfigFormat.FILE_EXT ),
                 new ToastConfigFormat( this ) );
-        builder.sync();//.autoreload(); TODO test alternative reloading
-        CONFIG_FILE = builder.build();
+        CONFIG_FILE = builder.sync().build();
+        
+        // Make sure the file exists (an empty file is all we need)
+        if( !CONFIG_FILE.getFile().exists() ) {
+            SpecialMobs.LOG.info( "Generating default config file {}", ConfigUtil.toRelativePath( CONFIG_FILE ) );
+            try {
+                if( !CONFIG_FILE.getFile().createNewFile() ) {
+                    SpecialMobs.LOG.error( "Failed to make config file! Things will likely explode. " +
+                            "Create the file manually to avoid this problem in the future: {}", dir );
+                }
+            }
+            catch( IOException ex ) {
+                SpecialMobs.LOG.error( "Caught exception while generating blank config file! Things will likely explode. " +
+                        "Create the file manually to avoid this problem in the future: {}", dir, ex );
+            }
+        }
     }
     
     /** Loads the config from disk. */
     public void initialize() {
-        SpecialMobs.LOG.info( "First-time loading config file {}", CONFIG_FILE.getFile() );
-        firstLoad = true;
+        SpecialMobs.LOG.info( "First-time loading config file {}", ConfigUtil.toRelativePath( CONFIG_FILE ) );
         try {
             CONFIG_FILE.load();
         }
         catch( ParsingException ex ) {
-            SpecialMobs.LOG.error( "Failed first-time loading of config file {} - this is bad!", CONFIG_FILE.getFile() );
+            SpecialMobs.LOG.error( "Failed first-time loading of config file {} - this is bad!",
+                    ConfigUtil.toRelativePath( CONFIG_FILE ) );
         }
         
-        //TODO test alternative reloading
         try {
             FileWatcher.defaultInstance().addWatch( CONFIG_FILE.getFile(), this::onFileChanged );
-            SpecialMobs.LOG.info( "Started watching config file {} for updates", CONFIG_FILE.getFile() );
+            SpecialMobs.LOG.info( "Started watching config file {} for updates", ConfigUtil.toRelativePath( CONFIG_FILE ) );
         }
         catch( IOException ex ) {
             SpecialMobs.LOG.error( "Failed to watch config file {} - this file will NOT update in-game until restarted!",
-                    CONFIG_FILE.getFile() );
+                    ConfigUtil.toRelativePath( CONFIG_FILE ) );
         }
     }
     
     /** Called when a change to the config file is detected. */
     public void onFileChanged() {
         if( writing ) {
-            SpecialMobs.LOG.info( "Attempted to reload config file {} while it was still saving - this is probably okay",
-                    CONFIG_FILE.getFile() );
+            SpecialMobs.LOG.debug( "Skipping config file reload (it is currently saving) {}", ConfigUtil.toRelativePath( CONFIG_FILE ) );
+        }
+        else if( freezeFileWatcher ) {
+            SpecialMobs.LOG.debug( "Skipping config file reload (file watcher paused) {}", ConfigUtil.toRelativePath( CONFIG_FILE ) );
         }
         else {
+            SpecialMobs.LOG.info( "Reloading config file {}", ConfigUtil.toRelativePath( CONFIG_FILE ) );
             try {
-                SpecialMobs.LOG.info( "Reloading config file {}", CONFIG_FILE.getFile() );
                 CONFIG_FILE.load();
             }
             catch( ParsingException ex ) {
-                SpecialMobs.LOG.error( "Failed to reload config file {}", CONFIG_FILE.getFile() );
+                SpecialMobs.LOG.error( "Failed to reload config file {}", ConfigUtil.toRelativePath( CONFIG_FILE ) );
             }
         }
     }
@@ -104,15 +120,17 @@ public class ToastConfigSpec {
         for( Action action : ACTIONS ) {
             if( action.onLoad() ) rewrite = true;
         }
-        // Only rewrite on first load or if one of the load actions requests it
-        if( rewrite || firstLoad ) {
-            firstLoad = false;
-            try {
-                CONFIG_FILE.save();
-            }
-            catch( WritingException ex ) {
-                SpecialMobs.LOG.error( "Failed to save config file {}", CONFIG_FILE.getFile() );
-            }
+        // Only rewrite if one of the load actions requests it
+        if( rewrite ) save();
+    }
+    
+    /** Saves this config to file. */
+    private void save() {
+        try {
+            CONFIG_FILE.save();
+        }
+        catch( WritingException ex ) {
+            SpecialMobs.LOG.error( "Failed to save config file {}", ConfigUtil.toRelativePath( CONFIG_FILE ) );
         }
     }
     

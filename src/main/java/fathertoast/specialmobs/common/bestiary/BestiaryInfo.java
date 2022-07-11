@@ -1,9 +1,6 @@
 package fathertoast.specialmobs.common.bestiary;
 
-import fathertoast.specialmobs.common.config.util.AttributeEntry;
-import fathertoast.specialmobs.common.config.util.AttributeList;
-import fathertoast.specialmobs.common.config.util.ConfigUtil;
-import fathertoast.specialmobs.common.config.util.RegistryEntryList;
+import fathertoast.specialmobs.common.config.util.*;
 import fathertoast.specialmobs.common.core.SpecialMobs;
 import fathertoast.specialmobs.common.util.References;
 import net.minecraft.block.Block;

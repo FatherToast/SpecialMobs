@@ -114,7 +114,6 @@ public class SpecialMobs {
     
     public SpecialMobs() {
         Config.initialize();
-        MobFamily.initBestiary();
         
         packetHandler.registerMessages();
         

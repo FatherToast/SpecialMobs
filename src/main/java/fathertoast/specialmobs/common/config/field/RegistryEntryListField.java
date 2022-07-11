@@ -3,11 +3,13 @@ package fathertoast.specialmobs.common.config.field;
 import fathertoast.specialmobs.common.config.file.TomlHelper;
 import fathertoast.specialmobs.common.config.util.RegistryEntryList;
 import fathertoast.specialmobs.common.core.SpecialMobs;
+import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.IForgeRegistryEntry;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Represents a config field with a registry entry list value.
@@ -54,4 +56,16 @@ public class RegistryEntryListField<T extends IForgeRegistryEntry<T>> extends Ge
         // All the actual loading is done through the objects
         value = new RegistryEntryList<>( this, valueDefault.getRegistry(), TomlHelper.parseStringList( raw ) );
     }
+    
+    /** @return The registry this list draws from. */
+    public IForgeRegistry<T> getRegistry() { return value.getRegistry(); }
+    
+    /** @return The entries in this list. */
+    public Set<T> getEntries() { return value.getEntries(); }
+    
+    /** @return Returns true if there are no entries in this list. */
+    public boolean isEmpty() { return value.isEmpty(); }
+    
+    /** @return Returns true if the entry is contained in this list. */
+    public boolean contains( T entry ) { return value.contains( entry ); }
 }

@@ -21,9 +21,13 @@ public class RegistryEntryList<T extends IForgeRegistryEntry<T>> implements IStr
     private final IForgeRegistry<T> REGISTRY;
     
     /** The entries in this list. */
-    private final Set<T> UNDERLYING_SET = new HashSet<>();
+    protected final Set<T> UNDERLYING_SET = new HashSet<>();
     /** The list used to write back to file. */
-    private final List<String> PRINT_LIST = new ArrayList<>();
+    protected final List<String> PRINT_LIST = new ArrayList<>();
+    
+    protected RegistryEntryList( IForgeRegistry<T> registry ) {
+        REGISTRY = registry;
+    }
     
     /**
      * Create a new registry entry list from an array of entries. Used for creating default configs.
@@ -32,7 +36,7 @@ public class RegistryEntryList<T extends IForgeRegistryEntry<T>> implements IStr
      */
     @SafeVarargs
     public RegistryEntryList( IForgeRegistry<T> registry, T... entries ) {
-        REGISTRY = registry;
+        this( registry );
         for( T entry : entries ) {
             if( UNDERLYING_SET.add( entry ) ) PRINT_LIST.add( SpecialMobs.toString( registry.getKey( entry ) ) );
         }
@@ -42,7 +46,7 @@ public class RegistryEntryList<T extends IForgeRegistryEntry<T>> implements IStr
      * Create a new registry entry list from a list of registry key strings.
      */
     public RegistryEntryList( AbstractConfigField field, IForgeRegistry<T> registry, List<String> entries ) {
-        REGISTRY = registry;
+        this( registry );
         for( String line : entries ) {
             if( line.endsWith( "*" ) ) {
                 // Handle special case; add all entries in namespace
@@ -99,7 +103,7 @@ public class RegistryEntryList<T extends IForgeRegistryEntry<T>> implements IStr
     public boolean contains( T entry ) { return UNDERLYING_SET.contains( entry ); }
     
     /** @return Adds the registry entry if it exists and isn't already present, returns true if successful. */
-    private boolean mergeFrom( ResourceLocation regKey ) {
+    protected boolean mergeFrom( ResourceLocation regKey ) {
         final T entry = REGISTRY.getValue( regKey );
         return entry != null && UNDERLYING_SET.add( entry );
     }
@@ -108,7 +112,7 @@ public class RegistryEntryList<T extends IForgeRegistryEntry<T>> implements IStr
      * @param namespace Merges all registry entries with keys that start with a namespace into this list.
      * @return True if any registry entries were actually added.
      */
-    private boolean mergeFromNamespace( String namespace ) {
+    protected boolean mergeFromNamespace( String namespace ) {
         boolean foundAny = false;
         for( ResourceLocation regKey : REGISTRY.getKeys() ) {
             if( regKey.toString().startsWith( namespace ) ) {

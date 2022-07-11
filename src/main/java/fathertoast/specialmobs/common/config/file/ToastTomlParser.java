@@ -7,12 +7,13 @@ import com.electronwill.nightconfig.core.io.ConfigParser;
 import com.electronwill.nightconfig.core.io.ParsingException;
 import com.electronwill.nightconfig.core.io.ParsingMode;
 import com.electronwill.nightconfig.toml.TomlParser;
+import fathertoast.specialmobs.common.config.util.ConfigUtil;
 import fathertoast.specialmobs.common.core.SpecialMobs;
 
 import java.io.Reader;
 
 /**
- * A simple toml writer implementation that allows the config spec to entirely define how to write.
+ * A simple toml parser implementation that allows the config spec to perform some additional actions on load.
  */
 public class ToastTomlParser implements ConfigParser<CommentedConfig> {
     /** The actual parser. */
@@ -36,7 +37,7 @@ public class ToastTomlParser implements ConfigParser<CommentedConfig> {
      */
     @Override
     public CommentedConfig parse( Reader reader ) {
-        SpecialMobs.LOG.error( "Attempting to parse NEW config file! ({})", CONFIG_SPEC.CONFIG_FILE.getFile() );
+        SpecialMobs.LOG.error( "Attempting to parse NEW config file! ({})", ConfigUtil.toRelativePath( CONFIG_SPEC.CONFIG_FILE ) );
         throw new ParsingException( "Attempted to generate new config! This is not supported." );
     }
     

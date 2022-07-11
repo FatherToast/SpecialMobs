@@ -1,5 +1,10 @@
 package fathertoast.specialmobs.common.config.util;
 
+import com.electronwill.nightconfig.core.file.FileConfig;
+import net.minecraftforge.fml.loading.FMLPaths;
+
+import java.io.File;
+
 public abstract class ConfigUtil {
     
     /** The plus or minus symbol (+/-). */
@@ -33,4 +38,10 @@ public abstract class ConfigUtil {
     
     /** @return The string, but with the first character changed to upper case. */
     public static String properCase( String str ) { return str.substring( 0, 1 ).toUpperCase() + str.substring( 1 ); }
+    
+    /** @return A string representation of the config file from the game directory. */
+    public static String toRelativePath( FileConfig configFile ) { return toRelativePath( configFile.getFile() ); }
+    
+    /** @return A string representation of the file from the game directory. */
+    public static String toRelativePath( File gameFile ) { return FMLPaths.GAMEDIR.get().relativize( gameFile.toPath() ).toString(); }
 }
