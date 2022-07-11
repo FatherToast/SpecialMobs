@@ -23,12 +23,13 @@ public class Config {
     
     /** Performs initial loading of all configs in this mod. */
     public static void initialize() {
-        AbstractConfigField.loadingCategory = null;
-        
         ToastConfigSpec.freezeFileWatcher = true;
         MAIN.SPEC.initialize();
         MobFamily.initBestiary();
         ToastConfigSpec.freezeFileWatcher = false;
+        
+        // We don't really need to do this, but it's nice to remove the reference once we're done making config specs
+        AbstractConfigField.loadingCategory = null;
     }
     
     /**
