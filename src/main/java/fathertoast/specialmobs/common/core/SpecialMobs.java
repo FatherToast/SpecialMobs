@@ -89,7 +89,6 @@ public class SpecialMobs {
      *      ? piglins
      *      ? hoglins
      *      ? zoglins
-     *      ? endermites
      *      ? guardians
      *          ? vortex
      *      ? shulkers

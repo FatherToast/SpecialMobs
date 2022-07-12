@@ -12,6 +12,7 @@ import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.entity.*;
 import net.minecraft.entity.ai.attributes.Attributes;
+import net.minecraft.entity.monster.CreeperEntity;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.EffectInstance;
@@ -22,6 +23,7 @@ import net.minecraft.world.World;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.function.BiPredicate;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -63,14 +65,15 @@ public class MadScientistZombieEntity extends _SpecialZombieEntity {
     
     //--------------- Variant-Specific Implementations ----------------
     
+    private final BiPredicate<MadScientistZombieEntity, ? super CreeperEntity> CHARGE_CREEPER_TARGET = ( madman, creeper ) ->
+            creeper.isAlive() && !creeper.isPowered() && madman.getSensing().canSee( creeper );
+    
     public MadScientistZombieEntity( EntityType<? extends _SpecialZombieEntity> entityType, World world ) { super( entityType, world ); }
     
     /** Override to change this entity's AI goals. */
     @Override
     protected void registerVariantGoals() {
-        AIHelper.insertGoal( goalSelector, 2, new ChargeCreeperGoal<>(
-                this, getAttributeValue( Attributes.MOVEMENT_SPEED ) * 1.25, 20.0,
-                ( madman, creeper ) -> creeper.isAlive() && !creeper.isPowered() && madman.getSensing().canSee( creeper ) ) );
+        AIHelper.insertGoal( goalSelector, 2, new ChargeCreeperGoal<>( this, 1.25, 20.0, CHARGE_CREEPER_TARGET ) );
     }
     
     /** Override to change this entity's attack goal priority. */
