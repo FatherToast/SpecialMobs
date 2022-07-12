@@ -34,10 +34,13 @@ public class SpecialMobs {
      * (KEY: - = complete in current version, o = incomplete feature from previous version,
      *       + = incomplete new feature, ? = feature to consider adding)
      *  o general
-     *      o entity replacer
+     *      - entity replacer
      *      o dimension-sensitive configs
      *      o environment-sensitive configs
-     *      ? natural spawning
+     *      + natural spawning
+     *          o nether spawns
+     *          o end spawns
+     *          ? ocean/water spawns
      *  + potions
      *      + vulnerability (opposite of resistance)
      *  o entities
@@ -45,7 +48,7 @@ public class SpecialMobs {
      *      o fish hook
      *      o bug spit
      *      + bestiary
-     *      - configurable stats TODO make sure the registries we use don't explode
+     *      - configurable stats
      *  - monster families (see doc for specifics)
      *      - creepers
      *          - chance to spawn charged during thunderstorms
@@ -75,6 +78,7 @@ public class SpecialMobs {
      *          o ranged attack AI (spitter)
      *      - cave spiders
      *          o ranged attack AI (spitter)
+     *          + natural spawning
      *      - silverfish
      *          + ranged attack AI (spitter)
      *          + puffer
@@ -86,13 +90,13 @@ public class SpecialMobs {
      *          - melee attack AI
      *      - blazes
      *          - melee attack AI
-     *      ? piglins
      *      ? hoglins
      *      ? zoglins
-     *      ? guardians
-     *          ? vortex
+     *      + guardians
+     *          + vortex
      *      ? shulkers
-     *      ? phantoms
+     *      + phantoms
+     *          + natural spawning
      *      + the goat
      */
     
