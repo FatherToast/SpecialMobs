@@ -11,27 +11,35 @@ import fathertoast.specialmobs.common.config.util.ConfigUtil;
 
 import java.io.File;
 import java.util.List;
+import java.util.function.Function;
 
 /**
  * This is the base config for mob families. This may be extended to add categories specific to the family, but all
  * options that are used by all families should be defined in this class.
  */
 public class FamilyConfig extends Config.AbstractConfig {
-    
     public static File dir( MobFamily<?, ?> family ) { return new File( Config.CONFIG_DIR, ConfigUtil.noSpaces( family.configName ) ); }
     
     protected static String fileName( MobFamily<?, ?> family ) { return "_family_of_" + ConfigUtil.noSpaces( family.configName ); }
+    
+    /** @return A basic config supplier with custom default variant chance. */
+    public static Function<MobFamily<?, ?>, FamilyConfig> withVariantChance( double chance ) {
+        return ( family ) -> new FamilyConfig( family, chance );
+    }
     
     /** Category containing all options applicable to mob families as a whole; i.e. not specific to any particular family. */
     public final General GENERAL;
     
     /** Builds the config spec that should be used for this config. */
-    public FamilyConfig( MobFamily<?, ?> family ) {
+    public FamilyConfig( MobFamily<?, ?> family ) { this( family, 0.25 ); }
+    
+    /** Builds the config spec that should be used for this config. */
+    public FamilyConfig( MobFamily<?, ?> family, double variantChance ) {
         super( dir( family ), fileName( family ),
                 "This config contains options that apply to the family of " + family.configName + " as a whole;",
                 "that is, the vanilla replacement and all special variants." );
         
-        GENERAL = new General( SPEC, family );
+        GENERAL = new General( SPEC, family, variantChance );
     }
     
     public static class General extends Config.AbstractCategory {
@@ -44,7 +52,7 @@ public class FamilyConfig extends Config.AbstractConfig {
         
         public final IntField[] specialVariantWeights;
         
-        General( ToastConfigSpec parent, MobFamily<?, ?> family ) {
+        General( ToastConfigSpec parent, MobFamily<?, ?> family, double variantChance ) {
             super( parent, "general",
                     "Options standard to all mob families (that is, not specific to any particular mob family)." );
             
@@ -61,7 +69,7 @@ public class FamilyConfig extends Config.AbstractConfig {
             
             SPEC.newLine();
             
-            specialVariantChance = SPEC.define( new DoubleField( "special_variant_chance", 0.25, DoubleField.Range.PERCENT,
+            specialVariantChance = SPEC.define( new DoubleField( "special_variant_chance", variantChance, DoubleField.Range.PERCENT,
                     "The chance for " + family.configName + " to spawn as special variants." ) );
             // TODO special variant chance exceptions
             

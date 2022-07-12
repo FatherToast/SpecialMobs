@@ -4,13 +4,12 @@ import fathertoast.specialmobs.common.config.Config;
 import fathertoast.specialmobs.common.entity.creeper._SpecialCreeperEntity;
 import net.minecraft.block.FlowingFluidBlock;
 import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.entity.CreatureAttribute;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.*;
 import net.minecraft.entity.monster.CreeperEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.AbstractArrowEntity;
 import net.minecraft.fluid.Fluid;
+import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.*;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.EffectType;
@@ -23,8 +22,11 @@ import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.Difficulty;
+import net.minecraft.world.DifficultyInstance;
+import net.minecraft.world.IServerWorld;
 import net.minecraft.world.World;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -53,6 +55,41 @@ public final class MobHelper {
             new EffectInstance( Effects.LEVITATION, 1, 1 ),
             new EffectInstance( Effects.POISON, 1, 0 ) // Keep this option last for easy disable (by cave spiders)
     };
+    
+    /** Called on spawn to initialize properties based on the world, difficulty, and the group it spawns with. */
+    @Nullable
+    public static ILivingEntityData finalizeSpawn( LivingEntity entity, IServerWorld world, DifficultyInstance difficulty,
+                                                   @Nullable SpawnReason spawnReason, @Nullable ILivingEntityData groupData ) {
+        final ItemStack[] startingEquipment = captureEquipment( entity );
+        ((ISpecialMob<?>) entity).finalizeSpecialSpawn( world, difficulty, spawnReason, groupData );
+        processSpawnEquipmentChanges( entity, startingEquipment, difficulty );
+        return groupData;
+    }
+    
+    /** @return An array of the entity's current equipment so that any changes can be identified. */
+    public static ItemStack[] captureEquipment( LivingEntity entity ) {
+        final EquipmentSlotType[] slots = EquipmentSlotType.values();
+        final ItemStack[] equipment = new ItemStack[slots.length];
+        for( int i = 0; i < slots.length; i++ ) {
+            equipment[i] = entity.getItemBySlot( slots[i] );
+        }
+        return equipment;
+    }
+    
+    /** Performs random enchanting and modification to any new equipment. */
+    public static void processSpawnEquipmentChanges( LivingEntity entity, ItemStack[] oldEquipment, DifficultyInstance difficulty ) {
+        final float diffMulti = difficulty.getSpecialMultiplier();
+        final EquipmentSlotType[] slots = EquipmentSlotType.values();
+        for( int i = 0; i < slots.length; i++ ) {
+            final ItemStack newItem = entity.getItemBySlot( slots[i] );
+            if( !newItem.isEmpty() && !ItemStack.matches( newItem, oldEquipment[i] ) &&
+                    entity.getRandom().nextFloat() < (slots[i].getType() == EquipmentSlotType.Group.HAND ? 0.25F : 0.5F) * diffMulti ) {
+                
+                entity.setItemSlot( slots[i], EnchantmentHelper.enchantItem( entity.getRandom(), newItem,
+                        (int) (5.0F + diffMulti * entity.getRandom().nextInt( 18 )), false ) );
+            }
+        }
+    }
     
     /** Charges a creeper, potentially supercharging it. */
     public static void charge( CreeperEntity creeper ) {

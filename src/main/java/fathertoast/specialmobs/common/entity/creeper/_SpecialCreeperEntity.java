@@ -3,9 +3,10 @@ package fathertoast.specialmobs.common.entity.creeper;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
-import fathertoast.specialmobs.common.config.species.SpeciesConfig;
 import fathertoast.specialmobs.common.config.species.CreeperSpeciesConfig;
+import fathertoast.specialmobs.common.config.species.SpeciesConfig;
 import fathertoast.specialmobs.common.entity.ISpecialMob;
+import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.entity.SpecialMobData;
 import fathertoast.specialmobs.common.entity.ai.IExplodingMob;
 import fathertoast.specialmobs.common.util.ExplosionHelper;
@@ -91,6 +92,10 @@ public class _SpecialCreeperEntity extends CreeperEntity implements IExplodingMo
     
     /** Override to change this entity's AI goals. */
     protected void registerVariantGoals() { }
+    
+    /** Override to change starting equipment or stats. */
+    public void finalizeVariantSpawn( IServerWorld world, DifficultyInstance difficulty, @Nullable SpawnReason spawnReason,
+                                      @Nullable ILivingEntityData groupData ) { }
     
     /** Called when this entity successfully damages a target to apply on-hit effects. */
     @Override
@@ -208,22 +213,6 @@ public class _SpecialCreeperEntity extends CreeperEntity implements IExplodingMo
         if( explodesWhileBurning() ) clearFire();
     }
     
-    /** Called on spawn to initialize properties based on the world, difficulty, and the group it spawns with. */
-    @Nullable
-    public ILivingEntityData finalizeSpawn( IServerWorld world, DifficultyInstance difficulty, SpawnReason spawnReason,
-                                            @Nullable ILivingEntityData groupData, @Nullable CompoundNBT eggTag ) {
-        groupData = super.finalizeSpawn( world, difficulty, spawnReason, groupData, eggTag );
-        
-        if( world.getLevelData().isThundering() ) {
-            final double chargedChance = getConfig().CREEPERS.stormChargeChance.get() < 0.0 ?
-                    MobFamily.CREEPER.config.CREEPERS.familyStormChargeChance.get() :
-                    getConfig().CREEPERS.stormChargeChance.get();
-            
-            if( random.nextDouble() < chargedChance ) charge();
-        }
-        return groupData;
-    }
-    
     
     //--------------- Creeper Explosion Property Setters/Getters ----------------
     
@@ -329,6 +318,34 @@ public class _SpecialCreeperEntity extends CreeperEntity implements IExplodingMo
     /** Sets the experience that should be dropped by this entity. */
     @Override
     public final void setExperience( int xp ) { xpReward = xp; }
+    
+    /** Called on spawn to initialize properties based on the world, difficulty, and the group it spawns with. */
+    @Nullable
+    @Override
+    public final ILivingEntityData finalizeSpawn( IServerWorld world, DifficultyInstance difficulty, SpawnReason spawnReason,
+                                                  @Nullable ILivingEntityData groupData, @Nullable CompoundNBT eggTag ) {
+        return MobHelper.finalizeSpawn( this, world, difficulty, spawnReason,
+                super.finalizeSpawn( world, difficulty, spawnReason, groupData, eggTag ) );
+    }
+    
+    /** Called on spawn to set starting equipment. */
+    @Override // Seal method to force spawn equipment changes through ISpecialMob
+    protected final void populateDefaultEquipmentSlots( DifficultyInstance difficulty ) { super.populateDefaultEquipmentSlots( difficulty ); }
+    
+    /** Called on spawn to initialize properties based on the world, difficulty, and the group it spawns with. */
+    @Override
+    public void finalizeSpecialSpawn( IServerWorld world, DifficultyInstance difficulty, @Nullable SpawnReason spawnReason,
+                                      @Nullable ILivingEntityData groupData ) {
+        if( world.getLevelData().isThundering() ) {
+            final double chargedChance = getConfig().CREEPERS.stormChargeChance.get() < 0.0 ?
+                    MobFamily.CREEPER.config.CREEPERS.familyStormChargeChance.get() :
+                    getConfig().CREEPERS.stormChargeChance.get();
+            
+            if( random.nextDouble() < chargedChance ) charge();
+        }
+        
+        finalizeVariantSpawn( world, difficulty, spawnReason, groupData );
+    }
     
     
     //--------------- SpecialMobData Hooks ----------------

@@ -9,13 +9,17 @@ import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.ILivingEntityData;
+import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.world.DifficultyInstance;
+import net.minecraft.world.IServerWorld;
 import net.minecraft.world.World;
 
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
@@ -67,11 +71,10 @@ public class KnightSkeletonEntity extends _SpecialSkeletonEntity {
     
     public KnightSkeletonEntity( EntityType<? extends _SpecialSkeletonEntity> entityType, World world ) { super( entityType, world ); }
     
-    /** Called during spawn finalization to set starting equipment. */
+    /** Override to change starting equipment or stats. */
     @Override
-    protected void populateDefaultEquipmentSlots( DifficultyInstance difficulty ) {
-        super.populateDefaultEquipmentSlots( difficulty );
-        
+    public void finalizeVariantSpawn( IServerWorld world, DifficultyInstance difficulty, @Nullable SpawnReason spawnReason,
+                                      @Nullable ILivingEntityData groupData ) {
         setItemSlot( EquipmentSlotType.HEAD, new ItemStack( Items.IRON_HELMET ) );
         setItemSlot( EquipmentSlotType.CHEST, new ItemStack( Items.IRON_CHESTPLATE ) );
         setItemSlot( EquipmentSlotType.LEGS, new ItemStack( Items.IRON_LEGGINGS ) );

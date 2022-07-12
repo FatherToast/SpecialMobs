@@ -8,6 +8,7 @@ import fathertoast.specialmobs.common.util.AnnotationHelper;
 import fathertoast.specialmobs.common.util.References;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.block.Block;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.monster.*;
@@ -31,7 +32,7 @@ import java.util.function.Function;
 @MethodsReturnNonnullByDefault
 public class MobFamily<T extends LivingEntity, V extends FamilyConfig> {
     /** List of all families, generated to make iteration possible. */
-    private static final List<MobFamily<?, ?>> FAMILY_LIST = new ArrayList<>();
+    private static final ArrayList<MobFamily<?, ?>> FAMILY_LIST = new ArrayList<>();
     /** List of all species, generated to make iteration more convenient. */
     private static final List<Species<?>> SPECIES_LIST;
     
@@ -74,11 +75,11 @@ public class MobFamily<T extends LivingEntity, V extends FamilyConfig> {
             "Bouncing", "Hardened", "Sticky", "Volatile"
     );
     
-    public static final MobFamily<SpiderEntity, FamilyConfig> SPIDER = new MobFamily<>( FamilyConfig::new,
+    public static final MobFamily<SpiderEntity, FamilyConfig> SPIDER = new MobFamily<>( FamilyConfig.withVariantChance( 0.33 ),
             "Spider", "spiders", 0x342D27, new EntityType[] { EntityType.SPIDER },
             "Baby", "Desert", "Flying", "Giant", "Hungry", "Mother", "Pale", "Poison", /*"Water",*/ "Web", "Witch"
     );
-    public static final MobFamily<CaveSpiderEntity, FamilyConfig> CAVE_SPIDER = new MobFamily<>( FamilyConfig::new,
+    public static final MobFamily<CaveSpiderEntity, FamilyConfig> CAVE_SPIDER = new MobFamily<>( FamilyConfig.withVariantChance( 0.33 ),
             "CaveSpider", "cave spiders", 0x0C424E, new EntityType[] { EntityType.CAVE_SPIDER },
             "Baby", "Flying", "Mother", /*"Water",*/ "Web", "Witch"
     );
@@ -109,6 +110,8 @@ public class MobFamily<T extends LivingEntity, V extends FamilyConfig> {
     );
     
     static {
+        FAMILY_LIST.trimToSize();
+        
         final HashMap<EntityType<?>, MobFamily<?, ?>> classToFamilyMap = new HashMap<>();
         final ArrayList<Species<?>> allSpecies = new ArrayList<>();
         
@@ -125,6 +128,9 @@ public class MobFamily<T extends LivingEntity, V extends FamilyConfig> {
         SPECIES_LIST = Collections.unmodifiableList( allSpecies );
     }
     
+    
+    //--------------- Static Helper Methods ----------------
+    
     /** Called during mod construction to initialize the bestiary. */
     public static void initBestiary() { }
     
@@ -136,9 +142,10 @@ public class MobFamily<T extends LivingEntity, V extends FamilyConfig> {
     
     /** @return The family of mobs that can replace the passed entity; returns null if the entity is not replaceable. */
     @Nullable
-    public static MobFamily<?, ?> getReplacementFamily( LivingEntity entity ) {
-        return TYPE_TO_FAMILY_MAP.get( entity.getType() );
-    }
+    public static MobFamily<?, ?> getReplacementFamily( Entity entity ) { return TYPE_TO_FAMILY_MAP.get( entity.getType() ); }
+    
+    
+    //--------------- Family Instance Implementations ----------------
     
     /** The technical name that refers to this family. Note that this is UpperCamelCase, but is often used in lowercase. */
     public final String name;
@@ -189,12 +196,12 @@ public class MobFamily<T extends LivingEntity, V extends FamilyConfig> {
     }
     
     /** Pick a new species from this family, based on the location. */
-    public Species<? extends T> nextVariant( World world, BlockPos pos ) { // TODO mob replacer
+    public Species<? extends T> nextVariant( World world, BlockPos pos ) {
         // Build weights for the current location
         int totalWeight = 0;
-        int[] variantWeights = new int[variants.length];
+        final int[] variantWeights = new int[variants.length];
         for( int i = 0; i < variants.length; i++ ) {
-            int weight = 0;//config.getVariantWeight( world, pos, variants[i] ); TODO configs
+            final int weight = config.GENERAL.specialVariantWeights[i].get(); //TODO environment exceptions
             if( weight > 0 ) {
                 totalWeight += weight;
                 variantWeights[i] = weight;
@@ -215,6 +222,9 @@ public class MobFamily<T extends LivingEntity, V extends FamilyConfig> {
         }
         return vanillaReplacement;
     }
+    
+    
+    //--------------- Species Instance Implementations ----------------
     
     /**
      * Each special mob family is effectively a collection of special mob species, and each species corresponds to one

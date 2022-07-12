@@ -6,6 +6,7 @@ import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.config.species.SilverfishSpeciesConfig;
 import fathertoast.specialmobs.common.config.species.SpeciesConfig;
 import fathertoast.specialmobs.common.entity.ISpecialMob;
+import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.entity.SpecialMobData;
 import fathertoast.specialmobs.common.entity.ai.AIHelper;
 import fathertoast.specialmobs.common.entity.ai.goal.SpecialHurtByTargetGoal;
@@ -94,6 +95,10 @@ public class _SpecialSilverfishEntity extends SilverfishEntity implements ISpeci
     /** Override to change this entity's AI goals. */
     protected void registerVariantGoals() { }
     
+    /** Override to change starting equipment or stats. */
+    public void finalizeVariantSpawn( IServerWorld world, DifficultyInstance difficulty, @Nullable SpawnReason spawnReason,
+                                      @Nullable ILivingEntityData groupData ) { }
+    
     /** Called when this entity successfully damages a target to apply on-hit effects. */
     @Override
     public void doEnchantDamageEffects( LivingEntity attacker, Entity target ) {
@@ -130,12 +135,45 @@ public class _SpecialSilverfishEntity extends SilverfishEntity implements ISpeci
         specialData = new SpecialMobData<>( this, SCALE );
     }
     
+    
+    //--------------- ISpecialMob Implementation ----------------
+    
+    private SpecialMobData<_SpecialSilverfishEntity> specialData;
+    
+    /** @return This mob's special data. */
+    @Override
+    public SpecialMobData<_SpecialSilverfishEntity> getSpecialData() { return specialData; }
+    
+    /** @return This entity's mob species. */
+    @SpecialMob.SpeciesSupplier
+    @Override
+    public MobFamily.Species<? extends _SpecialSilverfishEntity> getSpecies() { return SPECIES; }
+    
+    /** @return The experience that should be dropped by this entity. */
+    @Override
+    public final int getExperience() { return xpReward; }
+    
+    /** Sets the experience that should be dropped by this entity. */
+    @Override
+    public final void setExperience( int xp ) { xpReward = xp; }
+    
     /** Called on spawn to initialize properties based on the world, difficulty, and the group it spawns with. */
     @Nullable
-    public ILivingEntityData finalizeSpawn( IServerWorld world, DifficultyInstance difficulty, SpawnReason spawnReason,
-                                            @Nullable ILivingEntityData groupData, @Nullable CompoundNBT eggTag ) {
-        groupData = super.finalizeSpawn( world, difficulty, spawnReason, groupData, eggTag );
-        
+    @Override
+    public final ILivingEntityData finalizeSpawn( IServerWorld world, DifficultyInstance difficulty, SpawnReason spawnReason,
+                                                  @Nullable ILivingEntityData groupData, @Nullable CompoundNBT eggTag ) {
+        return MobHelper.finalizeSpawn( this, world, difficulty, spawnReason,
+                super.finalizeSpawn( world, difficulty, spawnReason, groupData, eggTag ) );
+    }
+    
+    /** Called on spawn to set starting equipment. */
+    @Override // Seal method to force spawn equipment changes through ISpecialMob
+    protected final void populateDefaultEquipmentSlots( DifficultyInstance difficulty ) { super.populateDefaultEquipmentSlots( difficulty ); }
+    
+    /** Called on spawn to initialize properties based on the world, difficulty, and the group it spawns with. */
+    @Override
+    public void finalizeSpecialSpawn( IServerWorld world, DifficultyInstance difficulty, @Nullable SpawnReason spawnReason,
+                                      @Nullable ILivingEntityData groupData ) {
         final double aggressiveChance = getConfig().SILVERFISH.aggressiveChance.get() < 0.0 ?
                 MobFamily.SILVERFISH.config.SILVERFISH.familyAggressiveChance.get() :
                 getConfig().SILVERFISH.aggressiveChance.get();
@@ -159,30 +197,8 @@ public class _SpecialSilverfishEntity extends SilverfishEntity implements ISpeci
             }
         }
         
-        return groupData;
+        finalizeVariantSpawn( world, difficulty, spawnReason, groupData );
     }
-    
-    
-    //--------------- ISpecialMob Implementation ----------------
-    
-    private SpecialMobData<_SpecialSilverfishEntity> specialData;
-    
-    /** @return This mob's special data. */
-    @Override
-    public SpecialMobData<_SpecialSilverfishEntity> getSpecialData() { return specialData; }
-    
-    /** @return This entity's mob species. */
-    @SpecialMob.SpeciesSupplier
-    @Override
-    public MobFamily.Species<? extends _SpecialSilverfishEntity> getSpecies() { return SPECIES; }
-    
-    /** @return The experience that should be dropped by this entity. */
-    @Override
-    public final int getExperience() { return xpReward; }
-    
-    /** Sets the experience that should be dropped by this entity. */
-    @Override
-    public final void setExperience( int xp ) { xpReward = xp; }
     
     
     //--------------- SpecialMobData Hooks ----------------

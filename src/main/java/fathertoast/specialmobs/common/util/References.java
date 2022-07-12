@@ -54,6 +54,8 @@ public final class References {
     
     public static final String TAG_FORGE_DATA = "ForgeData";
     
+    public static final String TAG_INIT = "SpecialMobsInit";
+    
     // Special mob data
     public static final String TAG_SPECIAL_MOB_DATA = "SpecialMobsData";
     public static final String TAG_RENDER_SCALE = "RenderScale";

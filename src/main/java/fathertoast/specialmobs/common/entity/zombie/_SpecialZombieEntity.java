@@ -111,18 +111,9 @@ public class _SpecialZombieEntity extends ZombieEntity implements IRangedAttackM
     /** Override to change this entity's attack goal priority. */
     protected int getVariantAttackPriority() { return 2; }
     
-    /** Called during spawn finalization to set starting equipment. */
-    @Override
-    protected void populateDefaultEquipmentSlots( DifficultyInstance difficulty ) {
-        super.populateDefaultEquipmentSlots( difficulty );
-        
-        if( getSpecialData().getRangedAttackMaxRange() > 0.0F && getConfig().ZOMBIES.bowEquipChance.rollChance( random ) ) {
-            setItemSlot( EquipmentSlotType.MAINHAND, new ItemStack( Items.BOW ) );
-        }
-        else if( getConfig().ZOMBIES.shieldEquipChance.rollChance( random ) ) {
-            setItemSlot( EquipmentSlotType.OFFHAND, new ItemStack( Items.SHIELD ) );
-        }
-    }
+    /** Override to change starting equipment or stats. */
+    public void finalizeVariantSpawn( IServerWorld world, DifficultyInstance difficulty, @Nullable SpawnReason spawnReason,
+                                      @Nullable ILivingEntityData groupData ) { }
     
     /** Called to attack the target with a ranged attack. */
     @Override
@@ -194,17 +185,6 @@ public class _SpecialZombieEntity extends ZombieEntity implements IRangedAttackM
         specialData = new SpecialMobData<>( this, SCALE );
     }
     
-    /** Called on spawn to initialize properties based on the world, difficulty, and the group it spawns with. */
-    @Nullable
-    public ILivingEntityData finalizeSpawn( IServerWorld world, DifficultyInstance difficulty, SpawnReason spawnReason,
-                                            @Nullable ILivingEntityData groupData, @Nullable CompoundNBT eggTag ) {
-        groupData = super.finalizeSpawn( world, difficulty, spawnReason, groupData, eggTag );
-        
-        reassessWeaponGoal();
-        
-        return groupData;
-    }
-    
     /** Called to set the item equipped in a particular slot. */
     @Override
     public void setItemSlot( EquipmentSlotType slot, ItemStack item ) {
@@ -252,6 +232,34 @@ public class _SpecialZombieEntity extends ZombieEntity implements IRangedAttackM
     /** Sets the experience that should be dropped by this entity. */
     @Override
     public final void setExperience( int xp ) { xpReward = xp; }
+    
+    /** Called on spawn to initialize properties based on the world, difficulty, and the group it spawns with. */
+    @Nullable
+    @Override
+    public final ILivingEntityData finalizeSpawn( IServerWorld world, DifficultyInstance difficulty, SpawnReason spawnReason,
+                                                  @Nullable ILivingEntityData groupData, @Nullable CompoundNBT eggTag ) {
+        return MobHelper.finalizeSpawn( this, world, difficulty, spawnReason,
+                super.finalizeSpawn( world, difficulty, spawnReason, groupData, eggTag ) );
+    }
+    
+    /** Called on spawn to set starting equipment. */
+    @Override // Seal method to force spawn equipment changes through ISpecialMob
+    protected final void populateDefaultEquipmentSlots( DifficultyInstance difficulty ) { super.populateDefaultEquipmentSlots( difficulty ); }
+    
+    /** Called on spawn to initialize properties based on the world, difficulty, and the group it spawns with. */
+    @Override
+    public void finalizeSpecialSpawn( IServerWorld world, DifficultyInstance difficulty, @Nullable SpawnReason spawnReason,
+                                      @Nullable ILivingEntityData groupData ) {
+        if( getSpecialData().getRangedAttackMaxRange() > 0.0F && getConfig().ZOMBIES.bowEquipChance.rollChance( random ) ) {
+            setItemSlot( EquipmentSlotType.MAINHAND, new ItemStack( Items.BOW ) );
+        }
+        else if( getConfig().ZOMBIES.shieldEquipChance.rollChance( random ) ) {
+            setItemSlot( EquipmentSlotType.OFFHAND, new ItemStack( Items.SHIELD ) );
+        }
+        
+        finalizeVariantSpawn( world, difficulty, spawnReason, groupData );
+        reassessWeaponGoal();
+    }
     
     
     //--------------- SpecialMobData Hooks ----------------

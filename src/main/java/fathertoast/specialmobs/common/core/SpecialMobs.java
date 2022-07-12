@@ -1,6 +1,5 @@
 package fathertoast.specialmobs.common.core;
 
-import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.compat.top.SMTheOneProbe;
 import fathertoast.specialmobs.common.config.Config;
 import fathertoast.specialmobs.common.core.register.SMEntities;

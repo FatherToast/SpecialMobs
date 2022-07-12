@@ -109,6 +109,10 @@ public class _SpecialSkeletonEntity extends AbstractSkeletonEntity implements IS
     /** Override to change this entity's attack goal priority. */
     protected int getVariantAttackPriority() { return 4; }
     
+    /** Override to change starting equipment or stats. */
+    public void finalizeVariantSpawn( IServerWorld world, DifficultyInstance difficulty, @Nullable SpawnReason spawnReason,
+                                      @Nullable ILivingEntityData groupData ) { }
+    
     /** Called to attack the target with a ranged attack. */
     @Override
     public void performRangedAttack( LivingEntity target, float damageMulti ) {
@@ -177,31 +181,6 @@ public class _SpecialSkeletonEntity extends AbstractSkeletonEntity implements IS
         super.defineSynchedData();
         specialData = new SpecialMobData<>( this, SCALE );
         entityData.define( IS_BABY, false );
-    }
-    
-    /** Called on spawn to initialize properties based on the world, difficulty, and the group it spawns with. */
-    @Nullable
-    public ILivingEntityData finalizeSpawn( IServerWorld world, DifficultyInstance difficulty, SpawnReason spawnReason,
-                                            @Nullable ILivingEntityData groupData, @Nullable CompoundNBT eggTag ) {
-        groupData = super.finalizeSpawn( world, difficulty, spawnReason, groupData, eggTag );
-        
-        setBaby( MobFamily.SKELETON.config.SKELETONS.babyChance.rollChance( random ) );
-        
-        return groupData;
-    }
-    
-    /** Called during spawn finalization to set starting equipment. */
-    @Override
-    protected void populateDefaultEquipmentSlots( DifficultyInstance difficulty ) {
-        super.populateDefaultEquipmentSlots( difficulty );
-        
-        if( getSpecialData().getRangedAttackMaxRange() <= 0.0F || !getConfig().SKELETONS.bowEquipChance.rollChance( random ) ) {
-            setItemSlot( EquipmentSlotType.MAINHAND, new ItemStack( Items.IRON_SWORD ) );
-            
-            if( getConfig().SKELETONS.shieldEquipChance.rollChance( random ) ) {
-                setItemSlot( EquipmentSlotType.OFFHAND, new ItemStack( Items.SHIELD ) );
-            }
-        }
     }
     
     /** Called to set this entity's attack AI based on current equipment. */
@@ -326,6 +305,37 @@ public class _SpecialSkeletonEntity extends AbstractSkeletonEntity implements IS
     /** Sets the experience that should be dropped by this entity. */
     @Override
     public final void setExperience( int xp ) { xpReward = xp; }
+    
+    /** Called on spawn to initialize properties based on the world, difficulty, and the group it spawns with. */
+    @Nullable
+    @Override
+    public final ILivingEntityData finalizeSpawn( IServerWorld world, DifficultyInstance difficulty, SpawnReason spawnReason,
+                                                  @Nullable ILivingEntityData groupData, @Nullable CompoundNBT eggTag ) {
+        return MobHelper.finalizeSpawn( this, world, difficulty, spawnReason,
+                super.finalizeSpawn( world, difficulty, spawnReason, groupData, eggTag ) );
+    }
+    
+    /** Called on spawn to set starting equipment. */
+    @Override // Seal method to force spawn equipment changes through ISpecialMob
+    protected final void populateDefaultEquipmentSlots( DifficultyInstance difficulty ) { super.populateDefaultEquipmentSlots( difficulty ); }
+    
+    /** Called on spawn to initialize properties based on the world, difficulty, and the group it spawns with. */
+    @Override
+    public void finalizeSpecialSpawn( IServerWorld world, DifficultyInstance difficulty, @Nullable SpawnReason spawnReason,
+                                      @Nullable ILivingEntityData groupData ) {
+        setBaby( MobFamily.SKELETON.config.SKELETONS.babyChance.rollChance( random ) );
+        
+        if( getSpecialData().getRangedAttackMaxRange() <= 0.0F || !getConfig().SKELETONS.bowEquipChance.rollChance( random ) ) {
+            setItemSlot( EquipmentSlotType.MAINHAND, new ItemStack( Items.IRON_SWORD ) );
+            
+            if( getConfig().SKELETONS.shieldEquipChance.rollChance( random ) ) {
+                setItemSlot( EquipmentSlotType.OFFHAND, new ItemStack( Items.SHIELD ) );
+            }
+        }
+        
+        finalizeVariantSpawn( world, difficulty, spawnReason, groupData );
+        reassessWeaponGoal();
+    }
     
     
     //--------------- SpecialMobData Hooks ----------------
