@@ -5,16 +5,12 @@ import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.entity.ai.AIHelper;
 import fathertoast.specialmobs.common.entity.ai.goal.SpecialLeapAtTargetGoal;
-import fathertoast.specialmobs.common.util.AttributeHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.AttributeModifierMap;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.item.Items;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -30,16 +26,11 @@ public class JumpingCreeperEntity extends _SpecialCreeperEntity {
     public static MobFamily.Species<JumpingCreeperEntity> SPECIES;
     
     @SpecialMob.BestiaryInfoSupplier
-    public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
-        return new BestiaryInfo( 0x7D6097 );
-        //TODO theme - mountain
-    }
-    
-    @SpecialMob.AttributeCreator
-    public static AttributeModifierMap.MutableAttribute createAttributes() {
-        return AttributeHelper.of( _SpecialCreeperEntity.createAttributes() )
-                .multAttribute( Attributes.MOVEMENT_SPEED, 1.2 )
-                .build();
+    public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
+        bestiaryInfo.color( 0x7D6097 ).theme( BestiaryInfo.Theme.MOUNTAIN )
+                .uniqueTextureBaseOnly()
+                .addExperience( 2 ).fallImmune()
+                .multiplyAttribute( Attributes.MOVEMENT_SPEED, 1.2 );
     }
     
     @SpecialMob.LanguageProvider
@@ -57,14 +48,15 @@ public class JumpingCreeperEntity extends _SpecialCreeperEntity {
     @SpecialMob.Factory
     public static EntityType.IFactory<JumpingCreeperEntity> getVariantFactory() { return JumpingCreeperEntity::new; }
     
+    /** @return This entity's mob species. */
+    @SpecialMob.SpeciesSupplier
+    @Override
+    public MobFamily.Species<? extends JumpingCreeperEntity> getSpecies() { return SPECIES; }
+    
     
     //--------------- Variant-Specific Implementations ----------------
     
-    public JumpingCreeperEntity( EntityType<? extends _SpecialCreeperEntity> entityType, World world ) {
-        super( entityType, world );
-        getSpecialData().setFallDamageMultiplier( 0.0F );
-        xpReward += 2;
-    }
+    public JumpingCreeperEntity( EntityType<? extends _SpecialCreeperEntity> entityType, World world ) { super( entityType, world ); }
     
     /** Override to change this entity's AI goals. */
     @Override
@@ -72,12 +64,4 @@ public class JumpingCreeperEntity extends _SpecialCreeperEntity {
         AIHelper.insertGoal( goalSelector, 4, new SpecialLeapAtTargetGoal(
                 this, 10, 6.0F, 10.0F, 1.3F, 2.0F ) );
     }
-    
-    private static final ResourceLocation[] TEXTURES = {
-            GET_TEXTURE_PATH( "jumping" )
-    };
-    
-    /** @return All default textures for this entity. */
-    @Override
-    public ResourceLocation[] getDefaultTextures() { return TEXTURES; }
 }

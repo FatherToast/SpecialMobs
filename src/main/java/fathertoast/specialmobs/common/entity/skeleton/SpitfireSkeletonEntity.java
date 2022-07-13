@@ -3,18 +3,17 @@ package fathertoast.specialmobs.common.entity.skeleton;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
-import fathertoast.specialmobs.common.util.AttributeHelper;
+import fathertoast.specialmobs.common.config.species.SkeletonSpeciesConfig;
+import fathertoast.specialmobs.common.config.species.SpeciesConfig;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.AttributeModifierMap;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.projectile.SmallFireballEntity;
 import net.minecraft.item.Items;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 
@@ -31,18 +30,18 @@ public class SpitfireSkeletonEntity extends _SpecialSkeletonEntity {
     public static MobFamily.Species<SpitfireSkeletonEntity> SPECIES;
     
     @SpecialMob.BestiaryInfoSupplier
-    public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
-        entityType.sized( 0.9F, 2.99F ).fireImmune();
-        return new BestiaryInfo( 0xDC1A00, BestiaryInfo.BaseWeight.LOW );
-        //TODO theme - fire
+    public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
+        bestiaryInfo.color( 0xDC1A00 ).weight( BestiaryInfo.DefaultWeight.LOW ).theme( BestiaryInfo.Theme.FIRE )
+                .uniqueTextureWithEyes()
+                .size( 1.5F, 0.9F, 2.99F )
+                .addExperience( 2 ).fireImmune().waterSensitive().rangedDamage( 0.0 )
+                .addToAttribute( Attributes.MAX_HEALTH, 20.0 )
+                .addToAttribute( Attributes.ATTACK_DAMAGE, 2.0 );
     }
     
-    @SpecialMob.AttributeCreator
-    public static AttributeModifierMap.MutableAttribute createAttributes() {
-        return AttributeHelper.of( _SpecialSkeletonEntity.createAttributes() )
-                .addAttribute( Attributes.MAX_HEALTH, 20.0 )
-                .addAttribute( Attributes.ATTACK_DAMAGE, 2.0 )
-                .build();
+    @SpecialMob.ConfigSupplier
+    public static SpeciesConfig createConfig( MobFamily.Species<?> species ) {
+        return new SkeletonSpeciesConfig( species, 1.0F, DEFAULT_SHIELD_CHANCE );
     }
     
     @SpecialMob.LanguageProvider
@@ -60,26 +59,18 @@ public class SpitfireSkeletonEntity extends _SpecialSkeletonEntity {
     @SpecialMob.Factory
     public static EntityType.IFactory<SpitfireSkeletonEntity> getVariantFactory() { return SpitfireSkeletonEntity::new; }
     
+    /** @return This entity's mob species. */
+    @SpecialMob.SpeciesSupplier
+    @Override
+    public MobFamily.Species<? extends SpitfireSkeletonEntity> getSpecies() { return SPECIES; }
+    
     
     //--------------- Variant-Specific Implementations ----------------
     
     public SpitfireSkeletonEntity( EntityType<? extends _SpecialSkeletonEntity> entityType, World world ) {
         super( entityType, world );
-        getSpecialData().setBaseScale( 1.5F );
-        getSpecialData().setDamagedByWater( true );
         maxUpStep = 1.0F;
-        xpReward += 2;
     }
-    
-    /** Override to change this entity's AI goals. */
-    @Override
-    protected void registerVariantGoals() {
-        getSpecialData().rangedAttackDamage += 2.0F;
-    }
-    
-    /** Override to change this entity's chance to spawn with a melee weapon. */
-    @Override
-    protected double getVariantMeleeChance() { return 0.0; }
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override
@@ -92,7 +83,7 @@ public class SpitfireSkeletonEntity extends _SpecialSkeletonEntity {
     public void performRangedAttack( LivingEntity target, float damageMulti ) {
         if( !isSilent() ) level.levelEvent( null, References.EVENT_BLAZE_SHOOT, blockPosition(), 0 );
         
-        final float accelVariance = MathHelper.sqrt( distanceTo( target ) ) * 0.5F * getSpecialData().rangedAttackSpread;
+        final float accelVariance = MathHelper.sqrt( distanceTo( target ) ) * 0.5F * getSpecialData().getRangedAttackSpread();
         
         for( int i = 0; i < 3; i++ ) {
             final double dX = target.getX() - getX() + getRandom().nextGaussian() * accelVariance;
@@ -112,13 +103,4 @@ public class SpitfireSkeletonEntity extends _SpecialSkeletonEntity {
     /** @return True if this entity is a baby. */
     @Override
     public boolean isBaby() { return false; }
-    
-    private static final ResourceLocation[] TEXTURES = {
-            GET_TEXTURE_PATH( "fire" ),
-            GET_TEXTURE_PATH( "fire_eyes" )
-    };
-    
-    /** @return All default textures for this entity. */
-    @Override
-    public ResourceLocation[] getDefaultTextures() { return TEXTURES; }
 }

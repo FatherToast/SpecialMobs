@@ -3,8 +3,8 @@ package fathertoast.specialmobs.common.entity.enderman;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
-import fathertoast.specialmobs.common.core.SpecialMobs;
 import fathertoast.specialmobs.common.entity.ISpecialMob;
+import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.entity.SpecialMobData;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
@@ -19,7 +19,6 @@ import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.potion.EffectInstance;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.IServerWorld;
@@ -39,14 +38,14 @@ public class _SpecialEndermanEntity extends EndermanEntity implements ISpecialMo
     public static MobFamily.Species<_SpecialEndermanEntity> SPECIES;
     
     @SpecialMob.BestiaryInfoSupplier
-    public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
-        return new BestiaryInfo( 0x000000 );
+    public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
+        bestiaryInfo.color( 0x000000 )
+                .vanillaTextureWithEyes( "textures/entity/enderman/enderman.png", "textures/entity/enderman/enderman_eyes.png" )
+                .experience( 5 ).waterSensitive();
     }
     
-    @SpecialMob.AttributeCreator
-    public static AttributeModifierMap.MutableAttribute createAttributes() {
-        return EndermanEntity.createAttributes();
-    }
+    @SpecialMob.AttributeSupplier
+    public static AttributeModifierMap.MutableAttribute createAttributes() { return EndermanEntity.createAttributes(); }
     
     @SpecialMob.LanguageProvider
     public static String[] getTranslations( String langKey ) {
@@ -65,12 +64,6 @@ public class _SpecialEndermanEntity extends EndermanEntity implements ISpecialMo
     
     //--------------- Variant-Specific Breakouts ----------------
     
-    public _SpecialEndermanEntity( EntityType<? extends _SpecialEndermanEntity> entityType, World world ) {
-        super( entityType, world );
-        getSpecialData().initialize();
-        getSpecialData().setDamagedByWater( true );
-    }
-    
     /** Called in the MobEntity.class constructor to initialize AI goals. */
     @Override
     protected void registerGoals() {
@@ -80,6 +73,10 @@ public class _SpecialEndermanEntity extends EndermanEntity implements ISpecialMo
     
     /** Override to change this entity's AI goals. */
     protected void registerVariantGoals() { }
+    
+    /** Override to change starting equipment or stats. */
+    public void finalizeVariantSpawn( IServerWorld world, DifficultyInstance difficulty, @Nullable SpawnReason spawnReason,
+                                      @Nullable ILivingEntityData groupData ) { }
     
     /** Called when this entity successfully damages a target to apply on-hit effects. */
     @Override
@@ -103,20 +100,16 @@ public class _SpecialEndermanEntity extends EndermanEntity implements ISpecialMo
     /** The parameter for special mob render scale. */
     private static final DataParameter<Float> SCALE = EntityDataManager.defineId( _SpecialEndermanEntity.class, DataSerializers.FLOAT );
     
+    public _SpecialEndermanEntity( EntityType<? extends _SpecialEndermanEntity> entityType, World world ) {
+        super( entityType, world );
+        getSpecialData().initialize();
+    }
+    
     /** Called from the Entity.class constructor to define data watcher variables. */
     @Override
     protected void defineSynchedData() {
         super.defineSynchedData();
-        specialData = new SpecialMobData<>( this, SCALE, 1.0F );
-    }
-    
-    /** Called on spawn to initialize properties based on the world, difficulty, and the group it spawns with. */
-    @Nullable
-    public ILivingEntityData finalizeSpawn( IServerWorld world, DifficultyInstance difficulty, SpawnReason spawnReason,
-                                            @Nullable ILivingEntityData groupData, @Nullable CompoundNBT eggTag ) {
-        groupData = super.finalizeSpawn( world, difficulty, spawnReason, groupData, eggTag );
-        // TODO anything?
-        return groupData;
+        specialData = new SpecialMobData<>( this, SCALE );
     }
     
     
@@ -128,6 +121,11 @@ public class _SpecialEndermanEntity extends EndermanEntity implements ISpecialMo
     @Override
     public SpecialMobData<_SpecialEndermanEntity> getSpecialData() { return specialData; }
     
+    /** @return This entity's mob species. */
+    @SpecialMob.SpeciesSupplier
+    @Override
+    public MobFamily.Species<? extends _SpecialEndermanEntity> getSpecies() { return SPECIES; }
+    
     /** @return The experience that should be dropped by this entity. */
     @Override
     public final int getExperience() { return xpReward; }
@@ -136,18 +134,25 @@ public class _SpecialEndermanEntity extends EndermanEntity implements ISpecialMo
     @Override
     public final void setExperience( int xp ) { xpReward = xp; }
     
-    static ResourceLocation GET_TEXTURE_PATH( String type ) {
-        return SpecialMobs.resourceLoc( SpecialMobs.TEXTURE_PATH + "enderman/" + type + ".png" );
+    /** Called on spawn to initialize properties based on the world, difficulty, and the group it spawns with. */
+    @Nullable
+    @Override
+    public final ILivingEntityData finalizeSpawn( IServerWorld world, DifficultyInstance difficulty, SpawnReason spawnReason,
+                                                  @Nullable ILivingEntityData groupData, @Nullable CompoundNBT eggTag ) {
+        return MobHelper.finalizeSpawn( this, world, difficulty, spawnReason,
+                super.finalizeSpawn( world, difficulty, spawnReason, groupData, eggTag ) );
     }
     
-    private static final ResourceLocation[] TEXTURES = {
-            new ResourceLocation( "textures/entity/enderman/enderman.png" ),
-            new ResourceLocation( "textures/entity/enderman/enderman_eyes.png" )
-    };
+    /** Called on spawn to set starting equipment. */
+    @Override // Seal method to force spawn equipment changes through ISpecialMob
+    protected final void populateDefaultEquipmentSlots( DifficultyInstance difficulty ) { super.populateDefaultEquipmentSlots( difficulty ); }
     
-    /** @return All default textures for this entity. */
+    /** Called on spawn to initialize properties based on the world, difficulty, and the group it spawns with. */
     @Override
-    public ResourceLocation[] getDefaultTextures() { return TEXTURES; }
+    public void finalizeSpecialSpawn( IServerWorld world, DifficultyInstance difficulty, @Nullable SpawnReason spawnReason,
+                                      @Nullable ILivingEntityData groupData ) {
+        finalizeVariantSpawn( world, difficulty, spawnReason, groupData );
+    }
     
     
     //--------------- SpecialMobData Hooks ----------------

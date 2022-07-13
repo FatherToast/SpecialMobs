@@ -3,19 +3,17 @@ package fathertoast.specialmobs.common.entity.witherskeleton;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
+import fathertoast.specialmobs.common.config.species.SkeletonSpeciesConfig;
+import fathertoast.specialmobs.common.config.species.SpeciesConfig;
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.entity.ai.INinja;
 import fathertoast.specialmobs.common.entity.ai.goal.NinjaGoal;
-import fathertoast.specialmobs.common.util.AttributeHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.AttributeModifierMap;
+import net.minecraft.entity.*;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.datasync.DataParameter;
@@ -23,10 +21,14 @@ import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.Effects;
-import net.minecraft.util.*;
+import net.minecraft.util.ActionResultType;
+import net.minecraft.util.DamageSource;
+import net.minecraft.util.Hand;
+import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.DifficultyInstance;
+import net.minecraft.world.IServerWorld;
 import net.minecraft.world.World;
 
 import javax.annotation.Nullable;
@@ -44,15 +46,17 @@ public class NinjaWitherSkeletonEntity extends _SpecialWitherSkeletonEntity impl
     public static MobFamily.Species<NinjaWitherSkeletonEntity> SPECIES;
     
     @SpecialMob.BestiaryInfoSupplier
-    public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
-        return new BestiaryInfo( 0x333366 );
+    public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
+        bestiaryInfo.color( 0x333366 )
+                .uniqueOverlayTexture()
+                .addExperience( 2 ).pressurePlateImmune()
+                .multiplyRangedCooldown( 0.5F ).rangedMaxRange( 9.0 )
+                .multiplyAttribute( Attributes.MOVEMENT_SPEED, 1.2 );
     }
     
-    @SpecialMob.AttributeCreator
-    public static AttributeModifierMap.MutableAttribute createAttributes() {
-        return AttributeHelper.of( _SpecialWitherSkeletonEntity.createAttributes() )
-                .multAttribute( Attributes.MOVEMENT_SPEED, 1.2 )
-                .build();
+    @SpecialMob.ConfigSupplier
+    public static SpeciesConfig createConfig( MobFamily.Species<?> species ) {
+        return new SkeletonSpeciesConfig( species, 0.5, 0.0 );
     }
     
     @SpecialMob.LanguageProvider
@@ -71,31 +75,28 @@ public class NinjaWitherSkeletonEntity extends _SpecialWitherSkeletonEntity impl
     @SpecialMob.Factory
     public static EntityType.IFactory<NinjaWitherSkeletonEntity> getVariantFactory() { return NinjaWitherSkeletonEntity::new; }
     
+    /** @return This entity's mob species. */
+    @SpecialMob.SpeciesSupplier
+    @Override
+    public MobFamily.Species<? extends NinjaWitherSkeletonEntity> getSpecies() { return SPECIES; }
+    
     
     //--------------- Variant-Specific Implementations ----------------
     
-    public NinjaWitherSkeletonEntity( EntityType<? extends _SpecialWitherSkeletonEntity> entityType, World world ) {
-        super( entityType, world );
-        xpReward += 2;
-    }
+    public NinjaWitherSkeletonEntity( EntityType<? extends _SpecialWitherSkeletonEntity> entityType, World world ) { super( entityType, world ); }
     
     /** Override to change this entity's AI goals. */
     @Override
     protected void registerVariantGoals() {
-        setRangedAI( 1.0, 10, 9.0F );
         goalSelector.addGoal( -9, new NinjaGoal<>( this ) );
     }
     
-    /** Called during spawn finalization to set starting equipment. */
+    /** Override to change starting equipment or stats. */
     @Override
-    protected void populateDefaultEquipmentSlots( DifficultyInstance difficulty ) {
-        super.populateDefaultEquipmentSlots( difficulty );
+    public void finalizeVariantSpawn( IServerWorld world, DifficultyInstance difficulty, @Nullable SpawnReason spawnReason,
+                                      @Nullable ILivingEntityData groupData ) {
         setCanPickUpLoot( true );
     }
-    
-    /** Override to change this entity's chance to spawn with a bow. */
-    @Override
-    protected double getVariantBowChance() { return 0.5; }
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override
@@ -192,16 +193,6 @@ public class NinjaWitherSkeletonEntity extends _SpecialWitherSkeletonEntity impl
             }
         }
     }
-    
-    private static final ResourceLocation[] TEXTURES = {
-            new ResourceLocation( "textures/entity/skeleton/wither_skeleton.png" ),
-            null,
-            GET_TEXTURE_PATH( "ninja_overlay" )
-    };
-    
-    /** @return All default textures for this entity. */
-    @Override
-    public ResourceLocation[] getDefaultTextures() { return TEXTURES; }
     
     
     //--------------- INinja Implementations ----------------

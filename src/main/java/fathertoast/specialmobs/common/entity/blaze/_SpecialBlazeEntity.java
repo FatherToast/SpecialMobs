@@ -3,8 +3,10 @@ package fathertoast.specialmobs.common.entity.blaze;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
-import fathertoast.specialmobs.common.core.SpecialMobs;
+import fathertoast.specialmobs.common.config.species.BlazeSpeciesConfig;
+import fathertoast.specialmobs.common.config.species.SpeciesConfig;
 import fathertoast.specialmobs.common.entity.ISpecialMob;
+import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.entity.SpecialMobData;
 import fathertoast.specialmobs.common.entity.ai.AIHelper;
 import fathertoast.specialmobs.common.entity.ai.goal.SpecialBlazeAttackGoal;
@@ -25,7 +27,6 @@ import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.DifficultyInstance;
@@ -46,14 +47,23 @@ public class _SpecialBlazeEntity extends BlazeEntity implements IRangedAttackMob
     public static MobFamily.Species<_SpecialBlazeEntity> SPECIES;
     
     @SpecialMob.BestiaryInfoSupplier
-    public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
-        return new BestiaryInfo( 0xFFF87E );
+    public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
+        bestiaryInfo.color( 0xFFF87E )
+                .vanillaTextureBaseOnly( "textures/entity/blaze.png" )
+                .experience( 10 ).fireImmune().waterSensitive()
+                .fireballAttack( 1.0, 60, 100, 48.0 );
     }
     
-    @SpecialMob.AttributeCreator
-    public static AttributeModifierMap.MutableAttribute createAttributes() {
-        return BlazeEntity.createAttributes();
+    @SpecialMob.ConfigSupplier
+    public static SpeciesConfig createConfig( MobFamily.Species<?> species ) {
+        return new BlazeSpeciesConfig( species, 3, 6 );
     }
+    
+    /** @return This entity's species config. */
+    public BlazeSpeciesConfig getConfig() { return (BlazeSpeciesConfig) getSpecies().config; }
+    
+    @SpecialMob.AttributeSupplier
+    public static AttributeModifierMap.MutableAttribute createAttributes() { return BlazeEntity.createAttributes(); }
     
     @SpecialMob.LanguageProvider
     public static String[] getTranslations( String langKey ) {
@@ -72,12 +82,6 @@ public class _SpecialBlazeEntity extends BlazeEntity implements IRangedAttackMob
     
     //--------------- Variant-Specific Breakouts ----------------
     
-    public _SpecialBlazeEntity( EntityType<? extends _SpecialBlazeEntity> entityType, World world ) {
-        super( entityType, world );
-        getSpecialData().initialize();
-        getSpecialData().setDamagedByWater( true );
-    }
-    
     /** Called in the MobEntity.class constructor to initialize AI goals. */
     @Override
     protected void registerGoals() {
@@ -86,28 +90,15 @@ public class _SpecialBlazeEntity extends BlazeEntity implements IRangedAttackMob
         goalSelector.addGoal( 4, new SpecialBlazeAttackGoal( this ) );
         AIHelper.replaceHurtByTarget( this, new SpecialHurtByTargetGoal( this, BlazeEntity.class ).setAlertOthers() );
         
-        getSpecialData().rangedAttackDamage = 2.0F;
-        setRangedAI( 3, 6, 60, 100, 48.0F );
         registerVariantGoals();
     }
     
     /** Override to change this entity's AI goals. */
     protected void registerVariantGoals() { }
     
-    /** Helper method to set the ranged attack AI more easily. */
-    protected void disableRangedAI() {
-        setRangedAI( 0, 6, 60, 100, 0.0F );
-    }
-    
-    /** Helper method to set the ranged attack AI more easily. */
-    protected void setRangedAI( int burstCount, int burstDelay, int chargeTime, int cooldownTime, float range ) {
-        fireballBurstCount = burstCount;
-        fireballBurstDelay = burstDelay;
-        
-        getSpecialData().rangedAttackCooldown = cooldownTime;
-        getSpecialData().rangedAttackMaxCooldown = cooldownTime + chargeTime;
-        getSpecialData().rangedAttackMaxRange = range;
-    }
+    /** Override to change starting equipment or stats. */
+    public void finalizeVariantSpawn( IServerWorld world, DifficultyInstance difficulty, @Nullable SpawnReason spawnReason,
+                                      @Nullable ILivingEntityData groupData ) { }
     
     /** Called when this entity successfully damages a target to apply on-hit effects. */
     @Override
@@ -118,6 +109,21 @@ public class _SpecialBlazeEntity extends BlazeEntity implements IRangedAttackMob
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
     protected void onVariantAttack( Entity target ) { }
+    
+    /** Called to attack the target with a ranged attack. */
+    @Override
+    public void performRangedAttack( LivingEntity target, float damageMulti ) {
+        if( !isSilent() ) level.levelEvent( null, References.EVENT_BLAZE_SHOOT, blockPosition(), 0 );
+        
+        final float accelVariance = MathHelper.sqrt( distanceTo( target ) ) * 0.5F * getSpecialData().getRangedAttackSpread();
+        final double dX = target.getX() - getX() + getRandom().nextGaussian() * accelVariance;
+        final double dY = target.getY( 0.5 ) - getY( 0.5 );
+        final double dZ = target.getZ() - getZ() + getRandom().nextGaussian() * accelVariance;
+        
+        final SmallFireballEntity fireball = new SmallFireballEntity( level, this, dX, dY, dZ );
+        fireball.setPos( getX(), getY( 0.5 ) + 0.5, getZ() );
+        level.addFreshEntity( fireball );
+    }
     
     /** Override to save data to this entity's NBT data. */
     public void addVariantSaveData( CompoundNBT saveTag ) { }
@@ -136,35 +142,19 @@ public class _SpecialBlazeEntity extends BlazeEntity implements IRangedAttackMob
     /** The ticks between each shot in a burst. */
     public int fireballBurstDelay;
     
+    public _SpecialBlazeEntity( EntityType<? extends _SpecialBlazeEntity> entityType, World world ) {
+        super( entityType, world );
+        fireballBurstCount = getConfig().BLAZES.fireballBurstCount.get();
+        fireballBurstDelay = getConfig().BLAZES.fireballBurstDelay.get();
+        
+        getSpecialData().initialize();
+    }
+    
     /** Called from the Entity.class constructor to define data watcher variables. */
     @Override
     protected void defineSynchedData() {
         super.defineSynchedData();
-        specialData = new SpecialMobData<>( this, SCALE, 1.0F );
-    }
-    
-    /** Called to attack the target with a ranged attack. */
-    @Override
-    public void performRangedAttack( LivingEntity target, float damageMulti ) {
-        if( !isSilent() ) level.levelEvent( null, References.EVENT_BLAZE_SHOOT, blockPosition(), 0 );
-        
-        final float accelVariance = MathHelper.sqrt( distanceTo( target ) ) * 0.5F * getSpecialData().rangedAttackSpread;
-        final double dX = target.getX() - getX() + getRandom().nextGaussian() * accelVariance;
-        final double dY = target.getY( 0.5 ) - getY( 0.5 );
-        final double dZ = target.getZ() - getZ() + getRandom().nextGaussian() * accelVariance;
-        
-        final SmallFireballEntity fireball = new SmallFireballEntity( level, this, dX, dY, dZ );
-        fireball.setPos( getX(), getY( 0.5 ) + 0.5, getZ() );
-        level.addFreshEntity( fireball );
-    }
-    
-    /** Called on spawn to initialize properties based on the world, difficulty, and the group it spawns with. */
-    @Nullable
-    public ILivingEntityData finalizeSpawn( IServerWorld world, DifficultyInstance difficulty, SpawnReason spawnReason,
-                                            @Nullable ILivingEntityData groupData, @Nullable CompoundNBT eggTag ) {
-        groupData = super.finalizeSpawn( world, difficulty, spawnReason, groupData, eggTag );
-        // TODO ranged attack
-        return groupData;
+        specialData = new SpecialMobData<>( this, SCALE );
     }
     
     
@@ -174,7 +164,12 @@ public class _SpecialBlazeEntity extends BlazeEntity implements IRangedAttackMob
     
     /** @return This mob's special data. */
     @Override
-    public SpecialMobData<_SpecialBlazeEntity> getSpecialData() { return specialData; }
+    public final SpecialMobData<_SpecialBlazeEntity> getSpecialData() { return specialData; }
+    
+    /** @return This entity's mob species. */
+    @SpecialMob.SpeciesSupplier
+    @Override
+    public MobFamily.Species<? extends _SpecialBlazeEntity> getSpecies() { return SPECIES; }
     
     /** @return The experience that should be dropped by this entity. */
     @Override
@@ -184,15 +179,25 @@ public class _SpecialBlazeEntity extends BlazeEntity implements IRangedAttackMob
     @Override
     public final void setExperience( int xp ) { xpReward = xp; }
     
-    static ResourceLocation GET_TEXTURE_PATH( String type ) {
-        return SpecialMobs.resourceLoc( SpecialMobs.TEXTURE_PATH + "blaze/" + type + ".png" );
+    /** Called on spawn to initialize properties based on the world, difficulty, and the group it spawns with. */
+    @Nullable
+    @Override
+    public final ILivingEntityData finalizeSpawn( IServerWorld world, DifficultyInstance difficulty, SpawnReason spawnReason,
+                                                  @Nullable ILivingEntityData groupData, @Nullable CompoundNBT eggTag ) {
+        return MobHelper.finalizeSpawn( this, world, difficulty, spawnReason,
+                super.finalizeSpawn( world, difficulty, spawnReason, groupData, eggTag ) );
     }
     
-    private static final ResourceLocation[] TEXTURES = { new ResourceLocation( "textures/entity/blaze.png" ) };
+    /** Called on spawn to set starting equipment. */
+    @Override // Seal method to force spawn equipment changes through ISpecialMob
+    protected final void populateDefaultEquipmentSlots( DifficultyInstance difficulty ) { super.populateDefaultEquipmentSlots( difficulty ); }
     
-    /** @return All default textures for this entity. */
+    /** Called on spawn to initialize properties based on the world, difficulty, and the group it spawns with. */
     @Override
-    public ResourceLocation[] getDefaultTextures() { return TEXTURES; }
+    public void finalizeSpecialSpawn( IServerWorld world, DifficultyInstance difficulty, @Nullable SpawnReason spawnReason,
+                                      @Nullable ILivingEntityData groupData ) {
+        finalizeVariantSpawn( world, difficulty, spawnReason, groupData );
+    }
     
     
     //--------------- SpecialMobData Hooks ----------------

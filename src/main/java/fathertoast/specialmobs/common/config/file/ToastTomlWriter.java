@@ -75,9 +75,7 @@ public class ToastTomlWriter implements ConfigWriter {
     public void continueLine() { skipNextIndent = true; }
     
     /** Writes the system-preferred new line character(s) to start a new line. */
-    public void writeNewLine( CharacterOutput output ) {
-        output.write( CHARS_NEW_LINE );
-    }
+    public void writeNewLine( CharacterOutput output ) { output.write( CHARS_NEW_LINE ); }
     
     /** Writes a single-line string. */
     public void writeLine( String line, CharacterOutput output ) {

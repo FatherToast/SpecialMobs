@@ -4,7 +4,6 @@ import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.entity.MobHelper;
-import fathertoast.specialmobs.common.util.AttributeHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import mcp.MethodsReturnNonnullByDefault;
@@ -12,13 +11,11 @@ import net.minecraft.entity.CreatureAttribute;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.AttributeModifierMap;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -34,18 +31,14 @@ public class UnholyGhastEntity extends _SpecialGhastEntity {
     public static MobFamily.Species<UnholyGhastEntity> SPECIES;
     
     @SpecialMob.BestiaryInfoSupplier
-    public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
-        entityType.sized( 2.0F, 2.0F );
-        return new BestiaryInfo( 0x7AC754, BestiaryInfo.BaseWeight.LOW );
-    }
-    
-    @SpecialMob.AttributeCreator
-    public static AttributeModifierMap.MutableAttribute createAttributes() {
-        return AttributeHelper.of( _SpecialGhastEntity.createAttributes() )
-                .addAttribute( Attributes.MAX_HEALTH, 10.0 )
-                .addAttribute( Attributes.ATTACK_DAMAGE, 2.0 )
-                .multAttribute( Attributes.MOVEMENT_SPEED, 0.7 )
-                .build();
+    public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
+        bestiaryInfo.color( 0x7AC754 ).weight( BestiaryInfo.DefaultWeight.LOW )
+                .uniqueTextureWithAnimation()
+                .size( 0.5F, 2.0F, 2.0F )
+                .addExperience( 4 ).undead().disableRangedAttack()
+                .addToAttribute( Attributes.MAX_HEALTH, 10.0 )
+                .addToAttribute( Attributes.ATTACK_DAMAGE, 2.0 )
+                .multiplyAttribute( Attributes.MOVEMENT_SPEED, 0.7 );
     }
     
     @SpecialMob.LanguageProvider
@@ -64,21 +57,15 @@ public class UnholyGhastEntity extends _SpecialGhastEntity {
     @SpecialMob.Factory
     public static EntityType.IFactory<UnholyGhastEntity> getVariantFactory() { return UnholyGhastEntity::new; }
     
+    /** @return This entity's mob species. */
+    @SpecialMob.SpeciesSupplier
+    @Override
+    public MobFamily.Species<? extends UnholyGhastEntity> getSpecies() { return SPECIES; }
+    
     
     //--------------- Variant-Specific Implementations ----------------
     
-    public UnholyGhastEntity( EntityType<? extends _SpecialGhastEntity> entityType, World world ) {
-        super( entityType, world );
-        getSpecialData().setBaseScale( 0.5F );
-        xpReward += 4;
-    }
-    
-    /** Override to change this entity's AI goals. */
-    @Override
-    protected void registerVariantGoals() {
-        getSpecialData().rangedAttackDamage += 2.0F;
-        disableRangedAI();
-    }
+    public UnholyGhastEntity( EntityType<? extends _SpecialGhastEntity> entityType, World world ) { super( entityType, world ); }
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
     protected void onVariantAttack( Entity target ) {
@@ -120,14 +107,4 @@ public class UnholyGhastEntity extends _SpecialGhastEntity {
         }
         super.aiStep();
     }
-    
-    private static final ResourceLocation[] TEXTURES = {
-            GET_TEXTURE_PATH( "unholy" ),
-            null,
-            GET_TEXTURE_PATH( "unholy_shooting" )
-    };
-    
-    /** @return All default textures for this entity. */
-    @Override
-    public ResourceLocation[] getDefaultTextures() { return TEXTURES; }
 }

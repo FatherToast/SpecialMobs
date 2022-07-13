@@ -3,9 +3,12 @@ package fathertoast.specialmobs.common.entity.creeper;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
-import fathertoast.specialmobs.common.core.SpecialMobs;
+import fathertoast.specialmobs.common.config.species.CreeperSpeciesConfig;
+import fathertoast.specialmobs.common.config.species.SpeciesConfig;
 import fathertoast.specialmobs.common.entity.ISpecialMob;
+import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.entity.SpecialMobData;
+import fathertoast.specialmobs.common.entity.ai.IExplodingMob;
 import fathertoast.specialmobs.common.util.ExplosionHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
@@ -24,7 +27,6 @@ import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.pathfinding.PathNodeType;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.IServerWorld;
@@ -39,7 +41,7 @@ import java.util.List;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 @SpecialMob
-public class _SpecialCreeperEntity extends CreeperEntity implements ISpecialMob<_SpecialCreeperEntity> {
+public class _SpecialCreeperEntity extends CreeperEntity implements IExplodingMob, ISpecialMob<_SpecialCreeperEntity> {
     
     //--------------- Static Special Mob Hooks ----------------
     
@@ -47,14 +49,22 @@ public class _SpecialCreeperEntity extends CreeperEntity implements ISpecialMob<
     public static MobFamily.Species<_SpecialCreeperEntity> SPECIES;
     
     @SpecialMob.BestiaryInfoSupplier
-    public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
-        return new BestiaryInfo( 0x000000 );
+    public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
+        bestiaryInfo.color( 0x000000 )
+                .vanillaTextureBaseOnly( "textures/entity/creeper/creeper.png" )
+                .experience( 5 );
     }
     
-    @SpecialMob.AttributeCreator
-    public static AttributeModifierMap.MutableAttribute createAttributes() {
-        return CreeperEntity.createAttributes();
+    @SpecialMob.ConfigSupplier
+    public static SpeciesConfig createConfig( MobFamily.Species<?> species ) {
+        return new CreeperSpeciesConfig( species, false, false, false );
     }
+    
+    /** @return This entity's species config. */
+    public CreeperSpeciesConfig getConfig() { return (CreeperSpeciesConfig) getSpecies().config; }
+    
+    @SpecialMob.AttributeSupplier
+    public static AttributeModifierMap.MutableAttribute createAttributes() { return CreeperEntity.createAttributes(); }
     
     @SpecialMob.LanguageProvider
     public static String[] getTranslations( String langKey ) {
@@ -73,11 +83,6 @@ public class _SpecialCreeperEntity extends CreeperEntity implements ISpecialMob<
     
     //--------------- Variant-Specific Breakouts ----------------
     
-    public _SpecialCreeperEntity( EntityType<? extends _SpecialCreeperEntity> entityType, World world ) {
-        super( entityType, world );
-        getSpecialData().initialize();
-    }
-    
     /** Called in the MobEntity.class constructor to initialize AI goals. */
     @Override
     protected void registerGoals() {
@@ -88,6 +93,10 @@ public class _SpecialCreeperEntity extends CreeperEntity implements ISpecialMob<
     /** Override to change this entity's AI goals. */
     protected void registerVariantGoals() { }
     
+    /** Override to change starting equipment or stats. */
+    public void finalizeVariantSpawn( IServerWorld world, DifficultyInstance difficulty, @Nullable SpawnReason spawnReason,
+                                      @Nullable ILivingEntityData groupData ) { }
+    
     /** Called when this entity successfully damages a target to apply on-hit effects. */
     @Override
     public void doEnchantDamageEffects( LivingEntity attacker, Entity target ) {
@@ -96,6 +105,7 @@ public class _SpecialCreeperEntity extends CreeperEntity implements ISpecialMob<
     }
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
+    @SuppressWarnings( "unused" ) // Not normally used for creepers
     protected void onVariantAttack( Entity target ) { }
     
     /** Called to perform this creeper's explosion 'attack'. */
@@ -159,13 +169,21 @@ public class _SpecialCreeperEntity extends CreeperEntity implements ISpecialMob<
     /** The parameter for special mob render scale. */
     private static final DataParameter<Float> SCALE = EntityDataManager.defineId( _SpecialCreeperEntity.class, DataSerializers.FLOAT );
     
+    public _SpecialCreeperEntity( EntityType<? extends _SpecialCreeperEntity> entityType, World world ) {
+        super( entityType, world );
+        setCannotExplodeWhileWet( !getConfig().CREEPERS.canExplodeWhileWet.get() );
+        setExplodesWhileBurning( getConfig().CREEPERS.explodesWhileBurning.get() );
+        setExplodesWhenShot( getConfig().CREEPERS.explodesWhenShot.get() );
+        
+        getSpecialData().initialize();
+    }
+    
     /** Called from the Entity.class constructor to define data watcher variables. */
     @Override
     protected void defineSynchedData() {
         super.defineSynchedData();
-        specialData = new SpecialMobData<>( this, SCALE, 1.0F );
+        specialData = new SpecialMobData<>( this, SCALE );
         entityData.define( EXPLODE_FLAGS, (byte) 0 );
-        entityData.define( IS_SUPERCHARGED, false );
     }
     
     /** Called each tick to update this entity. */
@@ -188,24 +206,11 @@ public class _SpecialCreeperEntity extends CreeperEntity implements ISpecialMob<
     /** Called when this entity is struck by lightning. */
     @Override
     public void thunderHit( ServerWorld world, LightningBoltEntity lightningBolt ) {
-        if( !isPowered() && random.nextDouble() < 0.1 ) // TODO config
-            setSupercharged( true );
-        
+        charge();
         super.thunderHit( world, lightningBolt );
         
         // Make it less likely for charged "explode while burning" creepers to immediately explode
         if( explodesWhileBurning() ) clearFire();
-    }
-    
-    /** Called on spawn to initialize properties based on the world, difficulty, and the group it spawns with. */
-    @Nullable
-    public ILivingEntityData finalizeSpawn( IServerWorld world, DifficultyInstance difficulty, SpawnReason spawnReason,
-                                            @Nullable ILivingEntityData groupData, @Nullable CompoundNBT eggTag ) {
-        groupData = super.finalizeSpawn( world, difficulty, spawnReason, groupData, eggTag );
-        if( world.getLevelData().isThundering() && random.nextDouble() < 0.01 ) { //TODO config
-            getEntityData().set( DATA_IS_POWERED, true );
-        }
-        return groupData;
     }
     
     
@@ -213,31 +218,48 @@ public class _SpecialCreeperEntity extends CreeperEntity implements ISpecialMob<
     
     /** The parameter for creeper explosion properties. This is a combination of boolean flags. */
     private static final DataParameter<Byte> EXPLODE_FLAGS = EntityDataManager.defineId( _SpecialCreeperEntity.class, DataSerializers.BYTE );
-    protected static final DataParameter<Boolean> IS_SUPERCHARGED = EntityDataManager.defineId( _SpecialCreeperEntity.class, DataSerializers.BOOLEAN );
     
+    /** The bit for "is supercharged". */
+    private static final byte EXPLODE_FLAG_SUPERCHARGED = 0b0001;
     /** The bit for "cannot explode while wet". */
-    private static final byte EXPLODE_FLAG_DEFUSE_IN_WATER = 0b0001;
+    private static final byte EXPLODE_FLAG_DEFUSE_IN_WATER = 0b0010;
     /** The bit for "explodes while burning". */
-    private static final byte EXPLODE_FLAG_ON_FIRE = 0b0010;
+    private static final byte EXPLODE_FLAG_ON_FIRE = 0b0100;
     /** The bit for "explodes when shot". */
-    private static final byte EXPLODE_FLAG_WHEN_SHOT = 0b0100;
+    private static final byte EXPLODE_FLAG_WHEN_SHOT = 0b1000;
     
-    
-    /** @return True if this creeper is super charged. */
-    public boolean isSupercharged() {
-        return entityData.get( IS_SUPERCHARGED );
+    /** Called to charge this creeper, potentially supercharging it. */
+    public void charge() {
+        if( !isPowered() ) {
+            setPowered( true );
+            if( MobFamily.CREEPER.config.CREEPERS.superchargeChance.rollChance( random ) )
+                setSupercharged( true );
+        }
     }
     
+    /** Copy another creeper's charged state. */
+    public void copyChargedState( _SpecialCreeperEntity other ) {
+        setPowered( other.isPowered() );
+        setSupercharged( other.isSupercharged() );
+    }
+    
+    /** Sets this creeper's charged state to the given value. */
+    private void setPowered( boolean charged ) { entityData.set( DATA_IS_POWERED, charged ); }
+    
+    /** @return True if this creeper is super charged. */
+    public boolean isSupercharged() { return getExplodeFlag( EXPLODE_FLAG_SUPERCHARGED ); }
+    
     /** Sets this creeper's supercharged state to the given value. */
-    public void setSupercharged( boolean superCharged ) {
-        entityData.set( IS_SUPERCHARGED, superCharged );
+    private void setSupercharged( boolean value ) {
+        if( value && !isPowered() ) setPowered( true );
+        setExplodeFlag( EXPLODE_FLAG_SUPERCHARGED, value );
     }
     
     /** @return True if this creeper is unable to explode while wet. */
     public boolean cannotExplodeWhileWet() { return getExplodeFlag( EXPLODE_FLAG_DEFUSE_IN_WATER ); }
     
     /** Sets this creeper's capability to explode while wet. */
-    public void setCannotExplodeWhileWet( boolean value ) {
+    private void setCannotExplodeWhileWet( boolean value ) {
         setExplodeFlag( EXPLODE_FLAG_DEFUSE_IN_WATER, value );
         setPathfindingMalus( PathNodeType.WATER, value ? PathNodeType.LAVA.getMalus() : PathNodeType.WATER.getMalus() );
     }
@@ -246,7 +268,7 @@ public class _SpecialCreeperEntity extends CreeperEntity implements ISpecialMob<
     public boolean explodesWhileBurning() { return getExplodeFlag( EXPLODE_FLAG_ON_FIRE ); }
     
     /** Sets this creeper's property to explode while burning. */
-    public void setExplodesWhileBurning( boolean value ) {
+    private void setExplodesWhileBurning( boolean value ) {
         setExplodeFlag( EXPLODE_FLAG_ON_FIRE, value );
         if( value ) {
             setPathfindingMalus( PathNodeType.DANGER_FIRE, PathNodeType.DAMAGE_FIRE.getMalus() );
@@ -262,7 +284,7 @@ public class _SpecialCreeperEntity extends CreeperEntity implements ISpecialMob<
     public boolean explodesWhenShot() { return getExplodeFlag( EXPLODE_FLAG_WHEN_SHOT ); }
     
     /** Sets this creeper's property to explode when shot. */
-    public void setExplodesWhenShot( boolean value ) { setExplodeFlag( EXPLODE_FLAG_WHEN_SHOT, value ); }
+    private void setExplodesWhenShot( boolean value ) { setExplodeFlag( EXPLODE_FLAG_WHEN_SHOT, value ); }
     
     /** @return The value for a specific explode flag. */
     private boolean getExplodeFlag( byte flag ) { return (entityData.get( EXPLODE_FLAGS ) & flag) != 0; }
@@ -284,6 +306,11 @@ public class _SpecialCreeperEntity extends CreeperEntity implements ISpecialMob<
     @Override
     public SpecialMobData<_SpecialCreeperEntity> getSpecialData() { return specialData; }
     
+    /** @return This entity's mob species. */
+    @SpecialMob.SpeciesSupplier
+    @Override
+    public MobFamily.Species<? extends _SpecialCreeperEntity> getSpecies() { return SPECIES; }
+    
     /** @return The experience that should be dropped by this entity. */
     @Override
     public final int getExperience() { return xpReward; }
@@ -292,15 +319,33 @@ public class _SpecialCreeperEntity extends CreeperEntity implements ISpecialMob<
     @Override
     public final void setExperience( int xp ) { xpReward = xp; }
     
-    static ResourceLocation GET_TEXTURE_PATH( String type ) {
-        return SpecialMobs.resourceLoc( SpecialMobs.TEXTURE_PATH + "creeper/" + type + ".png" );
+    /** Called on spawn to initialize properties based on the world, difficulty, and the group it spawns with. */
+    @Nullable
+    @Override
+    public final ILivingEntityData finalizeSpawn( IServerWorld world, DifficultyInstance difficulty, SpawnReason spawnReason,
+                                                  @Nullable ILivingEntityData groupData, @Nullable CompoundNBT eggTag ) {
+        return MobHelper.finalizeSpawn( this, world, difficulty, spawnReason,
+                super.finalizeSpawn( world, difficulty, spawnReason, groupData, eggTag ) );
     }
     
-    private static final ResourceLocation[] TEXTURES = { new ResourceLocation( "textures/entity/creeper/creeper.png" ) };
+    /** Called on spawn to set starting equipment. */
+    @Override // Seal method to force spawn equipment changes through ISpecialMob
+    protected final void populateDefaultEquipmentSlots( DifficultyInstance difficulty ) { super.populateDefaultEquipmentSlots( difficulty ); }
     
-    /** @return All default textures for this entity. */
+    /** Called on spawn to initialize properties based on the world, difficulty, and the group it spawns with. */
     @Override
-    public ResourceLocation[] getDefaultTextures() { return TEXTURES; }
+    public void finalizeSpecialSpawn( IServerWorld world, DifficultyInstance difficulty, @Nullable SpawnReason spawnReason,
+                                      @Nullable ILivingEntityData groupData ) {
+        if( world.getLevelData().isThundering() ) {
+            final double chargedChance = getConfig().CREEPERS.stormChargeChance.get() < 0.0 ?
+                    MobFamily.CREEPER.config.CREEPERS.familyStormChargeChance.get() :
+                    getConfig().CREEPERS.stormChargeChance.get();
+            
+            if( random.nextDouble() < chargedChance ) charge();
+        }
+        
+        finalizeVariantSpawn( world, difficulty, spawnReason, groupData );
+    }
     
     
     //--------------- SpecialMobData Hooks ----------------
@@ -388,7 +433,7 @@ public class _SpecialCreeperEntity extends CreeperEntity implements ISpecialMob<
         saveTag.putBoolean( References.TAG_SUPERCHARGED, isSupercharged() );
         
         saveTag.putBoolean( References.TAG_DRY_EXPLODE, cannotExplodeWhileWet() );
-        saveTag.putBoolean( References.TAG_WHEN_BURNING_EXPLODE, explodesWhileBurning() );
+        saveTag.putBoolean( References.TAG_WHILE_BURNING_EXPLODE, explodesWhileBurning() );
         saveTag.putBoolean( References.TAG_WHEN_SHOT_EXPLODE, explodesWhenShot() );
         
         getSpecialData().writeToNBT( saveTag );
@@ -407,8 +452,8 @@ public class _SpecialCreeperEntity extends CreeperEntity implements ISpecialMob<
         
         if( saveTag.contains( References.TAG_DRY_EXPLODE, References.NBT_TYPE_NUMERICAL ) )
             setCannotExplodeWhileWet( saveTag.getBoolean( References.TAG_DRY_EXPLODE ) );
-        if( saveTag.contains( References.TAG_WHEN_BURNING_EXPLODE, References.NBT_TYPE_NUMERICAL ) )
-            setExplodesWhileBurning( saveTag.getBoolean( References.TAG_WHEN_BURNING_EXPLODE ) );
+        if( saveTag.contains( References.TAG_WHILE_BURNING_EXPLODE, References.NBT_TYPE_NUMERICAL ) )
+            setExplodesWhileBurning( saveTag.getBoolean( References.TAG_WHILE_BURNING_EXPLODE ) );
         if( saveTag.contains( References.TAG_WHEN_SHOT_EXPLODE, References.NBT_TYPE_NUMERICAL ) )
             setExplodesWhenShot( saveTag.getBoolean( References.TAG_WHEN_SHOT_EXPLODE ) );
         

@@ -3,13 +3,10 @@ package fathertoast.specialmobs.common.entity.creeper;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
-import fathertoast.specialmobs.common.util.AttributeHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.AttributeModifierMap;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.world.World;
 
@@ -26,16 +23,10 @@ public class MiniCreeperEntity extends _SpecialCreeperEntity {
     public static MobFamily.Species<MiniCreeperEntity> SPECIES;
     
     @SpecialMob.BestiaryInfoSupplier
-    public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
-        entityType.sized( 0.5F, 0.9F );
-        return new BestiaryInfo( 0xFFC0CB, BestiaryInfo.BaseWeight.LOW );
-    }
-    
-    @SpecialMob.AttributeCreator
-    public static AttributeModifierMap.MutableAttribute createAttributes() {
-        return AttributeHelper.of( _SpecialCreeperEntity.createAttributes() )
-                .multAttribute( Attributes.MOVEMENT_SPEED, 1.3 )
-                .build();
+    public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
+        bestiaryInfo.color( 0xFFC0CB ).weight( BestiaryInfo.DefaultWeight.LOW )
+                .size( 0.5F, 0.5F, 0.9F )
+                .multiplyAttribute( Attributes.MOVEMENT_SPEED, 1.3 );
     }
     
     @SpecialMob.LanguageProvider
@@ -52,13 +43,15 @@ public class MiniCreeperEntity extends _SpecialCreeperEntity {
     @SpecialMob.Factory
     public static EntityType.IFactory<MiniCreeperEntity> getVariantFactory() { return MiniCreeperEntity::new; }
     
+    /** @return This entity's mob species. */
+    @SpecialMob.SpeciesSupplier
+    @Override
+    public MobFamily.Species<? extends MiniCreeperEntity> getSpecies() { return SPECIES; }
+    
     
     //--------------- Variant-Specific Implementations ----------------
     
-    public MiniCreeperEntity( EntityType<? extends _SpecialCreeperEntity> entityType, World world ) {
-        super( entityType, world );
-        getSpecialData().setBaseScale( 0.5F );
-    }
+    public MiniCreeperEntity( EntityType<? extends _SpecialCreeperEntity> entityType, World world ) { super( entityType, world ); }
     
     /** Override to change this creeper's explosion power multiplier. */
     protected float getVariantExplosionPower( float radius ) { return super.getVariantExplosionPower( radius / 2.0F ); }

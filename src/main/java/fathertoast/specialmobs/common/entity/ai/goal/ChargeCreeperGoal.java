@@ -1,18 +1,19 @@
 package fathertoast.specialmobs.common.entity.ai.goal;
 
-import fathertoast.specialmobs.common.entity.creeper._SpecialCreeperEntity;
-import fathertoast.specialmobs.common.entity.zombie.MadScientistZombieEntity;
+import fathertoast.specialmobs.common.entity.MobHelper;
+import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.entity.monster.CreeperEntity;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvents;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 
 import java.util.EnumSet;
 import java.util.List;
 import java.util.function.BiPredicate;
 
-public class ChargeCreeperGoal<T extends MadScientistZombieEntity> extends Goal {
+public class ChargeCreeperGoal<T extends MobEntity> extends Goal {
     
     private final BiPredicate<T, ? super CreeperEntity> targetPredicate;
     
@@ -23,8 +24,9 @@ public class ChargeCreeperGoal<T extends MadScientistZombieEntity> extends Goal 
     /** The creeper to target for power-up injection **/
     private CreeperEntity creeper;
     
+    private int pathUpdateCooldown;
+    private Vector3d pathTarget = Vector3d.ZERO;
     private boolean canUseWhileMounted = false;
-    
     
     public ChargeCreeperGoal( T madman, double movementSpeed, double targetRange, BiPredicate<T, ? super CreeperEntity> targetPredicate ) {
         this.madman = madman;
@@ -44,8 +46,14 @@ public class ChargeCreeperGoal<T extends MadScientistZombieEntity> extends Goal 
     @Override
     public boolean canUse() {
         if( madman.isPassenger() || !canUseWhileMounted && madman.isVehicle() ) return false;
+        
         findCreeper();
-        return creeper != null;
+        if( creeper == null ) return false;
+        
+        madman.getNavigation().moveTo( creeper, movementSpeed );
+        pathTarget = creeper.position();
+        pathUpdateCooldown = 4 + madman.getRandom().nextInt( 7 );
+        return madman.getNavigation().getPath() != null;
     }
     
     private void findCreeper() {
@@ -62,38 +70,36 @@ public class ChargeCreeperGoal<T extends MadScientistZombieEntity> extends Goal 
         }
     }
     
-    /** Called when this AI is activated. */
-    @Override
-    public void start() {
-        madman.getNavigation().moveTo( creeper, movementSpeed );
-    }
-    
     /** @return Called each update while active and returns true if this AI can remain active. */
     @Override
     public boolean canContinueToUse() {
-        return !madman.isOnGround() && !madman.isPassenger() && !madman.isInWaterOrBubble() && !madman.isInLava();
+        return !madman.isPassenger() && (canUseWhileMounted || madman.isVehicle()) && creeper != null && targetPredicate.test( madman, creeper );
     }
     
     /** Called each tick while this AI is active. */
     @Override
     public void tick() {
-        if( creeper == null || !targetPredicate.test( madman, creeper ) ) {
-            findCreeper();
-        }
-        else {
-            madman.getNavigation().moveTo( creeper, movementSpeed );
-            madman.getLookControl().setLookAt( this.creeper.getX(), this.creeper.getEyeY(), this.creeper.getZ() );
+        if( creeper == null ) return;
+        
+        final double distanceSq = madman.distanceToSqr( creeper );
+        
+        pathUpdateCooldown--;
+        if( pathUpdateCooldown <= 0 && (creeper.distanceToSqr( pathTarget ) >= 1.0 || madman.getRandom().nextFloat() < 0.05F) ) {
+            pathUpdateCooldown = 4 + madman.getRandom().nextInt( 7 );
+            if( distanceSq > 1024.0 ) pathUpdateCooldown += 10;
+            else if( distanceSq > 256.0 ) pathUpdateCooldown += 5;
             
-            if( madman.distanceTo( creeper ) < 1.5D ) {
-                creeper.getEntityData().set( CreeperEntity.DATA_IS_POWERED, true );
-                
-                // HEE HEE HEE HAW
-                if( creeper instanceof _SpecialCreeperEntity && creeper.level.random.nextDouble() < 0.1 ) { // TODO config
-                    ((_SpecialCreeperEntity) creeper).setSupercharged( true );
-                }
-                madman.level.playSound( null, creeper.getX() + 0.5D, creeper.getY(), creeper.getZ() + 0.5D, SoundEvents.BEE_STING, SoundCategory.HOSTILE, 0.9F, 1.0F );
-                creeper = null;
-            }
+            if( !madman.getNavigation().moveTo( creeper, movementSpeed ) ) pathUpdateCooldown += 15;
+            pathTarget = creeper.position();
+        }
+        
+        madman.getLookControl().setLookAt( creeper, 30.0F, 30.0F );
+        if( distanceSq < 2.5 ) {
+            MobHelper.charge( creeper );
+            madman.level.playSound( null, creeper.getX(), creeper.getY(), creeper.getZ(),
+                    SoundEvents.BEE_STING, SoundCategory.HOSTILE, 0.9F, 1.0F );
+            
+            creeper = null;
         }
     }
 }

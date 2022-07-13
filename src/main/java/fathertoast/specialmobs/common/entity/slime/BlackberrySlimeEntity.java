@@ -3,15 +3,15 @@ package fathertoast.specialmobs.common.entity.slime;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
+import fathertoast.specialmobs.common.entity.ai.IExplodingMob;
+import fathertoast.specialmobs.common.entity.ai.goal.SpecialSwellGoal;
 import fathertoast.specialmobs.common.util.ExplosionHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.entity.AreaEffectCloudEntity;
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -21,19 +21,17 @@ import net.minecraft.particles.ParticleTypes;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvents;
 import net.minecraft.world.World;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
-import java.util.EnumSet;
 import java.util.List;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 @SpecialMob
-public class BlackberrySlimeEntity extends _SpecialSlimeEntity {
+public class BlackberrySlimeEntity extends _SpecialSlimeEntity implements IExplodingMob {
     
     //--------------- Static Special Mob Hooks ----------------
     
@@ -41,8 +39,11 @@ public class BlackberrySlimeEntity extends _SpecialSlimeEntity {
     public static MobFamily.Species<BlackberrySlimeEntity> SPECIES;
     
     @SpecialMob.BestiaryInfoSupplier
-    public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
-        return new BestiaryInfo( 0x331133 );
+    public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
+        bestiaryInfo.color( 0x331133 )
+                .uniqueTextureBaseOnly()
+                .addExperience( 2 )
+                .addToAttribute( Attributes.MAX_HEALTH, 2.0 );
     }
     
     @SpecialMob.LanguageProvider
@@ -61,39 +62,34 @@ public class BlackberrySlimeEntity extends _SpecialSlimeEntity {
     @SpecialMob.Factory
     public static EntityType.IFactory<BlackberrySlimeEntity> getVariantFactory() { return BlackberrySlimeEntity::new; }
     
+    /** @return This entity's mob species. */
+    @SpecialMob.SpeciesSupplier
+    @Override
+    public MobFamily.Species<? extends BlackberrySlimeEntity> getSpecies() { return SPECIES; }
+    
     
     //--------------- Variant-Specific Implementations ----------------
-    
-    public BlackberrySlimeEntity( EntityType<? extends _SpecialSlimeEntity> entityType, World world ) {
-        super( entityType, world );
-        slimeExperienceValue += 2;
-    }
     
     private static final byte MAX_FUSE = 30;
     
     private int fuse = 0;
-    private int swellDir = 0;
     private boolean ignited = false;
     
-    /** Override to modify this slime's base attributes by size. */
-    @Override
-    protected void modifyVariantAttributes( int size ) {
-        addAttribute( Attributes.MAX_HEALTH, 2.0 * size );
-    }
+    public BlackberrySlimeEntity( EntityType<? extends _SpecialSlimeEntity> entityType, World world ) { super( entityType, world ); }
     
     /** Override to change this entity's AI goals. */
     @Override
     protected void registerVariantGoals() {
-        goalSelector.addGoal( 0, new SlimeSwellGoal( this ) );
+        goalSelector.addGoal( 0, new SpecialSwellGoal<>( this ) );
     }
     
     /** Called each tick to update this entity. */
     @Override
     public void tick() {
         if( isAlive() && !level.isClientSide() ) {
-            if( ignited ) swellDir = 1;
+            if( ignited ) setSwellDir( 1 );
             
-            if( swellDir > 0 ) {
+            if( getSwellDir() > 0 ) {
                 if( fuse == 0 ) {
                     playSound( SoundEvents.CREEPER_PRIMED, 1.0F, 0.5F );
                 }
@@ -107,9 +103,9 @@ public class BlackberrySlimeEntity extends _SpecialSlimeEntity {
                     changeFuse( +1 );
                 }
             }
-            else if( swellDir < 0 && fuse > 0 ) {
+            else if( getSwellDir() < 0 && fuse > 0 ) {
                 changeFuse( -1 );
-                if( fuse <= 0 ) swellDir = 0;
+                if( fuse <= 0 ) setSwellDir( 0 );
             }
         }
         super.tick();
@@ -188,51 +184,20 @@ public class BlackberrySlimeEntity extends _SpecialSlimeEntity {
     @Override
     protected IParticleData getParticleType() { return ParticleTypes.SMOKE; }
     
-    private static final ResourceLocation[] TEXTURES = {
-            GET_TEXTURE_PATH( "blackberry" )
-    };
     
-    /** @return All default textures for this entity. */
+    //--------------- IExplodingEntity Implementations ----------------
+    
+    private int swellDir = 0;
+    
+    /** Sets this exploding entity's swell direction. */
     @Override
-    public ResourceLocation[] getDefaultTextures() { return TEXTURES; }
+    public void setSwellDir( int value ) { swellDir = value; }
     
+    /** @return This exploding entity's swell direction. */
+    @Override
+    public int getSwellDir() { return swellDir; }
     
-    //--------------- Nested Classes ----------------
-    
-    /** The "creeper swell" goal repurposed for use on a slime. */
-    private static class SlimeSwellGoal extends Goal {
-        
-        private final BlackberrySlimeEntity slime;
-        
-        private LivingEntity target;
-        
-        public SlimeSwellGoal( BlackberrySlimeEntity entity ) {
-            slime = entity;
-            setFlags( EnumSet.of( Flag.MOVE ) );
-        }
-        
-        public boolean canUse() {
-            final LivingEntity target = slime.getTarget();
-            return slime.swellDir > 0 || target != null && slime.distanceToSqr( target ) < 9.0F + (slime.getSize() - 1) * 2.0F;
-        }
-        
-        public void start() {
-            slime.getNavigation().stop();
-            target = slime.getTarget();
-        }
-        
-        public void stop() {
-            slime.swellDir = -1;
-            target = null;
-        }
-        
-        public void tick() {
-            if( target == null || slime.distanceToSqr( target ) > 49.0 || !slime.getSensing().canSee( target ) ) {
-                slime.swellDir = -1;
-            }
-            else {
-                slime.swellDir = 1;
-            }
-        }
-    }
+    /** @return Additional range from its target at which this entity will start to explode. */
+    @Override
+    public double getExtraRange() { return (getSize() - 1) * 2.0F; }
 }

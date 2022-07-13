@@ -3,13 +3,10 @@ package fathertoast.specialmobs.common.entity.ghast;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
-import fathertoast.specialmobs.common.util.AttributeHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.AttributeModifierMap;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.item.Items;
 import net.minecraft.util.SoundEvent;
@@ -28,16 +25,11 @@ public class BabyGhastEntity extends _SpecialGhastEntity {
     public static MobFamily.Species<BabyGhastEntity> SPECIES;
     
     @SpecialMob.BestiaryInfoSupplier
-    public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
-        entityType.sized( 1.0F, 1.0F );
-        return new BestiaryInfo( 0xFFC0CB, BestiaryInfo.BaseWeight.DISABLED );
-    }
-    
-    @SpecialMob.AttributeCreator
-    public static AttributeModifierMap.MutableAttribute createAttributes() {
-        return AttributeHelper.of( _SpecialGhastEntity.createAttributes() )
-                .addAttribute( Attributes.ATTACK_DAMAGE, -1.0 )
-                .build();
+    public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
+        bestiaryInfo.color( 0xFFC0CB ).weight( BestiaryInfo.DefaultWeight.DISABLED )
+                .size( 0.25F, 1.0F, 1.0F )
+                .experience( 1 ).disableRangedAttack()
+                .addToAttribute( Attributes.ATTACK_DAMAGE, -1.0 );
     }
     
     @SpecialMob.LanguageProvider
@@ -54,21 +46,15 @@ public class BabyGhastEntity extends _SpecialGhastEntity {
     @SpecialMob.Factory
     public static EntityType.IFactory<BabyGhastEntity> getVariantFactory() { return BabyGhastEntity::new; }
     
+    /** @return This entity's mob species. */
+    @SpecialMob.SpeciesSupplier
+    @Override
+    public MobFamily.Species<? extends BabyGhastEntity> getSpecies() { return SPECIES; }
+    
     
     //--------------- Variant-Specific Implementations ----------------
     
-    public BabyGhastEntity( EntityType<? extends _SpecialGhastEntity> entityType, World world ) {
-        super( entityType, world );
-        getSpecialData().setBaseScale( 0.25F );
-        xpReward = 1;
-    }
-    
-    /** Override to change this entity's AI goals. */
-    @Override
-    protected void registerVariantGoals() {
-        getSpecialData().rangedAttackDamage -= 1.0F;
-        disableRangedAI();
-    }
+    public BabyGhastEntity( EntityType<? extends _SpecialGhastEntity> entityType, World world ) { super( entityType, world ); }
     
     /** @return The sound this entity makes idly. */
     @Override

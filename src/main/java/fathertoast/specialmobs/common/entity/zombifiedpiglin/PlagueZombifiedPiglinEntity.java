@@ -4,7 +4,6 @@ import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.entity.MobHelper;
-import fathertoast.specialmobs.common.util.AttributeHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import mcp.MethodsReturnNonnullByDefault;
@@ -12,13 +11,11 @@ import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.AttributeModifierMap;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.projectile.AbstractArrowEntity;
 import net.minecraft.entity.projectile.ArrowEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -34,16 +31,11 @@ public class PlagueZombifiedPiglinEntity extends _SpecialZombifiedPiglinEntity {
     public static MobFamily.Species<PlagueZombifiedPiglinEntity> SPECIES;
     
     @SpecialMob.BestiaryInfoSupplier
-    public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
-        return new BestiaryInfo( 0x8AA838 );
-        //TODO theme - forest
-    }
-    
-    @SpecialMob.AttributeCreator
-    public static AttributeModifierMap.MutableAttribute createAttributes() {
-        return AttributeHelper.of( _SpecialZombifiedPiglinEntity.createAttributes() )
-                .multAttribute( Attributes.MOVEMENT_SPEED, 1.1 )
-                .build();
+    public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
+        bestiaryInfo.color( 0x8AA838 ).theme( BestiaryInfo.Theme.FOREST )
+                .uniqueTextureBaseOnly()
+                .addExperience( 1 )
+                .multiplyAttribute( Attributes.MOVEMENT_SPEED, 1.1 );
     }
     
     @SpecialMob.LanguageProvider
@@ -62,13 +54,15 @@ public class PlagueZombifiedPiglinEntity extends _SpecialZombifiedPiglinEntity {
     @SpecialMob.Factory
     public static EntityType.IFactory<PlagueZombifiedPiglinEntity> getVariantFactory() { return PlagueZombifiedPiglinEntity::new; }
     
+    /** @return This entity's mob species. */
+    @SpecialMob.SpeciesSupplier
+    @Override
+    public MobFamily.Species<? extends PlagueZombifiedPiglinEntity> getSpecies() { return SPECIES; }
+    
     
     //--------------- Variant-Specific Implementations ----------------
     
-    public PlagueZombifiedPiglinEntity( EntityType<? extends _SpecialZombifiedPiglinEntity> entityType, World world ) {
-        super( entityType, world );
-        xpReward += 1;
-    }
+    public PlagueZombifiedPiglinEntity( EntityType<? extends _SpecialZombifiedPiglinEntity> entityType, World world ) { super( entityType, world ); }
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override
@@ -86,12 +80,4 @@ public class PlagueZombifiedPiglinEntity extends _SpecialZombifiedPiglinEntity {
         }
         return arrow;
     }
-    
-    private static final ResourceLocation[] TEXTURES = {
-            GET_TEXTURE_PATH( "plague" )
-    };
-    
-    /** @return All default textures for this entity. */
-    @Override
-    public ResourceLocation[] getDefaultTextures() { return TEXTURES; }
 }

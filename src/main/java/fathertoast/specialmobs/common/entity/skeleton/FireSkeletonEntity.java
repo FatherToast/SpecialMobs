@@ -8,11 +8,9 @@ import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.projectile.AbstractArrowEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -28,10 +26,10 @@ public class FireSkeletonEntity extends _SpecialSkeletonEntity {
     public static MobFamily.Species<FireSkeletonEntity> SPECIES;
     
     @SpecialMob.BestiaryInfoSupplier
-    public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
-        entityType.fireImmune();
-        return new BestiaryInfo( 0xDC1A00 );
-        //TODO theme - fire
+    public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
+        bestiaryInfo.color( 0xDC1A00 ).theme( BestiaryInfo.Theme.FIRE )
+                .uniqueTextureWithEyes()
+                .addExperience( 1 ).fireImmune().waterSensitive();
     }
     
     @SpecialMob.LanguageProvider
@@ -50,14 +48,15 @@ public class FireSkeletonEntity extends _SpecialSkeletonEntity {
     @SpecialMob.Factory
     public static EntityType.IFactory<FireSkeletonEntity> getVariantFactory() { return FireSkeletonEntity::new; }
     
+    /** @return This entity's mob species. */
+    @SpecialMob.SpeciesSupplier
+    @Override
+    public MobFamily.Species<? extends FireSkeletonEntity> getSpecies() { return SPECIES; }
+    
     
     //--------------- Variant-Specific Implementations ----------------
     
-    public FireSkeletonEntity( EntityType<? extends _SpecialSkeletonEntity> entityType, World world ) {
-        super( entityType, world );
-        getSpecialData().setDamagedByWater( true );
-        xpReward += 1;
-    }
+    public FireSkeletonEntity( EntityType<? extends _SpecialSkeletonEntity> entityType, World world ) { super( entityType, world ); }
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override
@@ -71,13 +70,4 @@ public class FireSkeletonEntity extends _SpecialSkeletonEntity {
         arrow.setSecondsOnFire( 100 );
         return arrow;
     }
-    
-    private static final ResourceLocation[] TEXTURES = {
-            GET_TEXTURE_PATH( "fire" ),
-            GET_TEXTURE_PATH( "fire_eyes" )
-    };
-    
-    /** @return All default textures for this entity. */
-    @Override
-    public ResourceLocation[] getDefaultTextures() { return TEXTURES; }
 }

@@ -3,17 +3,14 @@ package fathertoast.specialmobs.common.entity.enderman;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
-import fathertoast.specialmobs.common.util.AttributeHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.AttributeModifierMap;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.item.Items;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvents;
 import net.minecraft.world.World;
@@ -33,15 +30,11 @@ public class ThiefEndermanEntity extends _SpecialEndermanEntity {
     public static MobFamily.Species<ThiefEndermanEntity> SPECIES;
     
     @SpecialMob.BestiaryInfoSupplier
-    public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
-        return new BestiaryInfo( 0x04FA00, BestiaryInfo.BaseWeight.LOW );
-    }
-    
-    @SpecialMob.AttributeCreator
-    public static AttributeModifierMap.MutableAttribute createAttributes() {
-        return AttributeHelper.of( _SpecialEndermanEntity.createAttributes() )
-                .multAttribute( Attributes.MOVEMENT_SPEED, 1.2 )
-                .build();
+    public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
+        bestiaryInfo.color( 0x04FA00 ).weight( BestiaryInfo.DefaultWeight.LOW )
+                .uniqueTextureWithEyes()
+                .addExperience( 2 )
+                .multiplyAttribute( Attributes.MOVEMENT_SPEED, 1.2 );
     }
     
     @SpecialMob.LanguageProvider
@@ -59,15 +52,17 @@ public class ThiefEndermanEntity extends _SpecialEndermanEntity {
     @SpecialMob.Factory
     public static EntityType.IFactory<ThiefEndermanEntity> getVariantFactory() { return ThiefEndermanEntity::new; }
     
+    /** @return This entity's mob species. */
+    @SpecialMob.SpeciesSupplier
+    @Override
+    public MobFamily.Species<? extends ThiefEndermanEntity> getSpecies() { return SPECIES; }
+    
     
     //--------------- Variant-Specific Implementations ----------------
     
-    public ThiefEndermanEntity( EntityType<? extends _SpecialEndermanEntity> entityType, World world ) {
-        super( entityType, world );
-        xpReward += 2;
-    }
-    
     private int teleportTargetDelay;
+    
+    public ThiefEndermanEntity( EntityType<? extends _SpecialEndermanEntity> entityType, World world ) { super( entityType, world ); }
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override
@@ -118,13 +113,4 @@ public class ThiefEndermanEntity extends _SpecialEndermanEntity {
         super.aiStep();
         if( !level.isClientSide() ) teleportTargetDelay--;
     }
-    
-    private static final ResourceLocation[] TEXTURES = {
-            GET_TEXTURE_PATH( "thief" ),
-            GET_TEXTURE_PATH( "thief_eyes" )
-    };
-    
-    /** @return All default textures for this entity. */
-    @Override
-    public ResourceLocation[] getDefaultTextures() { return TEXTURES; }
 }

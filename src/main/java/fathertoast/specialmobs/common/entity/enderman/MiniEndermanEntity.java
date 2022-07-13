@@ -3,13 +3,10 @@ package fathertoast.specialmobs.common.entity.enderman;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
-import fathertoast.specialmobs.common.util.AttributeHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.AttributeModifierMap;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.world.World;
 
@@ -26,17 +23,12 @@ public class MiniEndermanEntity extends _SpecialEndermanEntity {
     public static MobFamily.Species<MiniEndermanEntity> SPECIES;
     
     @SpecialMob.BestiaryInfoSupplier
-    public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
-        entityType.sized( 0.5F, 0.99F );
-        return new BestiaryInfo( 0xFFC0CB, BestiaryInfo.BaseWeight.LOW );
-    }
-    
-    @SpecialMob.AttributeCreator
-    public static AttributeModifierMap.MutableAttribute createAttributes() {
-        return AttributeHelper.of( _SpecialEndermanEntity.createAttributes() )
-                .addAttribute( Attributes.ATTACK_DAMAGE, -2.0 )
-                .multAttribute( Attributes.MOVEMENT_SPEED, 1.3 )
-                .build();
+    public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
+        bestiaryInfo.color( 0xFFC0CB ).weight( BestiaryInfo.DefaultWeight.LOW )
+                .size( 0.35F, 0.5F, 0.99F )
+                .addExperience( 1 )
+                .addToAttribute( Attributes.ATTACK_DAMAGE, -2.0 )
+                .multiplyAttribute( Attributes.MOVEMENT_SPEED, 1.3 );
     }
     
     @SpecialMob.LanguageProvider
@@ -53,15 +45,16 @@ public class MiniEndermanEntity extends _SpecialEndermanEntity {
     @SpecialMob.Factory
     public static EntityType.IFactory<MiniEndermanEntity> getVariantFactory() { return MiniEndermanEntity::new; }
     
+    /** @return This entity's mob species. */
+    @SpecialMob.SpeciesSupplier
+    @Override
+    public MobFamily.Species<? extends MiniEndermanEntity> getSpecies() { return SPECIES; }
+    
     
     //--------------- Variant-Specific Implementations ----------------
     
     public MiniEndermanEntity( EntityType<? extends _SpecialEndermanEntity> entityType, World world ) {
         super( entityType, world );
-        getSpecialData().setBaseScale( 0.35F );
         maxUpStep = 0.5F;
-        xpReward += 1;
     }
-    
-    // None
 }

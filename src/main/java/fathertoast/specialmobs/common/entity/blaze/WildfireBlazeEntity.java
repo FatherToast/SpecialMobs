@@ -3,16 +3,15 @@ package fathertoast.specialmobs.common.entity.blaze;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
-import fathertoast.specialmobs.common.util.AttributeHelper;
+import fathertoast.specialmobs.common.config.species.SpeciesConfig;
+import fathertoast.specialmobs.common.config.species.WildfireBlazeSpeciesConfig;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.entity.*;
-import net.minecraft.entity.ai.attributes.AttributeModifierMap;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.IServerWorld;
 import net.minecraft.world.World;
 
@@ -30,16 +29,19 @@ public class WildfireBlazeEntity extends _SpecialBlazeEntity {
     public static MobFamily.Species<WildfireBlazeEntity> SPECIES;
     
     @SpecialMob.BestiaryInfoSupplier
-    public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
-        entityType.sized( 0.9F, 2.7F );
-        return new BestiaryInfo( 0xF4EE32 );
+    public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
+        bestiaryInfo.color( 0xF4EE32 )
+                .uniqueTextureBaseOnly()
+                .size( 1.5F, 0.9F, 2.7F )
+                .addExperience( 2 ).regen( 40 )
+                .fireballAttack( 0.1, 30, 50, 20.0 )
+                .addToAttribute( Attributes.MAX_HEALTH, 20.0 );
     }
     
-    @SpecialMob.AttributeCreator
-    public static AttributeModifierMap.MutableAttribute createAttributes() {
-        return AttributeHelper.of( _SpecialBlazeEntity.createAttributes() )
-                .addAttribute( Attributes.MAX_HEALTH, 20.0 )
-                .build();
+    @SpecialMob.ConfigSupplier
+    public static SpeciesConfig createConfig( MobFamily.Species<?> species ) {
+        return new WildfireBlazeSpeciesConfig( species, 1, 0,
+                3, 6, 4, 10 );
     }
     
     @SpecialMob.LanguageProvider
@@ -58,6 +60,11 @@ public class WildfireBlazeEntity extends _SpecialBlazeEntity {
     @SpecialMob.Factory
     public static EntityType.IFactory<WildfireBlazeEntity> getVariantFactory() { return WildfireBlazeEntity::new; }
     
+    /** @return This entity's mob species. */
+    @SpecialMob.SpeciesSupplier
+    @Override
+    public MobFamily.Species<? extends WildfireBlazeEntity> getSpecies() { return SPECIES; }
+    
     
     //--------------- Variant-Specific Implementations ----------------
     
@@ -68,22 +75,16 @@ public class WildfireBlazeEntity extends _SpecialBlazeEntity {
     
     public WildfireBlazeEntity( EntityType<? extends _SpecialBlazeEntity> entityType, World world ) {
         super( entityType, world );
-        getSpecialData().setBaseScale( 1.5F );
-        getSpecialData().setRegenerationTime( 40 );
-        xpReward += 2;
-        
-        babies = 3 + random.nextInt( 4 );
-        summons = 4 + random.nextInt( 7 );
+        babies = getConfig().WILDFIRE.babies.next( random );
+        summons = getConfig().WILDFIRE.summons.next( random );
     }
     
-    /** Override to change this entity's AI goals. */
+    /** @return This entity's species config. */
     @Override
-    protected void registerVariantGoals() {
-        getSpecialData().rangedAttackSpread *= 0.1F;
-        setRangedAI( 1, 0, 30, 50, 20.0F );
-    }
+    public WildfireBlazeSpeciesConfig getConfig() { return (WildfireBlazeSpeciesConfig) getSpecies().config; }
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
+    @Override
     protected void onVariantAttack( Entity target ) {
         target.setSecondsOnFire( 8 );
     }
@@ -157,12 +158,4 @@ public class WildfireBlazeEntity extends _SpecialBlazeEntity {
         if( saveTag.contains( References.TAG_SUMMONS, References.NBT_TYPE_NUMERICAL ) )
             summons = saveTag.getByte( References.TAG_SUMMONS );
     }
-    
-    private static final ResourceLocation[] TEXTURES = {
-            GET_TEXTURE_PATH( "wildfire" )
-    };
-    
-    /** @return All default textures for this entity. */
-    @Override
-    public ResourceLocation[] getDefaultTextures() { return TEXTURES; }
 }

@@ -3,19 +3,15 @@ package fathertoast.specialmobs.common.entity.enderman;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
-import fathertoast.specialmobs.common.util.AttributeHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.AttributeModifierMap;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -31,16 +27,11 @@ public class MirageEndermanEntity extends _SpecialEndermanEntity {
     public static MobFamily.Species<MirageEndermanEntity> SPECIES;
     
     @SpecialMob.BestiaryInfoSupplier
-    public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
-        return new BestiaryInfo( 0xC2BC84, BestiaryInfo.BaseWeight.LOW );
-        //TODO theme - desert
-    }
-    
-    @SpecialMob.AttributeCreator
-    public static AttributeModifierMap.MutableAttribute createAttributes() {
-        return AttributeHelper.of( _SpecialEndermanEntity.createAttributes() )
-                .addAttribute( Attributes.MAX_HEALTH, 20.0 )
-                .build();
+    public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
+        bestiaryInfo.color( 0xC2BC84 ).weight( BestiaryInfo.DefaultWeight.LOW ).theme( BestiaryInfo.Theme.DESERT )
+                .uniqueTextureWithEyes()
+                .addExperience( 2 )
+                .addToAttribute( Attributes.MAX_HEALTH, 20.0 );
     }
     
     @SpecialMob.LanguageProvider
@@ -60,21 +51,23 @@ public class MirageEndermanEntity extends _SpecialEndermanEntity {
     @SpecialMob.Factory
     public static EntityType.IFactory<MirageEndermanEntity> getVariantFactory() { return MirageEndermanEntity::new; }
     
+    /** @return This entity's mob species. */
+    @SpecialMob.SpeciesSupplier
+    @Override
+    public MobFamily.Species<? extends MirageEndermanEntity> getSpecies() { return SPECIES; }
+    
     
     //--------------- Variant-Specific Implementations ----------------
-    
-    public MirageEndermanEntity( EntityType<? extends _SpecialEndermanEntity> entityType, World world ) {
-        super( entityType, world );
-        xpReward += 2;
-    }
     
     /** Whether this mirage enderman is fake. */
     public boolean isFake = false;
     
+    public MirageEndermanEntity( EntityType<? extends _SpecialEndermanEntity> entityType, World world ) { super( entityType, world ); }
+    
     /** Sets this mirage enderman as fake. */
     public void setFake() {
         isFake = true;
-        xpReward = 0;
+        setExperience( 0 );
         //noinspection ConstantConditions
         getAttribute( Attributes.ATTACK_DAMAGE ).setBaseValue( 0.0 );
     }
@@ -112,18 +105,14 @@ public class MirageEndermanEntity extends _SpecialEndermanEntity {
     protected boolean teleport( double x, double y, double z ) {
         if( isFake ) return false;
         
-        double xI = getX();
-        double yI = getY();
-        double zI = getZ();
-        
         if( super.teleport( x, y, z ) ) {
-            mirage( xI, yI, zI );
+            mirage();
             return true;
         }
         return false;
     }
     
-    private void mirage( double xI, double yI, double zI ) {
+    private void mirage() {
         if( !isFake && getTarget() != null ) {
             final MirageEndermanEntity mirage = SPECIES.entityType.get().create( level );
             if( mirage == null ) return;
@@ -134,10 +123,10 @@ public class MirageEndermanEntity extends _SpecialEndermanEntity {
             
             // Return one of the endermen to the initial position (either the real or the fake)
             if( random.nextInt( 4 ) == 0 ) {
-                moveTo( xI, yI, zI );
+                moveTo( xo, yo, zo );
             }
             else {
-                mirage.moveTo( xI, yI, zI );
+                mirage.moveTo( xo, yo, zo );
             }
             
             mirage.setHealth( getHealth() );
@@ -163,13 +152,4 @@ public class MirageEndermanEntity extends _SpecialEndermanEntity {
         if( saveTag.contains( References.TAG_IS_FAKE, References.NBT_TYPE_NUMERICAL ) )
             isFake = saveTag.getBoolean( References.TAG_IS_FAKE );
     }
-    
-    private static final ResourceLocation[] TEXTURES = {
-            GET_TEXTURE_PATH( "mirage" ),
-            GET_TEXTURE_PATH( "mirage_eyes" )
-    };
-    
-    /** @return All default textures for this entity. */
-    @Override
-    public ResourceLocation[] getDefaultTextures() { return TEXTURES; }
 }

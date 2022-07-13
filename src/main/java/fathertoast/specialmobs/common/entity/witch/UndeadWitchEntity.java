@@ -3,6 +3,8 @@ package fathertoast.specialmobs.common.entity.witch;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
+import fathertoast.specialmobs.common.config.species.SpeciesConfig;
+import fathertoast.specialmobs.common.config.species.UndeadWitchSpeciesConfig;
 import fathertoast.specialmobs.common.entity.skeleton._SpecialSkeletonEntity;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
@@ -17,7 +19,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.potion.Potions;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvents;
 import net.minecraft.world.IServerWorld;
 import net.minecraft.world.World;
@@ -35,9 +36,19 @@ public class UndeadWitchEntity extends _SpecialWitchEntity {
     public static MobFamily.Species<UndeadWitchEntity> SPECIES;
     
     @SpecialMob.BestiaryInfoSupplier
-    public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
-        return new BestiaryInfo( 0x799C65 );
+    public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
+        bestiaryInfo.color( 0x799C65 )
+                .uniqueTextureBaseOnly()
+                .addExperience( 2 ).undead();
     }
+    
+    @SpecialMob.ConfigSupplier
+    public static SpeciesConfig createConfig( MobFamily.Species<?> species ) {
+        return new UndeadWitchSpeciesConfig( species, 3, 6 );
+    }
+    
+    /** @return This entity's species config. */
+    public UndeadWitchSpeciesConfig getConfig() { return (UndeadWitchSpeciesConfig) getSpecies().config; }
     
     @SpecialMob.LanguageProvider
     public static String[] getTranslations( String langKey ) {
@@ -55,6 +66,11 @@ public class UndeadWitchEntity extends _SpecialWitchEntity {
     @SpecialMob.Factory
     public static EntityType.IFactory<UndeadWitchEntity> getVariantFactory() { return UndeadWitchEntity::new; }
     
+    /** @return This entity's mob species. */
+    @SpecialMob.SpeciesSupplier
+    @Override
+    public MobFamily.Species<? extends UndeadWitchEntity> getSpecies() { return SPECIES; }
+    
     
     //--------------- Variant-Specific Implementations ----------------
     
@@ -63,9 +79,7 @@ public class UndeadWitchEntity extends _SpecialWitchEntity {
     
     public UndeadWitchEntity( EntityType<? extends _SpecialWitchEntity> entityType, World world ) {
         super( entityType, world );
-        xpReward += 2;
-        
-        summons = 3 + random.nextInt( 4 );
+        summons = getConfig().UNDEAD.summons.next( random );
     }
     
     /** Override to modify potion attacks. Return an empty item stack to cancel the potion throw. */
@@ -127,12 +141,4 @@ public class UndeadWitchEntity extends _SpecialWitchEntity {
         if( saveTag.contains( References.TAG_SUMMONS, References.NBT_TYPE_NUMERICAL ) )
             summons = saveTag.getByte( References.TAG_SUMMONS );
     }
-    
-    private static final ResourceLocation[] TEXTURES = {
-            GET_TEXTURE_PATH( "undead" )
-    };
-    
-    /** @return All default textures for this entity. */
-    @Override
-    public ResourceLocation[] getDefaultTextures() { return TEXTURES; }
 }

@@ -3,7 +3,8 @@ package fathertoast.specialmobs.common.entity.skeleton;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
-import fathertoast.specialmobs.common.core.SpecialMobs;
+import fathertoast.specialmobs.common.config.species.SkeletonSpeciesConfig;
+import fathertoast.specialmobs.common.config.species.SpeciesConfig;
 import fathertoast.specialmobs.common.entity.ISpecialMob;
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.entity.SpecialMobData;
@@ -12,7 +13,6 @@ import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.*;
-import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.ai.attributes.AttributeModifierMap;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.ai.attributes.ModifiableAttributeInstance;
@@ -36,7 +36,6 @@ import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.MathHelper;
@@ -47,7 +46,6 @@ import net.minecraft.world.World;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.UUID;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -60,14 +58,26 @@ public class _SpecialSkeletonEntity extends AbstractSkeletonEntity implements IS
     public static MobFamily.Species<_SpecialSkeletonEntity> SPECIES;
     
     @SpecialMob.BestiaryInfoSupplier
-    public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
-        return new BestiaryInfo( 0x494949 );
+    public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
+        bestiaryInfo.color( 0x494949 )
+                .vanillaTextureBaseOnly( "textures/entity/skeleton/skeleton.png" )
+                .experience( 5 ).undead()
+                .bowAttack( 2.0, 1.0, 1.0, 20, 15.0 );
     }
     
-    @SpecialMob.AttributeCreator
-    public static AttributeModifierMap.MutableAttribute createAttributes() {
-        return SkeletonEntity.createAttributes();
+    protected static final double DEFAULT_BOW_CHANCE = 0.95;
+    protected static final double DEFAULT_SHIELD_CHANCE = 0.05;
+    
+    @SpecialMob.ConfigSupplier
+    public static SpeciesConfig createConfig( MobFamily.Species<?> species ) {
+        return new SkeletonSpeciesConfig( species, DEFAULT_BOW_CHANCE, DEFAULT_SHIELD_CHANCE );
     }
+    
+    /** @return This entity's species config. */
+    public SkeletonSpeciesConfig getConfig() { return (SkeletonSpeciesConfig) getSpecies().config; }
+    
+    @SpecialMob.AttributeSupplier
+    public static AttributeModifierMap.MutableAttribute createAttributes() { return SkeletonEntity.createAttributes(); }
     
     @SpecialMob.LanguageProvider
     public static String[] getTranslations( String langKey ) {
@@ -86,56 +96,22 @@ public class _SpecialSkeletonEntity extends AbstractSkeletonEntity implements IS
     
     //--------------- Variant-Specific Breakouts ----------------
     
-    public _SpecialSkeletonEntity( EntityType<? extends _SpecialSkeletonEntity> entityType, World world ) {
-        super( entityType, world );
-        getSpecialData().initialize();
-    }
-    
     /** Called in the MobEntity.class constructor to initialize AI goals. */
     @Override
     protected void registerGoals() {
         super.registerGoals();
-        
-        getSpecialData().rangedAttackDamage = 2.0F;
-        getSpecialData().rangedAttackCooldown = 20;
-        getSpecialData().rangedAttackMaxCooldown = getSpecialData().rangedAttackCooldown;
-        getSpecialData().rangedAttackMaxRange = 15.0F;
         registerVariantGoals();
     }
     
     /** Override to change this entity's AI goals. */
     protected void registerVariantGoals() { }
     
-    /** Helper method to set the ranged attack AI more easily. */
-    protected void disableRangedAI() { setRangedAI( 1.0, 20, 0.0F ); }
-    
-    /** Helper method to set the ranged attack AI more easily. */
-    protected void setRangedAI( double walkSpeed, int cooldownTime ) {
-        getSpecialData().rangedWalkSpeed = (float) walkSpeed;
-        getSpecialData().rangedAttackCooldown = cooldownTime;
-        getSpecialData().rangedAttackMaxCooldown = cooldownTime;
-    }
-    
-    /** Helper method to set the ranged attack AI more easily. */
-    protected void setRangedAI( double walkSpeed, int cooldownTime, float range ) {
-        setRangedAI( walkSpeed, cooldownTime );
-        getSpecialData().rangedAttackMaxRange = range;
-    }
-    
     /** Override to change this entity's attack goal priority. */
     protected int getVariantAttackPriority() { return 4; }
     
-    /** Called during spawn finalization to set starting equipment. */
-    @Override
-    protected void populateDefaultEquipmentSlots( DifficultyInstance difficulty ) {
-        super.populateDefaultEquipmentSlots( difficulty );
-        if( random.nextDouble() < getVariantMeleeChance() ) { //TODO config the default 5% chance
-            setItemSlot( EquipmentSlotType.MAINHAND, new ItemStack( Items.IRON_SWORD ) );
-        }
-    }
-    
-    /** Override to change this entity's chance to spawn with a melee weapon. */
-    protected double getVariantMeleeChance() { return getSpecialData().rangedAttackMaxRange > 0.0F ? 0.05 : 1.0; }
+    /** Override to change starting equipment or stats. */
+    public void finalizeVariantSpawn( IServerWorld world, DifficultyInstance difficulty, @Nullable SpawnReason spawnReason,
+                                      @Nullable ILivingEntityData groupData ) { }
     
     /** Called to attack the target with a ranged attack. */
     @Override
@@ -151,7 +127,7 @@ public class _SpecialSkeletonEntity extends AbstractSkeletonEntity implements IS
         final double dZ = target.getZ() - getZ();
         final double dH = MathHelper.sqrt( dX * dX + dZ * dZ );
         arrow.shoot( dX, dY + dH * 0.2, dZ, 1.6F,
-                getSpecialData().rangedAttackSpread * (14 - 4 * level.getDifficulty().getId()) );
+                getSpecialData().getRangedAttackSpread() * (14 - 4 * level.getDifficulty().getId()) );
         
         playSound( SoundEvents.SKELETON_SHOOT, 1.0F, 1.0F / (random.nextFloat() * 0.4F + 0.8F) );
         level.addFreshEntity( arrow );
@@ -160,7 +136,7 @@ public class _SpecialSkeletonEntity extends AbstractSkeletonEntity implements IS
     /** @return The arrow for this skeleton to shoot. */
     @Override
     protected AbstractArrowEntity getArrow( ItemStack arrowItem, float damageMulti ) {
-        return getVariantArrow( super.getArrow( arrowItem, damageMulti * getSpecialData().rangedAttackDamage ),
+        return getVariantArrow( super.getArrow( arrowItem, damageMulti * getSpecialData().getRangedAttackDamage() ),
                 arrowItem, damageMulti );
     }
     
@@ -194,21 +170,17 @@ public class _SpecialSkeletonEntity extends AbstractSkeletonEntity implements IS
     /** This entity's attack AI. */
     private Goal currentAttackAI;
     
+    public _SpecialSkeletonEntity( EntityType<? extends _SpecialSkeletonEntity> entityType, World world ) {
+        super( entityType, world );
+        getSpecialData().initialize();
+    }
+    
     /** Called from the Entity.class constructor to define data watcher variables. */
     @Override
     protected void defineSynchedData() {
         super.defineSynchedData();
-        specialData = new SpecialMobData<>( this, SCALE, 1.0F );
+        specialData = new SpecialMobData<>( this, SCALE );
         entityData.define( IS_BABY, false );
-    }
-    
-    /** Called on spawn to initialize properties based on the world, difficulty, and the group it spawns with. */
-    @Nullable
-    public ILivingEntityData finalizeSpawn( IServerWorld world, DifficultyInstance difficulty, SpawnReason spawnReason,
-                                            @Nullable ILivingEntityData groupData, @Nullable CompoundNBT eggTag ) {
-        groupData = super.finalizeSpawn( world, difficulty, spawnReason, groupData, eggTag );
-        setBaby( random.nextDouble() < 0.05 ); //TODO config
-        return groupData;
     }
     
     /** Called to set this entity's attack AI based on current equipment. */
@@ -220,9 +192,9 @@ public class _SpecialSkeletonEntity extends AbstractSkeletonEntity implements IS
             final SpecialMobData<_SpecialSkeletonEntity> data = getSpecialData();
             final ItemStack weapon = getItemInHand( ProjectileHelper.getWeaponHoldingHand(
                     this, item -> item instanceof BowItem ) );
-            if( data.rangedAttackMaxRange > 0.0F && weapon.getItem() == Items.BOW ) {
-                currentAttackAI = new RangedBowAttackGoal<>( this, data.rangedWalkSpeed,
-                        data.rangedAttackCooldown, data.rangedAttackMaxRange );
+            if( data.getRangedAttackMaxRange() > 0.0F && weapon.getItem() == Items.BOW ) {
+                currentAttackAI = new RangedBowAttackGoal<>( this, data.getRangedWalkSpeed(),
+                        data.getRangedAttackCooldown(), data.getRangedAttackMaxRange() );
             }
             else {
                 currentAttackAI = new MeleeAttackGoal( this, 1.2, false );
@@ -271,9 +243,6 @@ public class _SpecialSkeletonEntity extends AbstractSkeletonEntity implements IS
     
     /** The parameter for baby status. */
     private static final DataParameter<Boolean> IS_BABY = EntityDataManager.defineId( _SpecialSkeletonEntity.class, DataSerializers.BOOLEAN );
-    /** The speed boost to apply when in baby state. */
-    private static final AttributeModifier BABY_SPEED_BOOST = new AttributeModifier( UUID.fromString( "B9766B59-9566-4402-BC1F-2EE2A276D836" ),
-            "Baby speed boost", 0.5, AttributeModifier.Operation.MULTIPLY_BASE );
     
     /** Sets this entity as a baby. */
     @Override
@@ -282,9 +251,9 @@ public class _SpecialSkeletonEntity extends AbstractSkeletonEntity implements IS
         if( level != null && !level.isClientSide ) {
             final ModifiableAttributeInstance attributeInstance = getAttribute( Attributes.MOVEMENT_SPEED );
             //noinspection ConstantConditions
-            attributeInstance.removeModifier( BABY_SPEED_BOOST );
+            attributeInstance.removeModifier( References.BABY_SPEED_BOOST );
             if( value ) {
-                attributeInstance.addTransientModifier( BABY_SPEED_BOOST );
+                attributeInstance.addTransientModifier( References.BABY_SPEED_BOOST );
             }
         }
     }
@@ -324,6 +293,11 @@ public class _SpecialSkeletonEntity extends AbstractSkeletonEntity implements IS
     @Override
     public SpecialMobData<_SpecialSkeletonEntity> getSpecialData() { return specialData; }
     
+    /** @return This entity's mob species. */
+    @SpecialMob.SpeciesSupplier
+    @Override
+    public MobFamily.Species<? extends _SpecialSkeletonEntity> getSpecies() { return SPECIES; }
+    
     /** @return The experience that should be dropped by this entity. */
     @Override
     public final int getExperience() { return xpReward; }
@@ -332,15 +306,36 @@ public class _SpecialSkeletonEntity extends AbstractSkeletonEntity implements IS
     @Override
     public final void setExperience( int xp ) { xpReward = xp; }
     
-    static ResourceLocation GET_TEXTURE_PATH( String type ) {
-        return SpecialMobs.resourceLoc( SpecialMobs.TEXTURE_PATH + "skeleton/" + type + ".png" );
+    /** Called on spawn to initialize properties based on the world, difficulty, and the group it spawns with. */
+    @Nullable
+    @Override
+    public final ILivingEntityData finalizeSpawn( IServerWorld world, DifficultyInstance difficulty, SpawnReason spawnReason,
+                                                  @Nullable ILivingEntityData groupData, @Nullable CompoundNBT eggTag ) {
+        return MobHelper.finalizeSpawn( this, world, difficulty, spawnReason,
+                super.finalizeSpawn( world, difficulty, spawnReason, groupData, eggTag ) );
     }
     
-    private static final ResourceLocation[] TEXTURES = { new ResourceLocation( "textures/entity/skeleton/skeleton.png" ) };
+    /** Called on spawn to set starting equipment. */
+    @Override // Seal method to force spawn equipment changes through ISpecialMob
+    protected final void populateDefaultEquipmentSlots( DifficultyInstance difficulty ) { super.populateDefaultEquipmentSlots( difficulty ); }
     
-    /** @return All default textures for this entity. */
+    /** Called on spawn to initialize properties based on the world, difficulty, and the group it spawns with. */
     @Override
-    public ResourceLocation[] getDefaultTextures() { return TEXTURES; }
+    public void finalizeSpecialSpawn( IServerWorld world, DifficultyInstance difficulty, @Nullable SpawnReason spawnReason,
+                                      @Nullable ILivingEntityData groupData ) {
+        setBaby( MobFamily.SKELETON.config.SKELETONS.babyChance.rollChance( random ) );
+        
+        if( getSpecialData().getRangedAttackMaxRange() <= 0.0F || !getConfig().SKELETONS.bowEquipChance.rollChance( random ) ) {
+            setItemSlot( EquipmentSlotType.MAINHAND, new ItemStack( Items.IRON_SWORD ) );
+            
+            if( getConfig().SKELETONS.shieldEquipChance.rollChance( random ) ) {
+                setItemSlot( EquipmentSlotType.OFFHAND, new ItemStack( Items.SHIELD ) );
+            }
+        }
+        
+        finalizeVariantSpawn( world, difficulty, spawnReason, groupData );
+        reassessWeaponGoal();
+    }
     
     
     //--------------- SpecialMobData Hooks ----------------

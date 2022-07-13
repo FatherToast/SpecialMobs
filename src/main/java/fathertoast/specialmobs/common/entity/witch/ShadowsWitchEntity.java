@@ -14,7 +14,6 @@ import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.Effects;
 import net.minecraft.potion.PotionUtils;
 import net.minecraft.potion.Potions;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -32,9 +31,10 @@ public class ShadowsWitchEntity extends _SpecialWitchEntity {
     public static MobFamily.Species<ShadowsWitchEntity> SPECIES;
     
     @SpecialMob.BestiaryInfoSupplier
-    public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
-        return new BestiaryInfo( 0x000000 );
-        //TODO theme - forest
+    public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
+        bestiaryInfo.color( 0x000000 ).theme( BestiaryInfo.Theme.FOREST )
+                .uniqueTextureWithEyes()
+                .addExperience( 2 ).effectImmune( Effects.BLINDNESS, Effects.WITHER );
     }
     
     @SpecialMob.LanguageProvider
@@ -53,6 +53,11 @@ public class ShadowsWitchEntity extends _SpecialWitchEntity {
     @SpecialMob.Factory
     public static EntityType.IFactory<ShadowsWitchEntity> getVariantFactory() { return ShadowsWitchEntity::new; }
     
+    /** @return This entity's mob species. */
+    @SpecialMob.SpeciesSupplier
+    @Override
+    public MobFamily.Species<? extends ShadowsWitchEntity> getSpecies() { return SPECIES; }
+    
     
     //--------------- Variant-Specific Implementations ----------------
     
@@ -61,11 +66,7 @@ public class ShadowsWitchEntity extends _SpecialWitchEntity {
             new EffectInstance( Effects.WITHER, 200, 0 )
     );
     
-    public ShadowsWitchEntity( EntityType<? extends _SpecialWitchEntity> entityType, World world ) {
-        super( entityType, world );
-        getSpecialData().addPotionImmunity( Effects.BLINDNESS, Effects.WITHER );
-        xpReward += 2;
-    }
+    public ShadowsWitchEntity( EntityType<? extends _SpecialWitchEntity> entityType, World world ) { super( entityType, world ); }
     
     /** Override to modify potion attacks. Return an empty item stack to cancel the potion throw. */
     @Override
@@ -85,13 +86,4 @@ public class ShadowsWitchEntity extends _SpecialWitchEntity {
         }
         super.aiStep();
     }
-    
-    private static final ResourceLocation[] TEXTURES = {
-            GET_TEXTURE_PATH( "shadows" ),
-            GET_TEXTURE_PATH( "shadows_eyes" )
-    };
-    
-    /** @return All default textures for this entity. */
-    @Override
-    public ResourceLocation[] getDefaultTextures() { return TEXTURES; }
 }

@@ -20,7 +20,7 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.potion.PotionUtils;
 import net.minecraft.potion.Potions;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -37,9 +37,11 @@ public class ConflagrationBlazeEntity extends _SpecialBlazeEntity {
     public static MobFamily.Species<ConflagrationBlazeEntity> SPECIES;
     
     @SpecialMob.BestiaryInfoSupplier
-    public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
-        entityType.sized( 0.9F, 2.7F );
-        return new BestiaryInfo( 0xFFF87E, BestiaryInfo.BaseWeight.LOW );
+    public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
+        bestiaryInfo.color( 0xFFF87E ).weight( BestiaryInfo.DefaultWeight.LOW )
+                .uniqueTextureBaseOnly()
+                .size( 1.5F, 0.9F, 2.7F )
+                .addExperience( 4 );
     }
     
     @SpecialMob.LanguageProvider
@@ -58,6 +60,11 @@ public class ConflagrationBlazeEntity extends _SpecialBlazeEntity {
     @SpecialMob.Factory
     public static EntityType.IFactory<ConflagrationBlazeEntity> getVariantFactory() { return ConflagrationBlazeEntity::new; }
     
+    /** @return This entity's mob species. */
+    @SpecialMob.SpeciesSupplier
+    @Override
+    public MobFamily.Species<? extends ConflagrationBlazeEntity> getSpecies() { return SPECIES; }
+    
     
     //--------------- Variant-Specific Implementations ----------------
     
@@ -68,13 +75,10 @@ public class ConflagrationBlazeEntity extends _SpecialBlazeEntity {
     /** The level of increased attack damage gained. */
     private int growthLevel;
     
-    public ConflagrationBlazeEntity( EntityType<? extends _SpecialBlazeEntity> entityType, World world ) {
-        super( entityType, world );
-        getSpecialData().setBaseScale( 1.5F );
-        xpReward += 4;
-    }
+    public ConflagrationBlazeEntity( EntityType<? extends _SpecialBlazeEntity> entityType, World world ) { super( entityType, world ); }
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
+    @Override
     protected void onVariantAttack( Entity target ) {
         if( target instanceof LivingEntity ) {
             MobHelper.stealLife( this, (LivingEntity) target, 2.0F );
@@ -91,12 +95,6 @@ public class ConflagrationBlazeEntity extends _SpecialBlazeEntity {
             
             if( !level.isClientSide() && growthLevel < 7 ) {
                 growthLevel++;
-                
-                getSpecialData().rangedAttackDamage += 0.5F;
-                getSpecialData().rangedAttackCooldown -= 4;
-                getSpecialData().rangedAttackMaxCooldown -= 4;
-                if( growthLevel == 7 ) fireballBurstCount++;
-                
                 updateFeedingLevels();
             }
             amount /= 2.0F;
@@ -107,6 +105,13 @@ public class ConflagrationBlazeEntity extends _SpecialBlazeEntity {
     /** Recalculates the modifiers associated with this entity's feeding level counters. */
     private void updateFeedingLevels() {
         if( level != null && !level.isClientSide ) {
+            final int cooldownReduction = MathHelper.floor( getConfig().GENERAL.rangedAttackCooldown.get() * growthLevel * 0.1 );
+            getSpecialData().setRangedAttackCooldown( getConfig().GENERAL.rangedAttackCooldown.get() - cooldownReduction );
+            getSpecialData().setRangedAttackMaxCooldown( getConfig().GENERAL.rangedAttackMaxCooldown.get() - cooldownReduction );
+            
+            fireballBurstCount = getConfig().BLAZES.fireballBurstCount.get();
+            if( growthLevel >= 7 ) fireballBurstCount++;
+            
             final ModifiableAttributeInstance damage = getAttribute( Attributes.ATTACK_DAMAGE );
             //noinspection ConstantConditions
             damage.removeModifier( DAMAGE_BOOST.getId() );
@@ -130,12 +135,4 @@ public class ConflagrationBlazeEntity extends _SpecialBlazeEntity {
             growthLevel = saveTag.getByte( References.TAG_GROWTH_LEVEL );
         updateFeedingLevels();
     }
-    
-    private static final ResourceLocation[] TEXTURES = {
-            GET_TEXTURE_PATH( "conflagration" )
-    };
-    
-    /** @return All default textures for this entity. */
-    @Override
-    public ResourceLocation[] getDefaultTextures() { return TEXTURES; }
 }

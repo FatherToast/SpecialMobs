@@ -11,7 +11,6 @@ import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
@@ -20,7 +19,6 @@ import net.minecraft.particles.ParticleTypes;
 import net.minecraft.pathfinding.PathNavigator;
 import net.minecraft.pathfinding.PathNodeType;
 import net.minecraft.tags.FluidTags;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -36,10 +34,10 @@ public class StrawberrySlimeEntity extends _SpecialSlimeEntity {
     public static MobFamily.Species<StrawberrySlimeEntity> SPECIES;
     
     @SpecialMob.BestiaryInfoSupplier
-    public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
-        entityType.fireImmune();
-        return new BestiaryInfo( 0xBE696B );
-        //TODO theme - fire
+    public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
+        bestiaryInfo.color( 0xBE696B ).theme( BestiaryInfo.Theme.FIRE )
+                .uniqueTextureBaseOnly()
+                .addExperience( 1 ).fireImmune().waterSensitive();
     }
     
     @SpecialMob.LanguageProvider
@@ -58,14 +56,16 @@ public class StrawberrySlimeEntity extends _SpecialSlimeEntity {
     @SpecialMob.Factory
     public static EntityType.IFactory<StrawberrySlimeEntity> getVariantFactory() { return StrawberrySlimeEntity::new; }
     
+    /** @return This entity's mob species. */
+    @SpecialMob.SpeciesSupplier
+    @Override
+    public MobFamily.Species<? extends StrawberrySlimeEntity> getSpecies() { return SPECIES; }
+    
     
     //--------------- Variant-Specific Implementations ----------------
     
     public StrawberrySlimeEntity( EntityType<? extends _SpecialSlimeEntity> entityType, World world ) {
         super( entityType, world );
-        getSpecialData().setDamagedByWater( true );
-        slimeExperienceValue += 1;
-        
         setPathfindingMalus( PathNodeType.LAVA, PathNodeType.WALKABLE.getMalus() );
     }
     
@@ -106,12 +106,4 @@ public class StrawberrySlimeEntity extends _SpecialSlimeEntity {
     /** @return This slime's particle type for jump effects. */
     @Override
     protected IParticleData getParticleType() { return ParticleTypes.FLAME; }
-    
-    private static final ResourceLocation[] TEXTURES = {
-            GET_TEXTURE_PATH( "strawberry" )
-    };
-    
-    /** @return All default textures for this entity. */
-    @Override
-    public ResourceLocation[] getDefaultTextures() { return TEXTURES; }
 }

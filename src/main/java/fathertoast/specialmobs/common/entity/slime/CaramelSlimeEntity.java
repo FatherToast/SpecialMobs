@@ -15,7 +15,6 @@ import net.minecraft.particles.IParticleData;
 import net.minecraft.particles.ItemParticleData;
 import net.minecraft.particles.ParticleTypes;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -32,8 +31,11 @@ public class CaramelSlimeEntity extends _SpecialSlimeEntity {
     public static MobFamily.Species<CaramelSlimeEntity> SPECIES;
     
     @SpecialMob.BestiaryInfoSupplier
-    public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
-        return new BestiaryInfo( 0x9D733F );
+    public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
+        bestiaryInfo.color( 0x9D733F )
+                .uniqueTextureBaseOnly()
+                .addExperience( 2 )
+                .addToAttribute( Attributes.MAX_HEALTH, 8.0 );
     }
     
     @SpecialMob.LanguageProvider
@@ -52,23 +54,19 @@ public class CaramelSlimeEntity extends _SpecialSlimeEntity {
     @SpecialMob.Factory
     public static EntityType.IFactory<CaramelSlimeEntity> getVariantFactory() { return CaramelSlimeEntity::new; }
     
+    /** @return This entity's mob species. */
+    @SpecialMob.SpeciesSupplier
+    @Override
+    public MobFamily.Species<? extends CaramelSlimeEntity> getSpecies() { return SPECIES; }
+    
     
     //--------------- Variant-Specific Implementations ----------------
-    
-    public CaramelSlimeEntity( EntityType<? extends _SpecialSlimeEntity> entityType, World world ) {
-        super( entityType, world );
-        slimeExperienceValue += 2;
-    }
     
     private final DamageSource grabDamageSource = DamageSource.mobAttack( this ).bypassArmor().bypassMagic();
     
     private int grabTime;
     
-    /** Override to modify this slime's base attributes by size. */
-    @Override
-    protected void modifyVariantAttributes( int size ) {
-        addAttribute( Attributes.MAX_HEALTH, 4.0 * size );
-    }
+    public CaramelSlimeEntity( EntityType<? extends _SpecialSlimeEntity> entityType, World world ) { super( entityType, world ); }
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override
@@ -100,12 +98,4 @@ public class CaramelSlimeEntity extends _SpecialSlimeEntity {
     /** @return This slime's particle type for jump effects. */
     @Override
     protected IParticleData getParticleType() { return JUMP_PARTICLE; }
-    
-    private static final ResourceLocation[] TEXTURES = {
-            GET_TEXTURE_PATH( "caramel" )
-    };
-    
-    /** @return All default textures for this entity. */
-    @Override
-    public ResourceLocation[] getDefaultTextures() { return TEXTURES; }
 }

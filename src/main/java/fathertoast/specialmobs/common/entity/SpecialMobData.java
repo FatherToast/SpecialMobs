@@ -1,12 +1,14 @@
 package fathertoast.specialmobs.common.entity;
 
+import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
+import fathertoast.specialmobs.common.bestiary.MobFamily;
+import fathertoast.specialmobs.common.config.Config;
+import fathertoast.specialmobs.common.config.species.SpeciesConfig;
 import fathertoast.specialmobs.common.core.SpecialMobs;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.entity.CreatureAttribute;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.monster.SpiderEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
 import net.minecraft.nbt.StringNBT;
@@ -14,11 +16,12 @@ import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.pathfinding.PathNodeType;
 import net.minecraft.potion.Effect;
 import net.minecraft.potion.EffectInstance;
-import net.minecraft.potion.Effects;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.PotionEvent;
+import net.minecraftforge.registries.ForgeRegistries;
 
+import java.util.Collection;
 import java.util.HashSet;
 
 import static fathertoast.specialmobs.common.util.References.*;
@@ -47,11 +50,6 @@ public class SpecialMobData<T extends LivingEntity & ISpecialMob<T>> {
     /** Data manager parameter for render scale. */
     private final DataParameter<Float> renderScale;
     
-    /** The base collision box scale of this variant's family. */
-    private final float familyScale;
-    /** The base collision box scale of this variant. */
-    private float baseScale;
-    
     /** The base texture of the entity. */
     private ResourceLocation texture;
     /** The glowing eyes texture of the entity. */
@@ -61,43 +59,17 @@ public class SpecialMobData<T extends LivingEntity & ISpecialMob<T>> {
     /** True if the textures need to be sent to the client. */
     private boolean updateTextures;
     
-    /** The damage the entity uses for its ranged attacks, when applicable. */
-    public float rangedAttackDamage;
-    /** The spread (inaccuracy) of the entity's ranged attacks. */
-    public float rangedAttackSpread = 1.0F;
-    /** The movement speed multiplier the entity uses during its ranged attack ai. Requires an AI reload to take effect. */
-    public float rangedWalkSpeed = 1.0F;
-    /** The delay (in ticks) before a new ranged attack can begin after firing. Requires an AI reload to take effect. */
-    public int rangedAttackCooldown;
-    /**
-     * The delay (in ticks) between each ranged attack at maximum delay. Requires an AI reload to take effect.
-     * Unused for bow attacks. For fireball attacks, this is the cooldown + charge time.
-     * For all other attacks, this is the cooldown at maximum range (scaled down to the minimum cooldown at point-blank).
-     */
-    public int rangedAttackMaxCooldown;
-    /**
-     * The maximum distance (in blocks) the entity can fire ranged attacks from. Requires an ai reload to take effect.
-     * Ranged ai can only be used if this stat is greater than 0. Does not change aggro range.
-     */
-    public float rangedAttackMaxRange;
-    
     /** The rate this mob regenerates health (ticks per 1 health). Off if 0 or less. */
     private int healTimeMax;
     /** Counter to the next heal, if healTimeMax is greater than 0. */
     private int healTime;
     
     /** Proportion of fall damage taken. */
-    private float fallDamageMultiplier = 1.0F;
-    
+    private float fallDamageMultiplier;
     /** Whether the entity is immune to fire damage. */
     private boolean isImmuneToFire;
     /** Whether the entity is immune to being set on fire. */
     private boolean isImmuneToBurning;
-    /** Whether the entity can be leashed. */
-    private boolean allowLeashing;
-    /** Whether the entity does not trigger pressure plates. */
-    private boolean ignorePressurePlates;
-    
     /** Whether the entity can breathe under water. */
     private boolean canBreatheInWater;
     /** Whether the entity can ignore pushing from flowing water. */
@@ -105,44 +77,79 @@ public class SpecialMobData<T extends LivingEntity & ISpecialMob<T>> {
     /** Whether the entity is damaged when wet. */
     private boolean isDamagedByWater;
     
-    /** List of blocks that the entity cannot be stuck in. */
-    private final HashSet<String> immuneToStickyBlocks = new HashSet<>();
-    /** List of potions that cannot be applied to the entity. */
-    private final HashSet<String> immuneToPotions = new HashSet<>();
+    /** Whether the entity can be leashed. */
+    private boolean allowLeashing;
+    /** Whether the entity does not trigger pressure plates. */
+    private boolean ignorePressurePlates;
+    /** Set of blocks that the entity cannot be stuck in. */
+    private final HashSet<Block> immuneToStickyBlocks = new HashSet<>();
+    /** Set of potions that cannot be applied to the entity. */
+    private final HashSet<Effect> immuneToPotions = new HashSet<>();
+    
+    /** The damage the entity uses for its ranged attacks, when applicable. */
+    private float rangedAttackDamage;
+    /** The spread (inaccuracy) of the entity's ranged attacks. */
+    private float rangedAttackSpread;
+    /** The movement speed multiplier the entity uses during its ranged attack ai. Requires an AI reload to take effect. */
+    private float rangedWalkSpeed;
+    /** The delay (in ticks) before a ranged attack can be used. Requires an AI reload to take effect. */
+    private int rangedAttackCooldown;
+    /**
+     * The delay (in ticks) between each ranged attack at maximum delay. Requires an AI reload to take effect.
+     * Unused for bow attacks. For fireball attacks, this is "refire" time.
+     * For spit attacks, this is the cooldown at maximum range (scaled down to the minimum cooldown at point-blank).
+     */
+    private int rangedAttackMaxCooldown;
+    /**
+     * The maximum distance (in blocks) the entity can fire ranged attacks from. Requires an ai reload to take effect.
+     * Ranged ai can only be used if this stat is greater than 0. Does not change aggro range.
+     */
+    private float rangedAttackMaxRange;
     
     /**
      * Constructs a SpecialMobData to store generic data about a mob.
      * <p>
      * This constructor should be called during data watcher definitions, and defining the 'render scale' data watcher
-     * parameter is the only thing actually done while constructing.
+     * parameter and setting up AI stats are the only things actually done while constructing.
      * <p>
-     * The #initialize() method must be called later on to complete initialization (e.g. in the entity constructor).
+     * The #initialize() method must be called later on to complete initialization (in the entity constructor).
      *
-     * @param entity          The entity to store data for.
-     * @param scale           Data parameter for storing the render scale.
-     * @param familyBaseScale Base render scale. Typically 1.0F.
+     * @param entity The entity to store data for.
+     * @param scale  Data parameter for storing the render scale.
      */
-    public SpecialMobData( T entity, DataParameter<Float> scale, float familyBaseScale ) {
+    public SpecialMobData( T entity, DataParameter<Float> scale ) {
         theEntity = entity;
         renderScale = scale;
-        
-        familyScale = baseScale = familyBaseScale;
-        
-        setTextures( entity.getDefaultTextures() );
-        
         entity.getEntityData().define( renderScale, nextScale() );
+        
+        final SpeciesConfig.General config = theEntity.getSpecies().config.GENERAL;
+        setRangedAttackDamage( config.rangedAttackDamage == null ? -1.0F : (float) config.rangedAttackDamage.get() );
+        setRangedAttackSpread( config.rangedAttackSpread == null ? -1.0F : (float) config.rangedAttackSpread.get() );
+        setRangedWalkSpeed( config.rangedWalkSpeed == null ? -1.0F : (float) config.rangedWalkSpeed.get() );
+        setRangedAttackCooldown( config.rangedAttackCooldown == null ? -1 : config.rangedAttackCooldown.get() );
+        setRangedAttackMaxCooldown( config.rangedAttackMaxCooldown == null ? -1 : config.rangedAttackMaxCooldown.get() );
+        setRangedAttackMaxRange( config.rangedAttackMaxRange == null ? -1.0F : (float) config.rangedAttackMaxRange.get() );
     }
     
-    /** Called to finish initialization, since we can only define data watcher params in the constructor. */
     public void initialize() {
-        setImmuneToFire( theEntity.getType().fireImmune() );
-        if( theEntity.getMobType() == CreatureAttribute.UNDEAD ) {
-            addPotionImmunity( Effects.REGENERATION, Effects.POISON );
-        }
-        if( theEntity instanceof SpiderEntity ) {
-            addStickyBlockImmunity( Blocks.COBWEB );
-            addPotionImmunity( Effects.POISON );
-        }
+        final BestiaryInfo info = theEntity.getSpecies().bestiaryInfo;
+        texture = info.texture;
+        textureEyes = info.eyesTexture;
+        textureOverlay = info.overlayTexture;
+        
+        final SpeciesConfig.General config = theEntity.getSpecies().config.GENERAL;
+        theEntity.setExperience( config.experience.get() );
+        setRegenerationTime( config.healTime.get() );
+        setFallDamageMultiplier( (float) config.fallDamageMultiplier.get() );
+        setImmuneToFire( config.isImmuneToFire.get() );
+        setImmuneToBurning( config.isImmuneToBurning.get() );
+        setCanBreatheInWater( config.canBreatheInWater.get() );
+        setIgnoreWaterPush( config.ignoreWaterPush.get() );
+        setDamagedByWater( config.isDamagedByWater.get() );
+        setAllowLeashing( config.allowLeashing.get() );
+        setIgnorePressurePlates( config.ignorePressurePlates.get() );
+        addStickyBlockImmunity( config.immuneToStickyBlocks.get().getEntries() );
+        addPotionImmunity( config.immuneToPotions.get().getEntries() );
     }
     
     /** Copies all of the data from another mob, optionally copying texture(s). */
@@ -177,43 +184,29 @@ public class SpecialMobData<T extends LivingEntity & ISpecialMob<T>> {
         }
     }
     
-    /**
-     * @return Whether this entity has a glowing eyes texture.
-     */
+    /** @return Whether this entity has a glowing eyes texture. */
     public boolean hasEyesTexture() { return textureEyes != null; }
     
-    /**
-     * @return Whether this entity has an overlay texture.
-     */
+    /** @return Whether this entity has an overlay texture. */
     public boolean hasOverlayTexture() { return textureOverlay != null; }
     
-    /**
-     * @return The base texture for the entity.
-     */
+    /** @return The base texture for the entity. */
     public ResourceLocation getTexture() { return texture; }
     
-    /**
-     * @return The glowing eyes texture for the entity.
-     */
+    /** @return The glowing eyes texture for the entity. */
     public ResourceLocation getTextureEyes() { return textureEyes; }
     
-    /**
-     * @return The overlay texture for the entity.
-     */
+    /** @return The overlay texture for the entity. */
     public ResourceLocation getTextureOverlay() { return textureOverlay; }
     
-    /**
-     * @param textures The new texture(s) to set for the entity.
-     */
+    /** @param textures The new texture(s) to set for the entity. */
     private void setTextures( ResourceLocation[] textures ) {
         texture = textures[0];
         textureEyes = textures.length > 1 ? textures[1] : null;
         textureOverlay = textures.length > 2 ? textures[2] : null;
     }
     
-    /**
-     * @param textures The new texture(s) to load for the entity. Called when loaded from a packet.
-     */
+    /** @param textures The new texture(s) to load for the entity. Called when loaded from a packet. */
     public void loadTextures( String[] textures ) {
         try {
             loadTexture( textures[0] );
@@ -275,42 +268,51 @@ public class SpecialMobData<T extends LivingEntity & ISpecialMob<T>> {
         }
     }
     
-    /** @return The render scale for the entity. */
+    /** @return The render scale for the entity, including any applied random scaling. */
     public float getRenderScale() { return theEntity.getEntityData().get( renderScale ); }
     
+    /** Sets the overall render scale for the entity. */
     public void setRenderScale( float scale ) {
-        if( !theEntity.level.isClientSide ) {
-            theEntity.getEntityData().set( renderScale, scale );
-        }
+        if( !theEntity.level.isClientSide ) theEntity.getEntityData().set( renderScale, scale );
     }
     
-    public float getFamilyBaseScale() { return familyScale; }
+    //** @return The base render scale for the entity's mob family. */
+    //public float getFamilyBaseScale() { return familyScale; }
     
-    public float getBaseScaleForPreScaledValues() { return getBaseScale() / getFamilyBaseScale(); }
+    //** @return The render scale for the entity without its family scale factored in; used to correct scaling for pre-scaled vanilla values. */
+    //public float getBaseScaleForPreScaledValues() { return getBaseScale() / getFamilyBaseScale(); }
     
-    public float getBaseScale() { return baseScale; }
+    /** @return The base render scale for the entity, which is a property of the mob species. */
+    public float getBaseScale() { return theEntity.getSpecies().bestiaryInfo.baseScale; }
     
-    public void setBaseScale( float newBaseScale ) {
-        baseScale = newBaseScale;
-        setRenderScale( nextScale() );
-    }
-    
+    /** @return A random render scale based on config settings. */
     private float nextScale() {
-        //        if( Config.get().GENERAL.RANDOM_SCALING > 0.0F ) { TODO configs
-        //            return baseScale * (1.0F + (theEntity.getRNG().nextFloat() - 0.5F) * Config.get().GENERAL.RANDOM_SCALING);
-        //        }
-        return baseScale;
+        // Don't do random on client side stuff
+        if( theEntity.level == null || theEntity.level.isClientSide() ) return getBaseScale();
+        
+        // Prioritize most specific value available
+        final MobFamily.Species<? extends T> species = theEntity.getSpecies();
+        final double randomScaling;
+        if( species.config.GENERAL.randomScaling.get() >= 0.0 )
+            randomScaling = species.config.GENERAL.randomScaling.get();
+        else if( species.family.config.GENERAL.familyRandomScaling.get() >= 0.0 )
+            randomScaling = species.family.config.GENERAL.familyRandomScaling.get();
+        else
+            randomScaling = Config.MAIN.GENERAL.masterRandomScaling.get();
+        
+        return randomScaling <= 0.0 ? getBaseScale() :
+                getBaseScale() * (1.0F + (theEntity.getRandom().nextFloat() - 0.5F) * 2.0F * (float) randomScaling);
     }
     
-    public void setRegenerationTime( int ticks ) { healTimeMax = ticks; }
+    private void setRegenerationTime( int ticks ) { healTimeMax = ticks; }
     
     public float getFallDamageMultiplier() { return fallDamageMultiplier; }
     
-    public void setFallDamageMultiplier( float value ) { fallDamageMultiplier = value; }
+    private void setFallDamageMultiplier( float value ) { fallDamageMultiplier = value; }
     
     public boolean isImmuneToFire() { return isImmuneToFire; }
     
-    public void setImmuneToFire( boolean value ) {
+    private void setImmuneToFire( boolean value ) {
         isImmuneToFire = value;
         if( value ) {
             theEntity.setPathfindingMalus( PathNodeType.LAVA, PathNodeType.WATER.getMalus() );
@@ -326,7 +328,7 @@ public class SpecialMobData<T extends LivingEntity & ISpecialMob<T>> {
     
     public boolean isImmuneToBurning() { return isImmuneToBurning; }
     
-    public void setImmuneToBurning( boolean value ) {
+    private void setImmuneToBurning( boolean value ) {
         theEntity.clearFire();
         isImmuneToBurning = value;
         if( value ) {
@@ -341,23 +343,23 @@ public class SpecialMobData<T extends LivingEntity & ISpecialMob<T>> {
     
     public boolean allowLeashing() { return allowLeashing; }
     
-    public void setAllowLeashing( boolean value ) { allowLeashing = value; }
+    private void setAllowLeashing( boolean value ) { allowLeashing = value; }
     
     public boolean ignorePressurePlates() { return ignorePressurePlates; }
     
-    public void setIgnorePressurePlates( boolean value ) { ignorePressurePlates = value; }
+    private void setIgnorePressurePlates( boolean value ) { ignorePressurePlates = value; }
     
     public boolean canBreatheInWater() { return canBreatheInWater; }
     
-    public void setCanBreatheInWater( boolean value ) { canBreatheInWater = value; }
+    private void setCanBreatheInWater( boolean value ) { canBreatheInWater = value; }
     
     public boolean ignoreWaterPush() { return ignoreWaterPush; }
     
-    public void setIgnoreWaterPush( boolean value ) { ignoreWaterPush = value; }
+    private void setIgnoreWaterPush( boolean value ) { ignoreWaterPush = value; }
     
     public boolean isDamagedByWater() { return isDamagedByWater; }
     
-    public void setDamagedByWater( boolean value ) {
+    private void setDamagedByWater( boolean value ) {
         isDamagedByWater = value;
         theEntity.setPathfindingMalus( PathNodeType.WATER, value ? PathNodeType.LAVA.getMalus() : PathNodeType.WATER.getMalus() );
     }
@@ -368,12 +370,10 @@ public class SpecialMobData<T extends LivingEntity & ISpecialMob<T>> {
      * @param block The block state to test.
      * @return True if the block is allowed to apply its stuck speed multiplier.
      */
-    public boolean canBeStuckIn( BlockState block ) { return !immuneToStickyBlocks.contains( block.getBlock().getDescriptionId() ); }
+    public boolean canBeStuckIn( BlockState block ) { return !immuneToStickyBlocks.contains( block.getBlock() ); }
     
     /** @param blocks The sticky block(s) to grant immunity from. */
-    public void addStickyBlockImmunity( Block... blocks ) {
-        for( Block block : blocks ) immuneToStickyBlocks.add( block.getDescriptionId() );
-    }
+    private void addStickyBlockImmunity( Collection<Block> blocks ) { immuneToStickyBlocks.addAll( blocks ); }
     
     /**
      * Tests a potion effect to see if it is applicable to the entity.
@@ -387,14 +387,38 @@ public class SpecialMobData<T extends LivingEntity & ISpecialMob<T>> {
         switch( event.getResult() ) {
             case DENY: return false;
             case ALLOW: return true;
-            default: return !immuneToPotions.contains( effect.getDescriptionId() );
+            default: return !immuneToPotions.contains( effect.getEffect() );
         }
     }
     
     /** @param effects The effect(s) to grant immunity from. */
-    public void addPotionImmunity( Effect... effects ) {
-        for( Effect effect : effects ) immuneToPotions.add( effect.getDescriptionId() );
-    }
+    private void addPotionImmunity( Collection<Effect> effects ) { immuneToPotions.addAll( effects ); }
+    
+    public float getRangedAttackDamage() { return rangedAttackDamage; }
+    
+    public void setRangedAttackDamage( float value ) { rangedAttackDamage = value; }
+    
+    public float getRangedAttackSpread() { return rangedAttackSpread; }
+    
+    public void setRangedAttackSpread( float value ) { rangedAttackSpread = value; }
+    
+    public float getRangedWalkSpeed() { return rangedWalkSpeed; }
+    
+    public void setRangedWalkSpeed( float value ) { rangedWalkSpeed = value; }
+    
+    public int getRangedAttackCooldown() { return rangedAttackCooldown; }
+    
+    public void setRangedAttackCooldown( int value ) { rangedAttackCooldown = value; }
+    
+    public int getRangedAttackMaxCooldown() { return rangedAttackMaxCooldown; }
+    
+    public void setRangedAttackMaxCooldown( int value ) { rangedAttackMaxCooldown = value; }
+    
+    public float getRangedAttackMaxRange() { return rangedAttackMaxRange; }
+    
+    public void setRangedAttackMaxRange( float value ) { rangedAttackMaxRange = value; }
+    
+    public void disableRangedAttack() { setRangedAttackMaxRange( 0.0F ); }
     
     /**
      * Saves this data to NBT.
@@ -403,22 +427,14 @@ public class SpecialMobData<T extends LivingEntity & ISpecialMob<T>> {
      */
     public void writeToNBT( CompoundNBT tag ) {
         tag.putFloat( TAG_RENDER_SCALE, getRenderScale() );
-        tag.putInt( TAG_EXPERIENCE, theEntity.getExperience() );
-        tag.putByte( TAG_REGENERATION, (byte) healTimeMax );
         
         tag.putString( TAG_TEXTURE, texture.toString() );
         tag.putString( TAG_TEXTURE_EYES, textureEyes == null ? "" : textureEyes.toString() );
         tag.putString( TAG_TEXTURE_OVER, textureOverlay == null ? "" : textureOverlay.toString() );
         
-        // Arrow AI
-        tag.putFloat( TAG_ARROW_DAMAGE, rangedAttackDamage );
-        tag.putFloat( TAG_ARROW_SPREAD, rangedAttackSpread );
-        tag.putFloat( TAG_ARROW_WALK_SPEED, rangedWalkSpeed );
-        tag.putShort( TAG_ARROW_REFIRE_MIN, (short) rangedAttackCooldown );
-        tag.putShort( TAG_ARROW_REFIRE_MAX, (short) rangedAttackMaxCooldown );
-        tag.putFloat( TAG_ARROW_RANGE, rangedAttackMaxRange );
-        
-        // Abilities
+        // Capabilities
+        tag.putInt( TAG_EXPERIENCE, theEntity.getExperience() );
+        tag.putByte( TAG_REGENERATION, (byte) healTimeMax );
         tag.putFloat( TAG_FALL_MULTI, getFallDamageMultiplier() );
         tag.putBoolean( TAG_FIRE_IMMUNE, isImmuneToFire() );
         tag.putBoolean( TAG_BURN_IMMUNE, isImmuneToBurning() );
@@ -429,16 +445,32 @@ public class SpecialMobData<T extends LivingEntity & ISpecialMob<T>> {
         tag.putBoolean( TAG_WATER_DAMAGE, isDamagedByWater() );
         
         final ListNBT stickyBlocksTag = new ListNBT();
-        for( String blockName : immuneToStickyBlocks ) {
-            stickyBlocksTag.add( StringNBT.valueOf( blockName ) );
+        for( Block block : immuneToStickyBlocks ) {
+            final ResourceLocation regKey = ForgeRegistries.BLOCKS.getKey( block );
+            if( regKey != null ) stickyBlocksTag.add( StringNBT.valueOf( SpecialMobs.toString( regKey ) ) );
         }
         tag.put( TAG_STICKY_IMMUNE, stickyBlocksTag );
         
         final ListNBT potionsTag = new ListNBT();
-        for( String potionName : immuneToPotions ) {
-            potionsTag.add( StringNBT.valueOf( potionName ) );
+        for( Effect effect : immuneToPotions ) {
+            final ResourceLocation regKey = ForgeRegistries.POTIONS.getKey( effect );
+            if( regKey != null ) potionsTag.add( StringNBT.valueOf( SpecialMobs.toString( regKey ) ) );
         }
         tag.put( TAG_POTION_IMMUNE, potionsTag );
+        
+        // Ranged attack stats (optional)
+        if( getRangedAttackDamage() >= 0.0F )
+            tag.putFloat( TAG_ARROW_DAMAGE, getRangedAttackDamage() );
+        if( getRangedAttackSpread() >= 0.0F )
+            tag.putFloat( TAG_ARROW_SPREAD, getRangedAttackSpread() );
+        if( getRangedWalkSpeed() >= 0.0F )
+            tag.putFloat( TAG_ARROW_WALK_SPEED, getRangedWalkSpeed() );
+        if( getRangedAttackCooldown() >= 0 )
+            tag.putShort( TAG_ARROW_REFIRE_MIN, (short) getRangedAttackCooldown() );
+        if( getRangedAttackMaxCooldown() >= 0 )
+            tag.putShort( TAG_ARROW_REFIRE_MAX, (short) getRangedAttackMaxCooldown() );
+        if( getRangedAttackMaxRange() >= 0.0F )
+            tag.putFloat( TAG_ARROW_RANGE, getRangedAttackMaxRange() );
     }
     
     /**
@@ -449,12 +481,6 @@ public class SpecialMobData<T extends LivingEntity & ISpecialMob<T>> {
     public void readFromNBT( CompoundNBT tag ) {
         if( tag.contains( TAG_RENDER_SCALE, NBT_TYPE_NUMERICAL ) ) {
             setRenderScale( tag.getFloat( TAG_RENDER_SCALE ) );
-        }
-        if( tag.contains( TAG_EXPERIENCE, NBT_TYPE_NUMERICAL ) ) {
-            theEntity.setExperience( tag.getInt( TAG_EXPERIENCE ) );
-        }
-        if( tag.contains( TAG_REGENERATION, NBT_TYPE_NUMERICAL ) ) {
-            healTimeMax = tag.getByte( TAG_REGENERATION );
         }
         
         try {
@@ -472,27 +498,13 @@ public class SpecialMobData<T extends LivingEntity & ISpecialMob<T>> {
             SpecialMobs.LOG.warn( "Failed to load textures from NBT! " + theEntity.toString() );
         }
         
-        // Arrow AI
-        if( tag.contains( TAG_ARROW_DAMAGE, NBT_TYPE_NUMERICAL ) ) {
-            rangedAttackDamage = tag.getFloat( TAG_ARROW_DAMAGE );
+        // Capabilities
+        if( tag.contains( TAG_EXPERIENCE, NBT_TYPE_NUMERICAL ) ) {
+            theEntity.setExperience( tag.getInt( TAG_EXPERIENCE ) );
         }
-        if( tag.contains( TAG_ARROW_SPREAD, NBT_TYPE_NUMERICAL ) ) {
-            rangedAttackSpread = tag.getFloat( TAG_ARROW_SPREAD );
+        if( tag.contains( TAG_REGENERATION, NBT_TYPE_NUMERICAL ) ) {
+            healTimeMax = tag.getByte( TAG_REGENERATION );
         }
-        if( tag.contains( TAG_ARROW_WALK_SPEED, NBT_TYPE_NUMERICAL ) ) {
-            rangedWalkSpeed = tag.getFloat( TAG_ARROW_WALK_SPEED );
-        }
-        if( tag.contains( TAG_ARROW_REFIRE_MIN, NBT_TYPE_NUMERICAL ) ) {
-            rangedAttackCooldown = tag.getShort( TAG_ARROW_REFIRE_MIN );
-        }
-        if( tag.contains( TAG_ARROW_REFIRE_MAX, NBT_TYPE_NUMERICAL ) ) {
-            rangedAttackMaxCooldown = tag.getShort( TAG_ARROW_REFIRE_MAX );
-        }
-        if( tag.contains( TAG_ARROW_RANGE, NBT_TYPE_NUMERICAL ) ) {
-            rangedAttackMaxRange = tag.getFloat( TAG_ARROW_RANGE );
-        }
-        
-        // Abilities
         if( tag.contains( TAG_FALL_MULTI, NBT_TYPE_NUMERICAL ) ) {
             setFallDamageMultiplier( tag.getFloat( TAG_FALL_MULTI ) );
         }
@@ -501,12 +513,6 @@ public class SpecialMobData<T extends LivingEntity & ISpecialMob<T>> {
         }
         if( tag.contains( TAG_BURN_IMMUNE, NBT_TYPE_NUMERICAL ) ) {
             setImmuneToBurning( tag.getBoolean( TAG_BURN_IMMUNE ) );
-        }
-        if( tag.contains( TAG_LEASHABLE, NBT_TYPE_NUMERICAL ) ) {
-            setAllowLeashing( tag.getBoolean( TAG_LEASHABLE ) );
-        }
-        if( tag.contains( TAG_TRAP_IMMUNE, NBT_TYPE_NUMERICAL ) ) {
-            setIgnorePressurePlates( tag.getBoolean( TAG_TRAP_IMMUNE ) );
         }
         if( tag.contains( TAG_DROWN_IMMUNE, NBT_TYPE_NUMERICAL ) ) {
             setCanBreatheInWater( tag.getBoolean( TAG_DROWN_IMMUNE ) );
@@ -517,19 +523,49 @@ public class SpecialMobData<T extends LivingEntity & ISpecialMob<T>> {
         if( tag.contains( TAG_WATER_DAMAGE, NBT_TYPE_NUMERICAL ) ) {
             setDamagedByWater( tag.getBoolean( TAG_WATER_DAMAGE ) );
         }
+        if( tag.contains( TAG_LEASHABLE, NBT_TYPE_NUMERICAL ) ) {
+            setAllowLeashing( tag.getBoolean( TAG_LEASHABLE ) );
+        }
+        if( tag.contains( TAG_TRAP_IMMUNE, NBT_TYPE_NUMERICAL ) ) {
+            setIgnorePressurePlates( tag.getBoolean( TAG_TRAP_IMMUNE ) );
+        }
         if( tag.contains( TAG_STICKY_IMMUNE, NBT_TYPE_LIST ) ) {
             final ListNBT stickyBlocksTag = tag.getList( TAG_STICKY_IMMUNE, NBT_TYPE_STRING );
             immuneToStickyBlocks.clear();
             for( int i = 0; i < stickyBlocksTag.size(); i++ ) {
-                immuneToStickyBlocks.add( stickyBlocksTag.getString( i ) );
+                final Block block = ForgeRegistries.BLOCKS.getValue( new ResourceLocation( stickyBlocksTag.getString( i ) ) );
+                if( block != null && !block.is( Blocks.AIR ) )
+                    immuneToStickyBlocks.add( block );
             }
         }
         if( tag.contains( TAG_POTION_IMMUNE, NBT_TYPE_LIST ) ) {
             final ListNBT potionsTag = tag.getList( TAG_POTION_IMMUNE, NBT_TYPE_STRING );
             immuneToPotions.clear();
             for( int i = 0; i < potionsTag.size(); i++ ) {
-                immuneToPotions.add( potionsTag.getString( i ) );
+                final Effect effect = ForgeRegistries.POTIONS.getValue( new ResourceLocation( potionsTag.getString( i ) ) );
+                if( effect != null )
+                    immuneToPotions.add( effect );
             }
+        }
+        
+        // Ranged attack stats
+        if( tag.contains( TAG_ARROW_DAMAGE, NBT_TYPE_NUMERICAL ) ) {
+            setRangedAttackDamage( tag.getFloat( TAG_ARROW_DAMAGE ) );
+        }
+        if( tag.contains( TAG_ARROW_SPREAD, NBT_TYPE_NUMERICAL ) ) {
+            setRangedAttackSpread( tag.getFloat( TAG_ARROW_SPREAD ) );
+        }
+        if( tag.contains( TAG_ARROW_WALK_SPEED, NBT_TYPE_NUMERICAL ) ) {
+            setRangedWalkSpeed( tag.getFloat( TAG_ARROW_WALK_SPEED ) );
+        }
+        if( tag.contains( TAG_ARROW_REFIRE_MIN, NBT_TYPE_NUMERICAL ) ) {
+            setRangedAttackCooldown( tag.getShort( TAG_ARROW_REFIRE_MIN ) );
+        }
+        if( tag.contains( TAG_ARROW_REFIRE_MAX, NBT_TYPE_NUMERICAL ) ) {
+            setRangedAttackMaxCooldown( tag.getShort( TAG_ARROW_REFIRE_MAX ) );
+        }
+        if( tag.contains( TAG_ARROW_RANGE, NBT_TYPE_NUMERICAL ) ) {
+            setRangedAttackMaxRange( tag.getFloat( TAG_ARROW_RANGE ) );
         }
     }
 }

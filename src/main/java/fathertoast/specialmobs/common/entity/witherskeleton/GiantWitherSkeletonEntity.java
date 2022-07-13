@@ -3,13 +3,10 @@ package fathertoast.specialmobs.common.entity.witherskeleton;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
-import fathertoast.specialmobs.common.util.AttributeHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.AttributeModifierMap;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.item.Items;
 import net.minecraft.world.World;
@@ -27,17 +24,12 @@ public class GiantWitherSkeletonEntity extends _SpecialWitherSkeletonEntity {
     public static MobFamily.Species<GiantWitherSkeletonEntity> SPECIES;
     
     @SpecialMob.BestiaryInfoSupplier
-    public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
-        entityType.sized( 0.95F, 3.6F );
-        return new BestiaryInfo( 0x474D4D );
-    }
-    
-    @SpecialMob.AttributeCreator
-    public static AttributeModifierMap.MutableAttribute createAttributes() {
-        return AttributeHelper.of( _SpecialWitherSkeletonEntity.createAttributes() )
-                .addAttribute( Attributes.MAX_HEALTH, 20.0 )
-                .addAttribute( Attributes.ATTACK_DAMAGE, 2.0 )
-                .build();
+    public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
+        bestiaryInfo.color( 0x474D4D )
+                .size( 1.8F, 0.95F, 3.6F )
+                .addExperience( 1 )
+                .addToAttribute( Attributes.MAX_HEALTH, 20.0 )
+                .addToAttribute( Attributes.ATTACK_DAMAGE, 2.0 ).addToRangedDamage( 2.0 );
     }
     
     @SpecialMob.LanguageProvider
@@ -55,20 +47,17 @@ public class GiantWitherSkeletonEntity extends _SpecialWitherSkeletonEntity {
     @SpecialMob.Factory
     public static EntityType.IFactory<GiantWitherSkeletonEntity> getVariantFactory() { return GiantWitherSkeletonEntity::new; }
     
+    /** @return This entity's mob species. */
+    @SpecialMob.SpeciesSupplier
+    @Override
+    public MobFamily.Species<? extends GiantWitherSkeletonEntity> getSpecies() { return SPECIES; }
+    
     
     //--------------- Variant-Specific Implementations ----------------
     
     public GiantWitherSkeletonEntity( EntityType<? extends _SpecialWitherSkeletonEntity> entityType, World world ) {
         super( entityType, world );
-        getSpecialData().setBaseScale( 1.8F );
         maxUpStep = 1.0F;
-        xpReward += 1;
-    }
-    
-    /** Override to change this entity's AI goals. */
-    @Override
-    protected void registerVariantGoals() {
-        getSpecialData().rangedAttackDamage += 2.0F;
     }
     
     /** Sets this entity as a baby. */

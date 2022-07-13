@@ -3,6 +3,7 @@ package fathertoast.specialmobs.common.util;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
+import fathertoast.specialmobs.common.config.species.SpeciesConfig;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.entity.EntityType;
@@ -13,7 +14,10 @@ import net.minecraft.item.Item;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.lang.annotation.Annotation;
-import java.lang.reflect.*;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 
 /**
  * Provides helper methods to handle annotation processing through reflection.
@@ -25,7 +29,7 @@ public final class AnnotationHelper {
     
     //--------------- PRETTY HELPER METHODS ----------------
     
-    /** Creates an entity factory from a special mob species. Throws an exception if anything goes wrong. */
+    /** Injects a reference to the special mob species into the species entity class. Throws an exception if anything goes wrong. */
     public static void injectSpeciesReference( MobFamily.Species<?> species ) {
         try {
             final Field field = getField( species.entityClass, SpecialMob.SpeciesReference.class );
@@ -36,21 +40,46 @@ public final class AnnotationHelper {
         }
     }
     
-    /** Gets bestiary info from a special mob species. Throws an exception if anything goes wrong. */
-    public static <T extends LivingEntity> BestiaryInfo getBestiaryInfo( MobFamily.Species<T> species, EntityType.Builder<T> entityType ) {
+    /** Verifies the special mob species's entity class is overriding ISpecialMob#getSpecies(). Throws an exception if anything goes wrong. */
+    public static void verifySpeciesSupplier( MobFamily.Species<?> species ) {
         try {
-            return (BestiaryInfo) getMethod( species.entityClass, SpecialMob.BestiaryInfoSupplier.class ).invoke( null, entityType );
+            getNonstaticMethod( species.entityClass, SpecialMob.SpeciesSupplier.class );
+        }
+        catch( NoSuchMethodException ex ) {
+            throw new RuntimeException( "Entity class for " + species.name + " does not override ISpecialMob#getSpecies()", ex );
+        }
+    }
+    
+    /** Gets bestiary info from a special mob species. Throws an exception if anything goes wrong. */
+    public static <T extends LivingEntity> BestiaryInfo.Builder getBestiaryInfo( MobFamily.Species<T> species, BestiaryInfo.Builder bestiaryInfo ) {
+        try {
+            getMethod( species.entityClass, SpecialMob.BestiaryInfoSupplier.class ).invoke( null, bestiaryInfo );
+            return bestiaryInfo;
         }
         catch( IllegalAccessException | NoSuchMethodException | InvocationTargetException ex ) {
             throw new RuntimeException( "Entity class for " + species.name + " has invalid bestiary info method", ex );
         }
     }
     
-    /** Creates an attribute modifier map from a special mob species. Throws an exception if anything goes wrong. */
-    public static AttributeModifierMap createAttributes( MobFamily.Species<?> species ) {
+    /** Creates a species config from a special mob species. Throws an exception if anything goes wrong. */
+    public static SpeciesConfig createConfig( MobFamily.Species<?> species ) {
         try {
-            return ((AttributeModifierMap.MutableAttribute) getMethodOrSuper( species.entityClass, SpecialMob.AttributeCreator.class )
-                    .invoke( null )).build();
+            final Method supplier = getMethodOrSuperOptional( species.entityClass, SpecialMob.ConfigSupplier.class );
+            if( supplier == null ) {
+                return new SpeciesConfig( species );
+            }
+            return (SpeciesConfig) supplier.invoke( null, species );
+        }
+        catch( InvocationTargetException | IllegalAccessException ex ) {
+            throw new RuntimeException( "Entity class for " + species.name + " has invalid config creation method", ex );
+        }
+    }
+    
+    /** Creates an attribute modifier map from a special mob species. Throws an exception if anything goes wrong. */
+    public static AttributeModifierMap.MutableAttribute createAttributes( MobFamily.Species<?> species ) {
+        try {
+            return (AttributeModifierMap.MutableAttribute) getMethodOrSuper( species.entityClass, SpecialMob.AttributeSupplier.class )
+                    .invoke( null );
         }
         catch( NoSuchMethodException | InvocationTargetException | IllegalAccessException ex ) {
             throw new RuntimeException( "Entity class for " + species.name + " has invalid attribute creation method", ex );
@@ -131,6 +160,20 @@ public final class AnnotationHelper {
     }
     
     /**
+     * @return Pulls a nonstatic method with a specific annotation from a class.
+     * @throws NoSuchMethodException if the method does not exist in the class.
+     */
+    @SuppressWarnings( "UnusedReturnValue" )
+    private static Method getNonstaticMethod( Class<?> type, Class<? extends Annotation> annotation ) throws NoSuchMethodException {
+        for( Method method : type.getDeclaredMethods() ) {
+            if( !Modifier.isStatic( method.getModifiers() ) && method.isAnnotationPresent( annotation ) )
+                return method;
+        }
+        throw new NoSuchMethodException( String.format( "Could not find required nonstatic @%s annotated method in %s",
+                annotation.getSimpleName(), type.getName() ) );
+    }
+    
+    /**
      * @return Pulls a static method with a specific annotation from a class.
      * @throws NoSuchMethodException if the method does not exist in the class.
      */
@@ -148,6 +191,20 @@ public final class AnnotationHelper {
      * @throws NoSuchMethodException if the method does not exist in the class or any of its parents.
      */
     private static Method getMethodOrSuper( Class<? extends LivingEntity> type, Class<? extends Annotation> annotation ) throws NoSuchMethodException {
+        final Method method = getMethodOrSuperOptional( type, annotation );
+        if( method == null ) {
+            throw new NoSuchMethodException( String.format( "Could not find 'overridable' static @%s annotated method in %s or its parents",
+                    annotation.getSimpleName(), type.getName() ) );
+        }
+        return method;
+    }
+    
+    /**
+     * @return Pulls a static method with a specific annotation from a class, or its super class(es) if none is defined in the class,
+     * or null if the method does not exist.
+     */
+    @Nullable
+    private static Method getMethodOrSuperOptional( Class<? extends LivingEntity> type, Class<? extends Annotation> annotation ) {
         Class<?> currentType = type;
         while( currentType != LivingEntity.class ) {
             for( Method method : currentType.getDeclaredMethods() ) {
@@ -156,21 +213,20 @@ public final class AnnotationHelper {
             }
             currentType = currentType.getSuperclass();
         }
-        throw new NoSuchMethodException( String.format( "Could not find 'overridable' static @%s annotated method in %s or its parents",
-                annotation.getSimpleName(), type.getName() ) );
+        return null;
     }
     
-    /**
-     * @return Pulls a constructor with a specific annotation from a class.
-     * @throws NoSuchMethodException if the constructor does not exist.
-     */
-    private static <T> Constructor<T> getConstructor( Class<T> type, Class<? extends Annotation> annotation ) throws NoSuchMethodException {
-        for( Constructor<?> constructor : type.getDeclaredConstructors() ) {
-            if( constructor.isAnnotationPresent( annotation ) )
-                //noinspection unchecked
-                return (Constructor<T>) constructor;
-        }
-        throw new NoSuchMethodException( String.format( "Could not find @%s annotated constructor in %s",
-                annotation.getSimpleName(), type.getName() ) );
-    }
+    //    /**
+    //     * @return Pulls a constructor with a specific annotation from a class.
+    //     * @throws NoSuchMethodException if the constructor does not exist.
+    //     */
+    //    private static <T> Constructor<T> getConstructor( Class<T> type, Class<? extends Annotation> annotation ) throws NoSuchMethodException {
+    //        for( Constructor<?> constructor : type.getDeclaredConstructors() ) {
+    //            if( constructor.isAnnotationPresent( annotation ) )
+    //                //noinspection unchecked
+    //                return (Constructor<T>) constructor;
+    //        }
+    //        throw new NoSuchMethodException( String.format( "Could not find @%s annotated constructor in %s",
+    //                annotation.getSimpleName(), type.getName() ) );
+    //    }
 }

@@ -15,7 +15,6 @@ import net.minecraft.item.Items;
 import net.minecraft.particles.IParticleData;
 import net.minecraft.particles.ItemParticleData;
 import net.minecraft.particles.ParticleTypes;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 
@@ -32,9 +31,13 @@ public class WatermelonSlimeEntity extends _SpecialSlimeEntity {
     public static MobFamily.Species<WatermelonSlimeEntity> SPECIES;
     
     @SpecialMob.BestiaryInfoSupplier
-    public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
-        entityType.sized( 3.06F, 3.06F );
-        return new BestiaryInfo( 0xDF7679, BestiaryInfo.BaseWeight.LOW );
+    public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
+        bestiaryInfo.color( 0xDF7679 ).weight( BestiaryInfo.DefaultWeight.LOW )
+                .uniqueTextureBaseOnly()
+                .size( 1.5F, 3.06F, 3.06F )
+                .addExperience( 2 )
+                .addToAttribute( Attributes.MAX_HEALTH, 8.0 ).addToAttribute( Attributes.ARMOR, 16.0 )
+                .addToAttribute( Attributes.ATTACK_DAMAGE, 1.0 );
     }
     
     @SpecialMob.LanguageProvider
@@ -54,21 +57,15 @@ public class WatermelonSlimeEntity extends _SpecialSlimeEntity {
     @SpecialMob.Factory
     public static EntityType.IFactory<WatermelonSlimeEntity> getVariantFactory() { return WatermelonSlimeEntity::new; }
     
+    /** @return This entity's mob species. */
+    @SpecialMob.SpeciesSupplier
+    @Override
+    public MobFamily.Species<? extends WatermelonSlimeEntity> getSpecies() { return SPECIES; }
+    
     
     //--------------- Variant-Specific Implementations ----------------
     
-    public WatermelonSlimeEntity( EntityType<? extends _SpecialSlimeEntity> entityType, World world ) {
-        super( entityType, world );
-        getSpecialData().setBaseScale( 1.5F );
-        slimeExperienceValue += 2;
-    }
-    
-    /** Override to modify this slime's base attributes by size. */
-    @Override
-    protected void modifyVariantAttributes( int size ) {
-        addAttribute( Attributes.MAX_HEALTH, 2.0 * size + 8.0 );
-        setAttribute( Attributes.ARMOR, 15.0 );
-    }
+    public WatermelonSlimeEntity( EntityType<? extends _SpecialSlimeEntity> entityType, World world ) { super( entityType, world ); }
     
     /** Override to change this entity's AI goals. */
     @Override
@@ -97,12 +94,4 @@ public class WatermelonSlimeEntity extends _SpecialSlimeEntity {
     /** @return This slime's particle type for jump effects. */
     @Override
     protected IParticleData getParticleType() { return JUMP_PARTICLE; }
-    
-    private static final ResourceLocation[] TEXTURES = {
-            GET_TEXTURE_PATH( "watermelon" )
-    };
-    
-    /** @return All default textures for this entity. */
-    @Override
-    public ResourceLocation[] getDefaultTextures() { return TEXTURES; }
 }

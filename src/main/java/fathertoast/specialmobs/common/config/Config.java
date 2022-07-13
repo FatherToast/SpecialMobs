@@ -1,5 +1,6 @@
 package fathertoast.specialmobs.common.config;
 
+import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.config.field.AbstractConfigField;
 import fathertoast.specialmobs.common.config.file.ToastConfigSpec;
 import fathertoast.specialmobs.common.config.file.TomlHelper;
@@ -22,9 +23,13 @@ public class Config {
     
     /** Performs initial loading of all configs in this mod. */
     public static void initialize() {
-        AbstractConfigField.loadingCategory = null;
-        
+        ToastConfigSpec.freezeFileWatcher = true;
         MAIN.SPEC.initialize();
+        MobFamily.initBestiary();
+        ToastConfigSpec.freezeFileWatcher = false;
+        
+        // We don't really need to do this, but it's nice to remove the reference once we're done making config specs
+        AbstractConfigField.loadingCategory = null;
     }
     
     /**
@@ -35,7 +40,7 @@ public class Config {
         /** The spec used by this config that defines the file's format. */
         public final ToastConfigSpec SPEC;
         
-        AbstractConfig( File dir, String fileName, String... fileDescription ) {
+        public AbstractConfig( File dir, String fileName, String... fileDescription ) {
             AbstractConfigField.loadingCategory = "";
             SPEC = new ToastConfigSpec( dir, fileName );
             SPEC.header( TomlHelper.newComment( fileDescription ) );
@@ -50,17 +55,10 @@ public class Config {
         /** The spec used by this config that defines the file's format. */
         protected final ToastConfigSpec SPEC;
         
-        AbstractCategory( ToastConfigSpec parent, String name, String... categoryDescription ) {
+        public AbstractCategory( ToastConfigSpec parent, String name, String... categoryDescription ) {
             AbstractConfigField.loadingCategory = name + ".";
             SPEC = parent;
             SPEC.category( name, TomlHelper.newComment( categoryDescription ) );
         }
     }
-    
-    /** The plus or minus symbol (+/-). */
-    public static final String PLUS_OR_MINUS = "\u00b1";
-    /** The less than or equal to symbol (<=). */
-    public static final String LESS_OR_EQUAL = "\u2264";
-    /** The greater than or equal to symbol (>=). */
-    public static final String GREATER_OR_EQUAL = "\u2265";
 }

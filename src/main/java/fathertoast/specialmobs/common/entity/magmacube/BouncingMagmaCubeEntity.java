@@ -11,7 +11,6 @@ import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.item.Items;
@@ -19,7 +18,6 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.pathfinding.PathNavigator;
 import net.minecraft.pathfinding.PathNodeType;
 import net.minecraft.tags.FluidTags;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -35,10 +33,12 @@ public class BouncingMagmaCubeEntity extends _SpecialMagmaCubeEntity {
     public static MobFamily.Species<BouncingMagmaCubeEntity> SPECIES;
     
     @SpecialMob.BestiaryInfoSupplier
-    public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
-        entityType.fireImmune();
-        return new BestiaryInfo( 0xB333B3 );
-        //TODO theme - mountain
+    public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
+        bestiaryInfo.color( 0xB333B3 ).theme( BestiaryInfo.Theme.MOUNTAIN )
+                .uniqueTextureBaseOnly()
+                .addExperience( 1 ).fallImmune()
+                .addToAttribute( Attributes.MAX_HEALTH, 4.0 )
+                .multiplyAttribute( Attributes.MOVEMENT_SPEED, 1.2 );
     }
     
     @SpecialMob.LanguageProvider
@@ -56,22 +56,17 @@ public class BouncingMagmaCubeEntity extends _SpecialMagmaCubeEntity {
     @SpecialMob.Factory
     public static EntityType.IFactory<BouncingMagmaCubeEntity> getVariantFactory() { return BouncingMagmaCubeEntity::new; }
     
+    /** @return This entity's mob species. */
+    @SpecialMob.SpeciesSupplier
+    @Override
+    public MobFamily.Species<? extends BouncingMagmaCubeEntity> getSpecies() { return SPECIES; }
+    
     
     //--------------- Variant-Specific Implementations ----------------
     
     public BouncingMagmaCubeEntity( EntityType<? extends _SpecialMagmaCubeEntity> entityType, World world ) {
         super( entityType, world );
-        getSpecialData().setFallDamageMultiplier( 0.0F );
-        slimeExperienceValue += 1;
-        
         setPathfindingMalus( PathNodeType.LAVA, PathNodeType.WALKABLE.getMalus() );
-    }
-    
-    /** Override to modify this slime's base attributes by size. */
-    @Override
-    protected void modifyVariantAttributes( int size ) {
-        addAttribute( Attributes.MAX_HEALTH, 2.0 * size );
-        multAttribute( Attributes.MOVEMENT_SPEED, 1.2 );
     }
     
     /** Override to change this entity's AI goals. */
@@ -104,12 +99,4 @@ public class BouncingMagmaCubeEntity extends _SpecialMagmaCubeEntity {
     public void readVariantSaveData( CompoundNBT saveTag ) {
         setPathfindingMalus( PathNodeType.LAVA, PathNodeType.WALKABLE.getMalus() );
     }
-    
-    private static final ResourceLocation[] TEXTURES = {
-            GET_TEXTURE_PATH( "bouncing" )
-    };
-    
-    /** @return All default textures for this entity. */
-    @Override
-    public ResourceLocation[] getDefaultTextures() { return TEXTURES; }
 }

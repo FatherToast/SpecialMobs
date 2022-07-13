@@ -7,24 +7,23 @@ import fathertoast.specialmobs.common.core.register.SMItems;
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.entity.ai.AIHelper;
 import fathertoast.specialmobs.common.entity.ai.goal.ChargeCreeperGoal;
-import fathertoast.specialmobs.common.util.AttributeHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import mcp.MethodsReturnNonnullByDefault;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.AttributeModifierMap;
+import net.minecraft.entity.*;
 import net.minecraft.entity.ai.attributes.Attributes;
+import net.minecraft.entity.monster.CreeperEntity;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.Effects;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.DifficultyInstance;
+import net.minecraft.world.IServerWorld;
 import net.minecraft.world.World;
 
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.function.BiPredicate;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -37,15 +36,10 @@ public class MadScientistZombieEntity extends _SpecialZombieEntity {
     public static MobFamily.Species<MadScientistZombieEntity> SPECIES;
     
     @SpecialMob.BestiaryInfoSupplier
-    public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
-        return new BestiaryInfo( 0xDED4C6 ); // TODO - Temp color
-        //TODO theme - madness
-    }
-    
-    @SpecialMob.AttributeCreator
-    public static AttributeModifierMap.MutableAttribute createAttributes() {
-        return AttributeHelper.of( _SpecialZombieEntity.createAttributes() )
-                .build();
+    public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
+        bestiaryInfo.color( 0xDED4C6 )
+                .uniqueTextureWithOverlay()
+                .addExperience( 2 ).disableRangedAttack();
     }
     
     @SpecialMob.LanguageProvider
@@ -63,40 +57,36 @@ public class MadScientistZombieEntity extends _SpecialZombieEntity {
     @SpecialMob.Factory
     public static EntityType.IFactory<MadScientistZombieEntity> getVariantFactory() { return MadScientistZombieEntity::new; }
     
+    /** @return This entity's mob species. */
+    @SpecialMob.SpeciesSupplier
+    @Override
+    public MobFamily.Species<? extends MadScientistZombieEntity> getSpecies() { return SPECIES; }
+    
     
     //--------------- Variant-Specific Implementations ----------------
     
-    public MadScientistZombieEntity( EntityType<? extends _SpecialZombieEntity> entityType, World world ) {
-        super( entityType, world );
-        xpReward += 2;
-    }
+    private final BiPredicate<MadScientistZombieEntity, ? super CreeperEntity> CHARGE_CREEPER_TARGET = ( madman, creeper ) ->
+            creeper.isAlive() && !creeper.isPowered() && madman.getSensing().canSee( creeper );
+    
+    public MadScientistZombieEntity( EntityType<? extends _SpecialZombieEntity> entityType, World world ) { super( entityType, world ); }
     
     /** Override to change this entity's AI goals. */
     @Override
     protected void registerVariantGoals() {
-        disableRangedAI();
-        
-        AIHelper.insertGoal( goalSelector, 2, new ChargeCreeperGoal<>(
-                this, getAttributeValue( Attributes.MOVEMENT_SPEED ) * 1.25D, 20.0D,
-                ( madman, creeper ) -> creeper.isAlive() && !creeper.isPowered() && madman.getSensing().canSee( creeper ) ) );
+        AIHelper.insertGoal( goalSelector, 2, new ChargeCreeperGoal<>( this, 1.25, 20.0, CHARGE_CREEPER_TARGET ) );
     }
     
     /** Override to change this entity's attack goal priority. */
     @Override
     protected int getVariantAttackPriority() { return super.getVariantAttackPriority() + 1; }
     
-    /** Called during spawn finalization to set starting equipment. */
+    /** Override to change starting equipment or stats. */
     @Override
-    protected void populateDefaultEquipmentSlots( DifficultyInstance difficulty ) {
-        super.populateDefaultEquipmentSlots( difficulty );
-        
+    public void finalizeVariantSpawn( IServerWorld world, DifficultyInstance difficulty, @Nullable SpawnReason spawnReason,
+                                      @Nullable ILivingEntityData groupData ) {
         setItemSlot( EquipmentSlotType.MAINHAND, new ItemStack( SMItems.SYRINGE.get() ) );
         setDropChance( EquipmentSlotType.MAINHAND, 0.0F );
     }
-    
-    /** Override to change this entity's chance to spawn with a bow. */
-    @Override
-    protected double getVariantBowChance() { return 0.0; }
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override
@@ -108,14 +98,4 @@ public class MadScientistZombieEntity extends _SpecialZombieEntity {
             livingTarget.addEffect( new EffectInstance( Effects.POISON, duration, 1 ) );
         }
     }
-    
-    private static final ResourceLocation[] TEXTURES = {
-            GET_TEXTURE_PATH( "madscientist" ),
-            null,
-            GET_TEXTURE_PATH( "madscientist_overlay" )
-    };
-    
-    /** @return All default textures for this entity. */
-    @Override
-    public ResourceLocation[] getDefaultTextures() { return TEXTURES; }
 }

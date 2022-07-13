@@ -3,31 +3,32 @@ package fathertoast.specialmobs.common.entity.magmacube;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
-import fathertoast.specialmobs.common.core.SpecialMobs;
 import fathertoast.specialmobs.common.entity.ISpecialMob;
+import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.entity.SpecialMobData;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.*;
-import net.minecraft.entity.ai.attributes.Attribute;
+import net.minecraft.entity.ai.attributes.AttributeModifierManager;
 import net.minecraft.entity.ai.attributes.AttributeModifierMap;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.entity.ai.attributes.ModifiableAttributeInstance;
 import net.minecraft.entity.monster.MagmaCubeEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.SnowballEntity;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.ListNBT;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.world.DifficultyInstance;
+import net.minecraft.world.IServerWorld;
 import net.minecraft.world.World;
 
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
@@ -41,11 +42,13 @@ public class _SpecialMagmaCubeEntity extends MagmaCubeEntity implements ISpecial
     public static MobFamily.Species<_SpecialMagmaCubeEntity> SPECIES;
     
     @SpecialMob.BestiaryInfoSupplier
-    public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
-        return new BestiaryInfo( 0xFCFC00 );
+    public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
+        bestiaryInfo.color( 0xFCFC00 )
+                .vanillaTextureBaseOnly( "textures/entity/slime/magmacube.png" )
+                .experience( 0 );
     }
     
-    @SpecialMob.AttributeCreator
+    @SpecialMob.AttributeSupplier
     public static AttributeModifierMap.MutableAttribute createAttributes() {
         return MagmaCubeEntity.createAttributes(); // Slimes define their attributes elsewhere based on size
     }
@@ -67,14 +70,6 @@ public class _SpecialMagmaCubeEntity extends MagmaCubeEntity implements ISpecial
     
     //--------------- Variant-Specific Breakouts ----------------
     
-    public _SpecialMagmaCubeEntity( EntityType<? extends _SpecialMagmaCubeEntity> entityType, World world ) {
-        super( entityType, world );
-        getSpecialData().initialize();
-    }
-    
-    /** Override to modify this slime's base attributes by size. */
-    protected void modifyVariantAttributes( int size ) { }
-    
     /** Called in the MobEntity.class constructor to initialize AI goals. */
     @Override
     protected void registerGoals() {
@@ -84,6 +79,10 @@ public class _SpecialMagmaCubeEntity extends MagmaCubeEntity implements ISpecial
     
     /** Override to change this entity's AI goals. */
     protected void registerVariantGoals() { }
+    
+    /** Override to change starting equipment or stats. */
+    public void finalizeVariantSpawn( IServerWorld world, DifficultyInstance difficulty, @Nullable SpawnReason spawnReason,
+                                      @Nullable ILivingEntityData groupData ) { }
     
     /** Called when this entity successfully damages a target to apply on-hit effects. */
     @Override
@@ -107,62 +106,39 @@ public class _SpecialMagmaCubeEntity extends MagmaCubeEntity implements ISpecial
     /** The parameter for special mob render scale. */
     private static final DataParameter<Float> SCALE = EntityDataManager.defineId( _SpecialMagmaCubeEntity.class, DataSerializers.FLOAT );
     
-    protected int slimeExperienceValue = 0;
+    /** Used to reset slimes' attributes to their freshly spawned state so attribute adjustments may be reapplied on size change. */
+    private static ListNBT magmaCubeAttributeSnapshot;
+    
+    private static ListNBT getAttributeSnapshot() {
+        if( magmaCubeAttributeSnapshot == null )
+            magmaCubeAttributeSnapshot = new AttributeModifierManager( createAttributes().build() ).save();
+        return magmaCubeAttributeSnapshot;
+    }
+    
+    private int slimeExperienceValue = 0;
+    
+    public _SpecialMagmaCubeEntity( EntityType<? extends _SpecialMagmaCubeEntity> entityType, World world ) {
+        super( entityType, world );
+        getSpecialData().initialize();
+    }
     
     /** Called from the Entity.class constructor to define data watcher variables. */
     @Override
     protected void defineSynchedData() {
         super.defineSynchedData();
-        specialData = new SpecialMobData<>( this, SCALE, 1.0F );
+        specialData = new SpecialMobData<>( this, SCALE );
     }
     
     /** Sets this slime's size, optionally resetting its health to max. */
     @Override
     protected void setSize( int size, boolean resetHealth ) {
+        // We must reset all attributes and reapply changes since slimes set attribute base values on size change
+        getAttributes().load( getAttributeSnapshot() );
         super.setSize( size, resetHealth );
+        getSpecies().config.GENERAL.attributeChanges.apply( this );
         
-        modifyVariantAttributes( size );
         if( resetHealth ) setHealth( getMaxHealth() );
-        xpReward = size + slimeExperienceValue;
-    }
-    
-    /**
-     * Alters this magma cube's base attribute by adding an amount to it.
-     * Do NOT use this for move speed, instead use {@link #multAttribute(Attribute, double)}
-     */
-    protected void addAttribute( Attribute attribute, double amount ) {
-        if( attribute != Attributes.MAX_HEALTH && attribute != Attributes.ARMOR && attribute != Attributes.ATTACK_DAMAGE && attribute != Attributes.MOVEMENT_SPEED )
-            throw new IllegalArgumentException( "Magma cube relative attributes are only health, armor, damage, and speed!" );
-        
-        final ModifiableAttributeInstance attributeInstance = getAttribute( attribute );
-        if( attributeInstance == null )
-            throw new IllegalStateException( "Attempted to modify non-registered attribute " + attribute.getDescriptionId() );
-        attributeInstance.setBaseValue( attributeInstance.getBaseValue() + amount );
-    }
-    
-    /**
-     * Alters this magma cube's base attribute by multiplying it by an amount.
-     * Mainly use this for move speed, for other attributes use {@link #addAttribute(Attribute, double)}
-     */
-    protected void multAttribute( Attribute attribute, double amount ) {
-        if( attribute != Attributes.MAX_HEALTH && attribute != Attributes.ARMOR && attribute != Attributes.ATTACK_DAMAGE && attribute != Attributes.MOVEMENT_SPEED )
-            throw new IllegalArgumentException( "Magma cube relative attributes are only health, armor, damage, and speed!" );
-        
-        final ModifiableAttributeInstance attributeInstance = getAttribute( attribute );
-        if( attributeInstance == null )
-            throw new IllegalStateException( "Attempted to modify non-registered attribute " + attribute.getDescriptionId() );
-        attributeInstance.setBaseValue( attributeInstance.getBaseValue() * amount );
-    }
-    
-    /** Sets this magma cube's base attribute. */
-    protected void setAttribute( Attribute attribute, double amount ) {
-        if( attribute == Attributes.MAX_HEALTH || attribute == Attributes.ARMOR || attribute == Attributes.ATTACK_DAMAGE || attribute == Attributes.MOVEMENT_SPEED )
-            throw new IllegalArgumentException( "Use magma cube relative attribute!" );
-        
-        final ModifiableAttributeInstance attributeInstance = getAttribute( attribute );
-        if( attributeInstance == null )
-            throw new IllegalStateException( "Attempted to modify non-registered attribute " + attribute.getDescriptionId() );
-        attributeInstance.setBaseValue( amount );
+        setExperience( getExperience() ); // Update for new size
     }
     
     
@@ -173,6 +149,11 @@ public class _SpecialMagmaCubeEntity extends MagmaCubeEntity implements ISpecial
     /** @return This mob's special data. */
     @Override
     public SpecialMobData<_SpecialMagmaCubeEntity> getSpecialData() { return specialData; }
+    
+    /** @return This entity's mob species. */
+    @SpecialMob.SpeciesSupplier
+    @Override
+    public MobFamily.Species<? extends _SpecialMagmaCubeEntity> getSpecies() { return SPECIES; }
     
     /** @return The experience that should be dropped by this entity. */
     @Override
@@ -185,17 +166,25 @@ public class _SpecialMagmaCubeEntity extends MagmaCubeEntity implements ISpecial
         xpReward = getSize() + xp;
     }
     
-    static ResourceLocation GET_TEXTURE_PATH( String type ) {
-        return SpecialMobs.resourceLoc( SpecialMobs.TEXTURE_PATH + "magmacube/" + type + ".png" );
+    /** Called on spawn to initialize properties based on the world, difficulty, and the group it spawns with. */
+    @Nullable
+    @Override
+    public final ILivingEntityData finalizeSpawn( IServerWorld world, DifficultyInstance difficulty, SpawnReason spawnReason,
+                                                  @Nullable ILivingEntityData groupData, @Nullable CompoundNBT eggTag ) {
+        return MobHelper.finalizeSpawn( this, world, difficulty, spawnReason,
+                super.finalizeSpawn( world, difficulty, spawnReason, groupData, eggTag ) );
     }
     
-    private static final ResourceLocation[] TEXTURES = {
-            new ResourceLocation( "textures/entity/slime/magmacube.png" )
-    };
+    /** Called on spawn to set starting equipment. */
+    @Override // Seal method to force spawn equipment changes through ISpecialMob
+    protected final void populateDefaultEquipmentSlots( DifficultyInstance difficulty ) { super.populateDefaultEquipmentSlots( difficulty ); }
     
-    /** @return All default textures for this entity. */
+    /** Called on spawn to initialize properties based on the world, difficulty, and the group it spawns with. */
     @Override
-    public ResourceLocation[] getDefaultTextures() { return TEXTURES; }
+    public void finalizeSpecialSpawn( IServerWorld world, DifficultyInstance difficulty, @Nullable SpawnReason spawnReason,
+                                      @Nullable ILivingEntityData groupData ) {
+        finalizeVariantSpawn( world, difficulty, spawnReason, groupData );
+    }
     
     
     //--------------- SpecialMobData Hooks ----------------

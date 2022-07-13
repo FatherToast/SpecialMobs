@@ -12,7 +12,6 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.item.Items;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -29,8 +28,11 @@ public class StickyMagmaCubeEntity extends _SpecialMagmaCubeEntity {
     public static MobFamily.Species<StickyMagmaCubeEntity> SPECIES;
     
     @SpecialMob.BestiaryInfoSupplier
-    public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
-        return new BestiaryInfo( 0x9D733F );
+    public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
+        bestiaryInfo.color( 0x9D733F )
+                .uniqueTextureBaseOnly()
+                .addExperience( 2 )
+                .addToAttribute( Attributes.MAX_HEALTH, 8.0 );
     }
     
     @SpecialMob.LanguageProvider
@@ -48,23 +50,19 @@ public class StickyMagmaCubeEntity extends _SpecialMagmaCubeEntity {
     @SpecialMob.Factory
     public static EntityType.IFactory<StickyMagmaCubeEntity> getVariantFactory() { return StickyMagmaCubeEntity::new; }
     
+    /** @return This entity's mob species. */
+    @SpecialMob.SpeciesSupplier
+    @Override
+    public MobFamily.Species<? extends StickyMagmaCubeEntity> getSpecies() { return SPECIES; }
+    
     
     //--------------- Variant-Specific Implementations ----------------
-    
-    public StickyMagmaCubeEntity( EntityType<? extends _SpecialMagmaCubeEntity> entityType, World world ) {
-        super( entityType, world );
-        slimeExperienceValue += 2;
-    }
     
     private final DamageSource grabDamageSource = DamageSource.mobAttack( this ).bypassArmor().bypassMagic();
     
     private int grabTime;
     
-    /** Override to modify this slime's base attributes by size. */
-    @Override
-    protected void modifyVariantAttributes( int size ) {
-        addAttribute( Attributes.MAX_HEALTH, 4.0 * size );
-    }
+    public StickyMagmaCubeEntity( EntityType<? extends _SpecialMagmaCubeEntity> entityType, World world ) { super( entityType, world ); }
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override
@@ -90,12 +88,4 @@ public class StickyMagmaCubeEntity extends _SpecialMagmaCubeEntity {
             }
         }
     }
-    
-    private static final ResourceLocation[] TEXTURES = {
-            GET_TEXTURE_PATH( "sticky" )
-    };
-    
-    /** @return All default textures for this entity. */
-    @Override
-    public ResourceLocation[] getDefaultTextures() { return TEXTURES; }
 }

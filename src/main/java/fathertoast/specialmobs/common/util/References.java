@@ -1,17 +1,32 @@
 package fathertoast.specialmobs.common.util;
 
 import fathertoast.specialmobs.common.core.SpecialMobs;
+import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
 import net.minecraft.nbt.StringNBT;
 
+import java.util.UUID;
+
 public final class References {
+    
+    /** The speed boost to apply to baby mobs. */
+    public static final AttributeModifier BABY_SPEED_BOOST = new AttributeModifier( UUID.fromString( "B9766B59-9566-4402-BC1F-2EE2A276D836" ),
+            "Baby speed boost", 0.5, AttributeModifier.Operation.MULTIPLY_BASE );
+    
     
     //--------------- BESTIARY REFLECTION ----------------
     
     public static final String ENTITY_PACKAGE = "fathertoast." + SpecialMobs.MOD_ID + ".common.entity.";
-    public static final String VANILLA_REPLACEMENT_FORMAT = "%s_Special%sEntity";
-    public static final String SPECIAL_VARIANT_FORMAT = "%s%sEntity";
+    public static final String VANILLA_REPLACEMENT_FORMAT = "%s._Special%sEntity";
+    public static final String SPECIAL_VARIANT_FORMAT = "%s.%sEntity";
+    
+    public static final String TEXTURE_FORMAT = SpecialMobs.TEXTURE_PATH + "%s/%s%s.png";
+    public static final String TEXTURE_BASE_SUFFIX = "";
+    public static final String TEXTURE_EYES_SUFFIX = "_eyes";
+    public static final String TEXTURE_OVERLAY_SUFFIX = "_overlay";
+    public static final String TEXTURE_SHOOTING_SUFFIX = "_shooting";
+    public static final String TEXTURE_SHOOTING_EYES_SUFFIX = "_shooting_eyes";
     
     
     //--------------- BIT FLAGS ----------------
@@ -38,6 +53,8 @@ public final class References {
     public static final int NBT_TYPE_COMPOUND = new CompoundNBT().getId(); // 10
     
     public static final String TAG_FORGE_DATA = "ForgeData";
+    
+    public static final String TAG_INIT = "SpecialMobsInit";
     
     // Special mob data
     public static final String TAG_SPECIAL_MOB_DATA = "SpecialMobsData";
@@ -67,7 +84,7 @@ public final class References {
     // Creepers
     public static final String TAG_SUPERCHARGED = "Supercharged";
     public static final String TAG_DRY_EXPLODE = "CannotExplodeWhileWet";
-    public static final String TAG_WHEN_BURNING_EXPLODE = "ExplodesWhileBurning";
+    public static final String TAG_WHILE_BURNING_EXPLODE = "ExplodesWhileBurning";
     public static final String TAG_WHEN_SHOT_EXPLODE = "ExplodesWhenShot";
     
     // Witches
@@ -81,7 +98,11 @@ public final class References {
     // Baby-able families - Skeletons, Wither Skeletons
     public static final String TAG_IS_BABY = "IsBaby";
     
-    // Spawner mobs TODO drowning creeper pufferfish cap?
+    // Shifting mobs - Corporeal Shift Ghast
+    public static final String TAG_IS_SHIFTED = "IsShifted";
+    public static final String TAG_SHIFT_TIME = "ShiftTime";
+    
+    // Spawner mobs
     public static final String TAG_BABIES = "Babies"; // Mother (Cave) Spider, Wilds Witch, Queen Ghast, Wildfire Blaze
     public static final String TAG_EXTRA_BABIES = "ExtraBabies"; // Splitting Creeper, Mother (Cave) Spider, Wilds Witch
     public static final String TAG_SUMMONS = "Summons"; // Undead Witch, Wilds Witch, Queen Ghast, Wildfire Blaze

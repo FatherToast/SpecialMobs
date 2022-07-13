@@ -8,9 +8,7 @@ import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.Items;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraft.world.storage.IServerWorldInfo;
 
@@ -27,9 +25,10 @@ public class LightningCreeperEntity extends _SpecialCreeperEntity {
     public static MobFamily.Species<LightningCreeperEntity> SPECIES;
     
     @SpecialMob.BestiaryInfoSupplier
-    public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
-        entityType.fireImmune();
-        return new BestiaryInfo( 0x499CAE );
+    public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
+        bestiaryInfo.color( 0x499CAE )
+                .uniqueTextureBaseOnly()
+                .addExperience( 1 ).fireImmune();
     }
     
     @SpecialMob.LanguageProvider
@@ -47,13 +46,15 @@ public class LightningCreeperEntity extends _SpecialCreeperEntity {
     @SpecialMob.Factory
     public static EntityType.IFactory<LightningCreeperEntity> getVariantFactory() { return LightningCreeperEntity::new; }
     
+    /** @return This entity's mob species. */
+    @SpecialMob.SpeciesSupplier
+    @Override
+    public MobFamily.Species<? extends LightningCreeperEntity> getSpecies() { return SPECIES; }
+    
     
     //--------------- Variant-Specific Implementations ----------------
     
-    public LightningCreeperEntity( EntityType<? extends _SpecialCreeperEntity> entityType, World world ) {
-        super( entityType, world );
-        xpReward += 1;
-    }
+    public LightningCreeperEntity( EntityType<? extends _SpecialCreeperEntity> entityType, World world ) { super( entityType, world ); }
     
     /** Override to change this creeper's explosion power multiplier. */
     @Override
@@ -95,12 +96,4 @@ public class LightningCreeperEntity extends _SpecialCreeperEntity {
             }
         }
     }
-    
-    private static final ResourceLocation[] TEXTURES = {
-            GET_TEXTURE_PATH( "lightning" )
-    };
-    
-    /** @return All default textures for this entity. */
-    @Override
-    public ResourceLocation[] getDefaultTextures() { return TEXTURES; }
 }

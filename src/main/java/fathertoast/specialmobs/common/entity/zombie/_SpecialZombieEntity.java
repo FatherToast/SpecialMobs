@@ -3,7 +3,8 @@ package fathertoast.specialmobs.common.entity.zombie;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
-import fathertoast.specialmobs.common.core.SpecialMobs;
+import fathertoast.specialmobs.common.config.species.SpeciesConfig;
+import fathertoast.specialmobs.common.config.species.ZombieSpeciesConfig;
 import fathertoast.specialmobs.common.entity.ISpecialMob;
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.entity.SpecialMobData;
@@ -34,7 +35,6 @@ import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.vector.Vector3d;
@@ -56,14 +56,26 @@ public class _SpecialZombieEntity extends ZombieEntity implements IRangedAttackM
     public static MobFamily.Species<_SpecialZombieEntity> SPECIES;
     
     @SpecialMob.BestiaryInfoSupplier
-    public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
-        return new BestiaryInfo( 0x799C65 );
+    public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
+        bestiaryInfo.color( 0x799C65 )
+                .vanillaTextureBaseOnly( "textures/entity/zombie/zombie.png" )
+                .experience( 5 ).undead()
+                .bowAttack( 2.0, 1.4, 0.8, 30, 12.0 );
     }
     
-    @SpecialMob.AttributeCreator
-    public static AttributeModifierMap.MutableAttribute createAttributes() {
-        return ZombieEntity.createAttributes();
+    protected static final double DEFAULT_BOW_CHANCE = 0.05;
+    protected static final double DEFAULT_SHIELD_CHANCE = 0.05;
+    
+    @SpecialMob.ConfigSupplier
+    public static SpeciesConfig createConfig( MobFamily.Species<?> species ) {
+        return new ZombieSpeciesConfig( species, DEFAULT_BOW_CHANCE, DEFAULT_SHIELD_CHANCE );
     }
+    
+    /** @return This entity's species config. */
+    public ZombieSpeciesConfig getConfig() { return (ZombieSpeciesConfig) getSpecies().config; }
+    
+    @SpecialMob.AttributeSupplier
+    public static AttributeModifierMap.MutableAttribute createAttributes() { return ZombieEntity.createAttributes(); }
     
     @SpecialMob.LanguageProvider
     public static String[] getTranslations( String langKey ) {
@@ -82,12 +94,6 @@ public class _SpecialZombieEntity extends ZombieEntity implements IRangedAttackM
     
     //--------------- Variant-Specific Breakouts ----------------
     
-    public _SpecialZombieEntity( EntityType<? extends _SpecialZombieEntity> entityType, World world ) {
-        super( entityType, world );
-        reassessWeaponGoal();
-        getSpecialData().initialize();
-    }
-    
     /** Called in the MobEntity.class constructor to initialize AI goals. */
     @Override
     protected void registerGoals() {
@@ -96,48 +102,18 @@ public class _SpecialZombieEntity extends ZombieEntity implements IRangedAttackM
         AIHelper.replaceHurtByTarget( this, new SpecialHurtByTargetGoal( this, ZombieEntity.class )
                 .setAlertOthers( ZombifiedPiglinEntity.class ) );
         
-        getSpecialData().rangedAttackDamage = 2.0F;
-        getSpecialData().rangedAttackSpread = 1.4F;
-        getSpecialData().rangedWalkSpeed = 0.8F;
-        getSpecialData().rangedAttackCooldown = 30;
-        getSpecialData().rangedAttackMaxCooldown = getSpecialData().rangedAttackCooldown;
-        getSpecialData().rangedAttackMaxRange = 12.0F;
         registerVariantGoals();
     }
     
     /** Override to change this entity's AI goals. */
     protected void registerVariantGoals() { }
     
-    /** Helper method to set the ranged attack AI more easily. */
-    protected void disableRangedAI() { setRangedAI( 1.0, 20, 0.0F ); }
-    
-    /** Helper method to set the ranged attack AI more easily. */
-    protected void setRangedAI( double walkSpeed, int cooldownTime ) {
-        getSpecialData().rangedWalkSpeed = (float) walkSpeed;
-        getSpecialData().rangedAttackCooldown = cooldownTime;
-        getSpecialData().rangedAttackMaxCooldown = cooldownTime;
-    }
-    
-    /** Helper method to set the ranged attack AI more easily. */
-    protected void setRangedAI( double walkSpeed, int cooldownTime, float range ) {
-        setRangedAI( walkSpeed, cooldownTime );
-        getSpecialData().rangedAttackMaxRange = range;
-    }
-    
     /** Override to change this entity's attack goal priority. */
     protected int getVariantAttackPriority() { return 2; }
     
-    /** Called during spawn finalization to set starting equipment. */
-    @Override
-    protected void populateDefaultEquipmentSlots( DifficultyInstance difficulty ) {
-        super.populateDefaultEquipmentSlots( difficulty );
-        if( random.nextDouble() < getVariantBowChance() ) { //TODO config the default 5% chance
-            setItemSlot( EquipmentSlotType.MAINHAND, new ItemStack( Items.BOW ) );
-        }
-    }
-    
-    /** Override to change this entity's chance to spawn with a bow. */
-    protected double getVariantBowChance() { return getSpecialData().rangedAttackMaxRange > 0.0F ? 0.05 : 0.0; }
+    /** Override to change starting equipment or stats. */
+    public void finalizeVariantSpawn( IServerWorld world, DifficultyInstance difficulty, @Nullable SpawnReason spawnReason,
+                                      @Nullable ILivingEntityData groupData ) { }
     
     /** Called to attack the target with a ranged attack. */
     @Override
@@ -153,7 +129,7 @@ public class _SpecialZombieEntity extends ZombieEntity implements IRangedAttackM
         final double dZ = target.getZ() - getZ();
         final double dH = MathHelper.sqrt( dX * dX + dZ * dZ );
         arrow.shoot( dX, dY + dH * 0.2, dZ, 1.6F,
-                getSpecialData().rangedAttackSpread * (14 - 4 * level.getDifficulty().getId()) );
+                getSpecialData().getRangedAttackSpread() * (14 - 4 * level.getDifficulty().getId()) );
         
         playSound( SoundEvents.SKELETON_SHOOT, 1.0F, 1.0F / (random.nextFloat() * 0.4F + 0.8F) );
         level.addFreshEntity( arrow );
@@ -162,7 +138,7 @@ public class _SpecialZombieEntity extends ZombieEntity implements IRangedAttackM
     /** @return The arrow for this zombie to shoot. */
     protected AbstractArrowEntity getArrow( ItemStack arrowItem, float damageMulti ) {
         return getVariantArrow( ProjectileHelper.getMobArrow( this, arrowItem,
-                damageMulti * getSpecialData().rangedAttackDamage ), arrowItem, damageMulti );
+                damageMulti * getSpecialData().getRangedAttackDamage() ), arrowItem, damageMulti );
     }
     
     /** Override to modify this entity's ranged attack projectile. */
@@ -195,20 +171,18 @@ public class _SpecialZombieEntity extends ZombieEntity implements IRangedAttackM
     /** This entity's attack AI. */
     private Goal currentAttackAI;
     
+    public _SpecialZombieEntity( EntityType<? extends _SpecialZombieEntity> entityType, World world ) {
+        super( entityType, world );
+        reassessWeaponGoal();
+        
+        getSpecialData().initialize();
+    }
+    
     /** Called from the Entity.class constructor to define data watcher variables. */
     @Override
     protected void defineSynchedData() {
         super.defineSynchedData();
-        specialData = new SpecialMobData<>( this, SCALE, 1.0F );
-    }
-    
-    /** Called on spawn to initialize properties based on the world, difficulty, and the group it spawns with. */
-    @Nullable
-    public ILivingEntityData finalizeSpawn( IServerWorld world, DifficultyInstance difficulty, SpawnReason spawnReason,
-                                            @Nullable ILivingEntityData groupData, @Nullable CompoundNBT eggTag ) {
-        groupData = super.finalizeSpawn( world, difficulty, spawnReason, groupData, eggTag );
-        reassessWeaponGoal();
-        return groupData;
+        specialData = new SpecialMobData<>( this, SCALE );
     }
     
     /** Called to set the item equipped in a particular slot. */
@@ -226,9 +200,9 @@ public class _SpecialZombieEntity extends ZombieEntity implements IRangedAttackM
             final SpecialMobData<_SpecialZombieEntity> data = getSpecialData();
             final ItemStack weapon = getItemInHand( ProjectileHelper.getWeaponHoldingHand(
                     this, item -> item instanceof BowItem ) );
-            if( data.rangedAttackMaxRange > 0.0F && weapon.getItem() == Items.BOW ) {
-                currentAttackAI = new RangedBowAttackGoal<>( this, data.rangedWalkSpeed,
-                        data.rangedAttackCooldown, data.rangedAttackMaxRange );
+            if( data.getRangedAttackMaxRange() > 0.0F && weapon.getItem() == Items.BOW ) {
+                currentAttackAI = new RangedBowAttackGoal<>( this, data.getRangedWalkSpeed(),
+                        data.getRangedAttackCooldown(), data.getRangedAttackMaxRange() );
             }
             else {
                 currentAttackAI = new ZombieAttackGoal( this, 1.0, false );
@@ -246,6 +220,11 @@ public class _SpecialZombieEntity extends ZombieEntity implements IRangedAttackM
     @Override
     public SpecialMobData<_SpecialZombieEntity> getSpecialData() { return specialData; }
     
+    /** @return This entity's mob species. */
+    @SpecialMob.SpeciesSupplier
+    @Override
+    public MobFamily.Species<? extends _SpecialZombieEntity> getSpecies() { return SPECIES; }
+    
     /** @return The experience that should be dropped by this entity. */
     @Override
     public final int getExperience() { return xpReward; }
@@ -254,15 +233,33 @@ public class _SpecialZombieEntity extends ZombieEntity implements IRangedAttackM
     @Override
     public final void setExperience( int xp ) { xpReward = xp; }
     
-    static ResourceLocation GET_TEXTURE_PATH( String type ) {
-        return SpecialMobs.resourceLoc( SpecialMobs.TEXTURE_PATH + "zombie/" + type + ".png" );
+    /** Called on spawn to initialize properties based on the world, difficulty, and the group it spawns with. */
+    @Nullable
+    @Override
+    public final ILivingEntityData finalizeSpawn( IServerWorld world, DifficultyInstance difficulty, SpawnReason spawnReason,
+                                                  @Nullable ILivingEntityData groupData, @Nullable CompoundNBT eggTag ) {
+        return MobHelper.finalizeSpawn( this, world, difficulty, spawnReason,
+                super.finalizeSpawn( world, difficulty, spawnReason, groupData, eggTag ) );
     }
     
-    private static final ResourceLocation[] TEXTURES = { new ResourceLocation( "textures/entity/zombie/zombie.png" ) };
+    /** Called on spawn to set starting equipment. */
+    @Override // Seal method to force spawn equipment changes through ISpecialMob
+    protected final void populateDefaultEquipmentSlots( DifficultyInstance difficulty ) { super.populateDefaultEquipmentSlots( difficulty ); }
     
-    /** @return All default textures for this entity. */
+    /** Called on spawn to initialize properties based on the world, difficulty, and the group it spawns with. */
     @Override
-    public ResourceLocation[] getDefaultTextures() { return TEXTURES; }
+    public void finalizeSpecialSpawn( IServerWorld world, DifficultyInstance difficulty, @Nullable SpawnReason spawnReason,
+                                      @Nullable ILivingEntityData groupData ) {
+        if( getSpecialData().getRangedAttackMaxRange() > 0.0F && getConfig().ZOMBIES.bowEquipChance.rollChance( random ) ) {
+            setItemSlot( EquipmentSlotType.MAINHAND, new ItemStack( Items.BOW ) );
+        }
+        else if( getConfig().ZOMBIES.shieldEquipChance.rollChance( random ) ) {
+            setItemSlot( EquipmentSlotType.OFFHAND, new ItemStack( Items.SHIELD ) );
+        }
+        
+        finalizeVariantSpawn( world, difficulty, spawnReason, groupData );
+        reassessWeaponGoal();
+    }
     
     
     //--------------- SpecialMobData Hooks ----------------

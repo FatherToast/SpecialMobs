@@ -3,32 +3,33 @@ package fathertoast.specialmobs.common.entity.slime;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
-import fathertoast.specialmobs.common.core.SpecialMobs;
 import fathertoast.specialmobs.common.entity.ISpecialMob;
+import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.entity.SpecialMobData;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.*;
-import net.minecraft.entity.ai.attributes.Attribute;
+import net.minecraft.entity.ai.attributes.AttributeModifierManager;
 import net.minecraft.entity.ai.attributes.AttributeModifierMap;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.entity.ai.attributes.ModifiableAttributeInstance;
 import net.minecraft.entity.monster.MonsterEntity;
 import net.minecraft.entity.monster.SlimeEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.SnowballEntity;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.ListNBT;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.world.DifficultyInstance;
+import net.minecraft.world.IServerWorld;
 import net.minecraft.world.World;
 
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
@@ -42,11 +43,13 @@ public class _SpecialSlimeEntity extends SlimeEntity implements ISpecialMob<_Spe
     public static MobFamily.Species<_SpecialSlimeEntity> SPECIES;
     
     @SpecialMob.BestiaryInfoSupplier
-    public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
-        return new BestiaryInfo( 0x51A03E );
+    public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
+        bestiaryInfo.color( 0x51A03E )
+                .vanillaTextureBaseOnly( "textures/entity/slime/slime.png" )
+                .experience( 0 );
     }
     
-    @SpecialMob.AttributeCreator
+    @SpecialMob.AttributeSupplier
     public static AttributeModifierMap.MutableAttribute createAttributes() {
         return MonsterEntity.createMonsterAttributes(); // Slimes define their attributes elsewhere based on size
     }
@@ -68,14 +71,6 @@ public class _SpecialSlimeEntity extends SlimeEntity implements ISpecialMob<_Spe
     
     //--------------- Variant-Specific Breakouts ----------------
     
-    public _SpecialSlimeEntity( EntityType<? extends _SpecialSlimeEntity> entityType, World world ) {
-        super( entityType, world );
-        getSpecialData().initialize();
-    }
-    
-    /** Override to modify this slime's base attributes by size. */
-    protected void modifyVariantAttributes( int size ) { }
-    
     /** Called in the MobEntity.class constructor to initialize AI goals. */
     @Override
     protected void registerGoals() {
@@ -85,6 +80,10 @@ public class _SpecialSlimeEntity extends SlimeEntity implements ISpecialMob<_Spe
     
     /** Override to change this entity's AI goals. */
     protected void registerVariantGoals() { }
+    
+    /** Override to change starting equipment or stats. */
+    public void finalizeVariantSpawn( IServerWorld world, DifficultyInstance difficulty, @Nullable SpawnReason spawnReason,
+                                      @Nullable ILivingEntityData groupData ) { }
     
     /** Called when this entity successfully damages a target to apply on-hit effects. */
     @Override
@@ -108,66 +107,45 @@ public class _SpecialSlimeEntity extends SlimeEntity implements ISpecialMob<_Spe
     /** The parameter for special mob render scale. */
     private static final DataParameter<Float> SCALE = EntityDataManager.defineId( _SpecialSlimeEntity.class, DataSerializers.FLOAT );
     
-    protected int slimeExperienceValue = 0;
+    /** Used to reset slimes' attributes to their freshly spawned state so attribute adjustments may be reapplied on size change. */
+    private static ListNBT slimeAttributeSnapshot;
+    
+    private static ListNBT getAttributeSnapshot() {
+        if( slimeAttributeSnapshot == null )
+            slimeAttributeSnapshot = new AttributeModifierManager( createAttributes().build() ).save();
+        return slimeAttributeSnapshot;
+    }
+    
+    private int slimeExperienceValue;
+    
+    public _SpecialSlimeEntity( EntityType<? extends _SpecialSlimeEntity> entityType, World world ) {
+        super( entityType, world );
+        getSpecialData().initialize();
+    }
     
     /** Called from the Entity.class constructor to define data watcher variables. */
     @Override
     protected void defineSynchedData() {
         super.defineSynchedData();
-        specialData = new SpecialMobData<>( this, SCALE, 1.0F );
+        specialData = new SpecialMobData<>( this, SCALE );
     }
     
     /** Returns true if this slime can deal damage. */
     @Override
-    protected boolean isDealsDamage() { return getSize() > 0 && isEffectiveAi(); } // TODO config for allow tiny slimes to hit
+    protected boolean isDealsDamage() {
+        return MobFamily.SLIME.config.SLIMES.tinySlimesDealDamage.get() ? isEffectiveAi() : super.isDealsDamage();
+    }
     
     /** Sets this slime's size, optionally resetting its health to max. */
     @Override
     protected void setSize( int size, boolean resetHealth ) {
+        // We must reset all attributes and reapply changes since slimes set attribute base values on size change
+        getAttributes().load( getAttributeSnapshot() );
         super.setSize( size, resetHealth );
+        getSpecies().config.GENERAL.attributeChanges.apply( this );
         
-        modifyVariantAttributes( size );
         if( resetHealth ) setHealth( getMaxHealth() );
-        xpReward = size + slimeExperienceValue;
-    }
-    
-    /**
-     * Alters this slime's base attribute by adding an amount to it.
-     * Do NOT use this for move speed, instead use {@link #multAttribute(Attribute, double)}
-     */
-    protected void addAttribute( Attribute attribute, double amount ) {
-        if( attribute != Attributes.MAX_HEALTH && attribute != Attributes.ATTACK_DAMAGE && attribute != Attributes.MOVEMENT_SPEED )
-            throw new IllegalArgumentException( "Slime relative attributes are only health, damage, and speed!" );
-        
-        final ModifiableAttributeInstance attributeInstance = getAttribute( attribute );
-        if( attributeInstance == null )
-            throw new IllegalStateException( "Attempted to modify non-registered attribute " + attribute.getDescriptionId() );
-        attributeInstance.setBaseValue( attributeInstance.getBaseValue() + amount );
-    }
-    
-    /**
-     * Alters this slime's base attribute by multiplying it by an amount.
-     * Mainly use this for move speed, for other attributes use {@link #addAttribute(Attribute, double)}
-     */
-    protected void multAttribute( Attribute attribute, double amount ) {
-        if( attribute != Attributes.MAX_HEALTH && attribute != Attributes.ATTACK_DAMAGE && attribute != Attributes.MOVEMENT_SPEED )
-            throw new IllegalArgumentException( "Slime relative attributes are only health, damage, and speed!" );
-        
-        final ModifiableAttributeInstance attributeInstance = getAttribute( attribute );
-        if( attributeInstance == null )
-            throw new IllegalStateException( "Attempted to modify non-registered attribute " + attribute.getDescriptionId() );
-        attributeInstance.setBaseValue( attributeInstance.getBaseValue() * amount );
-    }
-    
-    /** Sets this slime's base attribute. */
-    protected void setAttribute( Attribute attribute, double amount ) {
-        if( attribute == Attributes.MAX_HEALTH || attribute == Attributes.ATTACK_DAMAGE || attribute == Attributes.MOVEMENT_SPEED )
-            throw new IllegalArgumentException( "Use slime relative attribute!" );
-        
-        final ModifiableAttributeInstance attributeInstance = getAttribute( attribute );
-        if( attributeInstance == null )
-            throw new IllegalStateException( "Attempted to modify non-registered attribute " + attribute.getDescriptionId() );
-        attributeInstance.setBaseValue( amount );
+        setExperience( getExperience() ); // Update for new size
     }
     
     
@@ -178,6 +156,11 @@ public class _SpecialSlimeEntity extends SlimeEntity implements ISpecialMob<_Spe
     /** @return This mob's special data. */
     @Override
     public SpecialMobData<_SpecialSlimeEntity> getSpecialData() { return specialData; }
+    
+    /** @return This entity's mob species. */
+    @SpecialMob.SpeciesSupplier
+    @Override
+    public MobFamily.Species<? extends _SpecialSlimeEntity> getSpecies() { return SPECIES; }
     
     /** @return The experience that should be dropped by this entity. */
     @Override
@@ -190,17 +173,25 @@ public class _SpecialSlimeEntity extends SlimeEntity implements ISpecialMob<_Spe
         xpReward = getSize() + xp;
     }
     
-    static ResourceLocation GET_TEXTURE_PATH( String type ) {
-        return SpecialMobs.resourceLoc( SpecialMobs.TEXTURE_PATH + "slime/" + type + ".png" );
+    /** Called on spawn to initialize properties based on the world, difficulty, and the group it spawns with. */
+    @Nullable
+    @Override
+    public final ILivingEntityData finalizeSpawn( IServerWorld world, DifficultyInstance difficulty, SpawnReason spawnReason,
+                                                  @Nullable ILivingEntityData groupData, @Nullable CompoundNBT eggTag ) {
+        return MobHelper.finalizeSpawn( this, world, difficulty, spawnReason,
+                super.finalizeSpawn( world, difficulty, spawnReason, groupData, eggTag ) );
     }
     
-    private static final ResourceLocation[] TEXTURES = {
-            new ResourceLocation( "textures/entity/slime/slime.png" )
-    };
+    /** Called on spawn to set starting equipment. */
+    @Override // Seal method to force spawn equipment changes through ISpecialMob
+    protected final void populateDefaultEquipmentSlots( DifficultyInstance difficulty ) { super.populateDefaultEquipmentSlots( difficulty ); }
     
-    /** @return All default textures for this entity. */
+    /** Called on spawn to initialize properties based on the world, difficulty, and the group it spawns with. */
     @Override
-    public ResourceLocation[] getDefaultTextures() { return TEXTURES; }
+    public void finalizeSpecialSpawn( IServerWorld world, DifficultyInstance difficulty, @Nullable SpawnReason spawnReason,
+                                      @Nullable ILivingEntityData groupData ) {
+        finalizeVariantSpawn( world, difficulty, spawnReason, groupData );
+    }
     
     
     //--------------- SpecialMobData Hooks ----------------

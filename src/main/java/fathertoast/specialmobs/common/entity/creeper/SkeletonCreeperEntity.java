@@ -4,15 +4,12 @@ import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.entity.ai.AIHelper;
-import fathertoast.specialmobs.common.util.AttributeHelper;
 import fathertoast.specialmobs.common.util.ExplosionHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.entity.CreatureAttribute;
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.AttributeModifierMap;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.ai.goal.FleeSunGoal;
 import net.minecraft.entity.ai.goal.RestrictSunGoal;
@@ -21,7 +18,6 @@ import net.minecraft.entity.projectile.ProjectileHelper;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.BowItem;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.vector.Vector3d;
@@ -40,17 +36,12 @@ public class SkeletonCreeperEntity extends _SpecialCreeperEntity {
     public static MobFamily.Species<SkeletonCreeperEntity> SPECIES;
     
     @SpecialMob.BestiaryInfoSupplier
-    public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
-        return new BestiaryInfo( 0xC1C1C1 );
-        //TODO theme - forest
-    }
-    
-    @SpecialMob.AttributeCreator
-    public static AttributeModifierMap.MutableAttribute createAttributes() {
-        return AttributeHelper.of( _SpecialCreeperEntity.createAttributes() )
-                .addAttribute( Attributes.MAX_HEALTH, -4.0 )
-                .multAttribute( Attributes.MOVEMENT_SPEED, 1.2 )
-                .build();
+    public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
+        bestiaryInfo.color( 0xC1C1C1 ).theme( BestiaryInfo.Theme.FOREST )
+                .uniqueTextureBaseOnly()
+                .addExperience( 1 )
+                .addToAttribute( Attributes.MAX_HEALTH, -4.0 )
+                .multiplyAttribute( Attributes.MOVEMENT_SPEED, 1.2 );
     }
     
     @SpecialMob.LanguageProvider
@@ -68,13 +59,15 @@ public class SkeletonCreeperEntity extends _SpecialCreeperEntity {
     @SpecialMob.Factory
     public static EntityType.IFactory<SkeletonCreeperEntity> getVariantFactory() { return SkeletonCreeperEntity::new; }
     
+    /** @return This entity's mob species. */
+    @SpecialMob.SpeciesSupplier
+    @Override
+    public MobFamily.Species<? extends SkeletonCreeperEntity> getSpecies() { return SPECIES; }
+    
     
     //--------------- Variant-Specific Implementations ----------------
     
-    public SkeletonCreeperEntity( EntityType<? extends _SpecialCreeperEntity> entityType, World world ) {
-        super( entityType, world );
-        xpReward += 1;
-    }
+    public SkeletonCreeperEntity( EntityType<? extends _SpecialCreeperEntity> entityType, World world ) { super( entityType, world ); }
     
     /** Override to change this entity's AI goals. */
     @Override
@@ -140,12 +133,4 @@ public class SkeletonCreeperEntity extends _SpecialCreeperEntity {
         }
         super.aiStep();
     }
-    
-    private static final ResourceLocation[] TEXTURES = {
-            GET_TEXTURE_PATH( "skeleton" )
-    };
-    
-    /** @return All default textures for this entity. */
-    @Override
-    public ResourceLocation[] getDefaultTextures() { return TEXTURES; }
 }

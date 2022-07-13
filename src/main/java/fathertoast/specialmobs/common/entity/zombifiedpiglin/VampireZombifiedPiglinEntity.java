@@ -4,7 +4,6 @@ import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.entity.MobHelper;
-import fathertoast.specialmobs.common.util.AttributeHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import mcp.MethodsReturnNonnullByDefault;
@@ -12,7 +11,6 @@ import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.AttributeModifierMap;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.projectile.AbstractArrowEntity;
 import net.minecraft.entity.projectile.ArrowEntity;
@@ -21,7 +19,6 @@ import net.minecraft.item.Items;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.Effects;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -37,15 +34,11 @@ public class VampireZombifiedPiglinEntity extends _SpecialZombifiedPiglinEntity 
     public static MobFamily.Species<VampireZombifiedPiglinEntity> SPECIES;
     
     @SpecialMob.BestiaryInfoSupplier
-    public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
-        return new BestiaryInfo( 0x000000, BestiaryInfo.BaseWeight.LOW );
-    }
-    
-    @SpecialMob.AttributeCreator
-    public static AttributeModifierMap.MutableAttribute createAttributes() {
-        return AttributeHelper.of( _SpecialZombifiedPiglinEntity.createAttributes() )
-                .addAttribute( Attributes.MAX_HEALTH, 10.0 )
-                .build();
+    public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
+        bestiaryInfo.color( 0x000000 ).weight( BestiaryInfo.DefaultWeight.LOW )
+                .uniqueTextureWithOverlay()
+                .addExperience( 4 )
+                .addToAttribute( Attributes.MAX_HEALTH, 10.0 );
     }
     
     @SpecialMob.LanguageProvider
@@ -67,13 +60,15 @@ public class VampireZombifiedPiglinEntity extends _SpecialZombifiedPiglinEntity 
     @SpecialMob.Factory
     public static EntityType.IFactory<VampireZombifiedPiglinEntity> getVariantFactory() { return VampireZombifiedPiglinEntity::new; }
     
+    /** @return This entity's mob species. */
+    @SpecialMob.SpeciesSupplier
+    @Override
+    public MobFamily.Species<? extends VampireZombifiedPiglinEntity> getSpecies() { return SPECIES; }
+    
     
     //--------------- Variant-Specific Implementations ----------------
     
-    public VampireZombifiedPiglinEntity( EntityType<? extends _SpecialZombifiedPiglinEntity> entityType, World world ) {
-        super( entityType, world );
-        xpReward += 4;
-    }
+    public VampireZombifiedPiglinEntity( EntityType<? extends _SpecialZombifiedPiglinEntity> entityType, World world ) { super( entityType, world ); }
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override
@@ -100,14 +95,4 @@ public class VampireZombifiedPiglinEntity extends _SpecialZombifiedPiglinEntity 
         }
         return super.hurt( source, amount );
     }
-    
-    private static final ResourceLocation[] TEXTURES = {
-            GET_TEXTURE_PATH( "vampire" ),
-            null,
-            GET_TEXTURE_PATH( "vampire_overlay" )
-    };
-    
-    /** @return All default textures for this entity. */
-    @Override
-    public ResourceLocation[] getDefaultTextures() { return TEXTURES; }
 }

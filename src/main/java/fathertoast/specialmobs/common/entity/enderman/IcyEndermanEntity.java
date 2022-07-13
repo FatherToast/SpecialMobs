@@ -25,7 +25,6 @@ import net.minecraft.potion.Effects;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.Direction;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -45,9 +44,11 @@ public class IcyEndermanEntity extends _SpecialEndermanEntity {
     public static MobFamily.Species<IcyEndermanEntity> SPECIES;
     
     @SpecialMob.BestiaryInfoSupplier
-    public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
-        return new BestiaryInfo( 0x72959C );
-        //TODO theme - ice
+    public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
+        bestiaryInfo.color( 0x72959C ).theme( BestiaryInfo.Theme.ICE )
+                .uniqueTextureWithEyes()
+                .addExperience( 1 ).effectImmune( Effects.MOVEMENT_SLOWDOWN );
+        
     }
     
     @SpecialMob.LanguageProvider
@@ -66,14 +67,16 @@ public class IcyEndermanEntity extends _SpecialEndermanEntity {
     @SpecialMob.Factory
     public static EntityType.IFactory<IcyEndermanEntity> getVariantFactory() { return IcyEndermanEntity::new; }
     
+    /** @return This entity's mob species. */
+    @SpecialMob.SpeciesSupplier
+    @Override
+    public MobFamily.Species<? extends IcyEndermanEntity> getSpecies() { return SPECIES; }
+    
     
     //--------------- Variant-Specific Implementations ----------------
     
     public IcyEndermanEntity( EntityType<? extends _SpecialEndermanEntity> entityType, World world ) {
         super( entityType, world );
-        getSpecialData().addPotionImmunity( Effects.MOVEMENT_SLOWDOWN );
-        xpReward += 1;
-        
         setPathfindingMalus( PathNodeType.WATER, PathNodeType.WALKABLE.getMalus() );
     }
     
@@ -189,13 +192,4 @@ public class IcyEndermanEntity extends _SpecialEndermanEntity {
         FrostWalkerEnchantment.onEntityMoved( this, level, pos, 1 );
         onGround = actualOnGround;
     }
-    
-    private static final ResourceLocation[] TEXTURES = {
-            GET_TEXTURE_PATH( "icy" ),
-            GET_TEXTURE_PATH( "icy_eyes" )
-    };
-    
-    /** @return All default textures for this entity. */
-    @Override
-    public ResourceLocation[] getDefaultTextures() { return TEXTURES; }
 }

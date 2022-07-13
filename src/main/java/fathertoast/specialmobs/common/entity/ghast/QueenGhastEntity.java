@@ -3,7 +3,8 @@ package fathertoast.specialmobs.common.entity.ghast;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
-import fathertoast.specialmobs.common.util.AttributeHelper;
+import fathertoast.specialmobs.common.config.species.QueenGhastSpeciesConfig;
+import fathertoast.specialmobs.common.config.species.SpeciesConfig;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import mcp.MethodsReturnNonnullByDefault;
@@ -11,11 +12,9 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ILivingEntityData;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SpawnReason;
-import net.minecraft.entity.ai.attributes.AttributeModifierMap;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.IServerWorld;
 import net.minecraft.world.World;
 
@@ -33,19 +32,23 @@ public class QueenGhastEntity extends _SpecialGhastEntity {
     public static MobFamily.Species<QueenGhastEntity> SPECIES;
     
     @SpecialMob.BestiaryInfoSupplier
-    public static BestiaryInfo bestiaryInfo( EntityType.Builder<LivingEntity> entityType ) {
-        entityType.sized( 5.0F, 5.0F );
-        return new BestiaryInfo( 0xCE0Aff );
+    public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
+        bestiaryInfo.color( 0xCE0Aff )
+                .uniqueTextureWithAnimation()
+                .size( 1.25F, 5.0F, 5.0F )
+                .addExperience( 2 ).regen( 20 )
+                .addToAttribute( Attributes.MAX_HEALTH, 20.0 )
+                .addToAttribute( Attributes.ATTACK_DAMAGE, 2.0 )
+                .multiplyAttribute( Attributes.MOVEMENT_SPEED, 0.6 );
     }
     
-    @SpecialMob.AttributeCreator
-    public static AttributeModifierMap.MutableAttribute createAttributes() {
-        return AttributeHelper.of( _SpecialGhastEntity.createAttributes() )
-                .addAttribute( Attributes.MAX_HEALTH, 20.0 )
-                .addAttribute( Attributes.ATTACK_DAMAGE, 2.0 )
-                .multAttribute( Attributes.MOVEMENT_SPEED, 0.6 )
-                .build();
+    @SpecialMob.ConfigSupplier
+    public static SpeciesConfig createConfig( MobFamily.Species<?> species ) {
+        return new QueenGhastSpeciesConfig( species, 3, 6, 4, 10 );
     }
+    
+    /** @return This entity's species config. */
+    public QueenGhastSpeciesConfig getConfig() { return (QueenGhastSpeciesConfig) getSpecies().config; }
     
     @SpecialMob.LanguageProvider
     public static String[] getTranslations( String langKey ) {
@@ -63,6 +66,11 @@ public class QueenGhastEntity extends _SpecialGhastEntity {
     @SpecialMob.Factory
     public static EntityType.IFactory<QueenGhastEntity> getVariantFactory() { return QueenGhastEntity::new; }
     
+    /** @return This entity's mob species. */
+    @SpecialMob.SpeciesSupplier
+    @Override
+    public MobFamily.Species<? extends QueenGhastEntity> getSpecies() { return SPECIES; }
+    
     
     //--------------- Variant-Specific Implementations ----------------
     
@@ -73,18 +81,8 @@ public class QueenGhastEntity extends _SpecialGhastEntity {
     
     public QueenGhastEntity( EntityType<? extends _SpecialGhastEntity> entityType, World world ) {
         super( entityType, world );
-        getSpecialData().setBaseScale( 1.25F );
-        getSpecialData().setRegenerationTime( 20 );
-        xpReward += 2;
-        
-        babies = 3 + random.nextInt( 4 );
-        summons = 4 + random.nextInt( 7 );
-    }
-    
-    /** Override to change this entity's AI goals. */
-    @Override
-    protected void registerVariantGoals() {
-        getSpecialData().rangedAttackDamage += 2.0F;
+        babies = getConfig().QUEEN.babies.next( random );
+        summons = getConfig().QUEEN.summons.next( random );
     }
     
     /** Called to attack the target with a ranged attack. */
@@ -160,14 +158,4 @@ public class QueenGhastEntity extends _SpecialGhastEntity {
         if( saveTag.contains( References.TAG_SUMMONS, References.NBT_TYPE_NUMERICAL ) )
             summons = saveTag.getByte( References.TAG_SUMMONS );
     }
-    
-    private static final ResourceLocation[] TEXTURES = {
-            GET_TEXTURE_PATH( "queen" ),
-            null,
-            GET_TEXTURE_PATH( "queen_shooting" )
-    };
-    
-    /** @return All default textures for this entity. */
-    @Override
-    public ResourceLocation[] getDefaultTextures() { return TEXTURES; }
 }
