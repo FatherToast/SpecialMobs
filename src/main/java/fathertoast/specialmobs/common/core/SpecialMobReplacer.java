@@ -39,7 +39,8 @@ public final class SpecialMobReplacer {
      */
     @SubscribeEvent( priority = EventPriority.LOWEST )
     public static void onEntitySpawn( EntityJoinWorldEvent event ) {
-        if( event.getWorld().isClientSide() || !Config.MAIN.GENERAL.enableMobReplacement.get() ) return;
+        if( event.getWorld().isClientSide() || !Config.MAIN.GENERAL.enableMobReplacement.get() || event.isCanceled() )
+            return;
         
         final Entity entity = event.getEntity();
         final MobFamily<?, ?> mobFamily = getReplacingMobFamily( entity );
