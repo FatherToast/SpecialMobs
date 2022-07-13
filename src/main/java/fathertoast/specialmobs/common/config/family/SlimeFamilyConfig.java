@@ -15,7 +15,7 @@ public class SlimeFamilyConfig extends FamilyConfig {
     
     /** Builds the config spec that should be used for this config. */
     public SlimeFamilyConfig( MobFamily<?, ?> family ) {
-        super( family );
+        super( family, VARIANT_CHANCE_HIGH );
         
         SLIMES = new Slimes( SPEC, family );
     }

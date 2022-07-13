@@ -47,7 +47,7 @@ public class MobFamily<T extends LivingEntity, V extends FamilyConfig> {
             "Mini", /*"Scope",*/ "Skeleton", "Splitting"
     );
     
-    public static final MobFamily<ZombieEntity, FamilyConfig> ZOMBIE = new MobFamily<>( FamilyConfig::new,
+    public static final MobFamily<ZombieEntity, FamilyConfig> ZOMBIE = new MobFamily<>( FamilyConfig::newLessSpecial,
             "Zombie", "zombies", 0x00AFAF, new EntityType[] { EntityType.ZOMBIE, EntityType.HUSK },
             "Brute", "Fire", /*"Fishing",*/ "Giant", "Hungry", "Husk", "MadScientist", "Plague"
     );
@@ -70,16 +70,16 @@ public class MobFamily<T extends LivingEntity, V extends FamilyConfig> {
             "Slime", "slimes", 0x51A03E, new EntityType[] { EntityType.SLIME },
             "Blackberry", "Blueberry", "Caramel", "Grape", "Lemon", "Strawberry", "Watermelon"
     );
-    public static final MobFamily<MagmaCubeEntity, FamilyConfig> MAGMA_CUBE = new MobFamily<>( FamilyConfig::new,
+    public static final MobFamily<MagmaCubeEntity, FamilyConfig> MAGMA_CUBE = new MobFamily<>( FamilyConfig::newMoreSpecial,
             "MagmaCube", "magma cubes", 0x340000, new EntityType[] { EntityType.MAGMA_CUBE },
             "Bouncing", "Hardened", "Sticky", "Volatile"
     );
     
-    public static final MobFamily<SpiderEntity, FamilyConfig> SPIDER = new MobFamily<>( FamilyConfig.withVariantChance( 0.33 ),
+    public static final MobFamily<SpiderEntity, FamilyConfig> SPIDER = new MobFamily<>( FamilyConfig::newMoreSpecial,
             "Spider", "spiders", 0x342D27, new EntityType[] { EntityType.SPIDER },
             "Baby", "Desert", "Flying", "Giant", "Hungry", "Mother", "Pale", "Poison", /*"Water",*/ "Web", "Witch"
     );
-    public static final MobFamily<CaveSpiderEntity, FamilyConfig> CAVE_SPIDER = new MobFamily<>( FamilyConfig.withVariantChance( 0.33 ),
+    public static final MobFamily<CaveSpiderEntity, FamilyConfig> CAVE_SPIDER = new MobFamily<>( FamilyConfig::newMoreSpecial,
             "CaveSpider", "cave spiders", 0x0C424E, new EntityType[] { EntityType.CAVE_SPIDER },
             "Baby", "Flying", "Mother", /*"Water",*/ "Web", "Witch"
     );

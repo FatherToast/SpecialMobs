@@ -11,21 +11,24 @@ import fathertoast.specialmobs.common.config.util.ConfigUtil;
 
 import java.io.File;
 import java.util.List;
-import java.util.function.Function;
 
 /**
  * This is the base config for mob families. This may be extended to add categories specific to the family, but all
  * options that are used by all families should be defined in this class.
  */
 public class FamilyConfig extends Config.AbstractConfig {
+    protected static final double VARIANT_CHANCE_LOW = 0.2;
+    protected static final double VARIANT_CHANCE_HIGH = 0.33;
+    
     public static File dir( MobFamily<?, ?> family ) { return new File( Config.CONFIG_DIR, ConfigUtil.noSpaces( family.configName ) ); }
     
     protected static String fileName( MobFamily<?, ?> family ) { return "_family_of_" + ConfigUtil.noSpaces( family.configName ); }
     
-    /** @return A basic config supplier with custom default variant chance. */
-    public static Function<MobFamily<?, ?>, FamilyConfig> withVariantChance( double chance ) {
-        return ( family ) -> new FamilyConfig( family, chance );
-    }
+    /** @return A basic config supplier with a lower default variant chance. */
+    public static FamilyConfig newLessSpecial( MobFamily<?, ?> family ) { return new FamilyConfig( family, VARIANT_CHANCE_LOW ); }
+    
+    /** @return A basic config supplier with a higher default variant chance. */
+    public static FamilyConfig newMoreSpecial( MobFamily<?, ?> family ) { return new FamilyConfig( family, VARIANT_CHANCE_HIGH ); }
     
     /** Category containing all options applicable to mob families as a whole; i.e. not specific to any particular family. */
     public final General GENERAL;

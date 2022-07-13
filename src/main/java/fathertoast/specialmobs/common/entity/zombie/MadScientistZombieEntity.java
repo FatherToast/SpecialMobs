@@ -3,18 +3,21 @@ package fathertoast.specialmobs.common.entity.zombie;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
+import fathertoast.specialmobs.common.config.species.MadScientistZombieSpeciesConfig;
+import fathertoast.specialmobs.common.config.species.SpeciesConfig;
 import fathertoast.specialmobs.common.core.register.SMItems;
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.entity.ai.AIHelper;
+import fathertoast.specialmobs.common.entity.ai.IAmmoUser;
 import fathertoast.specialmobs.common.entity.ai.goal.ChargeCreeperGoal;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.entity.*;
-import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.monster.CreeperEntity;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.Effects;
 import net.minecraft.world.DifficultyInstance;
@@ -28,7 +31,7 @@ import java.util.function.BiPredicate;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 @SpecialMob
-public class MadScientistZombieEntity extends _SpecialZombieEntity {
+public class MadScientistZombieEntity extends _SpecialZombieEntity implements IAmmoUser {
     
     //--------------- Static Special Mob Hooks ----------------
     
@@ -38,9 +41,18 @@ public class MadScientistZombieEntity extends _SpecialZombieEntity {
     @SpecialMob.BestiaryInfoSupplier
     public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
         bestiaryInfo.color( 0xDED4C6 )
-                .uniqueTextureWithOverlay()
+                .uniqueTextureBaseOnly()
                 .addExperience( 2 ).disableRangedAttack();
     }
+    
+    @SpecialMob.ConfigSupplier
+    public static SpeciesConfig createConfig( MobFamily.Species<?> species ) {
+        return new MadScientistZombieSpeciesConfig( species, 0.0, 0.0, 1, 3 );
+    }
+    
+    /** @return This entity's species config. */
+    @Override
+    public MadScientistZombieSpeciesConfig getConfig() { return (MadScientistZombieSpeciesConfig) getSpecies().config; }
     
     @SpecialMob.LanguageProvider
     public static String[] getTranslations( String langKey ) {
@@ -65,10 +77,16 @@ public class MadScientistZombieEntity extends _SpecialZombieEntity {
     
     //--------------- Variant-Specific Implementations ----------------
     
-    private final BiPredicate<MadScientistZombieEntity, ? super CreeperEntity> CHARGE_CREEPER_TARGET = ( madman, creeper ) ->
+    private static final BiPredicate<MadScientistZombieEntity, ? super CreeperEntity> CHARGE_CREEPER_TARGET = ( madman, creeper ) ->
             creeper.isAlive() && !creeper.isPowered() && madman.getSensing().canSee( creeper );
     
-    public MadScientistZombieEntity( EntityType<? extends _SpecialZombieEntity> entityType, World world ) { super( entityType, world ); }
+    /** The number of creepers this madman can charge. */
+    private int chargeCount;
+    
+    public MadScientistZombieEntity( EntityType<? extends _SpecialZombieEntity> entityType, World world ) {
+        super( entityType, world );
+        chargeCount = getConfig().MAD_SCIENTIST.chargeCount.next( random );
+    }
     
     /** Override to change this entity's AI goals. */
     @Override
@@ -91,11 +109,44 @@ public class MadScientistZombieEntity extends _SpecialZombieEntity {
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override
     protected void onVariantAttack( Entity target ) {
-        if( target instanceof LivingEntity && random.nextFloat() < 0.3F ) {
+        if( target instanceof LivingEntity && hasAmmo() ) {
             final LivingEntity livingTarget = (LivingEntity) target;
             final int duration = MobHelper.getDebuffDuration( level.getDifficulty() );
             
-            livingTarget.addEffect( new EffectInstance( Effects.POISON, duration, 1 ) );
+            livingTarget.addEffect( new EffectInstance( Effects.POISON, duration ) );
         }
+    }
+    
+    /** Called each tick to update this entity's movement. */
+    @Override
+    public void aiStep() {
+        super.aiStep();
+        
+        // We can't do this when the last charge is used, since it would change the AI during the AI loop
+        if( chargeCount <= 0 && getItemBySlot( EquipmentSlotType.MAINHAND ).getItem() == SMItems.SYRINGE.get() ) {
+            broadcastBreakEvent( EquipmentSlotType.MAINHAND );
+            setItemSlot( EquipmentSlotType.MAINHAND, ItemStack.EMPTY );
+        }
+    }
+    
+    /** @return True if this entity has ammo to use. */
+    @Override
+    public boolean hasAmmo() { return chargeCount > 0; }
+    
+    /** Consumes ammo for a single use. */
+    @Override
+    public void consumeAmmo() { chargeCount--; }
+    
+    /** Override to save data to this entity's NBT data. */
+    @Override
+    public void addVariantSaveData( CompoundNBT saveTag ) {
+        saveTag.putByte( References.TAG_AMMO, (byte) chargeCount );
+    }
+    
+    /** Override to load data from this entity's NBT data. */
+    @Override
+    public void readVariantSaveData( CompoundNBT saveTag ) {
+        if( saveTag.contains( References.TAG_AMMO, References.NBT_TYPE_NUMERICAL ) )
+            chargeCount = saveTag.getByte( References.TAG_AMMO );
     }
 }
