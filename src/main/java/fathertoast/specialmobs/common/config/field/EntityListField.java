@@ -5,10 +5,8 @@ import fathertoast.specialmobs.common.config.util.EntityEntry;
 import fathertoast.specialmobs.common.config.util.EntityList;
 import fathertoast.specialmobs.common.core.SpecialMobs;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.registries.ForgeRegistries;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -85,16 +83,12 @@ public class EntityListField extends GenericField<EntityList> {
         List<String> list = TomlHelper.parseStringList( raw );
         List<EntityEntry> entryList = new ArrayList<>();
         for( String line : list ) {
-            EntityEntry entry = parseEntry( line );
-            if( entry != null ) {
-                entryList.add( entry );
-            }
+            entryList.add( parseEntry( line ) );
         }
         value = new EntityList( entryList );
     }
     
-    /** Parses a single entry line and returns a valid result if possible, or null if the entry is completely invalid. */
-    @Nullable
+    /** Parses a single entry line and returns the result. */
     private EntityEntry parseEntry( final String line ) {
         String modifiedLine = line;
         
@@ -110,20 +104,14 @@ public class EntityListField extends GenericField<EntityList> {
         
         // Parse the entity-value array
         final String[] args = modifiedLine.split( " " );
-        final EntityType<? extends Entity> entityType;
+        final ResourceLocation regKey;
         if( REG_KEY_DEFAULT.equalsIgnoreCase( args[0].trim() ) ) {
             // Handle the special case of a default entry
-            entityType = null;
+            regKey = null;
         }
         else {
             // Normal entry
-            final ResourceLocation regKey = new ResourceLocation( args[0].trim() );
-            if( !ForgeRegistries.ENTITIES.containsKey( regKey ) ) {
-                SpecialMobs.LOG.warn( "Invalid entry for {} \"{}\"! Deleting entry. Invalid entry: {}",
-                        getClass(), getKey(), line );
-                return null;
-            }
-            entityType = ForgeRegistries.ENTITIES.getValue( regKey );
+            regKey = new ResourceLocation( args[0].trim() );
         }
         final List<Double> valuesList = new ArrayList<>();
         final int reqValues = valueDefault.getRequiredValues();
@@ -173,7 +161,7 @@ public class EntityListField extends GenericField<EntityList> {
         for( int i = 0; i < values.length; i++ ) {
             values[i] = valuesList.get( i );
         }
-        return new EntityEntry( entityType, extendable, values );
+        return new EntityEntry( this, regKey, extendable, values );
     }
     
     /** Parses a single value argument and returns a valid result. */
