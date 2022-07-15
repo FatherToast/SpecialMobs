@@ -26,7 +26,7 @@ public final class References {
     public static final String TEXTURE_EYES_SUFFIX = "_eyes";
     public static final String TEXTURE_OVERLAY_SUFFIX = "_overlay";
     public static final String TEXTURE_SHOOTING_SUFFIX = "_shooting";
-    public static final String TEXTURE_SHOOTING_EYES_SUFFIX = "_shooting_eyes";
+    //public static final String TEXTURE_SHOOTING_EYES_SUFFIX = "_shooting_eyes";
     
     
     //--------------- BIT FLAGS ----------------
@@ -113,7 +113,7 @@ public final class References {
     
     // Misc.
     public static final String TAG_FUSE_TIME = "FuseTime"; // Blackberry Slime, Volatile Magma Cube
-    public static final String TAG_AMMO = "Ammo"; // Web (Cave) Spider
+    public static final String TAG_AMMO = "Ammo"; // Web (Cave) Spider, Mad Scientist Zombie
     public static final String TAG_IS_FAKE = "IsFake"; // Mirage Enderman
     public static final String TAG_EXPLOSION_POWER = "ExplosionPower"; // Hellfire Blaze
     

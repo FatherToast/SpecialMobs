@@ -1,6 +1,8 @@
 package fathertoast.specialmobs.common.entity.ai.goal;
 
 import fathertoast.specialmobs.common.entity.MobHelper;
+import fathertoast.specialmobs.common.entity.ai.IAmmoUser;
+import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.entity.monster.CreeperEntity;
@@ -9,11 +11,14 @@ import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.function.BiPredicate;
 
-public class ChargeCreeperGoal<T extends MobEntity> extends Goal {
+@ParametersAreNonnullByDefault
+@MethodsReturnNonnullByDefault
+public class ChargeCreeperGoal<T extends MobEntity & IAmmoUser> extends Goal {
     
     private final BiPredicate<T, ? super CreeperEntity> targetPredicate;
     
@@ -21,7 +26,7 @@ public class ChargeCreeperGoal<T extends MobEntity> extends Goal {
     private final double movementSpeed;
     private final double targetRange;
     
-    /** The creeper to target for power-up injection **/
+    /** The creeper to target for power-up injection */
     private CreeperEntity creeper;
     
     private int pathUpdateCooldown;
@@ -45,7 +50,7 @@ public class ChargeCreeperGoal<T extends MobEntity> extends Goal {
     /** @return Returns true if this AI can be activated. */
     @Override
     public boolean canUse() {
-        if( madman.isPassenger() || !canUseWhileMounted && madman.isVehicle() ) return false;
+        if( !madman.hasAmmo() || madman.isPassenger() || !canUseWhileMounted && madman.isVehicle() ) return false;
         
         findCreeper();
         if( creeper == null ) return false;
@@ -95,9 +100,12 @@ public class ChargeCreeperGoal<T extends MobEntity> extends Goal {
         
         madman.getLookControl().setLookAt( creeper, 30.0F, 30.0F );
         if( distanceSq < 2.5 ) {
-            MobHelper.charge( creeper );
-            madman.level.playSound( null, creeper.getX(), creeper.getY(), creeper.getZ(),
-                    SoundEvents.BEE_STING, SoundCategory.HOSTILE, 0.9F, 1.0F );
+            if( madman.hasAmmo() ) {
+                madman.consumeAmmo();
+                MobHelper.charge( creeper );
+                madman.level.playSound( null, creeper.getX(), creeper.getY(), creeper.getZ(),
+                        SoundEvents.BEE_STING, SoundCategory.HOSTILE, 0.9F, 1.0F );
+            }
             
             creeper = null;
         }

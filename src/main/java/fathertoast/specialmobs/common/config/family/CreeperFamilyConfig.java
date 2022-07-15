@@ -15,7 +15,7 @@ public class CreeperFamilyConfig extends FamilyConfig {
     
     /** Builds the config spec that should be used for this config. */
     public CreeperFamilyConfig( MobFamily<?, ?> family ) {
-        super( family, 0.33 );
+        super( family, VARIANT_CHANCE_HIGH );
         
         CREEPERS = new Creepers( SPEC, family );
     }

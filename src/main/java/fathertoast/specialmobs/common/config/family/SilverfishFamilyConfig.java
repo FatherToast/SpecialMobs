@@ -15,7 +15,7 @@ public class SilverfishFamilyConfig extends FamilyConfig {
     
     /** Builds the config spec that should be used for this config. */
     public SilverfishFamilyConfig( MobFamily<?, ?> family ) {
-        super( family );
+        super( family, VARIANT_CHANCE_LOW );
         
         SILVERFISH = new Silverfish( SPEC, family );
     }

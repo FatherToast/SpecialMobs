@@ -7,6 +7,7 @@ import fathertoast.specialmobs.common.core.register.SMEntities;
 import fathertoast.specialmobs.common.entity.ghast.CorporealShiftGhastEntity;
 import fathertoast.specialmobs.common.entity.skeleton.NinjaSkeletonEntity;
 import fathertoast.specialmobs.common.entity.witherskeleton.NinjaWitherSkeletonEntity;
+import fathertoast.specialmobs.common.entity.zombie.MadScientistZombieEntity;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ItemRenderer;
@@ -54,6 +55,7 @@ public class ClientRegister {
         registerFamilyRenderers( MobFamily.BLAZE, SpecialBlazeRenderer::new );
         
         // Species overrides
+        registerSpeciesRenderer( MadScientistZombieEntity.SPECIES, SpecialZombieVillagerRenderer::new );
         registerSpeciesRenderer( NinjaSkeletonEntity.SPECIES, NinjaSkeletonRenderer::new );
         registerSpeciesRenderer( NinjaWitherSkeletonEntity.SPECIES, NinjaSkeletonRenderer::new );
         registerSpeciesRenderer( CorporealShiftGhastEntity.SPECIES, CorporealShiftGhastRenderer::new );
