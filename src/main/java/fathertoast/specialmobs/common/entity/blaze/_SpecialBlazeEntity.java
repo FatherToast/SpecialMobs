@@ -205,11 +205,11 @@ public class _SpecialBlazeEntity extends BlazeEntity implements IRangedAttackMob
         getSpecialData().tick();
     }
     
-    /** @return The eye height of this entity when standing. */
-    @Override
-    protected float getStandingEyeHeight( Pose pose, EntitySize size ) {
-        return super.getStandingEyeHeight( pose, size ) * getSpecialData().getBaseScale() * (isBaby() ? 0.53448F : 1.0F);
-    }
+    //    /** @return The eye height of this entity when standing. */ - Blazes use auto-scaled eye height
+    //    @Override
+    //    protected float getStandingEyeHeight( Pose pose, EntitySize size ) {
+    //        return super.getStandingEyeHeight( pose, size ) * getSpecialData().getBaseScale() * (isBaby() ? 0.53448F : 1.0F);
+    //    }
     
     /** @return Whether this entity is immune to fire damage. */
     @Override
