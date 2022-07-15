@@ -12,7 +12,6 @@ import fathertoast.specialmobs.common.entity.ai.IAmmoUser;
 import fathertoast.specialmobs.common.entity.ai.goal.ChargeCreeperGoal;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
-import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.entity.*;
 import net.minecraft.entity.monster.CreeperEntity;
 import net.minecraft.inventory.EquipmentSlotType;
@@ -25,11 +24,8 @@ import net.minecraft.world.IServerWorld;
 import net.minecraft.world.World;
 
 import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.function.BiPredicate;
 
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
 @SpecialMob
 public class MadScientistZombieEntity extends _SpecialZombieEntity implements IAmmoUser {
     

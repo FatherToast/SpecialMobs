@@ -10,16 +10,11 @@ import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootEntryItemBuilder;
 import fathertoast.specialmobs.datagen.loot.LootPoolBuilder;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
-import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.item.Items;
 import net.minecraft.world.World;
 
-import javax.annotation.ParametersAreNonnullByDefault;
-
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
 @SpecialMob
 public class FishingSilverfishEntity extends _SpecialSilverfishEntity implements IAngler {
     

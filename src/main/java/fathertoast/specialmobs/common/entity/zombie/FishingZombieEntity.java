@@ -12,7 +12,6 @@ import fathertoast.specialmobs.datagen.loot.LootEntryItemBuilder;
 import fathertoast.specialmobs.datagen.loot.LootHelper;
 import fathertoast.specialmobs.datagen.loot.LootPoolBuilder;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
-import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ILivingEntityData;
 import net.minecraft.entity.SpawnReason;
@@ -30,10 +29,7 @@ import net.minecraft.world.IServerWorld;
 import net.minecraft.world.World;
 
 import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
 @SpecialMob
 public class FishingZombieEntity extends _SpecialZombieEntity implements IAngler {
     

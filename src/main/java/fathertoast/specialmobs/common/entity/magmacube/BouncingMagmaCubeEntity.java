@@ -9,7 +9,6 @@ import fathertoast.specialmobs.common.entity.ai.FluidPathNavigator;
 import fathertoast.specialmobs.common.entity.ai.goal.SpecialLeapAtTargetGoal;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
-import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.fluid.Fluid;
@@ -20,10 +19,6 @@ import net.minecraft.pathfinding.PathNodeType;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.world.World;
 
-import javax.annotation.ParametersAreNonnullByDefault;
-
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
 @SpecialMob
 public class BouncingMagmaCubeEntity extends _SpecialMagmaCubeEntity {
     

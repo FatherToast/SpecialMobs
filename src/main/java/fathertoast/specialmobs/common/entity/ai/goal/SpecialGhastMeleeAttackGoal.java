@@ -2,19 +2,15 @@ package fathertoast.specialmobs.common.entity.ai.goal;
 
 import fathertoast.specialmobs.common.entity.ai.SimpleFlyingMovementController;
 import fathertoast.specialmobs.common.entity.ghast._SpecialGhastEntity;
-import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.controller.MovementController;
 import net.minecraft.entity.ai.goal.Goal;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.EnumSet;
 
 /**
  * Melee attack goal modified to function for ghasts.
  */
-@MethodsReturnNonnullByDefault
-@ParametersAreNonnullByDefault
 public class SpecialGhastMeleeAttackGoal extends Goal {
     
     private final _SpecialGhastEntity ghast;

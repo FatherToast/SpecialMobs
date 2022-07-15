@@ -1,6 +1,5 @@
 package fathertoast.specialmobs.common.entity.ai.goal;
 
-import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.entity.CreatureEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MobEntity;
@@ -8,7 +7,6 @@ import net.minecraft.entity.ai.goal.HurtByTargetGoal;
 import net.minecraft.entity.passive.TameableEntity;
 import net.minecraft.util.math.AxisAlignedBB;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
 
 /**
@@ -16,8 +14,6 @@ import java.util.List;
  * <p>
  * The only two changes are: Allows the parent class to be specified; and Exclusions apply to all subclasses
  */
-@MethodsReturnNonnullByDefault
-@ParametersAreNonnullByDefault
 public class SpecialHurtByTargetGoal extends HurtByTargetGoal {
     
     private final Class<? extends MobEntity> parentClass;

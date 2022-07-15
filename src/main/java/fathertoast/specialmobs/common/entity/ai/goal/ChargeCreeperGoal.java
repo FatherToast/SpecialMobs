@@ -2,7 +2,6 @@ package fathertoast.specialmobs.common.entity.ai.goal;
 
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.entity.ai.IAmmoUser;
-import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.entity.monster.CreeperEntity;
@@ -11,13 +10,10 @@ import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.function.BiPredicate;
 
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
 public class ChargeCreeperGoal<T extends MobEntity & IAmmoUser> extends Goal {
     
     private final BiPredicate<T, ? super CreeperEntity> targetPredicate;

@@ -9,7 +9,6 @@ import fathertoast.specialmobs.common.entity.spider.BabySpiderEntity;
 import fathertoast.specialmobs.common.entity.spider._SpecialSpiderEntity;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
-import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.entity.*;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.item.ItemStack;
@@ -25,10 +24,7 @@ import net.minecraft.world.IServerWorld;
 import net.minecraft.world.World;
 
 import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
 @SpecialMob
 public class WildsWitchEntity extends _SpecialWitchEntity {
     
