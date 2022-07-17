@@ -8,10 +8,7 @@ import fathertoast.specialmobs.common.config.util.environment.biome.*;
 import fathertoast.specialmobs.common.config.util.environment.dimension.DimensionPropertyEnvironment;
 import fathertoast.specialmobs.common.config.util.environment.dimension.DimensionTypeEnvironment;
 import fathertoast.specialmobs.common.config.util.environment.dimension.DimensionTypeGroupEnvironment;
-import fathertoast.specialmobs.common.config.util.environment.position.StructureEnvironment;
-import fathertoast.specialmobs.common.config.util.environment.position.StructureGroupEnvironment;
-import fathertoast.specialmobs.common.config.util.environment.position.YEnvironment;
-import fathertoast.specialmobs.common.config.util.environment.position.YFromSeaEnvironment;
+import fathertoast.specialmobs.common.config.util.environment.position.*;
 import fathertoast.specialmobs.common.config.util.environment.time.*;
 import fathertoast.specialmobs.common.core.SpecialMobs;
 import net.minecraft.util.math.BlockPos;
@@ -42,10 +39,11 @@ public class EnvironmentListField extends GenericField<EnvironmentList> {
     public static final String ENV_TEMPERATURE = "temp";
     public static final String ENV_BIOME_CATEGORY = "biome_category";
     public static final String ENV_BIOME = "biome";
-    // Position-based TODO can_see_sky
+    // Position-based
     public static final String ENV_STRUCTURE = "structure";
     public static final String ENV_Y = "y";
     public static final String ENV_Y_FROM_SEA = "y_from_sea";
+    public static final String ENV_POSITION = "position";
     // Time-based
     public static final String ENV_DIFFICULTY = "difficulty";
     public static final String ENV_SPECIAL_DIFFICULTY = "special_difficulty";
@@ -101,6 +99,9 @@ public class EnvironmentListField extends GenericField<EnvironmentList> {
         comment.add( "    The y-value. For reference, sea level is normally 63 and lava level is normally 10." );//TODO change lava level to -54 for MC 1.18
         comment.add( "  \"" + ENV_Y_FROM_SEA + " op value\":" );
         comment.add( "    The y-value from sea level. Expect the only air <= 0 to be in caves (which may still have direct view of the sky)." );
+        comment.add( "  \"" + ENV_POSITION + " (!)state\":" );
+        comment.add( "    Valid state values: " + TomlHelper.literalList( (Object[]) PositionEnvironment.Value.values() ) );
+        comment.add( "    Miscellaneous conditions that generally do what you expect. For reference, 'near' a village is ~3 chunks, and redstone checks weak power." );
         // Time-based
         comment.add( "  \"" + ENV_DIFFICULTY + " op value\":" );
         comment.add( "    The regional difficulty (0 to 6.75). This is based on many factors such as difficulty setting, moon brightness, chunk inhabited time, and world time." );
@@ -239,6 +240,8 @@ public class EnvironmentListField extends GenericField<EnvironmentList> {
                 return new YEnvironment( this, value );
             case ENV_Y_FROM_SEA:
                 return new YFromSeaEnvironment( this, value );
+            case ENV_POSITION:
+                return new PositionEnvironment( this, value );
             // Time-based
             case ENV_DIFFICULTY:
                 return new DifficultyEnvironment( this, value );
@@ -265,7 +268,7 @@ public class EnvironmentListField extends GenericField<EnvironmentList> {
                 // Biome-based
                 ENV_RAINFALL, ENV_BIOME_TEMPERATURE, ENV_TEMPERATURE, ENV_BIOME_CATEGORY, ENV_BIOME,
                 // Position-based
-                ENV_STRUCTURE, ENV_Y, ENV_Y_FROM_SEA,
+                ENV_STRUCTURE, ENV_Y, ENV_Y_FROM_SEA, ENV_POSITION,
                 // Time-based
                 ENV_DIFFICULTY, ENV_SPECIAL_DIFFICULTY, ENV_WEATHER, ENV_MOON_BRIGHTNESS, ENV_MOON_PHASE, ENV_DAY_TIME,
                 ENV_TIME_FROM_MIDNIGHT, ENV_WORLD_TIME
