@@ -23,12 +23,12 @@ public class DoubleField extends AbstractConfigField {
     private double value;
     
     /** Creates a new field that accepts a common range of values. */
-    public DoubleField( String key, double defaultValue, Range range, String... description ) {
+    public DoubleField( String key, double defaultValue, Range range, @Nullable String... description ) {
         this( key, defaultValue, range.MIN, range.MAX, description );
     }
     
     /** Creates a new field that accepts a specialized range of values. */
-    public DoubleField( String key, double defaultValue, double min, double max, String... description ) {
+    public DoubleField( String key, double defaultValue, double min, double max, @Nullable String... description ) {
         super( key, description );
         valueDefault = defaultValue;
         valueMin = min;

@@ -8,6 +8,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.IForgeRegistryEntry;
 
+import javax.annotation.Nullable;
 import java.util.*;
 
 /**
@@ -25,9 +26,7 @@ public class RegistryEntryList<T extends IForgeRegistryEntry<T>> implements IStr
     /** The list used to write back to file. */
     protected final List<String> PRINT_LIST = new ArrayList<>();
     
-    protected RegistryEntryList( IForgeRegistry<T> registry ) {
-        REGISTRY = registry;
-    }
+    protected RegistryEntryList( IForgeRegistry<T> registry ) { REGISTRY = registry; }
     
     /**
      * Create a new registry entry list from an array of entries. Used for creating default configs.
@@ -79,13 +78,11 @@ public class RegistryEntryList<T extends IForgeRegistryEntry<T>> implements IStr
     
     /** @return A string representation of this object. */
     @Override
-    public String toString() {
-        return TomlHelper.toLiteral( PRINT_LIST.toArray() );
-    }
+    public String toString() { return TomlHelper.toLiteral( PRINT_LIST.toArray() ); }
     
     /** @return Returns true if this object has the same value as another object. */
     @Override
-    public boolean equals( Object other ) {
+    public boolean equals( @Nullable Object other ) {
         if( !(other instanceof RegistryEntryList) ) return false;
         // Compare by the registries used and string list view of the object
         return getRegistry() == ((RegistryEntryList<?>) other).getRegistry() &&
@@ -100,7 +97,7 @@ public class RegistryEntryList<T extends IForgeRegistryEntry<T>> implements IStr
     public boolean isEmpty() { return UNDERLYING_SET.isEmpty(); }
     
     /** @return Returns true if the entry is contained in this list. */
-    public boolean contains( T entry ) { return UNDERLYING_SET.contains( entry ); }
+    public boolean contains( @Nullable T entry ) { return UNDERLYING_SET.contains( entry ); }
     
     /** @return Adds the registry entry if it exists and isn't already present, returns true if successful. */
     protected boolean mergeFrom( ResourceLocation regKey ) {

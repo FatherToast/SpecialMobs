@@ -13,6 +13,7 @@ import java.util.*;
  * <p>
  * Creates a config field for each item so weights can be defined by the user.
  */
+@SuppressWarnings( "unused" )
 public class WeightedList<T extends WeightedList.Value> {
     /** The spec used by this config that defines the file's format. */
     protected final ToastConfigSpec SPEC;
@@ -110,6 +111,7 @@ public class WeightedList<T extends WeightedList.Value> {
         default int getDefaultWeight() { return 1; }
         
         /** @return Returns the comment for this object. */
+        @Nullable
         default String[] getComment() { return null; }
     }
 }

@@ -13,6 +13,7 @@ import net.minecraft.potion.Effects;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.registries.ForgeRegistries;
 
+import javax.annotation.Nullable;
 import java.util.*;
 
 /**
@@ -280,13 +281,13 @@ public class BestiaryInfo {
         public Builder vanillaTextureBaseOnly( String tex ) { return vanillaBaseTexture( tex ).noEyesTexture().noOverlayTexture(); }
         
         /** Sets the species default base texture. */
-        private Builder vanillaBaseTexture( String tex ) { return baseTexture( tex == null ? null : new ResourceLocation( tex ) ); }
+        private Builder vanillaBaseTexture( String tex ) { return baseTexture( new ResourceLocation( tex ) ); }
         
         /** Sets the species default glowing eyes texture. */
-        private Builder vanillaEyesTexture( String eyeTex ) { return eyesTexture( eyeTex == null ? null : new ResourceLocation( eyeTex ) ); }
+        private Builder vanillaEyesTexture( String eyeTex ) { return eyesTexture( new ResourceLocation( eyeTex ) ); }
         
         /** Sets the species default overlay texture. */
-        private Builder vanillaOverlayTexture( String ovrTex ) { return overlayTexture( ovrTex == null ? null : new ResourceLocation( ovrTex ) ); }
+        private Builder vanillaOverlayTexture( String ovrTex ) { return overlayTexture( new ResourceLocation( ovrTex ) ); }
         
         
         //--------------- Textures (Auto-selected) ----------------
@@ -351,19 +352,19 @@ public class BestiaryInfo {
         public Builder noAnimationTexture() { return noOverlayTexture(); }
         
         /** Sets the species default base texture. */
-        private Builder baseTexture( ResourceLocation tex ) {
+        private Builder baseTexture( @Nullable ResourceLocation tex ) {
             texture = tex;
             return this;
         }
         
         /** Sets the species default glowing eyes texture. */
-        private Builder eyesTexture( ResourceLocation eyeTex ) {
+        private Builder eyesTexture( @Nullable ResourceLocation eyeTex ) {
             eyesTexture = eyeTex;
             return this;
         }
         
         /** Sets the species default overlay texture. */
-        private Builder overlayTexture( ResourceLocation ovrTex ) {
+        private Builder overlayTexture( @Nullable ResourceLocation ovrTex ) {
             overlayTexture = ovrTex;
             return this;
         }

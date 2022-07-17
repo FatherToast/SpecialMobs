@@ -23,12 +23,12 @@ public class IntField extends AbstractConfigField {
     private int value;
     
     /** Creates a new field that accepts a common range of values. */
-    public IntField( String key, int defaultValue, Range range, String... description ) {
+    public IntField( String key, int defaultValue, Range range, @Nullable String... description ) {
         this( key, defaultValue, range.MIN, range.MAX, description );
     }
     
     /** Creates a new field that accepts a specialized range of values. */
-    public IntField( String key, int defaultValue, int min, int max, String... description ) {
+    public IntField( String key, int defaultValue, int min, int max, @Nullable String... description ) {
         super( key, description );
         valueDefault = defaultValue;
         valueMin = min;

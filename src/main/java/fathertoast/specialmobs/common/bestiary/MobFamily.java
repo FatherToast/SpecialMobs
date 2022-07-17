@@ -6,7 +6,6 @@ import fathertoast.specialmobs.common.core.register.SMEntities;
 import fathertoast.specialmobs.common.core.register.SMItems;
 import fathertoast.specialmobs.common.util.AnnotationHelper;
 import fathertoast.specialmobs.common.util.References;
-import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -18,7 +17,6 @@ import net.minecraftforge.common.ForgeSpawnEggItem;
 import net.minecraftforge.fml.RegistryObject;
 
 import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.*;
 import java.util.function.Function;
 
@@ -28,8 +26,6 @@ import java.util.function.Function;
  *
  * @see MobFamily.Species
  */
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
 public class MobFamily<T extends LivingEntity, V extends FamilyConfig> {
     /** List of all families, generated to make iteration possible. */
     private static final ArrayList<MobFamily<?, ?>> FAMILY_LIST = new ArrayList<>();
@@ -238,8 +234,6 @@ public class MobFamily<T extends LivingEntity, V extends FamilyConfig> {
      *
      * @see MobFamily
      */
-    @ParametersAreNonnullByDefault
-    @MethodsReturnNonnullByDefault
     public static class Species<T extends LivingEntity> {
         /** The special mob family this species belongs to. */
         public final MobFamily<? super T, ?> family;

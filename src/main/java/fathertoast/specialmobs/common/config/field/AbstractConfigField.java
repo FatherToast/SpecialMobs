@@ -25,7 +25,7 @@ public abstract class AbstractConfigField {
      * Creates a new field with the supplied key and description.
      * If the description is null, it will cancel the entire comment, including the automatic field info text.
      */
-    protected AbstractConfigField( String key, String... description ) {
+    protected AbstractConfigField( String key, @Nullable String... description ) {
         this( loadingCategory + key, description == null ? null : TomlHelper.newComment( description ) );
     }
     
@@ -33,7 +33,7 @@ public abstract class AbstractConfigField {
      * Creates a new field with the supplied key and comment. This method is only used for very special circumstances.
      * If the comment is null, it will cancel the entire comment, including the automatic field info text.
      */
-    AbstractConfigField( String key, List<String> comment ) {
+    AbstractConfigField( String key, @Nullable List<String> comment ) {
         KEY = key;
         COMMENT = comment;
     }

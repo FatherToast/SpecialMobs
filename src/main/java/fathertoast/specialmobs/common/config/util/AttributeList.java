@@ -5,6 +5,7 @@ import fathertoast.specialmobs.common.config.file.TomlHelper;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.AttributeModifierMap;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,7 +34,7 @@ public class AttributeList implements IStringArray {
     
     /** @return Returns true if this object has the same value as another object. */
     @Override
-    public boolean equals( Object other ) {
+    public boolean equals( @Nullable Object other ) {
         if( !(other instanceof AttributeList) ) return false;
         // Compare by the string list view of the object
         return toStringList().equals( ((AttributeList) other).toStringList() );

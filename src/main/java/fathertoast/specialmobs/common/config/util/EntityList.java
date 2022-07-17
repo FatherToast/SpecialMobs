@@ -5,6 +5,7 @@ import fathertoast.specialmobs.common.config.file.TomlHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,7 +46,7 @@ public class EntityList implements IStringArray {
     
     /** @return Returns true if this object has the same value as another object. */
     @Override
-    public boolean equals( Object other ) {
+    public boolean equals( @Nullable Object other ) {
         if( !(other instanceof EntityList) ) return false;
         // Compare by the string list view of the object
         return toStringList().equals( ((EntityList) other).toStringList() );
@@ -63,7 +64,8 @@ public class EntityList implements IStringArray {
     }
     
     /** @return True if the entity is contained in this list. */
-    public boolean contains( Entity entity ) {
+    public boolean contains( @Nullable Entity entity ) {
+        if( entity == null ) return false;
         final EntityEntry targetEntry = new EntityEntry( entity );
         for( EntityEntry currentEntry : ENTRIES ) {
             currentEntry.checkClass( entity.level );
@@ -77,7 +79,9 @@ public class EntityList implements IStringArray {
      * @param entity The entity to retrieve values for.
      * @return The array of values of the best-match entry. Returns null if the entity is not contained in this entity list.
      */
-    public double[] getValues( Entity entity ) {
+    @Nullable
+    public double[] getValues( @Nullable Entity entity ) {
+        if( entity == null ) return null;
         final EntityEntry targetEntry = new EntityEntry( entity );
         EntityEntry bestMatch = null;
         for( EntityEntry currentEntry : ENTRIES ) {
@@ -101,7 +105,7 @@ public class EntityList implements IStringArray {
      * @see #setSingleValue()
      * @see #setSinglePercent()
      */
-    public double getValue( Entity entity ) {
+    public double getValue( @Nullable Entity entity ) {
         final double[] values = getValues( entity );
         return values == null || values.length < 1 ? 0.0 : values[0];
     }
@@ -112,7 +116,7 @@ public class EntityList implements IStringArray {
      * is not contained in this entity list or has no values specified. This should only be used for 'single percent' lists.
      * @see #setSinglePercent()
      */
-    public boolean rollChance( LivingEntity entity ) {
+    public boolean rollChance( @Nullable LivingEntity entity ) {
         return ENTRIES.length > 0 && entity != null && entity.getRandom().nextDouble() < getValue( entity );
     }
     

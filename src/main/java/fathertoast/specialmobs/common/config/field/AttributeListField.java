@@ -42,15 +42,9 @@ public class AttributeListField extends GenericField<AttributeList> {
     public ConfigDrivenAttributeModifierMap linkedAttributeMap;
     
     /** Creates a new field. */
-    public AttributeListField( String key, AttributeList defaultValue, String... description ) {
+    public AttributeListField( String key, AttributeList defaultValue, @Nullable String... description ) {
         super( key, defaultValue, description );
     }
-    
-    /** Applies all attribute changes in this list to the entity attribute builder. */
-    public void apply( AttributeModifierMap.MutableAttribute builder ) { get().apply( builder ); }
-    
-    /** Applies all attribute changes in this list to the entity. */
-    public void apply( LivingEntity entity ) { get().apply( entity ); }
     
     /** Adds info about the field type, format, and bounds to the end of a field's description. */
     public void appendFieldInfo( List<String> comment ) {
@@ -81,7 +75,7 @@ public class AttributeListField extends GenericField<AttributeList> {
         if( linkedAttributeMap != null ) linkedAttributeMap.invalidate();
     }
     
-    /** Parses a single entry line and returns a valid result if possible, or null if the entry is completely invalid. */
+    /** Parses a single entry line and returns a valid result. */
     private AttributeEntry parseEntry( final String line ) {
         // Parse the attribute-operation-value array
         final String[] args = line.split( " ", 4 );
@@ -148,4 +142,13 @@ public class AttributeListField extends GenericField<AttributeList> {
         }
         return value;
     }
+    
+    
+    // Convenience methods
+    
+    /** Applies all attribute changes in this list to the entity attribute builder. */
+    public void apply( AttributeModifierMap.MutableAttribute builder ) { get().apply( builder ); }
+    
+    /** Applies all attribute changes in this list to the entity. */
+    public void apply( LivingEntity entity ) { get().apply( entity ); }
 }

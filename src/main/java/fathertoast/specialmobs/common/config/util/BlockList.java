@@ -10,6 +10,7 @@ import net.minecraft.block.Blocks;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.registries.ForgeRegistries;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -61,13 +62,11 @@ public class BlockList implements IStringArray {
     
     /** @return A string representation of this object. */
     @Override
-    public String toString() {
-        return TomlHelper.toLiteral( PRINT_LIST.toArray() );
-    }
+    public String toString() { return TomlHelper.toLiteral( PRINT_LIST.toArray() ); }
     
     /** @return Returns true if this object has the same value as another object. */
     @Override
-    public boolean equals( Object other ) {
+    public boolean equals( @Nullable Object other ) {
         if( !(other instanceof BlockList) ) return false;
         // Compare by the string list view of the object
         return toStringList().equals( ((BlockList) other).toStringList() );
@@ -109,10 +108,9 @@ public class BlockList implements IStringArray {
     private void mergeFromNamespace( String namespace ) {
         for( ResourceLocation regKey : ForgeRegistries.BLOCKS.getKeys() ) {
             if( regKey.toString().startsWith( namespace ) ) {
-                BlockEntry entry = new BlockEntry( ForgeRegistries.BLOCKS.getValue( regKey ) );
-                if( entry.BLOCK != null && entry.BLOCK != Blocks.AIR ) {
-                    mergeFrom( entry );
-                }
+                final Block block = ForgeRegistries.BLOCKS.getValue( regKey );
+                if( block != null && block != Blocks.AIR )
+                    mergeFrom( new BlockEntry( block ) );
             }
         }
     }

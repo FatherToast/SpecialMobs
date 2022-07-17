@@ -33,7 +33,7 @@ public class EntityListField extends GenericField<EntityList> {
     }
     
     /** Creates a new field. */
-    public EntityListField( String key, EntityList defaultValue, String... description ) {
+    public EntityListField( String key, EntityList defaultValue, @Nullable String... description ) {
         super( key, defaultValue, description );
     }
     
@@ -191,6 +191,36 @@ public class EntityListField extends GenericField<EntityList> {
         return value;
     }
     
+    
+    // Convenience methods
+    
+    /** @return True if the entity is contained in this list. */
+    public boolean contains( @Nullable Entity entity ) { return get().contains( entity ); }
+    
+    /**
+     * @param entity The entity to retrieve values for.
+     * @return The array of values of the best-match entry. Returns null if the entity is not contained in this entity list.
+     */
+    @Nullable
+    public double[] getValues( @Nullable Entity entity ) { return get().getValues( entity ); }
+    
+    /**
+     * @param entity The entity to retrieve a value for.
+     * @return The first value in the best-match entry's value array. Returns 0 if the entity is not contained in this
+     * entity list or has no values specified. This should only be used for 'single value' lists.
+     * @see EntityList#setSingleValue()
+     * @see EntityList#setSinglePercent()
+     */
+    public double getValue( @Nullable Entity entity ) { return get().getValue( entity ); }
+    
+    /**
+     * @param entity The entity to roll a value for.
+     * @return Randomly rolls the first percentage value in the best-match entry's value array. Returns false if the entity
+     * is not contained in this entity list or has no values specified. This should only be used for 'single percent' lists.
+     * @see EntityList#setSinglePercent()
+     */
+    public boolean rollChance( @Nullable LivingEntity entity ) { return get().rollChance( entity ); }
+    
     /**
      * Represents two entity list fields, a blacklist and a whitelist, combined into one.
      * The blacklist cannot contain values, but the whitelist can have any settings.
@@ -210,17 +240,21 @@ public class EntityListField extends GenericField<EntityList> {
             }
         }
         
+        
+        // Convenience methods
+        
         /** @return True if the entity is contained in this list. */
-        public boolean contains( Entity entity ) {
-            return entity != null && !BLACKLIST.get().contains( entity ) && WHITELIST.get().contains( entity );
+        public boolean contains( @Nullable Entity entity ) {
+            return entity != null && !BLACKLIST.contains( entity ) && WHITELIST.contains( entity );
         }
         
         /**
          * @param entity The entity to retrieve values for.
          * @return The array of values of the best-match entry. Returns null if the entity is not contained in this entity list.
          */
-        public double[] getValues( Entity entity ) {
-            return entity != null && !BLACKLIST.get().contains( entity ) ? WHITELIST.get().getValues( entity ) : null;
+        @Nullable
+        public double[] getValues( @Nullable Entity entity ) {
+            return entity != null && !BLACKLIST.contains( entity ) ? WHITELIST.getValues( entity ) : null;
         }
         
         /**
@@ -230,8 +264,8 @@ public class EntityListField extends GenericField<EntityList> {
          * @see EntityList#setSingleValue()
          * @see EntityList#setSinglePercent()
          */
-        public double getValue( Entity entity ) {
-            return entity != null && !BLACKLIST.get().contains( entity ) ? WHITELIST.get().getValue( entity ) : 0.0;
+        public double getValue( @Nullable Entity entity ) {
+            return entity != null && !BLACKLIST.contains( entity ) ? WHITELIST.getValue( entity ) : 0.0;
         }
         
         /**
@@ -240,8 +274,8 @@ public class EntityListField extends GenericField<EntityList> {
          * is not contained in this entity list or has no values specified. This should only be used for 'single percent' lists.
          * @see EntityList#setSinglePercent()
          */
-        public boolean rollChance( LivingEntity entity ) {
-            return entity != null && !BLACKLIST.get().contains( entity ) && WHITELIST.get().rollChance( entity );
+        public boolean rollChance( @Nullable LivingEntity entity ) {
+            return entity != null && !BLACKLIST.contains( entity ) && WHITELIST.rollChance( entity );
         }
     }
 }
