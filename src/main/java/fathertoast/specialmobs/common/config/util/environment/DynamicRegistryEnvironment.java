@@ -28,8 +28,6 @@ public abstract class DynamicRegistryEnvironment<T> extends AbstractEnvironment 
     /** The value of ConfigUtil#DYNAMIC_REGISTRY_VERSION at the time of last poll. */
     private byte version = -1;
     
-    public DynamicRegistryEnvironment( ResourceLocation regKey ) { this( regKey, false ); }
-    
     public DynamicRegistryEnvironment( ResourceLocation regKey, boolean invert ) {
         FIELD = null;
         INVERT = invert;

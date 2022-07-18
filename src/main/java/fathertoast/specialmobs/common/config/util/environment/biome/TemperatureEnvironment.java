@@ -12,13 +12,18 @@ import javax.annotation.Nullable;
 public class TemperatureEnvironment extends CompareFloatEnvironment {
     
     public static final String FREEZING = "freezing";
+    public static final float FREEZING_POINT = 0.15F;
     
     public static String handleTempInput( String line ) {
         if( line.equalsIgnoreCase( FREEZING ) )
-            return ComparisonOperator.LESS_THAN + " " + 0.15F;
+            return ComparisonOperator.LESS_THAN + " " + FREEZING_POINT;
         if( line.equalsIgnoreCase( "!" + FREEZING ) )
-            return ComparisonOperator.GREATER_THAN + " " + Math.nextDown( 0.15F );
+            return ComparisonOperator.LESS_THAN.invert() + " " + FREEZING_POINT;
         return line;
+    }
+    
+    public TemperatureEnvironment( boolean freezing ) {
+        this( ComparisonOperator.LESS_THAN.invert( !freezing ), FREEZING_POINT );
     }
     
     public TemperatureEnvironment( ComparisonOperator op, float value ) { super( op, value ); }
@@ -32,10 +37,8 @@ public class TemperatureEnvironment extends CompareFloatEnvironment {
     /** @return The string value of this environment, as it would appear in a config file. */
     @Override
     public String value() {
-        if( COMPARATOR == ComparisonOperator.LESS_THAN && VALUE == 0.15F )
-            return FREEZING;
-        if( COMPARATOR == ComparisonOperator.GREATER_THAN && VALUE == Math.nextDown( 0.15F ) )
-            return "!" + FREEZING;
+        if( COMPARATOR == ComparisonOperator.LESS_THAN && VALUE == FREEZING_POINT ) return FREEZING;
+        if( COMPARATOR == ComparisonOperator.LESS_THAN.invert() && VALUE == FREEZING_POINT ) return "!" + FREEZING;
         return super.value();
     }
     

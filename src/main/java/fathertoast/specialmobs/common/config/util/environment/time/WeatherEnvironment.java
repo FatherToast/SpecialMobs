@@ -12,15 +12,13 @@ public class WeatherEnvironment extends EnumEnvironment<WeatherEnvironment.Value
     /** Values match up to the vanilla weather command. */
     public enum Value { CLEAR, RAIN, THUNDER }
     
-    public WeatherEnvironment( Value value ) { super( value ); }
-    
     public WeatherEnvironment( Value value, boolean invert ) { super( value, invert ); }
     
     public WeatherEnvironment( AbstractConfigField field, String line ) { super( field, line, Value.values() ); }
     
     /** @return The string name of this environment, as it would appear in a config file. */
     @Override
-    public String name() { return EnvironmentListField.ENV_BIOME_CATEGORY; }
+    public String name() { return EnvironmentListField.ENV_WEATHER; }
     
     /** @return Returns true if this environment matches the provided environment. */
     @Override

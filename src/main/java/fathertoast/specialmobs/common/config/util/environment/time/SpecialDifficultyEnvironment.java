@@ -23,9 +23,11 @@ public class SpecialDifficultyEnvironment extends CompareFloatEnvironment {
     public SpecialDifficultyEnvironment( AbstractConfigField field, String line ) { super( field, line ); }
     
     /** @return The minimum value that can be given to the value. */
+    @Override
     protected float getMinValue() { return 0.0F; }
     
     /** @return The maximum value that can be given to the value. */
+    @Override
     protected float getMaxValue() { return 1.0F; }
     
     /** @return The string name of this environment, as it would appear in a config file. */

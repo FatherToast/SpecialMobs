@@ -13,8 +13,6 @@ import javax.annotation.Nullable;
 
 public class DimensionTypeEnvironment extends DynamicRegistryEnvironment<DimensionType> {
     
-    public DimensionTypeEnvironment( RegistryKey<DimensionType> dimType ) { super( dimType.getRegistryName() ); }
-    
     public DimensionTypeEnvironment( RegistryKey<DimensionType> dimType, boolean invert ) { super( dimType.getRegistryName(), invert ); }
     
     public DimensionTypeEnvironment( AbstractConfigField field, String line ) { super( field, line ); }

@@ -105,7 +105,7 @@ public final class SpecialMobReplacer {
     
     /** @return True if the next mob should be made a special variant. */
     private static boolean shouldMakeNextSpecial( MobFamily<?, ?> mobFamily, World world, BlockPos entityPos ) {
-        return world.random.nextFloat() < mobFamily.config.GENERAL.specialVariantChance.get(); //TODO environment exceptions
+        return world.random.nextDouble() < mobFamily.config.GENERAL.specialVariantChance.get( world, entityPos );
     }
     
     /** @return True if a mob should be replaced. */

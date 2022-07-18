@@ -4,6 +4,7 @@ import fathertoast.specialmobs.common.config.field.AbstractConfigField;
 import fathertoast.specialmobs.common.config.field.EnvironmentListField;
 import fathertoast.specialmobs.common.config.util.environment.DynamicRegistryGroupEnvironment;
 import net.minecraft.util.RegistryKey;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.biome.Biome;
@@ -14,9 +15,9 @@ import java.util.List;
 
 public class BiomeGroupEnvironment extends DynamicRegistryGroupEnvironment<Biome> {
     
-    public BiomeGroupEnvironment( RegistryKey<Biome> biome ) { super( biome.getRegistryName() ); }
+    public BiomeGroupEnvironment( RegistryKey<Biome> biome, boolean invert ) { this( biome.getRegistryName(), invert ); }
     
-    public BiomeGroupEnvironment( RegistryKey<Biome> biome, boolean invert ) { super( biome.getRegistryName(), invert ); }
+    public BiomeGroupEnvironment( ResourceLocation regKey, boolean invert ) { super( regKey, invert ); }
     
     public BiomeGroupEnvironment( AbstractConfigField field, String line ) { super( field, line ); }
     

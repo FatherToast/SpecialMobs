@@ -4,10 +4,13 @@ import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.config.Config;
 import fathertoast.specialmobs.common.config.field.BooleanField;
 import fathertoast.specialmobs.common.config.field.DoubleField;
+import fathertoast.specialmobs.common.config.field.EnvironmentListField;
 import fathertoast.specialmobs.common.config.field.IntField;
 import fathertoast.specialmobs.common.config.file.ToastConfigSpec;
 import fathertoast.specialmobs.common.config.file.TomlHelper;
 import fathertoast.specialmobs.common.config.util.ConfigUtil;
+import fathertoast.specialmobs.common.config.util.EnvironmentEntry;
+import fathertoast.specialmobs.common.config.util.EnvironmentList;
 
 import java.io.File;
 import java.util.List;
@@ -51,7 +54,7 @@ public class FamilyConfig extends Config.AbstractConfig {
         
         public final DoubleField familyRandomScaling;
         
-        public final DoubleField specialVariantChance;
+        public final DoubleField.EnvironmentSensitive specialVariantChance;
         
         public final IntField[] specialVariantWeights;
         
@@ -72,9 +75,17 @@ public class FamilyConfig extends Config.AbstractConfig {
             
             SPEC.newLine();
             
-            specialVariantChance = SPEC.define( new DoubleField( "special_variant_chance", variantChance, DoubleField.Range.PERCENT,
-                    "The chance for " + family.configName + " to spawn as special variants." ) );
-            // TODO special variant chance exceptions
+            specialVariantChance = new DoubleField.EnvironmentSensitive(
+                    SPEC.define( new DoubleField( "special_variant_chance.base", variantChance, DoubleField.Range.PERCENT,
+                            "The chance for " + family.configName + " to spawn as special variants." ) ),
+                    SPEC.define( new EnvironmentListField( "special_variant_chance.exceptions", new EnvironmentList(
+                            EnvironmentEntry.builder( (float) variantChance * 0.5F ).beforeDays( 5 ).build(), // Also skips first night's full moon
+                            EnvironmentEntry.builder( (float) variantChance * 2.0F ).atMaxMoonLight().aboveDifficulty( 0.5F ).build(),
+                            EnvironmentEntry.builder( (float) variantChance * 1.5F ).atMaxMoonLight().build(),
+                            EnvironmentEntry.builder( (float) variantChance * 1.5F ).aboveDifficulty( 0.5F ).build() )
+                            .setRange( DoubleField.Range.PERCENT ),
+                            "The chance for " + family.configName + " to spawn as special variants when specific environmental conditions are met." ) )
+            );
             
             SPEC.newLine();
             

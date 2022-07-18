@@ -4,6 +4,7 @@ import fathertoast.specialmobs.common.config.field.AbstractConfigField;
 import fathertoast.specialmobs.common.config.field.EnvironmentListField;
 import fathertoast.specialmobs.common.config.util.environment.DynamicRegistryGroupEnvironment;
 import net.minecraft.util.RegistryKey;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.DimensionType;
@@ -14,9 +15,9 @@ import java.util.List;
 
 public class DimensionTypeGroupEnvironment extends DynamicRegistryGroupEnvironment<DimensionType> {
     
-    public DimensionTypeGroupEnvironment( RegistryKey<DimensionType> dimType ) { super( dimType.getRegistryName() ); }
+    public DimensionTypeGroupEnvironment( RegistryKey<DimensionType> dimType, boolean invert ) { this( dimType.getRegistryName(), invert ); }
     
-    public DimensionTypeGroupEnvironment( RegistryKey<DimensionType> dimType, boolean invert ) { super( dimType.getRegistryName(), invert ); }
+    public DimensionTypeGroupEnvironment( ResourceLocation regKey, boolean invert ) { super( regKey, invert ); }
     
     public DimensionTypeGroupEnvironment( AbstractConfigField field, String line ) { super( field, line ); }
     

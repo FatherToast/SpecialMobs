@@ -5,40 +5,14 @@ import fathertoast.specialmobs.common.config.field.EnvironmentListField;
 import fathertoast.specialmobs.common.config.util.environment.EnumEnvironment;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraft.world.biome.Biome;
 
 import javax.annotation.Nullable;
 
-public class BiomeCategoryEnvironment extends EnumEnvironment<BiomeCategoryEnvironment.Value> {
-    public enum Value {
-        NONE( Biome.Category.NONE ),
-        TAIGA( Biome.Category.TAIGA ),
-        EXTREME_HILLS( Biome.Category.EXTREME_HILLS ),
-        JUNGLE( Biome.Category.JUNGLE ),
-        MESA( Biome.Category.MESA ),
-        PLAINS( Biome.Category.PLAINS ),
-        SAVANNA( Biome.Category.SAVANNA ),
-        ICY( Biome.Category.ICY ),
-        THE_END( Biome.Category.THEEND ),
-        BEACH( Biome.Category.BEACH ),
-        FOREST( Biome.Category.FOREST ),
-        OCEAN( Biome.Category.OCEAN ),
-        DESERT( Biome.Category.DESERT ),
-        RIVER( Biome.Category.RIVER ),
-        SWAMP( Biome.Category.SWAMP ),
-        MUSHROOM( Biome.Category.MUSHROOM ),
-        NETHER( Biome.Category.NETHER );
-        
-        public final Biome.Category BASE;
-        
-        Value( Biome.Category vanillaCat ) { BASE = vanillaCat; }
-    }
+public class BiomeCategoryEnvironment extends EnumEnvironment<BiomeCategory> {
     
-    public BiomeCategoryEnvironment( Value value ) { super( value ); }
+    public BiomeCategoryEnvironment( BiomeCategory value, boolean invert ) { super( value, invert ); }
     
-    public BiomeCategoryEnvironment( Value value, boolean invert ) { super( value, invert ); }
-    
-    public BiomeCategoryEnvironment( AbstractConfigField field, String line ) { super( field, line, Value.values() ); }
+    public BiomeCategoryEnvironment( AbstractConfigField field, String line ) { super( field, line, BiomeCategory.values() ); }
     
     /** @return The string name of this environment, as it would appear in a config file. */
     @Override

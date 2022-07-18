@@ -13,56 +13,54 @@ public enum ComparisonOperator {
     @Override
     public String toString() { return LITERAL; }
     
+    /** @return A convenience method that returns the opposite comparison operator only if the passed value is true. */
+    public ComparisonOperator invert( boolean invert ) { return invert ? invert() : this; }
+    
+    /** @return The opposite comparison operator. */
+    public ComparisonOperator invert() {
+        switch( this ) {
+            case LESS_THAN: return GREATER_OR_EQUAL;
+            case LESS_OR_EQUAL: return GREATER_THAN;
+            case GREATER_THAN: return LESS_OR_EQUAL;
+            case GREATER_OR_EQUAL: return LESS_THAN;
+            case EQUAL_TO: return NOT_EQUAL_TO;
+            case NOT_EQUAL_TO: return EQUAL_TO;
+        }
+        throw new IllegalStateException( "Inversion implementation is invalid! :(" );
+    }
+    
     public boolean apply( float first, float second ) {
         switch( this ) {
-            case LESS_THAN:
-                return first < second;
-            case LESS_OR_EQUAL:
-                return first <= second;
-            case GREATER_THAN:
-                return first > second;
-            case GREATER_OR_EQUAL:
-                return first >= second;
-            case EQUAL_TO:
-                return first == second;
-            case NOT_EQUAL_TO:
-                return first != second;
+            case LESS_THAN: return first < second;
+            case LESS_OR_EQUAL: return first <= second;
+            case GREATER_THAN: return first > second;
+            case GREATER_OR_EQUAL: return first >= second;
+            case EQUAL_TO: return first == second;
+            case NOT_EQUAL_TO: return first != second;
         }
         throw new IllegalStateException( "Float comparison implementation is invalid! :(" );
     }
     
     public boolean apply( int first, int second ) {
         switch( this ) {
-            case LESS_THAN:
-                return first < second;
-            case LESS_OR_EQUAL:
-                return first <= second;
-            case GREATER_THAN:
-                return first > second;
-            case GREATER_OR_EQUAL:
-                return first >= second;
-            case EQUAL_TO:
-                return first == second;
-            case NOT_EQUAL_TO:
-                return first != second;
+            case LESS_THAN: return first < second;
+            case LESS_OR_EQUAL: return first <= second;
+            case GREATER_THAN: return first > second;
+            case GREATER_OR_EQUAL: return first >= second;
+            case EQUAL_TO: return first == second;
+            case NOT_EQUAL_TO: return first != second;
         }
         throw new IllegalStateException( "Integer comparison implementation is invalid! :(" );
     }
     
     public boolean apply( long first, long second ) {
         switch( this ) {
-            case LESS_THAN:
-                return first < second;
-            case LESS_OR_EQUAL:
-                return first <= second;
-            case GREATER_THAN:
-                return first > second;
-            case GREATER_OR_EQUAL:
-                return first >= second;
-            case EQUAL_TO:
-                return first == second;
-            case NOT_EQUAL_TO:
-                return first != second;
+            case LESS_THAN: return first < second;
+            case LESS_OR_EQUAL: return first <= second;
+            case GREATER_THAN: return first > second;
+            case GREATER_OR_EQUAL: return first >= second;
+            case EQUAL_TO: return first == second;
+            case NOT_EQUAL_TO: return first != second;
         }
         throw new IllegalStateException( "Long comparison implementation is invalid! :(" );
     }

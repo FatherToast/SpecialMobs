@@ -3,6 +3,7 @@ package fathertoast.specialmobs.common.config.util.environment.position;
 import fathertoast.specialmobs.common.config.field.AbstractConfigField;
 import fathertoast.specialmobs.common.config.field.EnvironmentListField;
 import fathertoast.specialmobs.common.config.util.environment.RegistryGroupEnvironment;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.gen.feature.structure.Structure;
@@ -16,9 +17,9 @@ import java.util.List;
 
 public class StructureGroupEnvironment extends RegistryGroupEnvironment<Structure<?>> {
     
-    public StructureGroupEnvironment( Structure<?> biome ) { super( biome ); }
+    public StructureGroupEnvironment( Structure<?> structure, boolean invert ) { super( structure, invert ); }
     
-    public StructureGroupEnvironment( Structure<?> biome, boolean invert ) { super( biome, invert ); }
+    public StructureGroupEnvironment( ResourceLocation regKey, boolean invert ) { super( regKey, invert ); }
     
     public StructureGroupEnvironment( AbstractConfigField field, String line ) { super( field, line ); }
     

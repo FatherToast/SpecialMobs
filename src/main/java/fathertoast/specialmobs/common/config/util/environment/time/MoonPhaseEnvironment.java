@@ -19,8 +19,6 @@ public class MoonPhaseEnvironment extends EnumEnvironment<MoonPhaseEnvironment.V
         Value( int i ) { INDEX = i; }
     }
     
-    public MoonPhaseEnvironment( Value value ) { super( value ); }
-    
     public MoonPhaseEnvironment( Value value, boolean invert ) { super( value, invert ); }
     
     public MoonPhaseEnvironment( AbstractConfigField field, String line ) { super( field, line, Value.values() ); }

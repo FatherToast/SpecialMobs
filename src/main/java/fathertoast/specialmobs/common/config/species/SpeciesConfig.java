@@ -38,8 +38,6 @@ public class SpeciesConfig extends Config.AbstractConfig {
         super( FamilyConfig.dir( species.family ), fileName( species ),
                 String.format( "This config contains options that apply only to the %s %s species.",
                         variantName( species ), ConfigUtil.camelCaseToLowerSpace( species.family.name ) ) );
-        SPEC.newLine();
-        SPEC.comment( "See the main mod config for common terms and how to use special field types like Attribute List or Registry List." );
         
         speciesName = variantName( species ) + " " + species.family.configName;
         

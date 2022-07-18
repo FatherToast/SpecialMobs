@@ -24,13 +24,15 @@ public abstract class RegistryGroupEnvironment<T extends IForgeRegistryEntry<T>>
     
     private List<T> registryEntries;
     
-    public RegistryGroupEnvironment( T regEntry ) { this( regEntry, false ); }
-    
     public RegistryGroupEnvironment( T regEntry, boolean invert ) {
+        //noinspection ConstantConditions
+        this( regEntry.getRegistryName(), invert );
+    }
+    
+    public RegistryGroupEnvironment( ResourceLocation regKey, boolean invert ) {
         FIELD = null;
         INVERT = invert;
-        //noinspection ConstantConditions
-        NAMESPACE = regEntry.getRegistryName().toString();
+        NAMESPACE = regKey.toString();
     }
     
     public RegistryGroupEnvironment( AbstractConfigField field, String line ) {

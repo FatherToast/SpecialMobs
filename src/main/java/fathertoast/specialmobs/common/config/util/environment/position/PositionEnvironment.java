@@ -18,7 +18,7 @@ public class PositionEnvironment extends EnumEnvironment<PositionEnvironment.Val
         IS_IN_VILLAGE( ( world, pos ) -> pos != null && world instanceof ServerWorld && ((ServerWorld) world).isVillage( pos ) ),
         IS_NEAR_VILLAGE( ( world, pos ) -> pos != null && world instanceof ServerWorld &&
                 ((ServerWorld) world).isCloseToVillage( pos, 3 ) ),
-        IS_RAIDED( ( world, pos ) -> pos != null && world instanceof ServerWorld && ((ServerWorld) world).isRaided( pos ) ),
+        IS_NEAR_RAID( ( world, pos ) -> pos != null && world instanceof ServerWorld && ((ServerWorld) world).isRaided( pos ) ),
         IS_IN_WATER( ( world, pos ) -> pos != null && world.getFluidState( pos ).is( FluidTags.WATER ) ),
         IS_IN_LAVA( ( world, pos ) -> pos != null && world.getFluidState( pos ).is( FluidTags.LAVA ) ),
         IS_IN_FLUID( ( world, pos ) -> pos != null && !world.getFluidState( pos ).isEmpty() ),
@@ -30,8 +30,6 @@ public class PositionEnvironment extends EnumEnvironment<PositionEnvironment.Val
         
         public boolean of( World world, @Nullable BlockPos pos ) { return SUPPLIER.apply( world, pos ); }
     }
-    
-    public PositionEnvironment( Value value ) { super( value ); }
     
     public PositionEnvironment( Value value, boolean invert ) { super( value, invert ); }
     

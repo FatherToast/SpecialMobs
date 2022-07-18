@@ -22,8 +22,6 @@ public abstract class RegistryEnvironment<T extends IForgeRegistryEntry<T>> exte
     
     private T registryEntry;
     
-    public RegistryEnvironment( T regEntry ) { this( regEntry, false ); }
-    
     public RegistryEnvironment( T regEntry, boolean invert ) {
         FIELD = null;
         INVERT = invert;

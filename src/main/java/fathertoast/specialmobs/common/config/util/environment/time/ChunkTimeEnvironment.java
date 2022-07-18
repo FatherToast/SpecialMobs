@@ -9,11 +9,11 @@ import net.minecraft.world.World;
 
 import javax.annotation.Nullable;
 
-public class WorldTimeEnvironment extends CompareLongEnvironment {
+public class ChunkTimeEnvironment extends CompareLongEnvironment {
     
-    public WorldTimeEnvironment( ComparisonOperator op, long value ) { super( op, value ); }
+    public ChunkTimeEnvironment( ComparisonOperator op, long value ) { super( op, value ); }
     
-    public WorldTimeEnvironment( AbstractConfigField field, String line ) { super( field, line ); }
+    public ChunkTimeEnvironment( AbstractConfigField field, String line ) { super( field, line ); }
     
     /** @return The minimum value that can be given to the value. */
     @Override
@@ -21,9 +21,13 @@ public class WorldTimeEnvironment extends CompareLongEnvironment {
     
     /** @return The string name of this environment, as it would appear in a config file. */
     @Override
-    public String name() { return EnvironmentListField.ENV_WORLD_TIME; }
+    public String name() { return EnvironmentListField.ENV_CHUNK_TIME; }
     
     /** @return Returns the actual value to compare, or null if there isn't enough information. */
     @Override
-    public Long getActual( World world, @Nullable BlockPos pos ) { return world.dayTime(); }
+    public Long getActual( World world, @Nullable BlockPos pos ) {
+        // Ignore deprecation; this is intentionally the same method used by World#getCurrentDifficultyAt
+        //noinspection deprecation
+        return pos == null || !world.hasChunkAt( pos ) ? null : world.getChunkAt( pos ).getInhabitedTime();
+    }
 }

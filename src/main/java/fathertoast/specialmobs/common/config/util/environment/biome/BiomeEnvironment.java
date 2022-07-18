@@ -13,8 +13,6 @@ import javax.annotation.Nullable;
 
 public class BiomeEnvironment extends DynamicRegistryEnvironment<Biome> {
     
-    public BiomeEnvironment( RegistryKey<Biome> biome ) { super( biome.getRegistryName() ); }
-    
     public BiomeEnvironment( RegistryKey<Biome> biome, boolean invert ) { super( biome.getRegistryName(), invert ); }
     
     public BiomeEnvironment( AbstractConfigField field, String line ) { super( field, line ); }

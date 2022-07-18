@@ -14,8 +14,6 @@ import javax.annotation.Nullable;
 
 public class StructureEnvironment extends RegistryEnvironment<Structure<?>> {
     
-    public StructureEnvironment( Structure<?> structure ) { super( structure ); }
-    
     public StructureEnvironment( Structure<?> structure, boolean invert ) { super( structure, invert ); }
     
     public StructureEnvironment( AbstractConfigField field, String line ) { super( field, line ); }

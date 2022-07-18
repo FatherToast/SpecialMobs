@@ -24,6 +24,7 @@ public class Config {
     /** Performs initial loading of all configs in this mod. */
     public static void initialize() {
         ToastConfigSpec.freezeFileWatcher = true;
+        ReadMeConfig.makeReadMe( CONFIG_DIR );
         MAIN.SPEC.initialize();
         MobFamily.initBestiary();
         ToastConfigSpec.freezeFileWatcher = false;

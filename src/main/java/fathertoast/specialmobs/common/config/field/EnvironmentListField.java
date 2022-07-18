@@ -17,6 +17,7 @@ import net.minecraft.world.World;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Represents a config field with an environment list value.
@@ -53,6 +54,7 @@ public class EnvironmentListField extends GenericField<EnvironmentList> {
     public static final String ENV_DAY_TIME = "day_time";
     public static final String ENV_TIME_FROM_MIDNIGHT = "time_from_midnight";
     public static final String ENV_WORLD_TIME = "world_time";
+    public static final String ENV_CHUNK_TIME = "chunk_time";
     
     /**
      * Provides a description of how to use environment lists. Recommended to put at the top of any file using environment lists.
@@ -78,7 +80,7 @@ public class EnvironmentListField extends GenericField<EnvironmentList> {
         comment.add( "  \"" + ENV_DIMENSION_PROPERTY + " (!)property\":" );
         comment.add( "    Valid property values: " + TomlHelper.literalList( (Object[]) DimensionPropertyEnvironment.Value.values() ) );
         comment.add( "    Dimension properties are the true/false values available to dimension types in data packs." );
-        comment.add( "      See the wiki for more info: [https://minecraft.fandom.com/wiki/Custom_dimension#Syntax]." );
+        comment.add( "    See the wiki for more info: [https://minecraft.fandom.com/wiki/Custom_dimension#Syntax]." );
         comment.add( "  \"" + ENV_DIMENSION_TYPE + " (!)namespace:dimension_type_name\":" );
         comment.add( "    The world's dimension type. In vanilla, these are only \"minecraft:overworld\", \"minecraft:the_nether\", or \"minecraft:the_end\"." );
         // Biome-based
@@ -89,7 +91,7 @@ public class EnvironmentListField extends GenericField<EnvironmentList> {
         comment.add( "  \"" + ENV_TEMPERATURE + " op value\" or \"" + ENV_TEMPERATURE + " (!)" + TemperatureEnvironment.FREEZING + "\":" );
         comment.add( "    Height-adjusted temperature. For reference, freezing is < 0.15 and hot is generally considered > 0.95." );
         comment.add( "  \"" + ENV_BIOME_CATEGORY + " (!)category\":" );
-        comment.add( "    Valid category values: " + TomlHelper.literalList( (Object[]) BiomeCategoryEnvironment.Value.values() ) );
+        comment.add( "    Valid category values: " + TomlHelper.literalList( (Object[]) BiomeCategory.values() ) );
         comment.add( "  \"" + ENV_BIOME + " (!)namespace:biome_name\":" );
         comment.add( "    The biome. See the wiki for vanilla biome names (resource locations) [https://minecraft.fandom.com/wiki/Biome#Biome_IDs]." );
         // Position-based
@@ -98,7 +100,7 @@ public class EnvironmentListField extends GenericField<EnvironmentList> {
         comment.add( "  \"" + ENV_Y + " op value\":" );
         comment.add( "    The y-value. For reference, sea level is normally 63 and lava level is normally 10." );//TODO change lava level to -54 for MC 1.18
         comment.add( "  \"" + ENV_Y_FROM_SEA + " op value\":" );
-        comment.add( "    The y-value from sea level. Expect the only air <= 0 to be in caves (which may still have direct view of the sky)." );
+        comment.add( "    The y-value from sea level. Expect the only air <= 0 to be in caves/ravines (which may still have direct view of the sky)." );
         comment.add( "  \"" + ENV_POSITION + " (!)state\":" );
         comment.add( "    Valid state values: " + TomlHelper.literalList( (Object[]) PositionEnvironment.Value.values() ) );
         comment.add( "    Miscellaneous conditions that generally do what you expect. For reference, 'near' a village is ~3 chunks, and redstone checks weak power." );
@@ -123,8 +125,11 @@ public class EnvironmentListField extends GenericField<EnvironmentList> {
         comment.add( "    The absolute time in ticks away from midnight. Value must be 0 to 12000." );
         comment.add( "  \"" + ENV_MOON_PHASE + " (!)phase\":" );
         comment.add( "    Valid phase values: " + TomlHelper.literalList( (Object[]) MoonPhaseEnvironment.Value.values() ) );
+        comment.add( "    For reference, the first day in a new world is always a full moon." );
         comment.add( "  \"" + ENV_WORLD_TIME + " op value\":" );
         comment.add( "    The total time the world has existed, in ticks. For reference, each day cycle is 24000 ticks and each lunar cycle is 192000 ticks." );
+        comment.add( "  \"" + ENV_CHUNK_TIME + " op value\":" );
+        comment.add( "    The total time the chunk has been loaded, in ticks. For reference, each day cycle is 24000 ticks and each lunar cycle is 192000 ticks." );
         return comment;
     }
     
@@ -167,7 +172,7 @@ public class EnvironmentListField extends GenericField<EnvironmentList> {
         
         final List<AbstractEnvironment> conditions = new ArrayList<>();
         if( args.length > 1 ) {
-            final String[] condArgs = args[1].trim().split( "&" );
+            final String[] condArgs = args[1].split( "&" );
             for( String condArg : condArgs ) {
                 conditions.add( parseCondition( condArg.trim(), line ) );
             }
@@ -216,7 +221,7 @@ public class EnvironmentListField extends GenericField<EnvironmentList> {
         if( args.length < 2 ) value = "";
         else value = args[1].trim();
         
-        switch( args[0] ) {
+        switch( args[0].toLowerCase( Locale.ROOT ) ) {
             // Dimension-based
             case ENV_DIMENSION_PROPERTY:
                 return new DimensionPropertyEnvironment( this, value );
@@ -259,6 +264,8 @@ public class EnvironmentListField extends GenericField<EnvironmentList> {
                 return new TimeFromMidnightEnvironment( this, value );
             case ENV_WORLD_TIME:
                 return new WorldTimeEnvironment( this, value );
+            case ENV_CHUNK_TIME:
+                return new ChunkTimeEnvironment( this, value );
         }
         
         // The environment name was not recognized; try to provide some good feedback because this field is complicated
@@ -271,7 +278,7 @@ public class EnvironmentListField extends GenericField<EnvironmentList> {
                 ENV_STRUCTURE, ENV_Y, ENV_Y_FROM_SEA, ENV_POSITION,
                 // Time-based
                 ENV_DIFFICULTY, ENV_SPECIAL_DIFFICULTY, ENV_WEATHER, ENV_MOON_BRIGHTNESS, ENV_MOON_PHASE, ENV_DAY_TIME,
-                ENV_TIME_FROM_MIDNIGHT, ENV_WORLD_TIME
+                ENV_TIME_FROM_MIDNIGHT, ENV_WORLD_TIME, ENV_CHUNK_TIME
         };
         final AbstractEnvironment fallback = new YEnvironment( ComparisonOperator.LESS_THAN, 0 );
         SpecialMobs.LOG.warn( "Invalid environment '{}' for {} \"{}\"! Falling back to \"{}\". Environment name must be in the set [ {} ]. Invalid environment: {}",

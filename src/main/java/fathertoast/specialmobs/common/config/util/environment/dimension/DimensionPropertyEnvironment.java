@@ -35,8 +35,6 @@ public class DimensionPropertyEnvironment extends EnumEnvironment<DimensionPrope
         public boolean of( DimensionType dimType ) { return SUPPLIER.apply( dimType ); }
     }
     
-    public DimensionPropertyEnvironment( Value value ) { super( value ); }
-    
     public DimensionPropertyEnvironment( Value value, boolean invert ) { super( value, invert ); }
     
     public DimensionPropertyEnvironment( AbstractConfigField field, String line ) { super( field, line, Value.values() ); }

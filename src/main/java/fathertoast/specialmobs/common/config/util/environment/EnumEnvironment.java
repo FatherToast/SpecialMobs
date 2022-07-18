@@ -12,8 +12,6 @@ public abstract class EnumEnvironment<T extends Enum<T>> extends AbstractEnviron
     /** The enum value for this environment. */
     protected final T VALUE;
     
-    public EnumEnvironment( T value ) { this( value, false ); }
-    
     public EnumEnvironment( T value, boolean invert ) {
         INVERT = invert;
         VALUE = value;
