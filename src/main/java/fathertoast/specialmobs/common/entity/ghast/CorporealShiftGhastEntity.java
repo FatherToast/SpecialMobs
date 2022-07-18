@@ -4,12 +4,14 @@ import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.core.register.SMItems;
-import fathertoast.specialmobs.common.entity.projectile.CorporealShiftFireballEntity;
+import fathertoast.specialmobs.common.entity.projectile.IncorporealFireballEntity;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.Attributes;
+import net.minecraft.entity.projectile.FireballEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
@@ -90,7 +92,18 @@ public class CorporealShiftGhastEntity extends _SpecialGhastEntity {
     private void spawnShiftSmoke( ServerWorld world ) {
         world.sendParticles( ParticleTypes.CLOUD, this.getX(), this.getY(), this.getZ(), 25, 0.0, 0.0, 0.0, 0.4 );
     }
-    
+
+    @Override
+    public boolean isPushable() {
+        return isCorporeal() && super.isPushable();
+    }
+
+    @Override
+    protected void doPush(Entity entity) {
+        if (isCorporeal())
+            super.doPush(entity);
+    }
+
     public boolean isCorporeal() { return entityData.get( CORPOREAL ); }
     
     private void setCorporeal( boolean value ) { entityData.set( CORPOREAL, value ); }
@@ -109,14 +122,25 @@ public class CorporealShiftGhastEntity extends _SpecialGhastEntity {
         double dX = target.getX() - (getX() + lookVec.x) + getRandom().nextGaussian() * accelVariance;
         double dY = target.getY( 0.5 ) - (0.5 + getY( 0.5 ));
         double dZ = target.getZ() - (getZ() + lookVec.z) + getRandom().nextGaussian() * accelVariance;
-        
-        final CorporealShiftFireballEntity fireball = new CorporealShiftFireballEntity( level, this, dX, dY, dZ );
-        fireball.explosionPower = getVariantExplosionPower( getExplosionPower() );
-        fireball.setPos(
-                getX() + lookVec.x,
-                getY( 0.5 ) + 0.5,
-                getZ() + lookVec.z );
-        level.addFreshEntity( fireball );
+
+        if (isCorporeal()) {
+            FireballEntity fireball = new FireballEntity( level, this, dX, dY, dZ );
+            fireball.explosionPower = getVariantExplosionPower( getExplosionPower() );
+            fireball.setPos(
+                    getX() + lookVec.x,
+                    getY( 0.5 ) + 0.5,
+                    getZ() + lookVec.z );
+            level.addFreshEntity( fireball );
+        }
+        else {
+            IncorporealFireballEntity fireball = new IncorporealFireballEntity( level, this, dX, dY, dZ );
+            fireball.explosionPower = getVariantExplosionPower( getExplosionPower() );
+            fireball.setPos(
+                    getX() + lookVec.x,
+                    getY( 0.5 ) + 0.5,
+                    getZ() + lookVec.z );
+            level.addFreshEntity( fireball );
+        }
     }
     
     

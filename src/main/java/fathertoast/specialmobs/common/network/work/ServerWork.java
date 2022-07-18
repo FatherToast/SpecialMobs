@@ -1,6 +1,6 @@
 package fathertoast.specialmobs.common.network.work;
 
-import fathertoast.specialmobs.common.entity.projectile.CorporealShiftFireballEntity;
+import fathertoast.specialmobs.common.entity.projectile.IncorporealFireballEntity;
 import fathertoast.specialmobs.common.network.message.C2SSpawnIncorporealFireball;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
@@ -30,7 +30,7 @@ public class ServerWork {
             return;
 
         LivingEntity livingEntity = (LivingEntity) entity;
-        CorporealShiftFireballEntity fireballEntity = new CorporealShiftFireballEntity(world, player, livingEntity, player.getX(), player.getEyeY(), player.getZ());
+        IncorporealFireballEntity fireballEntity = new IncorporealFireballEntity(world, player, livingEntity, player.getX(), player.getEyeY(), player.getZ());
         world.addFreshEntity(fireballEntity);
     }
  }
