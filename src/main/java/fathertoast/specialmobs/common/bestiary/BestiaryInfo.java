@@ -1,6 +1,8 @@
 package fathertoast.specialmobs.common.bestiary;
 
+import fathertoast.specialmobs.common.config.field.DoubleField;
 import fathertoast.specialmobs.common.config.util.*;
+import fathertoast.specialmobs.common.config.util.environment.biome.BiomeCategory;
 import fathertoast.specialmobs.common.core.SpecialMobs;
 import fathertoast.specialmobs.common.util.References;
 import net.minecraft.block.Block;
@@ -14,7 +16,9 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * This class serves solely to store data for mob species in an organized way, providing builder methods as applicable.
@@ -23,24 +27,75 @@ import java.util.*;
 public class BestiaryInfo {
     
     public enum DefaultWeight {
-        DEFAULT( 600 ),
-        DISABLED( 0 ),
-        LOWEST( DEFAULT.value / 8 ),
-        LOW( DEFAULT.value / 4 ),
-        HIGH( DEFAULT.value * 4 ),
-        HIGHEST( DEFAULT.value * 8 );
+        DEFAULT( 60.0 ),
+        DISABLED( 0.0 ),
+        LOWEST( DEFAULT.value / 8.0 ),
+        LOW( DEFAULT.value / 4.0 ),
+        HIGH( DEFAULT.value * 4.0 ),
+        HIGHEST( DEFAULT.value * 8.0 );
         
-        public final int value;
+        public final double value;
         
-        DefaultWeight( int v ) { value = v; }
+        DefaultWeight( double v ) { value = v; }
     }
     
     public enum Theme {
-        NONE,
-        FIRE, ICE,
-        DESERT, WATER,
-        FOREST, MOUNTAIN,
-        FISHING
+        NONE( new EnvironmentList() ),
+        FIRE( new EnvironmentList(
+                EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).inUltraWarmDimension().build(),
+                EnvironmentEntry.builder( DefaultWeight.LOWEST.value ).isRaining().canSeeSky().notInDryBiome().build(),
+                EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).isHot().build(),
+                EnvironmentEntry.builder( DefaultWeight.HIGH.value ).isWarm().build(),
+                EnvironmentEntry.builder( DefaultWeight.LOWEST.value ).isFreezing().build()
+        ) ),
+        ICE( new EnvironmentList(
+                EnvironmentEntry.builder( DefaultWeight.LOWEST.value ).inUltraWarmDimension().build(),
+                EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).isFreezing().build(),
+                EnvironmentEntry.builder( DefaultWeight.LOW.value ).isWarm().build(),
+                EnvironmentEntry.builder( DefaultWeight.LOWEST.value ).isHot().build()
+        ) ),
+        DESERT( new EnvironmentList(
+                EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).inUltraWarmDimension().build(),
+                EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).inDryBiome().build(),
+                EnvironmentEntry.builder( DefaultWeight.LOWEST.value ).inHumidBiome().build(),
+                EnvironmentEntry.builder( DefaultWeight.LOWEST.value ).inBiomeCategory( BiomeCategory.OCEAN ).build(),
+                EnvironmentEntry.builder( DefaultWeight.LOWEST.value ).inBiomeCategory( BiomeCategory.RIVER ).build(),
+                EnvironmentEntry.builder( DefaultWeight.LOWEST.value ).isRaining().canSeeSky().build()
+        ) ),
+        WATER( new EnvironmentList(
+                EnvironmentEntry.builder( DefaultWeight.LOWEST.value ).inUltraWarmDimension().build(),
+                EnvironmentEntry.builder( DefaultWeight.LOWEST.value ).inDryBiome().build(),
+                EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).inHumidBiome().build(),
+                EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).inBiomeCategory( BiomeCategory.OCEAN ).build(),
+                EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).inBiomeCategory( BiomeCategory.RIVER ).build(),
+                EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).isRaining().canSeeSky().build()
+        ) ),
+        FOREST( new EnvironmentList(
+                EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).inBiomeCategory( BiomeCategory.TAIGA ).build(),
+                EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).inBiomeCategory( BiomeCategory.JUNGLE ).build(),
+                EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).inBiomeCategory( BiomeCategory.FOREST ).build(),
+                EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).inBiomeCategory( BiomeCategory.SWAMP ).build(),
+                EnvironmentEntry.builder( DefaultWeight.HIGH.value ).atMaxMoonLight().build()
+        ) ),
+        MOUNTAIN( new EnvironmentList(
+                EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).inBiomeCategory( BiomeCategory.EXTREME_HILLS ).build(),
+                EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).inBiomeCategory( BiomeCategory.MESA ).build(),
+                EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).aboveMountainLevel().build(),
+                EnvironmentEntry.builder( DefaultWeight.HIGH.value ).atNoMoonLight().build(),
+                EnvironmentEntry.builder( DefaultWeight.LOW.value ).belowSeaFloor().build()
+        ) ),
+        FISHING( new EnvironmentList(
+                EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).inBiomeCategory( BiomeCategory.OCEAN ).build(),
+                EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).inBiomeCategory( BiomeCategory.RIVER ).build(),
+                EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).inBiomeCategory( BiomeCategory.BEACH ).build(),
+                EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).inBiomeCategory( BiomeCategory.BEACH ).build(),
+                EnvironmentEntry.builder( DefaultWeight.HIGH.value ).atMaxMoonLight().build(),
+                EnvironmentEntry.builder( DefaultWeight.HIGH.value ).isRaining().notInDryBiome().build()
+        ) );
+        
+        public final EnvironmentList value;
+        
+        Theme( EnvironmentList v ) { value = v.setRange( DoubleField.Range.NON_NEGATIVE ); }
     }
     
     /** The spot color for spawn eggs of this species. The base color is determined by the family. */

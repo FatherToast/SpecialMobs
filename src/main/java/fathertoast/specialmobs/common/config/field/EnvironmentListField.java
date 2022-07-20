@@ -134,7 +134,7 @@ public class EnvironmentListField extends GenericField<EnvironmentList> {
     }
     
     /** Creates a new field. */
-    public EnvironmentListField( String key, EnvironmentList defaultValue, String... description ) {
+    public EnvironmentListField( String key, EnvironmentList defaultValue, @Nullable String... description ) {
         super( key, defaultValue, description );
     }
     

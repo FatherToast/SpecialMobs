@@ -192,31 +192,10 @@ public class MobFamily<T extends LivingEntity, V extends FamilyConfig> {
     }
     
     /** Pick a new species from this family, based on the location. */
-    public Species<? extends T> nextVariant( World world, BlockPos pos ) {
-        // Build weights for the current location
-        int totalWeight = 0;
-        final int[] variantWeights = new int[variants.length];
-        for( int i = 0; i < variants.length; i++ ) {
-            final int weight = config.GENERAL.specialVariantWeights[i].get(); //TODO environment exceptions
-            if( weight > 0 ) {
-                totalWeight += weight;
-                variantWeights[i] = weight;
-            }
-        }
-        
-        // Pick one item at random
-        if( totalWeight > 0 ) {
-            int weight = world.random.nextInt( totalWeight );
-            for( int i = 0; i < variants.length; i++ ) {
-                if( variantWeights[i] > 0 ) {
-                    weight -= variantWeights[i];
-                    if( weight < 0 ) {
-                        return variants[i];
-                    }
-                }
-            }
-        }
-        return vanillaReplacement;
+    public Species<? extends T> nextVariant( World world, @Nullable BlockPos pos ) {
+        final Species<?> species = config.GENERAL.specialVariantList.next( world.random, world, pos );
+        //noinspection unchecked
+        return species == null ? vanillaReplacement : (Species<? extends T>) species;
     }
     
     

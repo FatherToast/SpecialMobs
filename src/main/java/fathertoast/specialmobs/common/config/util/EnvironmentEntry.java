@@ -215,6 +215,12 @@ public class EnvironmentEntry {
         /** Check if the position is above/below the average sea floor. */
         public Builder aboveSeaFloor() { return in( new YFromSeaEnvironment( ComparisonOperator.LESS_OR_EQUAL.invert(), -18 ) ); }
         
+        /** Check if the position is above/below 'mountain level' - that is, high enough to die from falling to sea level. */
+        public Builder aboveMountainLevel() { return in( new YFromSeaEnvironment( ComparisonOperator.GREATER_OR_EQUAL, 24 ) ); }
+        
+        /** Check if the position is above/below 'mountain level' - that is, high enough to die from falling to sea level. */
+        public Builder belowMountainLevel() { return in( new YFromSeaEnvironment( ComparisonOperator.GREATER_OR_EQUAL.invert(), 24 ) ); }
+        
         public Builder canSeeSky() { return inPositionWithState( PositionEnvironment.Value.CAN_SEE_SKY, false ); }
         
         public Builder cannotSeeSky() { return inPositionWithState( PositionEnvironment.Value.CAN_SEE_SKY, true ); }
