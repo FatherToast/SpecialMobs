@@ -262,7 +262,7 @@ public class EnvironmentEntry {
         
         public Builder belowHalfMoonLight() { return fromHalfMoonLight( ComparisonOperator.LESS_THAN ); }
         
-        public Builder atNoMoonLight() { return in( new MoonPhaseEnvironment( MoonPhaseEnvironment.Value.NEW, true ) ); }
+        public Builder atNoMoonLight() { return in( new MoonPhaseEnvironment( MoonPhaseEnvironment.Value.NEW, false ) ); }
         
         private Builder fromHalfMoonLight( ComparisonOperator op ) { return in( new MoonBrightnessEnvironment( op, 0.5F ) ); }
         

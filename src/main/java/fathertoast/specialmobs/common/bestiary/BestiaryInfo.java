@@ -31,8 +31,8 @@ public class BestiaryInfo {
         DISABLED( 0.0 ),
         LOWEST( DEFAULT.value / 8.0 ),
         LOW( DEFAULT.value / 4.0 ),
-        HIGH( DEFAULT.value * 4.0 ),
-        HIGHEST( DEFAULT.value * 8.0 );
+        HIGH( DEFAULT.value * 2.5 ),
+        HIGHEST( DEFAULT.value * 5.0 );
         
         public final double value;
         
