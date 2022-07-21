@@ -27,7 +27,7 @@ public class EnvironmentListField extends GenericField<EnvironmentList> {
     /* When adding new environment conditions, you must:
      *  - Add a new constant for its name here
      *  - Create the environment class and ensure #name() returns the new name constant
-     *  - Link the name to construction in #parseCondition(String,String) below
+     *  - Link the name to construction and valid name array in #parseCondition(String,String) below
      *  - Add any applicable builder methods in EnvironmentEntry.Builder
      *  - Describe the new environment condition's usage/format in #environmentDescriptions() below
      */
@@ -35,6 +35,8 @@ public class EnvironmentListField extends GenericField<EnvironmentList> {
     public static final String ENV_DIMENSION_PROPERTY = "dimension_property";
     public static final String ENV_DIMENSION_TYPE = "dimension_type";
     // Biome-based
+    public static final String ENV_TERRAIN_DEPTH = "terrain_depth";
+    public static final String ENV_TERRAIN_SCALE = "terrain_scale";
     public static final String ENV_RAINFALL = "rainfall";
     public static final String ENV_BIOME_TEMPERATURE = "biome_temp";
     public static final String ENV_TEMPERATURE = "temp";
@@ -84,6 +86,11 @@ public class EnvironmentListField extends GenericField<EnvironmentList> {
         comment.add( "  \"" + ENV_DIMENSION_TYPE + " (!)namespace:dimension_type_name\":" );
         comment.add( "    The world's dimension type. In vanilla, these are only \"minecraft:overworld\", \"minecraft:the_nether\", or \"minecraft:the_end\"." );
         // Biome-based
+        comment.add( "  \"" + ENV_TERRAIN_DEPTH + " op value\":" );//TODO see if this changes in MC 1.18
+        comment.add( "    Biome's depth parameter. A measure of how high the terrain generates; depth < 0 makes a watery biome. For reference, generally vanilla" );
+        comment.add( "      plateaus are 1.5, mountains are 1, plains are 0.125, swamps are -0.2, rivers are -0.5, oceans are -1, and deep oceans are -1.8." );
+        comment.add( "  \"" + ENV_TERRAIN_SCALE + " op value\":" );
+        comment.add( "    Biome's scale parameter. A measure of how 'wavy' the terrain generates. For reference, generally vanilla mountains are 0.5 and plains are 0.05." );
         comment.add( "  \"" + ENV_RAINFALL + " op value\":" );
         comment.add( "    Biome's rainfall parameter. If this is \"= 0\", it checks that rain is disabled. For reference, rainfall > 0.85 suppresses fire." );
         comment.add( "  \"" + ENV_BIOME_TEMPERATURE + " op value\" or \"" + ENV_BIOME_TEMPERATURE + " (!)" + TemperatureEnvironment.FREEZING + "\":" );
@@ -228,6 +235,10 @@ public class EnvironmentListField extends GenericField<EnvironmentList> {
             case ENV_DIMENSION_TYPE:
                 return value.endsWith( "*" ) ? new DimensionTypeGroupEnvironment( this, value ) : new DimensionTypeEnvironment( this, value );
             // Biome-based
+            case ENV_TERRAIN_DEPTH:
+                return new TerrainDepthEnvironment( this, value );
+            case ENV_TERRAIN_SCALE:
+                return new TerrainScaleEnvironment( this, value );
             case ENV_RAINFALL:
                 return new RainfallEnvironment( this, value );
             case ENV_BIOME_TEMPERATURE:
@@ -273,7 +284,7 @@ public class EnvironmentListField extends GenericField<EnvironmentList> {
                 // Dimension-based
                 ENV_DIMENSION_PROPERTY, ENV_DIMENSION_TYPE,
                 // Biome-based
-                ENV_RAINFALL, ENV_BIOME_TEMPERATURE, ENV_TEMPERATURE, ENV_BIOME_CATEGORY, ENV_BIOME,
+                ENV_TERRAIN_DEPTH, ENV_TERRAIN_SCALE, ENV_RAINFALL, ENV_BIOME_TEMPERATURE, ENV_TEMPERATURE, ENV_BIOME_CATEGORY, ENV_BIOME,
                 // Position-based
                 ENV_STRUCTURE, ENV_Y, ENV_Y_FROM_SEA, ENV_POSITION,
                 // Time-based

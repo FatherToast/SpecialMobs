@@ -138,6 +138,34 @@ public class EnvironmentEntry {
         
         // Biome-based
         
+        /** Check if the biome is a water or beach biome (depth at or below sea level). */
+        public Builder inWaterBiome() { return isDepth( ComparisonOperator.LESS_OR_EQUAL, 0.0F ); }
+        
+        /** Check if the biome is a water or beach biome (depth at or below sea level). */
+        public Builder notInWaterBiome() { return isDepth( ComparisonOperator.LESS_OR_EQUAL.invert(), 0.0F ); }
+        
+        /** Check if the biome has relatively high elevation. */
+        public Builder inMountainBiome() { return isDepth( ComparisonOperator.GREATER_OR_EQUAL, 0.4F ); }
+        
+        /** Check if the biome has relatively high elevation. */
+        public Builder notInMountainBiome() { return isDepth( ComparisonOperator.GREATER_OR_EQUAL.invert(), 0.4F ); }
+        
+        private Builder isDepth( ComparisonOperator op, float value ) { return in( new TerrainDepthEnvironment( op, value ) ); }
+        
+        /** Check if the biome is relatively flat. */
+        public Builder inFlatBiome() { return isScale( ComparisonOperator.LESS_OR_EQUAL, 0.1F ); }
+        
+        /** Check if the biome is relatively flat. */
+        public Builder notInFlatBiome() { return isScale( ComparisonOperator.LESS_OR_EQUAL.invert(), 0.1F ); }
+        
+        /** Check if the biome is relatively hilly. */
+        public Builder inHillyBiome() { return isScale( ComparisonOperator.GREATER_OR_EQUAL, 0.3F ); }
+        
+        /** Check if the biome is relatively hilly. */
+        public Builder notInHillyBiome() { return isScale( ComparisonOperator.GREATER_OR_EQUAL.invert(), 0.3F ); }
+        
+        private Builder isScale( ComparisonOperator op, float value ) { return in( new TerrainScaleEnvironment( op, value ) ); }
+        
         /** Check if the biome has rain disabled. */
         public Builder inDryBiome() { return inAvgRainfall( ComparisonOperator.EQUAL_TO, 0.0F ); }
         

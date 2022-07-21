@@ -57,18 +57,18 @@ public class BestiaryInfo {
         DESERT( new EnvironmentList(
                 EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).inUltraWarmDimension().build(),
                 EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).inDryBiome().build(),
+                EnvironmentEntry.builder( DefaultWeight.LOWEST.value ).inWaterBiome().build(),
                 EnvironmentEntry.builder( DefaultWeight.LOWEST.value ).inHumidBiome().build(),
-                EnvironmentEntry.builder( DefaultWeight.LOWEST.value ).inBiomeCategory( BiomeCategory.OCEAN ).build(),
-                EnvironmentEntry.builder( DefaultWeight.LOWEST.value ).inBiomeCategory( BiomeCategory.RIVER ).build(),
-                EnvironmentEntry.builder( DefaultWeight.LOWEST.value ).isRaining().canSeeSky().build()
+                EnvironmentEntry.builder( DefaultWeight.LOWEST.value ).isRaining().canSeeSky().build(),
+                EnvironmentEntry.builder( DefaultWeight.HIGH.value ).belowHalfMoonLight().build()
         ) ),
         WATER( new EnvironmentList(
                 EnvironmentEntry.builder( DefaultWeight.LOWEST.value ).inUltraWarmDimension().build(),
                 EnvironmentEntry.builder( DefaultWeight.LOWEST.value ).inDryBiome().build(),
+                EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).inWaterBiome().build(),
                 EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).inHumidBiome().build(),
-                EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).inBiomeCategory( BiomeCategory.OCEAN ).build(),
-                EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).inBiomeCategory( BiomeCategory.RIVER ).build(),
-                EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).isRaining().canSeeSky().build()
+                EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).isRaining().canSeeSky().build(),
+                EnvironmentEntry.builder( DefaultWeight.HIGH.value ).aboveHalfMoonLight().build()
         ) ),
         FOREST( new EnvironmentList(
                 EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).inBiomeCategory( BiomeCategory.TAIGA ).build(),
@@ -78,17 +78,13 @@ public class BestiaryInfo {
                 EnvironmentEntry.builder( DefaultWeight.HIGH.value ).atMaxMoonLight().build()
         ) ),
         MOUNTAIN( new EnvironmentList(
-                EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).inBiomeCategory( BiomeCategory.EXTREME_HILLS ).build(),
-                EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).inBiomeCategory( BiomeCategory.MESA ).build(),
+                EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).inMountainBiome().build(),
                 EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).aboveMountainLevel().build(),
                 EnvironmentEntry.builder( DefaultWeight.HIGH.value ).atNoMoonLight().build(),
-                EnvironmentEntry.builder( DefaultWeight.LOW.value ).belowSeaFloor().build()
+                EnvironmentEntry.builder( DefaultWeight.LOW.value ).belowSeaLevel().build()
         ) ),
         FISHING( new EnvironmentList(
-                EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).inBiomeCategory( BiomeCategory.OCEAN ).build(),
-                EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).inBiomeCategory( BiomeCategory.RIVER ).build(),
-                EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).inBiomeCategory( BiomeCategory.BEACH ).build(),
-                EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).inBiomeCategory( BiomeCategory.BEACH ).build(),
+                EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).inWaterBiome().build(),
                 EnvironmentEntry.builder( DefaultWeight.HIGH.value ).atMaxMoonLight().build(),
                 EnvironmentEntry.builder( DefaultWeight.HIGH.value ).isRaining().notInDryBiome().build()
         ) );

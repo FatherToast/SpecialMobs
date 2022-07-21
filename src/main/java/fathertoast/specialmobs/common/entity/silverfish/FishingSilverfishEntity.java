@@ -25,7 +25,7 @@ public class FishingSilverfishEntity extends _SpecialSilverfishEntity implements
     
     @SpecialMob.BestiaryInfoSupplier
     public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
-        bestiaryInfo.color( 0x2D41F4 ).theme( BestiaryInfo.Theme.FISHING )
+        bestiaryInfo.color( 0x2D41F4 ).weight( BestiaryInfo.DefaultWeight.LOW ).theme( BestiaryInfo.Theme.FISHING )
                 .uniqueTextureBaseOnly()
                 .size( 1.2F, 0.5F, 0.4F )
                 .addExperience( 2 ).drownImmune().fluidPushImmune()
