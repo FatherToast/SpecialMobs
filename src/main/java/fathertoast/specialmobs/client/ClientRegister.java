@@ -8,6 +8,7 @@ import fathertoast.specialmobs.common.entity.ghast.CorporealShiftGhastEntity;
 import fathertoast.specialmobs.common.entity.skeleton.NinjaSkeletonEntity;
 import fathertoast.specialmobs.common.entity.witherskeleton.NinjaWitherSkeletonEntity;
 import fathertoast.specialmobs.common.entity.zombie.MadScientistZombieEntity;
+import fathertoast.specialmobs.common.entity.zombifiedpiglin.VampireZombifiedPiglinEntity;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ItemRenderer;
@@ -56,8 +57,11 @@ public class ClientRegister {
         
         // Species overrides
         registerSpeciesRenderer( MadScientistZombieEntity.SPECIES, SpecialZombieVillagerRenderer::new );
+        registerSpeciesRenderer( VampireZombifiedPiglinEntity.SPECIES, SpecialPiglinRenderer::newBothEars );
+        
         registerSpeciesRenderer( NinjaSkeletonEntity.SPECIES, NinjaSkeletonRenderer::new );
         registerSpeciesRenderer( NinjaWitherSkeletonEntity.SPECIES, NinjaSkeletonRenderer::new );
+        
         registerSpeciesRenderer( CorporealShiftGhastEntity.SPECIES, CorporealShiftGhastRenderer::new );
         
         // Other
