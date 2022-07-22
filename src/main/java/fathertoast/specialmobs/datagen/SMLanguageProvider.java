@@ -45,29 +45,32 @@ public class SMLanguageProvider extends LanguageProvider {
         
         final String[] spawnEggTranslationPattern = References.translations( "%s", "%s Spawn Egg",
                 "%s", "%s", "%s", "%s", "%s", "%s" ); //TODO
+        final String[] vanillaReplacementSpawnEggTranslationPattern = References.translations( "%s", "Normal %s Spawn Egg",
+                "%s", "%s", "%s", "%s", "%s", "%s" ); //TODO
         
         // Bestiary-generated translations
         for( MobFamily.Species<?> species : MobFamily.getAllSpecies() ) {
             final String[] speciesTranslations = AnnotationHelper.getTranslations( species );
-            String[] spawnEggTranslations = format( spawnEggTranslationPattern, speciesTranslations );
+            String[] spawnEggTranslations = format( species.specialVariantName == null ?
+                    vanillaReplacementSpawnEggTranslationPattern : spawnEggTranslationPattern, speciesTranslations );
             spawnEggTranslations[0] = species.spawnEgg.get().getDescriptionId();
             
             translationList.add( speciesTranslations );
             translationList.add( spawnEggTranslations );
         }
-
+        
         // Items
-        for (RegistryObject<Item> regObject : SMItems.REGISTRY.getEntries()) {
+        for( RegistryObject<Item> regObject : SMItems.REGISTRY.getEntries() ) {
             Item item = regObject.get();
-
+            
             // Lazy method of avoiding duplicate entries for now
-            if (item instanceof ForgeSpawnEggItem) {
+            if( item instanceof ForgeSpawnEggItem ) {
                 continue;
             }
-            final String[] itemTranslations = AnnotationHelper.getTranslations(regObject.get());
-            translationList.add(itemTranslations);
+            final String[] itemTranslations = AnnotationHelper.getTranslations( regObject.get() );
+            translationList.add( itemTranslations );
         }
-
+        
         TRANSLATIONS = translationList.toArray( new String[0][0] );
         
         // Assign all specific locales to the translation we want to use

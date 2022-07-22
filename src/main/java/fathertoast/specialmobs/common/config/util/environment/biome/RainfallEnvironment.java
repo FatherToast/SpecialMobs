@@ -26,6 +26,8 @@ public class RainfallEnvironment extends CompareFloatEnvironment {
         // Handle the special case of no rainfall
         if( COMPARATOR == ComparisonOperator.EQUAL_TO && VALUE == 0.0F )
             return pos != null && world.getBiome( pos ).getPrecipitation() == Biome.RainType.NONE;
+        if( COMPARATOR == ComparisonOperator.NOT_EQUAL_TO && VALUE == 0.0F )
+            return pos != null && world.getBiome( pos ).getPrecipitation() != Biome.RainType.NONE;
         return super.matches( world, pos );
     }
     

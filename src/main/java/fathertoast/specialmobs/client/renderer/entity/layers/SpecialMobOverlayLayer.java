@@ -3,7 +3,6 @@ package fathertoast.specialmobs.client.renderer.entity.layers;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
 import fathertoast.specialmobs.common.entity.ISpecialMob;
-import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.IEntityRenderer;
@@ -15,10 +14,6 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-import javax.annotation.ParametersAreNonnullByDefault;
-
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
 @OnlyIn( Dist.CLIENT )
 public class SpecialMobOverlayLayer<T extends Entity, M extends EntityModel<T>> extends LayerRenderer<T, M> {
     

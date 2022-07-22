@@ -528,6 +528,11 @@ public class BestiaryInfo {
             return rangedDamage( damage ).rangedSpread( spread ).rangedWalkSpeed( walkSpeed ).rangedCooldown( cooldown ).rangedMaxRange( range );
         }
         
+        /** Sets the species ranged attack stats (for a throwing item user). */
+        public Builder throwAttack( double spread, double walkSpeed, int cooldown, double range ) {
+            return rangedSpread( spread ).rangedWalkSpeed( walkSpeed ).rangedCooldown( cooldown ).rangedMaxRange( range );
+        }
+        
         /** Sets the species ranged attack stats (for a fireball shooter). */
         public Builder fireballAttack( double spread, int charge, int cooldown, double range ) {
             return rangedSpread( spread ).rangedCooldown( charge ).rangedMaxCooldown( charge + cooldown ).rangedMaxRange( range );

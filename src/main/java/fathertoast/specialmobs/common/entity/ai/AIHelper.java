@@ -11,6 +11,7 @@ import java.util.ArrayList;
 /**
  * Provides helper methods for adjusting pre-defined AI goals.
  */
+@SuppressWarnings( "unused" )
 public final class AIHelper {
     
     /** Inserts an AI goal at the specified priority. Existing goals have their priority incremented accordingly. */

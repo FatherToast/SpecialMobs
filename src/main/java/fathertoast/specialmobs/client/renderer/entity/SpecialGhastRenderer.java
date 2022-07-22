@@ -3,7 +3,6 @@ package fathertoast.specialmobs.client.renderer.entity;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import fathertoast.specialmobs.common.entity.ISpecialMob;
 import fathertoast.specialmobs.common.entity.SpecialMobData;
-import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.client.renderer.entity.GhastRenderer;
 import net.minecraft.entity.monster.GhastEntity;
@@ -11,10 +10,6 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-import javax.annotation.ParametersAreNonnullByDefault;
-
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
 @OnlyIn( Dist.CLIENT )
 public class SpecialGhastRenderer extends GhastRenderer {
     
@@ -32,7 +27,7 @@ public class SpecialGhastRenderer extends GhastRenderer {
     @Override
     public ResourceLocation getTextureLocation( GhastEntity entity ) {
         final SpecialMobData<?> data = ((ISpecialMob<?>) entity).getSpecialData();
-        return entity.isCharging() && data.hasOverlayTexture() ? data.getTextureOverlay() : data.getTexture();
+        return entity.isCharging() && data.getTextureOverlay() != null ? data.getTextureOverlay() : data.getTexture();
     }
     
     @Override

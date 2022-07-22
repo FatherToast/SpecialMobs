@@ -5,7 +5,6 @@ import com.mojang.blaze3d.vertex.IVertexBuilder;
 import com.mojang.blaze3d.vertex.MatrixApplyingVertexBuilder;
 import com.mojang.blaze3d.vertex.VertexBuilderUtils;
 import fathertoast.specialmobs.common.entity.ai.INinja;
-import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.*;
@@ -30,11 +29,9 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Random;
 import java.util.SortedSet;
 
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
 @OnlyIn( Dist.CLIENT )
 public class NinjaSkeletonRenderer extends SpecialSkeletonRenderer {
-
+    
     private final BlockRendererDispatcher blockRenderer;
     
     public NinjaSkeletonRenderer( EntityRendererManager rendererManager ) {
@@ -45,10 +42,10 @@ public class NinjaSkeletonRenderer extends SpecialSkeletonRenderer {
     @Override
     public void render( AbstractSkeletonEntity entity, float rotation, float partialTicks,
                         MatrixStack matrixStack, IRenderTypeBuffer buffer, int packedLight ) {
-
+        
         INinja ninja = (INinja) entity;
         final BlockState disguiseBlock = ninja.getHiddenDragon();
-
+        
         if( disguiseBlock == null ) {
             super.render( entity, rotation, partialTicks, matrixStack, buffer, packedLight );
         }
@@ -61,7 +58,7 @@ public class NinjaSkeletonRenderer extends SpecialSkeletonRenderer {
     private void renderBlockDisguise( BlockState block, BlockPos pos, IBlockDisplayReader displayReader, MatrixStack matrixStack, IRenderTypeBuffer buffer, Random random ) {
         matrixStack.pushPose();
         matrixStack.translate( -0.5, 0.0, -0.5 );
-        blockRenderer.renderModel(block, pos, displayReader, matrixStack, buffer.getBuffer(RenderType.cutout()), false, random, EmptyModelData.INSTANCE);
+        blockRenderer.renderModel( block, pos, displayReader, matrixStack, buffer.getBuffer( RenderType.cutout() ), false, random, EmptyModelData.INSTANCE );
         matrixStack.popPose();
     }
 }

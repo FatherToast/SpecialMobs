@@ -33,10 +33,9 @@ public class SpecialMobs {
     /* Feature List: //TODO; list may not be complete
      * (KEY: - = complete in current version, o = incomplete feature from previous version,
      *       + = incomplete new feature, ? = feature to consider adding)
-     *  o general
+     *  - general
      *      - entity replacer
-     *      o dimension-sensitive configs
-     *      o environment-sensitive configs
+     *      - environment-sensitive configs
      *      + natural spawning
      *          o nether spawns
      *          o end spawns
@@ -53,7 +52,7 @@ public class SpecialMobs {
      *      - creepers
      *          - chance to spawn charged during thunderstorms
      *          + scope
-     *      - zombies TODO zombie villager renderer
+     *      - zombies
      *          o villager infection
      *          + transformations
      *          - ranged attack AI (using bow)
@@ -83,7 +82,7 @@ public class SpecialMobs {
      *          + ranged attack AI (spitter)
      *          + puffer
      *      - endermen
-     *      - witches TODO inject ranged attack stats
+     *      - witches
      *          - ability to equip held items
      *          - uses splash speed instead of regular
      *      - ghasts
