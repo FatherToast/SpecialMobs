@@ -17,8 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @SuppressWarnings( { "unused", "WeakerAccess", "UnusedReturnValue" } )
-public
-class LootEntryItemBuilder {
+public class LootEntryItemBuilder {
     
     private final IItemProvider item;
     
@@ -37,9 +36,6 @@ class LootEntryItemBuilder {
         if( itemStack.getTag() != null ) {
             setNBTTag( itemStack.getTag().copy() );
         }
-        //        if( !itemStack.isDamageableItem() && itemStack.getMetadata() != 0 ) {
-        //            setMetadata( itemStack.getMetadata() );
-        //        }
     }
     
     /** @return A new loot entry object reflecting the current state of this builder. */
@@ -100,16 +96,6 @@ class LootEntryItemBuilder {
     public LootEntryItemBuilder setDamage( int min, int max ) {
         return addFunction( SetDamage.setDamage( new RandomValueRange( min, max ) ) );
     }
-    
-    //    /** Adds a set metadata function. */
-    //    public LootEntryItemBuilder setMetadata( int min, int max ) {
-    //        return addFunction( new SetMetadata( NO_CONDITIONS, new RandomValueRange( min, max ) ) );
-    //    }
-    //
-    //    /** Adds a set metadata function. */
-    //    public LootEntryItemBuilder setMetadata( int value ) {
-    //        return addFunction( new SetMetadata( NO_CONDITIONS, new RandomValueRange( value ) ) );
-    //    }
     
     /** Adds an nbt tag compound function. */
     public LootEntryItemBuilder setNBTTag( CompoundNBT tag ) { return addFunction( SetNBT.setTag( tag ) ); }

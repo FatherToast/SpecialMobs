@@ -93,6 +93,7 @@ public class _SpecialBlazeEntity extends BlazeEntity implements IRangedAttackMob
     protected void registerVariantGoals() { }
     
     /** Override to change starting equipment or stats. */
+    @SuppressWarnings( "unused" )
     public void finalizeVariantSpawn( IServerWorld world, DifficultyInstance difficulty, @Nullable SpawnReason spawnReason,
                                       @Nullable ILivingEntityData groupData ) { }
     

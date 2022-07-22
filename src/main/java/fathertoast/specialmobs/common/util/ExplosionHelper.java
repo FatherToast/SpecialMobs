@@ -1,6 +1,5 @@
 package fathertoast.specialmobs.common.util;
 
-import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -16,7 +15,6 @@ import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.event.ForgeEventFactory;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,8 +23,6 @@ import java.util.Optional;
  * and providing helper methods.
  */
 @SuppressWarnings( "UnusedReturnValue" )
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
 public class ExplosionHelper {
     
     /** Gets the explosion mode to use as a result of appropriate Forge events. */
@@ -150,6 +146,7 @@ public class ExplosionHelper {
     }
     
     /** @return The block's explosion resistance (helper method). */
+    @SuppressWarnings( "unused" )
     public Optional<Float> getBlockExplosionResistance( BlockPos pos, BlockState block ) {
         return damageCalculator.getBlockExplosionResistance( explosion, level, pos, block, level.getFluidState( pos ) );
     }

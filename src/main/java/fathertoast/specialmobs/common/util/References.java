@@ -61,9 +61,9 @@ public final class References {
     public static final String TAG_RENDER_SCALE = "RenderScale";
     public static final String TAG_EXPERIENCE = "Experience";
     public static final String TAG_REGENERATION = "Regeneration";
-    public static final String TAG_TEXTURE = "Texture";
-    public static final String TAG_TEXTURE_EYES = "TextureEyes";
-    public static final String TAG_TEXTURE_OVER = "TextureOverlay";
+    //    public static final String TAG_TEXTURE = "Texture";
+    //    public static final String TAG_TEXTURE_EYES = "TextureEyes";
+    //    public static final String TAG_TEXTURE_OVER = "TextureOverlay";
     public static final String TAG_ARROW_DAMAGE = "ArrowDamage";
     public static final String TAG_ARROW_SPREAD = "ArrowSpread";
     public static final String TAG_ARROW_WALK_SPEED = "ArrowWalkSpeed";

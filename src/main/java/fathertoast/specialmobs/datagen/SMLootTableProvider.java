@@ -5,7 +5,6 @@ import com.mojang.datafixers.util.Pair;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.core.register.SMEntities;
 import fathertoast.specialmobs.common.util.AnnotationHelper;
-import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.advancements.criterion.EntityPredicate;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.LootTableProvider;
@@ -18,15 +17,12 @@ import net.minecraft.loot.ValidationTracker;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.RegistryObject;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
 public class SMLootTableProvider extends LootTableProvider {
     
     public SMLootTableProvider( DataGenerator gen ) { super( gen ); }

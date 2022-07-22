@@ -92,6 +92,7 @@ public class _SpecialSilverfishEntity extends SilverfishEntity implements ISpeci
     protected void registerVariantGoals() { }
     
     /** Override to change starting equipment or stats. */
+    @SuppressWarnings( "unused" )
     public void finalizeVariantSpawn( IServerWorld world, DifficultyInstance difficulty, @Nullable SpawnReason spawnReason,
                                       @Nullable ILivingEntityData groupData ) { }
     
@@ -106,10 +107,10 @@ public class _SpecialSilverfishEntity extends SilverfishEntity implements ISpeci
     protected void onVariantAttack( Entity target ) { }
     
     /** Override to save data to this entity's NBT data. */
-    public void addVariantSaveData( CompoundNBT saveTag ) { }
+    public void addVariantSaveData( @SuppressWarnings( "unused" ) CompoundNBT saveTag ) { }
     
     /** Override to load data from this entity's NBT data. */
-    public void readVariantSaveData( CompoundNBT saveTag ) { }
+    public void readVariantSaveData( @SuppressWarnings( "unused" ) CompoundNBT saveTag ) { }
     
     
     //--------------- Family-Specific Implementations ----------------

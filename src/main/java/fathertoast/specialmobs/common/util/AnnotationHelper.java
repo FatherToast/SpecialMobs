@@ -5,14 +5,12 @@ import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.config.species.SpeciesConfig;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
-import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.AttributeModifierMap;
 import net.minecraft.item.Item;
 
 import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -23,8 +21,6 @@ import java.lang.reflect.Modifier;
  * Provides helper methods to handle annotation processing through reflection.
  */
 @SuppressWarnings( "SameParameterValue" )
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
 public final class AnnotationHelper {
     
     //--------------- PRETTY HELPER METHODS ----------------

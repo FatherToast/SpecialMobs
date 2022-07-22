@@ -1,6 +1,6 @@
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-package fathertoast.specialmobs.common.entity.silverfish;
+package fathertoast.specialmobs.common.compat.top;
 
 import mcp.MethodsReturnNonnullByDefault;
 

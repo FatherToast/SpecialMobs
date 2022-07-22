@@ -40,7 +40,7 @@ public class _SpecialSlimeEntity extends SlimeEntity implements ISpecialMob<_Spe
     
     @SpecialMob.BestiaryInfoSupplier
     public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
-        bestiaryInfo.color( 0x51A03E )
+        bestiaryInfo.color( 0x7EBF6E )
                 .vanillaTextureBaseOnly( "textures/entity/slime/slime.png" )
                 .experience( 0 );
     }
@@ -78,6 +78,7 @@ public class _SpecialSlimeEntity extends SlimeEntity implements ISpecialMob<_Spe
     protected void registerVariantGoals() { }
     
     /** Override to change starting equipment or stats. */
+    @SuppressWarnings( "unused" )
     public void finalizeVariantSpawn( IServerWorld world, DifficultyInstance difficulty, @Nullable SpawnReason spawnReason,
                                       @Nullable ILivingEntityData groupData ) { }
     

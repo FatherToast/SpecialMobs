@@ -1,6 +1,5 @@
 package fathertoast.specialmobs.common.entity.ai;
 
-import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.MobEntity;
@@ -11,13 +10,9 @@ import net.minecraft.pathfinding.WalkNodeProcessor;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-import javax.annotation.ParametersAreNonnullByDefault;
-
 /**
  * A path navigator used for entities that can walk on fluids. Based on the strider's lava path navigator.
  */
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
 public class FluidPathNavigator extends GroundPathNavigator {
     
     private final boolean waterWalkable;

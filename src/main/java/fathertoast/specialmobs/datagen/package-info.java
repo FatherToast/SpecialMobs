@@ -1,6 +1,6 @@
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-package fathertoast.specialmobs.common.entity.silverfish;
+package fathertoast.specialmobs.datagen;
 
 import mcp.MethodsReturnNonnullByDefault;
 
