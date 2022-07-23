@@ -1,4 +1,4 @@
-package fathertoast.specialmobs.common.entity.slime;
+package fathertoast.specialmobs.common.entity.spider;
 
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
@@ -7,60 +7,64 @@ import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.entity.ai.AIHelper;
 import fathertoast.specialmobs.common.entity.ai.FluidPathNavigator;
 import fathertoast.specialmobs.common.util.References;
+import fathertoast.specialmobs.datagen.loot.LootEntryItemBuilder;
+import fathertoast.specialmobs.datagen.loot.LootPoolBuilder;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.particles.IParticleData;
-import net.minecraft.particles.ParticleTypes;
 import net.minecraft.pathfinding.PathNavigator;
 import net.minecraft.pathfinding.PathNodeType;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.world.World;
 
 @SpecialMob
-public class BlueberrySlimeEntity extends _SpecialSlimeEntity {
+public class WaterSpiderEntity extends _SpecialSpiderEntity {
     
     //--------------- Static Special Mob Hooks ----------------
     
     @SpecialMob.SpeciesReference
-    public static MobFamily.Species<BlueberrySlimeEntity> SPECIES;
+    public static MobFamily.Species<WaterSpiderEntity> SPECIES;
     
     @SpecialMob.BestiaryInfoSupplier
     public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
-        bestiaryInfo.color( 0x766BBC ).theme( BestiaryInfo.Theme.WATER )
-                .uniqueTextureBaseOnly()
+        bestiaryInfo.color( 0x2D41F4 ).theme( BestiaryInfo.Theme.WATER )
+                .uniqueTextureWithEyes()
                 .addExperience( 1 ).drownImmune().fluidPushImmune()
-                .addToAttribute( Attributes.ATTACK_DAMAGE, 2.0 );
+                .addToAttribute( Attributes.ATTACK_DAMAGE, 1.0 );
     }
     
     @SpecialMob.LanguageProvider
     public static String[] getTranslations( String langKey ) {
-        return References.translations( langKey, "Blueberry Slime",
+        return References.translations( langKey, "Water Spider",
                 "", "", "", "", "", "" );//TODO
     }
     
     @SpecialMob.LootTableProvider
     public static void buildLootTable( LootTableBuilder loot ) {
         addBaseLoot( loot );
-        loot.addRareDrop( "rare", Items.GOLD_NUGGET, Items.PRISMARINE_SHARD, Items.PRISMARINE_CRYSTALS );
-        loot.addUncommonDrop( "uncommon", Items.BLUE_DYE );
+        loot.addPool( new LootPoolBuilder( "common" )
+                .addEntry( new LootEntryItemBuilder( Items.COD ).setCount( 0, 2 ).addLootingBonus( 0, 1 ).smeltIfBurning().toLootEntry() )
+                .toLootPool() );
+        loot.addPool( new LootPoolBuilder( "semicommon" )
+                .addEntry( new LootEntryItemBuilder( Items.SALMON ).setCount( 0, 1 ).addLootingBonus( 0, 1 ).smeltIfBurning().toLootEntry() )
+                .toLootPool() );
     }
     
     @SpecialMob.Factory
-    public static EntityType.IFactory<BlueberrySlimeEntity> getVariantFactory() { return BlueberrySlimeEntity::new; }
+    public static EntityType.IFactory<WaterSpiderEntity> getVariantFactory() { return WaterSpiderEntity::new; }
     
     /** @return This entity's mob species. */
     @SpecialMob.SpeciesSupplier
     @Override
-    public MobFamily.Species<? extends BlueberrySlimeEntity> getSpecies() { return SPECIES; }
+    public MobFamily.Species<? extends WaterSpiderEntity> getSpecies() { return SPECIES; }
     
     
     //--------------- Variant-Specific Implementations ----------------
     
-    public BlueberrySlimeEntity( EntityType<? extends _SpecialSlimeEntity> entityType, World world ) {
+    public WaterSpiderEntity( EntityType<? extends _SpecialSpiderEntity> entityType, World world ) {
         super( entityType, world );
         setPathfindingMalus( PathNodeType.WATER, PathNodeType.WALKABLE.getMalus() );
     }
@@ -68,7 +72,7 @@ public class BlueberrySlimeEntity extends _SpecialSlimeEntity {
     /** Override to change this entity's AI goals. */
     @Override
     protected void registerVariantGoals() {
-        AIHelper.removeGoals( goalSelector, 1 ); // SlimeEntity.FloatGoal
+        AIHelper.replaceWaterAvoidingRandomWalking( this, 0.8 );
     }
     
     /** @return A new path navigator for this entity to use. */
@@ -88,20 +92,9 @@ public class BlueberrySlimeEntity extends _SpecialSlimeEntity {
         MobHelper.floatInFluid( this, 0.06, FluidTags.WATER );
     }
     
-    // The below two methods are here to effectively override the private Entity#isInRain to always return true (always wet)
-    @Override
-    public boolean isInWaterOrRain() { return true; }
-    
-    @Override
-    public boolean isInWaterRainOrBubble() { return true; }
-    
     /** Override to load data from this entity's NBT data. */
     @Override
     public void readVariantSaveData( CompoundNBT saveTag ) {
         setPathfindingMalus( PathNodeType.WATER, PathNodeType.WALKABLE.getMalus() );
     }
-    
-    /** @return This slime's particle type for jump effects. */
-    @Override
-    protected IParticleData getParticleType() { return ParticleTypes.SPLASH; }
 }

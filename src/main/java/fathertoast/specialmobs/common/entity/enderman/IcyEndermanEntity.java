@@ -40,7 +40,7 @@ public class IcyEndermanEntity extends _SpecialEndermanEntity {
     
     @SpecialMob.BestiaryInfoSupplier
     public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
-        bestiaryInfo.color( 0x72959C ).theme( BestiaryInfo.Theme.ICE )
+        bestiaryInfo.color( 0xDDEAEA ).theme( BestiaryInfo.Theme.ICE )
                 .uniqueTextureWithEyes()
                 .addExperience( 1 ).effectImmune( Effects.MOVEMENT_SLOWDOWN );
         
@@ -56,7 +56,7 @@ public class IcyEndermanEntity extends _SpecialEndermanEntity {
     public static void buildLootTable( LootTableBuilder loot ) {
         addBaseLoot( loot );
         loot.addClusterDrop( "common", Items.SNOWBALL );
-        loot.addUncommonDrop( "uncommon", Blocks.ICE );
+        loot.addUncommonDrop( "uncommon", Blocks.BLUE_ICE );
     }
     
     @SpecialMob.Factory
@@ -88,6 +88,7 @@ public class IcyEndermanEntity extends _SpecialEndermanEntity {
     }
     
     /** Override to change this entity's AI goals. */
+    @Override
     protected void registerVariantGoals() {
         AIHelper.replaceWaterAvoidingRandomWalking( this, 1.0 );
     }

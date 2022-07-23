@@ -63,6 +63,9 @@ public class FishingZombieEntity extends _SpecialZombieEntity implements IAngler
         loot.addPool( new LootPoolBuilder( "common" )
                 .addEntry( new LootEntryItemBuilder( Items.COD ).setCount( 0, 2 ).addLootingBonus( 0, 1 ).smeltIfBurning().toLootEntry() )
                 .toLootPool() );
+        loot.addPool( new LootPoolBuilder( "semicommon" )
+                .addEntry( new LootEntryItemBuilder( Items.SALMON ).setCount( 0, 1 ).addLootingBonus( 0, 1 ).smeltIfBurning().toLootEntry() )
+                .toLootPool() );
         loot.addPool( new LootPoolBuilder( "rare" ).addConditions( LootHelper.RARE_CONDITIONS )
                 .addEntry( new LootEntryItemBuilder( Items.FISHING_ROD ).enchant( 30, true ).toLootEntry() )
                 .toLootPool() );

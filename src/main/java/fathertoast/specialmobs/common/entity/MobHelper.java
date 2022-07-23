@@ -103,14 +103,12 @@ public final class MobHelper {
     
     /** @return True if the damage source can deal normal damage to vampire-type mobs (e.g., wooden or smiting weapons). */
     public static boolean isDamageSourceIneffectiveAgainstVampires( DamageSource source ) {
-        if( source != null ) {
-            if( source.isBypassMagic() || source.isBypassInvul() ) return false;
-            
-            final Entity attacker = source.getEntity();
-            if( attacker instanceof LivingEntity ) {
-                final ItemStack weapon = ((LivingEntity) attacker).getMainHandItem();
-                return !isWoodenTool( weapon ) && !hasSmite( weapon );
-            }
+        if( source.isBypassMagic() || source.isBypassInvul() ) return false;
+        
+        final Entity attacker = source.getEntity();
+        if( attacker instanceof LivingEntity ) {
+            final ItemStack weapon = ((LivingEntity) attacker).getMainHandItem();
+            return !isWoodenTool( weapon ) && !hasSmite( weapon );
         }
         return true;
     }

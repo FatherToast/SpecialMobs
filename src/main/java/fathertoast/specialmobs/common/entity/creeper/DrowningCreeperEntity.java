@@ -49,6 +49,9 @@ public class DrowningCreeperEntity extends _SpecialCreeperEntity {
         loot.addPool( new LootPoolBuilder( "common" )
                 .addEntry( new LootEntryItemBuilder( Items.COD ).setCount( 0, 2 ).addLootingBonus( 0, 1 ).smeltIfBurning().toLootEntry() )
                 .toLootPool() );
+        loot.addPool( new LootPoolBuilder( "semicommon" )
+                .addEntry( new LootEntryItemBuilder( Items.SALMON ).setCount( 0, 1 ).addLootingBonus( 0, 1 ).smeltIfBurning().toLootEntry() )
+                .toLootPool() );
         loot.addUncommonDrop( "uncommon", Items.GOLD_NUGGET, Items.PRISMARINE_SHARD, Items.PRISMARINE_CRYSTALS );
     }
     
@@ -66,6 +69,7 @@ public class DrowningCreeperEntity extends _SpecialCreeperEntity {
     public DrowningCreeperEntity( EntityType<? extends _SpecialCreeperEntity> entityType, World world ) { super( entityType, world ); }
     
     /** Override to change this creeper's explosion power multiplier. */
+    @Override
     protected float getVariantExplosionPower( float radius ) { return super.getVariantExplosionPower( radius ) + 3.0F; }
     
     /** Override to change this creeper's explosion. */

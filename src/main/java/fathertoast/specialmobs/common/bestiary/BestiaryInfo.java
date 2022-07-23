@@ -83,6 +83,11 @@ public class BestiaryInfo {
                 EnvironmentEntry.builder( DefaultWeight.HIGH.value ).atNoMoonLight().build(),
                 EnvironmentEntry.builder( DefaultWeight.LOW.value ).belowSeaLevel().build()
         ) ),
+        STORM( new EnvironmentList(
+                EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).isThundering().build(),
+                EnvironmentEntry.builder( DefaultWeight.HIGH.value ).isRaining().build(),
+                EnvironmentEntry.builder( DefaultWeight.LOW.value ).cannotSeeSky().build()
+        ) ),
         FISHING( new EnvironmentList(
                 EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).inWaterBiome().build(),
                 EnvironmentEntry.builder( DefaultWeight.HIGH.value ).atMaxMoonLight().build(),
@@ -484,6 +489,12 @@ public class BestiaryInfo {
         /** Sets the species as damaged by water. */
         public Builder waterSensitive() {
             isDamagedByWater = true;
+            return this;
+        }
+        
+        /** Sets the species as NOT damaged by water. */
+        public Builder waterInsensitive() {
+            isDamagedByWater = false;
             return this;
         }
         

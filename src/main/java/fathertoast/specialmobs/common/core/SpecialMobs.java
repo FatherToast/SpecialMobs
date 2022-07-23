@@ -83,7 +83,7 @@ public class SpecialMobs {
      *          + puffer
      *      - endermen
      *      - witches
-     *          - ability to equip held items
+     *          - ability to equip held items (wonky)
      *          - uses splash speed instead of regular
      *      - ghasts
      *          - melee attack AI

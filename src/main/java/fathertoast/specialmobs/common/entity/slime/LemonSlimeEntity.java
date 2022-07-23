@@ -29,7 +29,7 @@ public class LemonSlimeEntity extends _SpecialSlimeEntity {
     
     @SpecialMob.BestiaryInfoSupplier
     public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
-        bestiaryInfo.color( 0xE6E861 )
+        bestiaryInfo.color( 0xE6E861 ).theme( BestiaryInfo.Theme.STORM )
                 .uniqueTextureBaseOnly()
                 .addExperience( 2 ).fireImmune()
                 .addToAttribute( Attributes.MAX_HEALTH, 4.0 );

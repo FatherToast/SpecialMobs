@@ -40,18 +40,22 @@ public class MobFamily<T extends LivingEntity, V extends FamilyConfig> {
     public static final MobFamily<CreeperEntity, CreeperFamilyConfig> CREEPER = new MobFamily<>( CreeperFamilyConfig::new,
             "Creeper", "creepers", 0x0DA70B, new EntityType[] { EntityType.CREEPER },
             "Dark", "Death", "Dirt", "Doom", "Drowning", "Ender", "Fire", "Gravel", "Jumping", "Lightning",
-            "Mini", /*"Scope",*/ "Skeleton", "Splitting"
-    );
+            "Mini", "Sand", /*"Scope",*/ "Snow", "Skeleton", "Splitting"
+    );//TODO scope
     
     public static final MobFamily<ZombieEntity, FamilyConfig> ZOMBIE = new MobFamily<>( FamilyConfig::newLessSpecial,
             "Zombie", "zombies", 0x00AFAF, new EntityType[] { EntityType.ZOMBIE, EntityType.HUSK },
             "Brute", "Fire", /*"Fishing",*/ "Giant", "Hungry", "Husk", "MadScientist", "Plague"
-    );
+    );//TODO fishing
     // TODO Drowned family and zombie transform mechanic
+    //    public static final MobFamily<ZombieEntity, FamilyConfig> DROWNED = new MobFamily<>( FamilyConfig::new,
+    //            "Zombie", "zombies", 0x8FF1D7, new EntityType[] { EntityType.DROWNED }, //VR egg: 0x799C65
+    //            "Brute", /*"Fishing",*/ "Giant", "Hungry", "Knight", "Plague"
+    //    );
     public static final MobFamily<ZombifiedPiglinEntity, FamilyConfig> ZOMBIFIED_PIGLIN = new MobFamily<>( FamilyConfig::new,
             "ZombifiedPiglin", "zombified piglins", 0xEA9393, new EntityType[] { EntityType.ZOMBIFIED_PIGLIN },
             "Brute", /*"Fishing",*/ "Giant", "Hungry", "Knight", "Plague", "Vampire"//TODO figure out crossbows
-    );
+    );//TODO fishing
     
     public static final MobFamily<AbstractSkeletonEntity, SkeletonFamilyConfig> SKELETON = new MobFamily<>( SkeletonFamilyConfig::new,
             "Skeleton", "skeletons", 0xC1C1C1, new EntityType[] { EntityType.SKELETON, EntityType.STRAY },
@@ -73,21 +77,21 @@ public class MobFamily<T extends LivingEntity, V extends FamilyConfig> {
     
     public static final MobFamily<SpiderEntity, FamilyConfig> SPIDER = new MobFamily<>( FamilyConfig::newMoreSpecial,
             "Spider", "spiders", 0x342D27, new EntityType[] { EntityType.SPIDER },
-            "Baby", "Desert", "Flying", "Giant", "Hungry", "Mother", "Pale", "Poison", /*"Water",*/ "Web", "Witch"
+            "Baby", "Desert", "Fire", "Flying", "Giant", "Hungry", "Mother", "Pale", "Poison", "Water", "Web", "Witch"
     );
     public static final MobFamily<CaveSpiderEntity, FamilyConfig> CAVE_SPIDER = new MobFamily<>( FamilyConfig::newMoreSpecial,
             "CaveSpider", "cave spiders", 0x0C424E, new EntityType[] { EntityType.CAVE_SPIDER },
-            "Baby", "Flying", "Mother", /*"Water",*/ "Web", "Witch"
-    );
+            "Baby", /*"Desert", "Fire",*/ "Flying", "Mother", /*"Water",*/ "Web", "Witch"
+    );//TODO desert, fire, water
     
     public static final MobFamily<SilverfishEntity, SilverfishFamilyConfig> SILVERFISH = new MobFamily<>( SilverfishFamilyConfig::new,
             "Silverfish", "silverfish", 0x6E6E6E, new EntityType[] { EntityType.SILVERFISH },
-            "Blinding", /*"Fishing",*/ "Flying", "Poison", /*"Puffer",*/ "Tough"
-    );
+            "Blinding", "Desiccated", /*"Fishing",*/ "Flying", "Poison", /*"Puffer",*/ "Tough"
+    );//TODO fishing, puffer
     
     public static final MobFamily<EndermanEntity, FamilyConfig> ENDERMAN = new MobFamily<>( FamilyConfig::new,
             "Enderman", "endermen", 0x161616, new EntityType[] { EntityType.ENDERMAN },
-            "Blinding", "Icy", "Lightning", "Mini", "Mirage", "Thief"
+            "Blinding", "Flame", "Icy", "Lightning", "Mini", "Mirage", "Runic", "Thief"
     );
     
     public static final MobFamily<WitchEntity, WitchFamilyConfig> WITCH = new MobFamily<>( WitchFamilyConfig::new,
@@ -97,7 +101,7 @@ public class MobFamily<T extends LivingEntity, V extends FamilyConfig> {
     
     public static final MobFamily<GhastEntity, GhastFamilyConfig> GHAST = new MobFamily<>( GhastFamilyConfig::new,
             "Ghast", "ghasts", 0xF9F9F9, new EntityType[] { EntityType.GHAST },
-            "Baby", "Fighter", "King", "Queen", "Unholy", "CorporealShift"
+            "Baby", "CorporealShift", "Fighter", "King", "Queen", "Unholy"
     );
     
     public static final MobFamily<BlazeEntity, FamilyConfig> BLAZE = new MobFamily<>( FamilyConfig::new,

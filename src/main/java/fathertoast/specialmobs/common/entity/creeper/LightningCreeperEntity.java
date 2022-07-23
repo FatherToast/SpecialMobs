@@ -21,7 +21,7 @@ public class LightningCreeperEntity extends _SpecialCreeperEntity {
     
     @SpecialMob.BestiaryInfoSupplier
     public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
-        bestiaryInfo.color( 0x499CAE )
+        bestiaryInfo.color( 0x499CAE ).theme( BestiaryInfo.Theme.STORM )
                 .uniqueTextureBaseOnly()
                 .addExperience( 1 ).fireImmune();
     }
