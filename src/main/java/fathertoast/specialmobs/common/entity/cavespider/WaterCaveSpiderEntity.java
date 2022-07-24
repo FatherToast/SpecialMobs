@@ -1,4 +1,4 @@
-package fathertoast.specialmobs.common.entity.spider;
+package fathertoast.specialmobs.common.entity.cavespider;
 
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
@@ -21,24 +21,24 @@ import net.minecraft.tags.FluidTags;
 import net.minecraft.world.World;
 
 @SpecialMob
-public class WaterSpiderEntity extends _SpecialSpiderEntity {
+public class WaterCaveSpiderEntity extends _SpecialCaveSpiderEntity {
     
     //--------------- Static Special Mob Hooks ----------------
     
     @SpecialMob.SpeciesReference
-    public static MobFamily.Species<WaterSpiderEntity> SPECIES;
+    public static MobFamily.Species<WaterCaveSpiderEntity> SPECIES;
     
     @SpecialMob.BestiaryInfoSupplier
     public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
         bestiaryInfo.color( 0x2D41F4 ).theme( BestiaryInfo.Theme.WATER )
                 .uniqueTextureWithEyes()
                 .addExperience( 1 ).drownImmune().fluidPushImmune()
-                .addToAttribute( Attributes.ATTACK_DAMAGE, 1.0 ).addToRangedDamage( 1.0 );
+                .addToAttribute( Attributes.ATTACK_DAMAGE, 1.0 );
     }
     
     @SpecialMob.LanguageProvider
     public static String[] getTranslations( String langKey ) {
-        return References.translations( langKey, "Water Spider",
+        return References.translations( langKey, "Water Cave Spider",
                 "", "", "", "", "", "" );//TODO
     }
     
@@ -54,17 +54,17 @@ public class WaterSpiderEntity extends _SpecialSpiderEntity {
     }
     
     @SpecialMob.Factory
-    public static EntityType.IFactory<WaterSpiderEntity> getVariantFactory() { return WaterSpiderEntity::new; }
+    public static EntityType.IFactory<WaterCaveSpiderEntity> getVariantFactory() { return WaterCaveSpiderEntity::new; }
     
     /** @return This entity's mob species. */
     @SpecialMob.SpeciesSupplier
     @Override
-    public MobFamily.Species<? extends WaterSpiderEntity> getSpecies() { return SPECIES; }
+    public MobFamily.Species<? extends WaterCaveSpiderEntity> getSpecies() { return SPECIES; }
     
     
     //--------------- Variant-Specific Implementations ----------------
     
-    public WaterSpiderEntity( EntityType<? extends _SpecialSpiderEntity> entityType, World world ) {
+    public WaterCaveSpiderEntity( EntityType<? extends _SpecialCaveSpiderEntity> entityType, World world ) {
         super( entityType, world );
         setPathfindingMalus( PathNodeType.WATER, PathNodeType.WALKABLE.getMalus() );
     }

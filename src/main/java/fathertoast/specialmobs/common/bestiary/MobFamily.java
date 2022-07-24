@@ -81,8 +81,8 @@ public class MobFamily<T extends LivingEntity, V extends FamilyConfig> {
     );
     public static final MobFamily<CaveSpiderEntity, FamilyConfig> CAVE_SPIDER = new MobFamily<>( FamilyConfig::newMoreSpecial,
             "CaveSpider", "cave spiders", 0x0C424E, new EntityType[] { EntityType.CAVE_SPIDER },
-            "Baby", /*"Desert", "Fire",*/ "Flying", "Mother", /*"Water",*/ "Web", "Witch"
-    );//TODO desert, fire, water
+            "Baby", "Desert", "Fire", "Flying", "Mother", "Pale", "Water", "Web", "Witch"
+    );
     
     public static final MobFamily<SilverfishEntity, SilverfishFamilyConfig> SILVERFISH = new MobFamily<>( SilverfishFamilyConfig::new,
             "Silverfish", "silverfish", 0x6E6E6E, new EntityType[] { EntityType.SILVERFISH },
