@@ -36,7 +36,7 @@ public class MadScientistZombieEntity extends _SpecialZombieEntity implements IA
     
     @SpecialMob.BestiaryInfoSupplier
     public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
-        bestiaryInfo.color( 0xDED4C6 )
+        bestiaryInfo.color( 0xDED4C6 ).weight( BestiaryInfo.DefaultWeight.LOW ).theme( BestiaryInfo.Theme.STORM )
                 .uniqueTextureBaseOnly()
                 .addExperience( 2 ).disableRangedAttack();
     }

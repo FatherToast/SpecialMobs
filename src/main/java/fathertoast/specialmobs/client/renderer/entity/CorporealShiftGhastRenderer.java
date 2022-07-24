@@ -7,7 +7,6 @@ import fathertoast.specialmobs.common.core.SpecialMobs;
 import fathertoast.specialmobs.common.entity.ISpecialMob;
 import fathertoast.specialmobs.common.entity.SpecialMobData;
 import fathertoast.specialmobs.common.entity.ghast.CorporealShiftGhastEntity;
-import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
@@ -16,11 +15,8 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.function.Function;
 
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
 @OnlyIn( Dist.CLIENT )
 public class CorporealShiftGhastRenderer extends MobRenderer<CorporealShiftGhastEntity, CorporealShiftGhastModel<CorporealShiftGhastEntity>> {
     
@@ -47,7 +43,7 @@ public class CorporealShiftGhastRenderer extends MobRenderer<CorporealShiftGhast
     @Override
     public ResourceLocation getTextureLocation( CorporealShiftGhastEntity entity ) {
         final SpecialMobData<?> data = ((ISpecialMob<?>) entity).getSpecialData();
-        return entity.isCharging() && data.hasOverlayTexture() ? data.getTextureOverlay() : data.getTexture();
+        return entity.isCharging() && data.getTextureOverlay() != null ? data.getTextureOverlay() : data.getTexture();
     }
     
     @Override

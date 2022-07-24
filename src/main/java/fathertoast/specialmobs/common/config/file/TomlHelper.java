@@ -6,10 +6,12 @@ import fathertoast.specialmobs.common.config.field.DoubleField;
 import fathertoast.specialmobs.common.config.field.IntField;
 import fathertoast.specialmobs.common.config.util.ConfigUtil;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+@SuppressWarnings( "unused" )
 public final class TomlHelper {
     private TomlHelper() { } // This is a static access only class that cannot be instantiated
     
@@ -32,7 +34,7 @@ public final class TomlHelper {
     }
     
     /** Attempts to convert a string value to a raw non-string toml literal. May or may not be accurate. */
-    public static Object parseRaw( String value ) {
+    public static Object parseRaw( @Nullable String value ) {
         // Note: It is very important here that the returned value is NOT a string
         
         if( value != null && !"".equals( value ) ) {
@@ -56,9 +58,9 @@ public final class TomlHelper {
     }
     
     /** Attempts to convert an object to a toml literal. May or may not be accurate. */
-    public static String toLiteral( Object value ) {
+    public static String toLiteral( @Nullable Object value ) {
         if( value == null ) {
-            return "null";
+            return "";
         }
         else if( value instanceof Enum<?> ) {
             return "\"" + ((Enum<?>) value).name().toLowerCase() + "\"";
@@ -66,21 +68,22 @@ public final class TomlHelper {
         else if( value instanceof String ) {
             return "\"" + value + "\"";
         }
-        else if( value instanceof Double && ((Double) value).isInfinite() ) {
-            // Toml infinite literals do not match java; these may also be unsupported in the current version
-            return (Double) value > 0.0 ? "Inf" : "-Inf";
-        }
+        // Infinite values not supported
+        //else if( value instanceof Double && ((Double) value).isInfinite() ) {
+        //    // Toml infinite literals do not match java
+        //    return (Double) value > 0.0 ? "Inf" : "-Inf";
+        //}
         else {
             return value.toString();
         }
     }
     
     /** Attempts to convert an object array to a toml literal. May or may not be accurate. */
-    public static String toLiteral( Object... values ) {
+    public static String toLiteral( @Nullable Object... values ) {
         if( values == null ) {
-            return "null";
+            return "";
         }
-        else if( values.length < 1 ) {
+        if( values.length < 1 ) {
             return "[]";
         }
         else {
@@ -92,7 +95,7 @@ public final class TomlHelper {
     public static String literalList( Object... list ) { return literalList( Arrays.asList( list ) ); }
     
     /** Attempts to convert an object list to a list of toml literals. May or may not be accurate. */
-    public static String literalList( List<Object> list ) {
+    public static String literalList( @Nullable List<Object> list ) {
         if( list == null || list.isEmpty() ) return "";
         StringBuilder literals = new StringBuilder();
         for( Object obj : list ) {
@@ -196,7 +199,7 @@ public final class TomlHelper {
     public static List<String> splitKey( String key ) { return StringUtils.split( key, '.' ); }
     
     /** Combines a toml path into a key. */
-    public static String mergePath( List<String> path ) {
+    public static String mergePath( @Nullable List<String> path ) {
         if( path == null || path.isEmpty() ) return "";
         StringBuilder key = new StringBuilder();
         for( String subKey : path ) {
@@ -207,15 +210,13 @@ public final class TomlHelper {
     }
     
     /** Convenience method for creating a list of single-line comments (no \n or \r). */
-    public static ArrayList<String> newComment( String... lines ) {
-        return new ArrayList<>( Arrays.asList( lines ) );
-    }
+    public static ArrayList<String> newComment( String... lines ) { return new ArrayList<>( Arrays.asList( lines ) ); }
     
     /** Combines an array of objects as a comma-separated string. */
     public static String combineList( Object... list ) { return combineList( Arrays.asList( list ) ); }
     
     /** Combines a list of objects as a comma-separated string. */
-    public static String combineList( List<Object> list ) {
+    public static String combineList( @Nullable List<Object> list ) {
         if( list == null || list.isEmpty() ) return "";
         StringBuilder key = new StringBuilder();
         for( Object obj : list ) {

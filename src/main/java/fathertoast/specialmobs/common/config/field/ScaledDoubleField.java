@@ -14,13 +14,13 @@ public class ScaledDoubleField extends DoubleField {
     private double valueScaled;
     
     /** Creates a new field that accepts a common range of values. */
-    public ScaledDoubleField( String key, double defaultValue, double scale, Range range, String... description ) {
+    public ScaledDoubleField( String key, double defaultValue, double scale, Range range, @Nullable String... description ) {
         super( key, defaultValue, range, description );
         SCALE = scale;
     }
     
     /** Creates a new field that accepts a specialized range of values. */
-    public ScaledDoubleField( String key, double defaultValue, double scale, double min, double max, String... description ) {
+    public ScaledDoubleField( String key, double defaultValue, double scale, double min, double max, @Nullable String... description ) {
         super( key, defaultValue, min, max, description );
         SCALE = scale;
     }

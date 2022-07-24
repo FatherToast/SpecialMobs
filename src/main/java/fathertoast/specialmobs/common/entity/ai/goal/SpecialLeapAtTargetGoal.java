@@ -37,18 +37,21 @@ public class SpecialLeapAtTargetGoal extends Goal {
     }
     
     /** Builder that sets momentum. */
+    @SuppressWarnings( "unused" )
     public SpecialLeapAtTargetGoal setMomentum( float value ) {
         momentum = value;
         return this;
     }
     
     /** Builder that enables the entity to leap while mounted. */
+    @SuppressWarnings( "unused" )
     public SpecialLeapAtTargetGoal canUseWhileMounted() {
         canUseWhileMounted = true;
         return this;
     }
     
     /** Builder that enables the entity to ignore fall damage from leaping. */
+    @SuppressWarnings( "unused" )
     public SpecialLeapAtTargetGoal ignoreFallDamage() {
         ignoreFallDamage = true;
         return this;

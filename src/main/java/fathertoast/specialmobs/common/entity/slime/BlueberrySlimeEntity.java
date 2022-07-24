@@ -66,6 +66,7 @@ public class BlueberrySlimeEntity extends _SpecialSlimeEntity {
     }
     
     /** Override to change this entity's AI goals. */
+    @Override
     protected void registerVariantGoals() {
         AIHelper.removeGoals( goalSelector, 1 ); // SlimeEntity.FloatGoal
     }

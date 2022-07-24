@@ -49,6 +49,9 @@ public class DrowningCreeperEntity extends _SpecialCreeperEntity {
         loot.addPool( new LootPoolBuilder( "common" )
                 .addEntry( new LootEntryItemBuilder( Items.COD ).setCount( 0, 2 ).addLootingBonus( 0, 1 ).smeltIfBurning().toLootEntry() )
                 .toLootPool() );
+        loot.addPool( new LootPoolBuilder( "semicommon" )
+                .addEntry( new LootEntryItemBuilder( Items.SALMON ).setCount( 0, 1 ).addLootingBonus( 0, 1 ).smeltIfBurning().toLootEntry() )
+                .toLootPool() );
         loot.addUncommonDrop( "uncommon", Items.GOLD_NUGGET, Items.PRISMARINE_SHARD, Items.PRISMARINE_CRYSTALS );
     }
     
@@ -66,6 +69,7 @@ public class DrowningCreeperEntity extends _SpecialCreeperEntity {
     public DrowningCreeperEntity( EntityType<? extends _SpecialCreeperEntity> entityType, World world ) { super( entityType, world ); }
     
     /** Override to change this creeper's explosion power multiplier. */
+    @Override
     protected float getVariantExplosionPower( float radius ) { return super.getVariantExplosionPower( radius ) + 3.0F; }
     
     /** Override to change this creeper's explosion. */
@@ -104,20 +108,20 @@ public class DrowningCreeperEntity extends _SpecialCreeperEntity {
                         if( stateAtPos.getMaterial().isReplaceable() || stateAtPos.is( BlockTags.LEAVES ) ) {
                             if( distSq > rMinusOneSq ) {
                                 // "Coral" casing
-                                level.setBlock( pos, random.nextFloat() < 0.25F ? brainCoral : hornCoral, References.SET_BLOCK_FLAGS );
+                                level.setBlock( pos, random.nextFloat() < 0.25F ? brainCoral : hornCoral, References.SetBlockFlags.DEFAULTS );
                             }
                             else {
                                 final float fillChoice = random.nextFloat();
                                 
                                 if( fillChoice < 0.1F && seaPickle.canSurvive( level, pos ) ) {
-                                    level.setBlock( pos, seaPickle, References.SET_BLOCK_FLAGS );
+                                    level.setBlock( pos, seaPickle, References.SetBlockFlags.DEFAULTS );
                                 }
                                 else if( fillChoice < 0.3F && seaGrass.canSurvive( level, pos ) ) {
-                                    level.setBlock( pos, seaGrass, References.SET_BLOCK_FLAGS );
+                                    level.setBlock( pos, seaGrass, References.SetBlockFlags.DEFAULTS );
                                 }
                                 else {
                                     // Water fill
-                                    level.setBlock( pos, water, References.SET_BLOCK_FLAGS );
+                                    level.setBlock( pos, water, References.SetBlockFlags.DEFAULTS );
                                     
                                     // Prevent greater radiuses from spawning a bazillion pufferfish
                                     if( random.nextFloat() < 0.01F && pufferCount < 10 ) {

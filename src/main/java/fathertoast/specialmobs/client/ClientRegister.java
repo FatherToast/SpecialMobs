@@ -8,7 +8,7 @@ import fathertoast.specialmobs.common.entity.ghast.CorporealShiftGhastEntity;
 import fathertoast.specialmobs.common.entity.skeleton.NinjaSkeletonEntity;
 import fathertoast.specialmobs.common.entity.witherskeleton.NinjaWitherSkeletonEntity;
 import fathertoast.specialmobs.common.entity.zombie.MadScientistZombieEntity;
-import mcp.MethodsReturnNonnullByDefault;
+import fathertoast.specialmobs.common.entity.zombifiedpiglin.VampireZombifiedPiglinEntity;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ItemRenderer;
 import net.minecraft.client.renderer.entity.SpriteRenderer;
@@ -23,11 +23,8 @@ import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.function.Supplier;
 
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
 @Mod.EventBusSubscriber( value = Dist.CLIENT, modid = SpecialMobs.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD )
 public class ClientRegister {
     
@@ -56,8 +53,11 @@ public class ClientRegister {
         
         // Species overrides
         registerSpeciesRenderer( MadScientistZombieEntity.SPECIES, SpecialZombieVillagerRenderer::new );
+        registerSpeciesRenderer( VampireZombifiedPiglinEntity.SPECIES, SpecialPiglinRenderer::newBothEars );
+        
         registerSpeciesRenderer( NinjaSkeletonEntity.SPECIES, NinjaSkeletonRenderer::new );
         registerSpeciesRenderer( NinjaWitherSkeletonEntity.SPECIES, NinjaSkeletonRenderer::new );
+        
         registerSpeciesRenderer( CorporealShiftGhastEntity.SPECIES, CorporealShiftGhastRenderer::new );
         
         // Other
@@ -74,6 +74,7 @@ public class ClientRegister {
         RenderingRegistry.registerEntityRenderingHandler( species.entityType.get(), renderFactory );
     }
     
+    @SuppressWarnings( "SameParameterValue" )
     private static <T extends Entity & IRendersAsItem> void registerSpriteRenderer( EntityType<T> entityType, Supplier<Minecraft> minecraftSupplier, float scale, boolean fullBright ) {
         ItemRenderer itemRenderer = minecraftSupplier.get().getItemRenderer();
         RenderingRegistry.registerEntityRenderingHandler( entityType, ( renderManager ) -> new SpriteRenderer<>( renderManager, itemRenderer, scale, fullBright ) );

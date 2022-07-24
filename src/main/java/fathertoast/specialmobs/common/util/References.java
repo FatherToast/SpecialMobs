@@ -1,10 +1,12 @@
 package fathertoast.specialmobs.common.util;
 
 import fathertoast.specialmobs.common.core.SpecialMobs;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
 import net.minecraft.nbt.StringNBT;
+import net.minecraft.util.math.BlockPos;
 
 import java.util.UUID;
 
@@ -29,12 +31,31 @@ public final class References {
     //public static final String TEXTURE_SHOOTING_EYES_SUFFIX = "_shooting_eyes";
     
     
-    //--------------- BIT FLAGS ----------------
-    
-    public static final int SET_BLOCK_FLAGS = 0b00000011;
-    
-    
     //--------------- EVENT CODES ----------------
+    
+    /** Bit flags that can be provided to {@link net.minecraft.world.World#setBlock(BlockPos, BlockState, int)}. */
+    @SuppressWarnings( "unused" )
+    public static class SetBlockFlags {
+        /** Triggers a block update. */
+        public static final int BLOCK_UPDATE = 0b0000_0001;
+        /** On servers, sends the change to clients. On clients, triggers a render update. */
+        public static final int UPDATE_CLIENT = 0b0000_0010;
+        /** Prevents clients from performing a render update. */
+        public static final int SKIP_RENDER_UPDATE = 0b0000_0100;
+        /** Forces clients to immediately perform the render update on the main thread. Generally used for direct player actions. */
+        public static final int PRIORITY_RENDER_UPDATE = 0b0000_1000;
+        /** Prevents neighboring blocks from being notified of the change. */
+        public static final int SKIP_NEIGHBOR_UPDATE = 0b0001_0000;
+        /** Prevents neighbor blocks that are removed by the change from dropping as items. Used by multi-part blocks to prevent dupes. */
+        public static final int SKIP_NEIGHBOR_DROPS = 0b0010_0000;
+        /** Marks the change as the result of a block moving. Generally prevents connection states from being updated. Used by pistons. */
+        public static final int IS_MOVED = 0b0100_0000;
+        /** Prevents light levels from being recalculated when set. */
+        public static final int SKIP_LIGHT_UPDATE = 0b1000_0000;
+        
+        /** The set block flags used for most non-world-gen purposes. */
+        public static final int DEFAULTS = BLOCK_UPDATE | UPDATE_CLIENT;
+    }
     
     // Entity events; used in World#broadcastEntityEvent(Entity, byte) then executed by Entity#handleEntityEvent(byte)
     public static final byte EVENT_TELEPORT_TRAIL_PARTICLES = 46;
@@ -61,15 +82,9 @@ public final class References {
     public static final String TAG_RENDER_SCALE = "RenderScale";
     public static final String TAG_EXPERIENCE = "Experience";
     public static final String TAG_REGENERATION = "Regeneration";
-    public static final String TAG_TEXTURE = "Texture";
-    public static final String TAG_TEXTURE_EYES = "TextureEyes";
-    public static final String TAG_TEXTURE_OVER = "TextureOverlay";
-    public static final String TAG_ARROW_DAMAGE = "ArrowDamage";
-    public static final String TAG_ARROW_SPREAD = "ArrowSpread";
-    public static final String TAG_ARROW_WALK_SPEED = "ArrowWalkSpeed";
-    public static final String TAG_ARROW_REFIRE_MIN = "ArrowRefireMin";
-    public static final String TAG_ARROW_REFIRE_MAX = "ArrowRefireMax";
-    public static final String TAG_ARROW_RANGE = "ArrowRange";
+    //    public static final String TAG_TEXTURE = "Texture";
+    //    public static final String TAG_TEXTURE_EYES = "TextureEyes";
+    //    public static final String TAG_TEXTURE_OVER = "TextureOverlay";
     public static final String TAG_FALL_MULTI = "FallMulti";
     public static final String TAG_FIRE_IMMUNE = "FireImmune";
     public static final String TAG_BURN_IMMUNE = "BurningImmune";
@@ -80,6 +95,12 @@ public final class References {
     public static final String TAG_WATER_DAMAGE = "WaterDamage";
     public static final String TAG_STICKY_IMMUNE = "StickyImmune";
     public static final String TAG_POTION_IMMUNE = "PotionImmune";
+    public static final String TAG_ARROW_DAMAGE = "ArrowDamage";
+    public static final String TAG_ARROW_SPREAD = "ArrowSpread";
+    public static final String TAG_ARROW_WALK_SPEED = "ArrowWalkSpeed";
+    public static final String TAG_ARROW_REFIRE_MIN = "ArrowRefireMin";
+    public static final String TAG_ARROW_REFIRE_MAX = "ArrowRefireMax";
+    public static final String TAG_ARROW_RANGE = "ArrowRange";
     
     // Creepers
     public static final String TAG_SUPERCHARGED = "Supercharged";
@@ -113,7 +134,7 @@ public final class References {
     
     // Misc.
     public static final String TAG_FUSE_TIME = "FuseTime"; // Blackberry Slime, Volatile Magma Cube
-    public static final String TAG_AMMO = "Ammo"; // Web (Cave) Spider, Mad Scientist Zombie
+    public static final String TAG_AMMO = "Ammo"; // Web (Cave) Spider, Mad Scientist Zombie, Desiccated Silverfish
     public static final String TAG_IS_FAKE = "IsFake"; // Mirage Enderman
     public static final String TAG_EXPLOSION_POWER = "ExplosionPower"; // Hellfire Blaze
     

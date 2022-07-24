@@ -18,7 +18,7 @@ public class BooleanField extends AbstractConfigField {
     private boolean value;
     
     /** Creates a new field. */
-    public BooleanField( String key, boolean defaultValue, String... description ) {
+    public BooleanField( String key, boolean defaultValue, @Nullable String... description ) {
         super( key, description );
         valueDefault = defaultValue;
     }

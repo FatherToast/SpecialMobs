@@ -4,7 +4,6 @@ import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.config.Config;
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.util.References;
-import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.nbt.CompoundNBT;
@@ -18,12 +17,9 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
 import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
 @Mod.EventBusSubscriber( modid = SpecialMobs.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE )
 public final class SpecialMobReplacer {
     /** List of data for mobs needing replacement. */
@@ -39,7 +35,8 @@ public final class SpecialMobReplacer {
      */
     @SubscribeEvent( priority = EventPriority.LOWEST )
     public static void onEntitySpawn( EntityJoinWorldEvent event ) {
-        if( event.getWorld().isClientSide() || !Config.MAIN.GENERAL.enableMobReplacement.get() ) return;
+        if( event.getWorld().isClientSide() || !Config.MAIN.GENERAL.enableMobReplacement.get() || event.isCanceled() )
+            return;
         
         final Entity entity = event.getEntity();
         final MobFamily<?, ?> mobFamily = getReplacingMobFamily( entity );
@@ -108,7 +105,7 @@ public final class SpecialMobReplacer {
     
     /** @return True if the next mob should be made a special variant. */
     private static boolean shouldMakeNextSpecial( MobFamily<?, ?> mobFamily, World world, BlockPos entityPos ) {
-        return world.random.nextFloat() < mobFamily.config.GENERAL.specialVariantChance.get(); //TODO environment exceptions
+        return world.random.nextDouble() < mobFamily.config.GENERAL.specialVariantChance.get( world, entityPos );
     }
     
     /** @return True if a mob should be replaced. */

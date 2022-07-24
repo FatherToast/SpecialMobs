@@ -37,7 +37,7 @@ public class ConflagrationBlazeEntity extends _SpecialBlazeEntity {
         bestiaryInfo.color( 0xFFF87E ).weight( BestiaryInfo.DefaultWeight.LOW )
                 .uniqueTextureBaseOnly()
                 .size( 1.5F, 0.9F, 2.7F )
-                .addExperience( 4 );
+                .addExperience( 4 ).regen( 20 );
     }
     
     @SpecialMob.LanguageProvider
@@ -106,6 +106,7 @@ public class ConflagrationBlazeEntity extends _SpecialBlazeEntity {
             getSpecialData().setRangedAttackMaxCooldown( getConfig().GENERAL.rangedAttackMaxCooldown.get() - cooldownReduction );
             
             fireballBurstCount = getConfig().BLAZES.fireballBurstCount.get();
+            if( growthLevel >= 3 ) fireballBurstCount++;
             if( growthLevel >= 7 ) fireballBurstCount++;
             
             final ModifiableAttributeInstance damage = getAttribute( Attributes.ATTACK_DAMAGE );

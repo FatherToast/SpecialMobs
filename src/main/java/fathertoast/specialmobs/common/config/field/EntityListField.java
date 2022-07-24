@@ -5,10 +5,8 @@ import fathertoast.specialmobs.common.config.util.EntityEntry;
 import fathertoast.specialmobs.common.config.util.EntityList;
 import fathertoast.specialmobs.common.core.SpecialMobs;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.registries.ForgeRegistries;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -35,7 +33,7 @@ public class EntityListField extends GenericField<EntityList> {
     }
     
     /** Creates a new field. */
-    public EntityListField( String key, EntityList defaultValue, String... description ) {
+    public EntityListField( String key, EntityList defaultValue, @Nullable String... description ) {
         super( key, defaultValue, description );
     }
     
@@ -85,16 +83,12 @@ public class EntityListField extends GenericField<EntityList> {
         List<String> list = TomlHelper.parseStringList( raw );
         List<EntityEntry> entryList = new ArrayList<>();
         for( String line : list ) {
-            EntityEntry entry = parseEntry( line );
-            if( entry != null ) {
-                entryList.add( entry );
-            }
+            entryList.add( parseEntry( line ) );
         }
         value = new EntityList( entryList );
     }
     
-    /** Parses a single entry line and returns a valid result if possible, or null if the entry is completely invalid. */
-    @Nullable
+    /** Parses a single entry line and returns the result. */
     private EntityEntry parseEntry( final String line ) {
         String modifiedLine = line;
         
@@ -110,20 +104,14 @@ public class EntityListField extends GenericField<EntityList> {
         
         // Parse the entity-value array
         final String[] args = modifiedLine.split( " " );
-        final EntityType<? extends Entity> entityType;
+        final ResourceLocation regKey;
         if( REG_KEY_DEFAULT.equalsIgnoreCase( args[0].trim() ) ) {
             // Handle the special case of a default entry
-            entityType = null;
+            regKey = null;
         }
         else {
             // Normal entry
-            final ResourceLocation regKey = new ResourceLocation( args[0].trim() );
-            if( !ForgeRegistries.ENTITIES.containsKey( regKey ) ) {
-                SpecialMobs.LOG.warn( "Invalid entry for {} \"{}\"! Deleting entry. Invalid entry: {}",
-                        getClass(), getKey(), line );
-                return null;
-            }
-            entityType = ForgeRegistries.ENTITIES.getValue( regKey );
+            regKey = new ResourceLocation( args[0].trim() );
         }
         final List<Double> valuesList = new ArrayList<>();
         final int reqValues = valueDefault.getRequiredValues();
@@ -173,7 +161,7 @@ public class EntityListField extends GenericField<EntityList> {
         for( int i = 0; i < values.length; i++ ) {
             values[i] = valuesList.get( i );
         }
-        return new EntityEntry( entityType, extendable, values );
+        return new EntityEntry( this, regKey, extendable, values );
     }
     
     /** Parses a single value argument and returns a valid result. */
@@ -203,6 +191,36 @@ public class EntityListField extends GenericField<EntityList> {
         return value;
     }
     
+    
+    // Convenience methods
+    
+    /** @return True if the entity is contained in this list. */
+    public boolean contains( @Nullable Entity entity ) { return get().contains( entity ); }
+    
+    /**
+     * @param entity The entity to retrieve values for.
+     * @return The array of values of the best-match entry. Returns null if the entity is not contained in this entity list.
+     */
+    @Nullable
+    public double[] getValues( @Nullable Entity entity ) { return get().getValues( entity ); }
+    
+    /**
+     * @param entity The entity to retrieve a value for.
+     * @return The first value in the best-match entry's value array. Returns 0 if the entity is not contained in this
+     * entity list or has no values specified. This should only be used for 'single value' lists.
+     * @see EntityList#setSingleValue()
+     * @see EntityList#setSinglePercent()
+     */
+    public double getValue( @Nullable Entity entity ) { return get().getValue( entity ); }
+    
+    /**
+     * @param entity The entity to roll a value for.
+     * @return Randomly rolls the first percentage value in the best-match entry's value array. Returns false if the entity
+     * is not contained in this entity list or has no values specified. This should only be used for 'single percent' lists.
+     * @see EntityList#setSinglePercent()
+     */
+    public boolean rollChance( @Nullable LivingEntity entity ) { return get().rollChance( entity ); }
+    
     /**
      * Represents two entity list fields, a blacklist and a whitelist, combined into one.
      * The blacklist cannot contain values, but the whitelist can have any settings.
@@ -222,17 +240,21 @@ public class EntityListField extends GenericField<EntityList> {
             }
         }
         
+        
+        // Convenience methods
+        
         /** @return True if the entity is contained in this list. */
-        public boolean contains( Entity entity ) {
-            return entity != null && !BLACKLIST.get().contains( entity ) && WHITELIST.get().contains( entity );
+        public boolean contains( @Nullable Entity entity ) {
+            return entity != null && !BLACKLIST.contains( entity ) && WHITELIST.contains( entity );
         }
         
         /**
          * @param entity The entity to retrieve values for.
          * @return The array of values of the best-match entry. Returns null if the entity is not contained in this entity list.
          */
-        public double[] getValues( Entity entity ) {
-            return entity != null && !BLACKLIST.get().contains( entity ) ? WHITELIST.get().getValues( entity ) : null;
+        @Nullable
+        public double[] getValues( @Nullable Entity entity ) {
+            return entity != null && !BLACKLIST.contains( entity ) ? WHITELIST.getValues( entity ) : null;
         }
         
         /**
@@ -242,8 +264,8 @@ public class EntityListField extends GenericField<EntityList> {
          * @see EntityList#setSingleValue()
          * @see EntityList#setSinglePercent()
          */
-        public double getValue( Entity entity ) {
-            return entity != null && !BLACKLIST.get().contains( entity ) ? WHITELIST.get().getValue( entity ) : 0.0;
+        public double getValue( @Nullable Entity entity ) {
+            return entity != null && !BLACKLIST.contains( entity ) ? WHITELIST.getValue( entity ) : 0.0;
         }
         
         /**
@@ -252,8 +274,8 @@ public class EntityListField extends GenericField<EntityList> {
          * is not contained in this entity list or has no values specified. This should only be used for 'single percent' lists.
          * @see EntityList#setSinglePercent()
          */
-        public boolean rollChance( LivingEntity entity ) {
-            return entity != null && !BLACKLIST.get().contains( entity ) && WHITELIST.get().rollChance( entity );
+        public boolean rollChance( @Nullable LivingEntity entity ) {
+            return entity != null && !BLACKLIST.contains( entity ) && WHITELIST.rollChance( entity );
         }
     }
 }

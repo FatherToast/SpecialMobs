@@ -6,10 +6,8 @@ import net.minecraft.loot.conditions.KilledByPlayer;
 import net.minecraft.loot.conditions.RandomChanceWithLooting;
 import net.minecraft.loot.functions.ILootFunction;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
 
-@ParametersAreNonnullByDefault
 public class LootHelper {
     
     public static final ILootCondition.IBuilder KILLED_BY_PLAYER_CONDITION = KilledByPlayer.killedByPlayer();

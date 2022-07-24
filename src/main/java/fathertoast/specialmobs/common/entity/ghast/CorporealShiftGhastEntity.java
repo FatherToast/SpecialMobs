@@ -4,9 +4,10 @@ import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.core.register.SMItems;
-import fathertoast.specialmobs.common.entity.projectile.CorporealShiftFireballEntity;
+import fathertoast.specialmobs.common.entity.projectile.IncorporealFireballEntity;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.Attributes;
@@ -63,7 +64,7 @@ public class CorporealShiftGhastEntity extends _SpecialGhastEntity {
     
     public static final DataParameter<Boolean> CORPOREAL = EntityDataManager.defineId( CorporealShiftGhastEntity.class, DataSerializers.BOOLEAN );
     
-    private final int maxShiftTime = 600;
+    private final int maxShiftTime = 150;
     private int shiftTime = maxShiftTime;
     
     public CorporealShiftGhastEntity( EntityType<? extends _SpecialGhastEntity> entityType, World world ) { super( entityType, world ); }
@@ -72,6 +73,7 @@ public class CorporealShiftGhastEntity extends _SpecialGhastEntity {
     protected void defineSynchedData() {
         super.defineSynchedData();
         entityData.define( CORPOREAL, false );
+        if( !level.isClientSide() && random.nextBoolean() ) setCorporeal( true );
     }
     
     @Override
@@ -80,7 +82,7 @@ public class CorporealShiftGhastEntity extends _SpecialGhastEntity {
         
         if( --shiftTime <= 0 ) {
             if( !level.isClientSide ) {
-                shiftTime = maxShiftTime;
+                shiftTime = maxShiftTime + random.nextInt( maxShiftTime );
                 setCorporeal( !isCorporeal() );
                 spawnShiftSmoke( (ServerWorld) level );
             }
@@ -88,20 +90,32 @@ public class CorporealShiftGhastEntity extends _SpecialGhastEntity {
     }
     
     private void spawnShiftSmoke( ServerWorld world ) {
-        world.sendParticles( ParticleTypes.CLOUD, this.getX(), this.getY(), this.getZ(), 25, 0.0, 0.0, 0.0, 0.4 );
+        world.sendParticles( ParticleTypes.CLOUD, this.getX(), this.getY(), this.getZ(),
+                25, 0.0, 0.0, 0.0, 0.4 );
     }
+    
+    @Override
+    public boolean isPushable() { return isCorporeal() && super.isPushable(); }
+    
+    @Override
+    protected void doPush( Entity entity ) { if( isCorporeal() ) super.doPush( entity ); }
+    
+    /** @return Attempts to damage this entity; returns true if the hit was successful. */
+    @Override
+    public boolean hurt( DamageSource source, float amount ) { return isCorporeal() && super.hurt( source, amount ); }
     
     public boolean isCorporeal() { return entityData.get( CORPOREAL ); }
     
     private void setCorporeal( boolean value ) { entityData.set( CORPOREAL, value ); }
     
-    /** Override to change this ghast's explosion power multiplier. */
-    @Override
-    protected int getVariantExplosionPower( int radius ) { return Math.round( radius * 2.5F ); }
-    
     /** Called to attack the target with a ranged attack. */
     @Override
     public void performRangedAttack( LivingEntity target, float damageMulti ) {
+        if( isCorporeal() ) {
+            super.performRangedAttack( target, damageMulti );
+            return;
+        }
+        
         if( !isSilent() ) level.levelEvent( null, References.EVENT_GHAST_SHOOT, blockPosition(), 0 );
         
         final float accelVariance = MathHelper.sqrt( distanceTo( target ) ) * 0.5F * getSpecialData().getRangedAttackSpread();
@@ -110,22 +124,13 @@ public class CorporealShiftGhastEntity extends _SpecialGhastEntity {
         double dY = target.getY( 0.5 ) - (0.5 + getY( 0.5 ));
         double dZ = target.getZ() - (getZ() + lookVec.z) + getRandom().nextGaussian() * accelVariance;
         
-        final CorporealShiftFireballEntity fireball = new CorporealShiftFireballEntity( level, this, dX, dY, dZ );
+        final IncorporealFireballEntity fireball = new IncorporealFireballEntity( level, this, dX, dY, dZ );
         fireball.explosionPower = getVariantExplosionPower( getExplosionPower() );
         fireball.setPos(
                 getX() + lookVec.x,
                 getY( 0.5 ) + 0.5,
                 getZ() + lookVec.z );
         level.addFreshEntity( fireball );
-    }
-    
-    
-    //--------------- SpecialMobData Hooks ----------------
-    
-    /** @return Attempts to damage this entity; returns true if the hit was successful. */
-    @Override
-    public boolean hurt( DamageSource source, float amount ) {
-        return isCorporeal() && super.hurt( source, amount );
     }
     
     /** Override to save data to this entity's NBT data. */

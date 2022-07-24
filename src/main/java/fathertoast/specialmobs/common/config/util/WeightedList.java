@@ -13,10 +13,8 @@ import java.util.*;
  * <p>
  * Creates a config field for each item so weights can be defined by the user.
  */
+@SuppressWarnings( "unused" )
 public class WeightedList<T extends WeightedList.Value> {
-    /** The spec used by this config that defines the file's format. */
-    protected final ToastConfigSpec SPEC;
-    
     /** The weighted entries in this list. */
     private final List<Entry<T>> ENTRIES;
     /** The total weight of all entries in this list. */
@@ -25,20 +23,20 @@ public class WeightedList<T extends WeightedList.Value> {
     /**
      * Creates a new weighted list config option and registers it and any needed definitions with the spec.
      */
-    public WeightedList( ToastConfigSpec parent, String key, T[] values, String... description ) {
-        this( parent, key, Arrays.asList( values ), description );
+    public WeightedList( ToastConfigSpec SPEC, String key, T[] values, @Nullable String... description ) {
+        this( SPEC, key, Arrays.asList( values ), description );
     }
     
     /**
      * Creates a new weighted list config option and registers it and any needed definitions with the spec.
      */
-    public WeightedList( ToastConfigSpec parent, String key, Iterable<T> values, String... description ) {
-        SPEC = parent;
-        
+    public WeightedList( ToastConfigSpec SPEC, String key, Iterable<T> values, @Nullable String... description ) {
         final IntField.Range fieldRange = IntField.Range.NON_NEGATIVE;
-        List<String> comment = TomlHelper.newComment( description );
-        comment.add( TomlHelper.multiFieldInfo( fieldRange ) );
-        SPEC.comment( comment );
+        if( description != null ) {
+            List<String> comment = TomlHelper.newComment( description );
+            comment.add( TomlHelper.multiFieldInfo( fieldRange ) );
+            SPEC.comment( comment );
+        }
         
         // Define each value's weight field and connect the value to its weight in an entry
         List<Entry<T>> list = new ArrayList<>();
@@ -110,6 +108,7 @@ public class WeightedList<T extends WeightedList.Value> {
         default int getDefaultWeight() { return 1; }
         
         /** @return Returns the comment for this object. */
+        @Nullable
         default String[] getComment() { return null; }
     }
 }

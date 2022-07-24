@@ -31,7 +31,7 @@ public class RegistryEntryListField<T extends IForgeRegistryEntry<T>> extends Ge
     }
     
     /** Creates a new field. */
-    public RegistryEntryListField( String key, RegistryEntryList<T> defaultValue, String... description ) {
+    public RegistryEntryListField( String key, RegistryEntryList<T> defaultValue, @Nullable String... description ) {
         super( key, defaultValue, description );
     }
     
@@ -57,15 +57,18 @@ public class RegistryEntryListField<T extends IForgeRegistryEntry<T>> extends Ge
         value = new RegistryEntryList<>( this, valueDefault.getRegistry(), TomlHelper.parseStringList( raw ) );
     }
     
+    
+    // Convenience methods
+    
     /** @return The registry this list draws from. */
-    public IForgeRegistry<T> getRegistry() { return value.getRegistry(); }
+    public IForgeRegistry<T> getRegistry() { return get().getRegistry(); }
     
     /** @return The entries in this list. */
-    public Set<T> getEntries() { return value.getEntries(); }
+    public Set<T> getEntries() { return get().getEntries(); }
     
     /** @return Returns true if there are no entries in this list. */
-    public boolean isEmpty() { return value.isEmpty(); }
+    public boolean isEmpty() { return get().isEmpty(); }
     
     /** @return Returns true if the entry is contained in this list. */
-    public boolean contains( T entry ) { return value.contains( entry ); }
+    public boolean contains( @Nullable T entry ) { return get().contains( entry ); }
 }

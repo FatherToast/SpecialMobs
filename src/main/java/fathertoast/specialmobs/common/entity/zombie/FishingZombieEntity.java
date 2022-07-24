@@ -40,7 +40,7 @@ public class FishingZombieEntity extends _SpecialZombieEntity implements IAngler
     
     @SpecialMob.BestiaryInfoSupplier
     public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
-        bestiaryInfo.color( 0x2D41F4 ).theme( BestiaryInfo.Theme.FISHING )
+        bestiaryInfo.color( 0x2D41F4 ).weight( BestiaryInfo.DefaultWeight.LOW ).theme( BestiaryInfo.Theme.FISHING )
                 .addExperience( 2 ).drownImmune().fluidPushImmune()
                 .bowAttack( 0.0, 1.0, 1.0, 40, 10.0 )
                 .multiplyAttribute( Attributes.MOVEMENT_SPEED, 0.8 );
@@ -62,6 +62,9 @@ public class FishingZombieEntity extends _SpecialZombieEntity implements IAngler
         addBaseLoot( loot );
         loot.addPool( new LootPoolBuilder( "common" )
                 .addEntry( new LootEntryItemBuilder( Items.COD ).setCount( 0, 2 ).addLootingBonus( 0, 1 ).smeltIfBurning().toLootEntry() )
+                .toLootPool() );
+        loot.addPool( new LootPoolBuilder( "semicommon" )
+                .addEntry( new LootEntryItemBuilder( Items.SALMON ).setCount( 0, 1 ).addLootingBonus( 0, 1 ).smeltIfBurning().toLootEntry() )
                 .toLootPool() );
         loot.addPool( new LootPoolBuilder( "rare" ).addConditions( LootHelper.RARE_CONDITIONS )
                 .addEntry( new LootEntryItemBuilder( Items.FISHING_ROD ).enchant( 30, true ).toLootEntry() )

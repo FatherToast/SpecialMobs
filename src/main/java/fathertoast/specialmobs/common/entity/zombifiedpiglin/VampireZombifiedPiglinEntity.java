@@ -31,7 +31,7 @@ public class VampireZombifiedPiglinEntity extends _SpecialZombifiedPiglinEntity 
     @SpecialMob.BestiaryInfoSupplier
     public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
         bestiaryInfo.color( 0x000000 ).weight( BestiaryInfo.DefaultWeight.LOW )
-                .uniqueTextureWithOverlay()
+                .uniqueTextureBaseOnly()
                 .addExperience( 4 )
                 .addToAttribute( Attributes.MAX_HEALTH, 10.0 );
     }

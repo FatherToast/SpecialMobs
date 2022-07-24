@@ -1,6 +1,8 @@
 package fathertoast.specialmobs.common.bestiary;
 
+import fathertoast.specialmobs.common.config.field.DoubleField;
 import fathertoast.specialmobs.common.config.util.*;
+import fathertoast.specialmobs.common.config.util.environment.biome.BiomeCategory;
 import fathertoast.specialmobs.common.core.SpecialMobs;
 import fathertoast.specialmobs.common.util.References;
 import net.minecraft.block.Block;
@@ -13,7 +15,10 @@ import net.minecraft.potion.Effects;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.registries.ForgeRegistries;
 
-import java.util.*;
+import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * This class serves solely to store data for mob species in an organized way, providing builder methods as applicable.
@@ -22,24 +27,76 @@ import java.util.*;
 public class BestiaryInfo {
     
     public enum DefaultWeight {
-        DEFAULT( 600 ),
-        DISABLED( 0 ),
-        LOWEST( DEFAULT.value / 8 ),
-        LOW( DEFAULT.value / 4 ),
-        HIGH( DEFAULT.value * 4 ),
-        HIGHEST( DEFAULT.value * 8 );
+        DEFAULT( 60.0 ),
+        DISABLED( 0.0 ),
+        LOWEST( DEFAULT.value / 8.0 ),
+        LOW( DEFAULT.value / 4.0 ),
+        HIGH( DEFAULT.value * 2.5 ),
+        HIGHEST( DEFAULT.value * 5.0 );
         
-        public final int value;
+        public final double value;
         
-        DefaultWeight( int v ) { value = v; }
+        DefaultWeight( double v ) { value = v; }
     }
     
     public enum Theme {
-        NONE,
-        FIRE, ICE,
-        DESERT, WATER,
-        FOREST, MOUNTAIN,
-        FISHING
+        NONE( new EnvironmentList() ),
+        FIRE( new EnvironmentList(
+                EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).inUltraWarmDimension().build(),
+                EnvironmentEntry.builder( DefaultWeight.LOWEST.value ).isRaining().canSeeSky().notInDryBiome().build(),
+                EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).isHot().build(),
+                EnvironmentEntry.builder( DefaultWeight.HIGH.value ).isWarm().build(),
+                EnvironmentEntry.builder( DefaultWeight.LOWEST.value ).isFreezing().build()
+        ) ),
+        ICE( new EnvironmentList(
+                EnvironmentEntry.builder( DefaultWeight.LOWEST.value ).inUltraWarmDimension().build(),
+                EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).isFreezing().build(),
+                EnvironmentEntry.builder( DefaultWeight.LOW.value ).isWarm().build(),
+                EnvironmentEntry.builder( DefaultWeight.LOWEST.value ).isHot().build()
+        ) ),
+        DESERT( new EnvironmentList(
+                EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).inUltraWarmDimension().build(),
+                EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).inDryBiome().build(),
+                EnvironmentEntry.builder( DefaultWeight.LOWEST.value ).inWaterBiome().build(),
+                EnvironmentEntry.builder( DefaultWeight.LOWEST.value ).inHumidBiome().build(),
+                EnvironmentEntry.builder( DefaultWeight.LOWEST.value ).isRaining().canSeeSky().build(),
+                EnvironmentEntry.builder( DefaultWeight.HIGH.value ).belowHalfMoonLight().build()
+        ) ),
+        WATER( new EnvironmentList(
+                EnvironmentEntry.builder( DefaultWeight.LOWEST.value ).inUltraWarmDimension().build(),
+                EnvironmentEntry.builder( DefaultWeight.LOWEST.value ).inDryBiome().build(),
+                EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).inWaterBiome().build(),
+                EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).inHumidBiome().build(),
+                EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).isRaining().canSeeSky().build(),
+                EnvironmentEntry.builder( DefaultWeight.HIGH.value ).aboveHalfMoonLight().build()
+        ) ),
+        FOREST( new EnvironmentList(
+                EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).inBiomeCategory( BiomeCategory.TAIGA ).build(),
+                EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).inBiomeCategory( BiomeCategory.JUNGLE ).build(),
+                EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).inBiomeCategory( BiomeCategory.FOREST ).build(),
+                EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).inBiomeCategory( BiomeCategory.SWAMP ).build(),
+                EnvironmentEntry.builder( DefaultWeight.HIGH.value ).atMaxMoonLight().build()
+        ) ),
+        MOUNTAIN( new EnvironmentList(
+                EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).inMountainBiome().build(),
+                EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).aboveMountainLevel().build(),
+                EnvironmentEntry.builder( DefaultWeight.HIGH.value ).atNoMoonLight().build(),
+                EnvironmentEntry.builder( DefaultWeight.LOW.value ).belowSeaLevel().build()
+        ) ),
+        STORM( new EnvironmentList(
+                EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).isThundering().build(),
+                EnvironmentEntry.builder( DefaultWeight.HIGH.value ).isRaining().build(),
+                EnvironmentEntry.builder( DefaultWeight.LOW.value ).cannotSeeSky().build()
+        ) ),
+        FISHING( new EnvironmentList(
+                EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).inWaterBiome().build(),
+                EnvironmentEntry.builder( DefaultWeight.HIGH.value ).atMaxMoonLight().build(),
+                EnvironmentEntry.builder( DefaultWeight.HIGH.value ).isRaining().notInDryBiome().build()
+        ) );
+        
+        public final EnvironmentList value;
+        
+        Theme( EnvironmentList v ) { value = v.setRange( DoubleField.Range.NON_NEGATIVE ); }
     }
     
     /** The spot color for spawn eggs of this species. The base color is determined by the family. */
@@ -280,13 +337,13 @@ public class BestiaryInfo {
         public Builder vanillaTextureBaseOnly( String tex ) { return vanillaBaseTexture( tex ).noEyesTexture().noOverlayTexture(); }
         
         /** Sets the species default base texture. */
-        private Builder vanillaBaseTexture( String tex ) { return baseTexture( tex == null ? null : new ResourceLocation( tex ) ); }
+        private Builder vanillaBaseTexture( String tex ) { return baseTexture( new ResourceLocation( tex ) ); }
         
         /** Sets the species default glowing eyes texture. */
-        private Builder vanillaEyesTexture( String eyeTex ) { return eyesTexture( eyeTex == null ? null : new ResourceLocation( eyeTex ) ); }
+        private Builder vanillaEyesTexture( String eyeTex ) { return eyesTexture( new ResourceLocation( eyeTex ) ); }
         
         /** Sets the species default overlay texture. */
-        private Builder vanillaOverlayTexture( String ovrTex ) { return overlayTexture( ovrTex == null ? null : new ResourceLocation( ovrTex ) ); }
+        private Builder vanillaOverlayTexture( String ovrTex ) { return overlayTexture( new ResourceLocation( ovrTex ) ); }
         
         
         //--------------- Textures (Auto-selected) ----------------
@@ -351,19 +408,19 @@ public class BestiaryInfo {
         public Builder noAnimationTexture() { return noOverlayTexture(); }
         
         /** Sets the species default base texture. */
-        private Builder baseTexture( ResourceLocation tex ) {
+        private Builder baseTexture( @Nullable ResourceLocation tex ) {
             texture = tex;
             return this;
         }
         
         /** Sets the species default glowing eyes texture. */
-        private Builder eyesTexture( ResourceLocation eyeTex ) {
+        private Builder eyesTexture( @Nullable ResourceLocation eyeTex ) {
             eyesTexture = eyeTex;
             return this;
         }
         
         /** Sets the species default overlay texture. */
-        private Builder overlayTexture( ResourceLocation ovrTex ) {
+        private Builder overlayTexture( @Nullable ResourceLocation ovrTex ) {
             overlayTexture = ovrTex;
             return this;
         }
@@ -435,6 +492,12 @@ public class BestiaryInfo {
             return this;
         }
         
+        /** Sets the species as NOT damaged by water. */
+        public Builder waterInsensitive() {
+            isDamagedByWater = false;
+            return this;
+        }
+        
         /** Sets the species as leashable (can have a lead attached). */
         public Builder leashable() {
             allowLeashing = true;
@@ -474,6 +537,11 @@ public class BestiaryInfo {
         /** Sets the species ranged attack stats (for a bow user). */
         public Builder bowAttack( double damage, double spread, double walkSpeed, int cooldown, double range ) {
             return rangedDamage( damage ).rangedSpread( spread ).rangedWalkSpeed( walkSpeed ).rangedCooldown( cooldown ).rangedMaxRange( range );
+        }
+        
+        /** Sets the species ranged attack stats (for a throwing item user). */
+        public Builder throwAttack( double spread, double walkSpeed, int cooldown, double range ) {
+            return rangedSpread( spread ).rangedWalkSpeed( walkSpeed ).rangedCooldown( cooldown ).rangedMaxRange( range );
         }
         
         /** Sets the species ranged attack stats (for a fireball shooter). */

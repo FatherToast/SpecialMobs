@@ -2,8 +2,12 @@ package fathertoast.specialmobs.common.config.field;
 
 import fathertoast.specialmobs.common.config.file.TomlHelper;
 import fathertoast.specialmobs.common.core.SpecialMobs;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
@@ -23,12 +27,12 @@ public class DoubleField extends AbstractConfigField {
     private double value;
     
     /** Creates a new field that accepts a common range of values. */
-    public DoubleField( String key, double defaultValue, Range range, String... description ) {
+    public DoubleField( String key, double defaultValue, Range range, @Nullable String... description ) {
         this( key, defaultValue, range.MIN, range.MAX, description );
     }
     
     /** Creates a new field that accepts a specialized range of values. */
-    public DoubleField( String key, double defaultValue, double min, double max, String... description ) {
+    public DoubleField( String key, double defaultValue, double min, double max, @Nullable String... description ) {
         super( key, description );
         valueDefault = defaultValue;
         valueMin = min;
@@ -154,6 +158,91 @@ public class DoubleField extends AbstractConfigField {
                         MINIMUM.getKey(), MAXIMUM.getKey(), getMin(), getMax() );
             }
             return getMin();
+        }
+    }
+    
+    /**
+     * Represents a double field and an environment exception list, combined into one.
+     * This has convenience methods for returning the value that should be used based on the environment.
+     */
+    public static class EnvironmentSensitive {
+        /** The base value. */
+        private final DoubleField BASE;
+        /** The environment exceptions list. */
+        private final EnvironmentListField EXCEPTIONS;
+        
+        /** Links two fields together as base and exceptions. */
+        public EnvironmentSensitive( DoubleField base, EnvironmentListField exceptions ) {
+            BASE = base;
+            EXCEPTIONS = exceptions;
+        }
+        
+        /** @return Returns the config field's value. */
+        public double get( World world, @Nullable BlockPos pos ) { return EXCEPTIONS.getOrElse( world, pos, BASE ); }
+        
+        /** @return Treats the config field's value as a percent chance (from 0 to 1) and returns the result of a single roll. */
+        public boolean rollChance( Random random, World world, @Nullable BlockPos pos ) { return random.nextDouble() < get( world, pos ); }
+    }
+    
+    /**
+     * Represents an environment sensitive list of weighted values. Unlike the normal weighted list, this is just a simple
+     * wrapper class, and its weights are doubles.
+     * It sacrifices automation for flexibility, largely to help with the craziness of environment list fields.
+     */
+    public static class EnvironmentSensitiveWeightedList<T> {
+        
+        private final List<Entry<T>> UNDERLYING_LIST;
+        
+        /** Links an array of values to two arrays of fields as base weights and exceptions. */
+        public EnvironmentSensitiveWeightedList( T[] values, DoubleField[] baseWeights, EnvironmentListField[] weightExceptions ) {
+            if( values.length != baseWeights.length || values.length != weightExceptions.length )
+                throw new IllegalArgumentException( "All arrays must be equal length!" );
+            
+            final ArrayList<Entry<T>> list = new ArrayList<>();
+            for( int i = 0; i < values.length; i++ ) {
+                list.add( new Entry<>( values[i], new EnvironmentSensitive( baseWeights[i], weightExceptions[i] ) ) );
+                
+                // Do a bit of error checking; allows us to ignore the possibility of negative weights
+                if( baseWeights[i].valueMin < 0.0 || weightExceptions[i].valueDefault.getMinValue() < 0.0 ) {
+                    throw new IllegalArgumentException( "Weight is not allowed to be negative! See " +
+                            baseWeights[i].getKey() + " and/or " + weightExceptions[i].getKey() );
+                }
+            }
+            list.trimToSize();
+            UNDERLYING_LIST = Collections.unmodifiableList( list );
+        }
+        
+        /** @return Returns a random item from this weighted list. Null if none of the items have a positive weight. */
+        @Nullable
+        public T next( Random random, World world, @Nullable BlockPos pos ) {
+            // Due to the 'nebulous' nature of environment-based weights, we must recalculate weights for EVERY call
+            final double[] weights = new double[UNDERLYING_LIST.size()];
+            double targetWeight = 0.0;
+            for( int i = 0; i < weights.length; i++ ) {
+                targetWeight += weights[i] = UNDERLYING_LIST.get( i ).WEIGHT.get( world, pos );
+            }
+            if( targetWeight <= 0.0 ) return null;
+            
+            // Now we unravel the target weight to a random point
+            targetWeight *= random.nextDouble();
+            for( int i = 0; i < weights.length; i++ ) {
+                targetWeight -= weights[i];
+                if( targetWeight < 0.0 ) return UNDERLYING_LIST.get( i ).VALUE;
+            }
+            
+            SpecialMobs.LOG.error( "Environment-sensitive weight list was unable to return a value when it should have! " +
+                    "This is probably due to error in floating point calculations, perhaps try changing the scale of weights." );
+            return null;
+        }
+        
+        private static class Entry<T> {
+            final T VALUE;
+            final DoubleField.EnvironmentSensitive WEIGHT;
+            
+            Entry( T value, DoubleField.EnvironmentSensitive weight ) {
+                VALUE = value;
+                WEIGHT = weight;
+            }
         }
     }
 }

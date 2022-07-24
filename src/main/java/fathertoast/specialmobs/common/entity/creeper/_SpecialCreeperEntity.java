@@ -90,6 +90,7 @@ public class _SpecialCreeperEntity extends CreeperEntity implements IExplodingMo
     protected void registerVariantGoals() { }
     
     /** Override to change starting equipment or stats. */
+    @SuppressWarnings( "unused" )
     public void finalizeVariantSpawn( IServerWorld world, DifficultyInstance difficulty, @Nullable SpawnReason spawnReason,
                                       @Nullable ILivingEntityData groupData ) { }
     
@@ -116,7 +117,7 @@ public class _SpecialCreeperEntity extends CreeperEntity implements IExplodingMo
     }
     
     /** Override to change this creeper's explosion power multiplier. */
-    protected float getVariantExplosionPower( float radius ) { return radius * (isSupercharged() ? 3.5F : (isPowered() ? 2.0F : 1.0F)); }
+    protected float getVariantExplosionPower( float radius ) { return radius * (isSupercharged() ? 3.5F : isPowered() ? 2.0F : 1.0F); }
     
     /** Override to change this creeper's explosion. */
     protected void makeVariantExplosion( float explosionPower ) {

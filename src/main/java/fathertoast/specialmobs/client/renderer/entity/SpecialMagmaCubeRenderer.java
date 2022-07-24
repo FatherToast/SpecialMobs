@@ -2,7 +2,6 @@ package fathertoast.specialmobs.client.renderer.entity;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import fathertoast.specialmobs.common.entity.ISpecialMob;
-import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.client.renderer.entity.MagmaCubeRenderer;
 import net.minecraft.entity.monster.MagmaCubeEntity;
@@ -10,10 +9,6 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-import javax.annotation.ParametersAreNonnullByDefault;
-
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
 @OnlyIn( Dist.CLIENT )
 public class SpecialMagmaCubeRenderer extends MagmaCubeRenderer {
     

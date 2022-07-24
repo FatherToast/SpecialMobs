@@ -78,7 +78,7 @@ public class DirtCreeperEntity extends _SpecialCreeperEntity {
                     if( x * x + y * y + z * z <= radius * radius ) {
                         final BlockPos pos = center.offset( x, y, z );
                         if( level.getBlockState( pos ).getMaterial().isReplaceable() ) {
-                            level.setBlock( pos, dirt, References.SET_BLOCK_FLAGS );
+                            level.setBlock( pos, dirt, References.SetBlockFlags.DEFAULTS );
                         }
                     }
                 }

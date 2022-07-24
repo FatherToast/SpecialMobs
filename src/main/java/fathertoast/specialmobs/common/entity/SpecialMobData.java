@@ -1,6 +1,5 @@
 package fathertoast.specialmobs.common.entity;
 
-import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.config.Config;
 import fathertoast.specialmobs.common.config.species.SpeciesConfig;
@@ -21,6 +20,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.PotionEvent;
 import net.minecraftforge.registries.ForgeRegistries;
 
+import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.HashSet;
 
@@ -50,14 +50,14 @@ public class SpecialMobData<T extends LivingEntity & ISpecialMob<T>> {
     /** Data manager parameter for render scale. */
     private final DataParameter<Float> renderScale;
     
-    /** The base texture of the entity. */
-    private ResourceLocation texture;
-    /** The glowing eyes texture of the entity. */
-    private ResourceLocation textureEyes;
-    /** The overlay texture of the entity. */
-    private ResourceLocation textureOverlay;
-    /** True if the textures need to be sent to the client. */
-    private boolean updateTextures;
+    //    /** The base texture of the entity. */
+    //    private ResourceLocation texture;
+    //    /** The glowing eyes texture of the entity. */
+    //    private ResourceLocation textureEyes;
+    //    /** The overlay texture of the entity. */
+    //    private ResourceLocation textureOverlay;
+    //    /** True if the textures need to be sent to the client. */
+    //    private boolean updateTextures;
     
     /** The rate this mob regenerates health (ticks per 1 health). Off if 0 or less. */
     private int healTimeMax;
@@ -132,10 +132,10 @@ public class SpecialMobData<T extends LivingEntity & ISpecialMob<T>> {
     }
     
     public void initialize() {
-        final BestiaryInfo info = theEntity.getSpecies().bestiaryInfo;
-        texture = info.texture;
-        textureEyes = info.eyesTexture;
-        textureOverlay = info.overlayTexture;
+        //        final BestiaryInfo info = theEntity.getSpecies().bestiaryInfo;
+        //        texture = info.texture;
+        //        textureEyes = info.eyesTexture;
+        //        textureOverlay = info.overlayTexture;
         
         final SpeciesConfig.General config = theEntity.getSpecies().config.GENERAL;
         theEntity.setExperience( config.experience.get() );
@@ -152,29 +152,29 @@ public class SpecialMobData<T extends LivingEntity & ISpecialMob<T>> {
         addPotionImmunity( config.immuneToPotions.get().getEntries() );
     }
     
-    /** Copies all of the data from another mob, optionally copying texture(s). */
-    public void copyDataFrom( LivingEntity entity, boolean copyTextures ) {
-        if( entity instanceof ISpecialMob ) {
-            CompoundNBT tag = new CompoundNBT();
-            
-            ((ISpecialMob<?>) entity).getSpecialData().writeToNBT( tag );
-            if( !copyTextures ) {
-                tag.remove( TAG_TEXTURE );
-                tag.remove( TAG_TEXTURE_EYES );
-                tag.remove( TAG_TEXTURE_OVER );
-            }
-            readFromNBT( tag );
-        }
-    }
+    //    /** Copies all of the data from another mob, optionally copying texture(s). */
+    //    public void copyDataFrom( LivingEntity entity, boolean copyTextures ) {
+    //        if( entity instanceof ISpecialMob ) {
+    //            CompoundNBT tag = new CompoundNBT();
+    //
+    //            ((ISpecialMob<?>) entity).getSpecialData().writeToNBT( tag );
+    //            if( !copyTextures ) {
+    //                tag.remove( TAG_TEXTURE );
+    //                tag.remove( TAG_TEXTURE_EYES );
+    //                tag.remove( TAG_TEXTURE_OVER );
+    //            }
+    //            readFromNBT( tag );
+    //        }
+    //    }
     
     /** Called each tick for every living special mob. */
     public void tick() {
         if( !theEntity.level.isClientSide && theEntity.isAlive() ) {
             // Send texture to client
-            if( updateTextures && theEntity.tickCount > 1 ) {
-                updateTextures = false;
-                //SpecialMobs.network().sendToDimension( new MessageTexture( theEntity ), theEntity.dimension ); TODO
-            }
+            //            if( updateTextures && theEntity.tickCount > 1 ) {
+            //                updateTextures = false;
+            //                SpecialMobs.network().sendToDimension( new MessageTexture( theEntity ), theEntity.dimension ); TODO
+            //            }
             
             // Update natural regen
             if( healTimeMax > 0 && ++healTime >= healTimeMax ) {
@@ -184,89 +184,85 @@ public class SpecialMobData<T extends LivingEntity & ISpecialMob<T>> {
         }
     }
     
-    /** @return Whether this entity has a glowing eyes texture. */
-    public boolean hasEyesTexture() { return textureEyes != null; }
-    
-    /** @return Whether this entity has an overlay texture. */
-    public boolean hasOverlayTexture() { return textureOverlay != null; }
-    
     /** @return The base texture for the entity. */
-    public ResourceLocation getTexture() { return texture; }
+    public ResourceLocation getTexture() { return theEntity.getSpecies().bestiaryInfo.texture; }
     
     /** @return The glowing eyes texture for the entity. */
-    public ResourceLocation getTextureEyes() { return textureEyes; }
+    @Nullable
+    public ResourceLocation getTextureEyes() { return theEntity.getSpecies().bestiaryInfo.eyesTexture; }
     
     /** @return The overlay texture for the entity. */
-    public ResourceLocation getTextureOverlay() { return textureOverlay; }
+    @Nullable
+    public ResourceLocation getTextureOverlay() { return theEntity.getSpecies().bestiaryInfo.overlayTexture; }
     
-    /** @param textures The new texture(s) to set for the entity. */
-    private void setTextures( ResourceLocation[] textures ) {
-        texture = textures[0];
-        textureEyes = textures.length > 1 ? textures[1] : null;
-        textureOverlay = textures.length > 2 ? textures[2] : null;
-    }
+    //    /** @param textures The new texture(s) to set for the entity. */
+    //    private void setTextures( ResourceLocation[] textures ) {
+    //        texture = textures[0];
+    //        textureEyes = textures.length > 1 ? textures[1] : null;
+    //        textureOverlay = textures.length > 2 ? textures[2] : null;
+    //    }
     
-    /** @param textures The new texture(s) to load for the entity. Called when loaded from a packet. */
-    public void loadTextures( String[] textures ) {
-        try {
-            loadTexture( textures[0] );
-            loadTextureEyes( textures.length > 1 ? textures[1] : "" );
-            loadTextureOverlay( textures.length > 2 ? textures[2] : "" );
-        }
-        catch( Exception ex ) {
-            SpecialMobs.LOG.warn( "Failed to load textures for {}! ({})", theEntity, textures );
-            ex.printStackTrace();
-        }
-    }
+    //    /** @param textures The new texture(s) to load for the entity. Called when loaded from a packet. */
+    //    public void loadTextures( String[] textures ) {
+    //        try {
+    //            loadTexture( textures[0] );
+    //            loadTextureEyes( textures.length > 1 ? textures[1] : "" );
+    //            loadTextureOverlay( textures.length > 2 ? textures[2] : "" );
+    //        }
+    //        catch( Exception ex ) {
+    //            SpecialMobs.LOG.warn( "Failed to load textures for {}! ({})", theEntity, textures );
+    //            ex.printStackTrace();
+    //        }
+    //    }
     
-    private void loadTexture( String tex ) {
-        if( tex.isEmpty() ) throw new IllegalArgumentException( "Entity must have a base texture" );
-        final ResourceLocation newTexture = new ResourceLocation( tex );
-        if( !newTexture.toString().equals( texture.toString() ) ) {
-            texture = newTexture;
-            updateTextures = true;
-        }
-    }
+    //    private void loadTexture( String tex ) {
+    //        if( tex.isEmpty() ) throw new IllegalArgumentException( "Entity must have a base texture" );
+    //        final ResourceLocation newTexture = new ResourceLocation( tex );
+    //        if( !newTexture.toString().equals( texture.toString() ) ) {
+    //            texture = newTexture;
+    //            updateTextures = true;
+    //        }
+    //    }
     
-    private void loadTextureEyes( String tex ) {
-        if( tex.isEmpty() ) {
-            if( textureEyes != null ) {
-                textureEyes = null;
-                updateTextures = true;
-            }
-        }
-        else if( textureEyes == null ) {
-            textureEyes = new ResourceLocation( tex );
-            updateTextures = true;
-        }
-        else {
-            final ResourceLocation newTexture = new ResourceLocation( tex );
-            if( !newTexture.toString().equals( textureEyes.toString() ) ) {
-                texture = newTexture;
-                updateTextures = true;
-            }
-        }
-    }
+    //    private void loadTextureEyes( String tex ) {
+    //        if( tex.isEmpty() ) {
+    //            if( textureEyes != null ) {
+    //                textureEyes = null;
+    //                updateTextures = true;
+    //            }
+    //        }
+    //        else if( textureEyes == null ) {
+    //            textureEyes = new ResourceLocation( tex );
+    //            updateTextures = true;
+    //        }
+    //        else {
+    //            final ResourceLocation newTexture = new ResourceLocation( tex );
+    //            if( !newTexture.toString().equals( textureEyes.toString() ) ) {
+    //                texture = newTexture;
+    //                updateTextures = true;
+    //            }
+    //        }
+    //    }
     
-    private void loadTextureOverlay( String tex ) {
-        if( tex.isEmpty() ) {
-            if( textureOverlay != null ) {
-                textureOverlay = null;
-                updateTextures = true;
-            }
-        }
-        else if( textureOverlay == null ) {
-            textureOverlay = new ResourceLocation( tex );
-            updateTextures = true;
-        }
-        else {
-            final ResourceLocation newTexture = new ResourceLocation( tex );
-            if( !newTexture.toString().equals( textureOverlay.toString() ) ) {
-                texture = newTexture;
-                updateTextures = true;
-            }
-        }
-    }
+    //    private void loadTextureOverlay( String tex ) {
+    //        if( tex.isEmpty() ) {
+    //            if( textureOverlay != null ) {
+    //                textureOverlay = null;
+    //                updateTextures = true;
+    //            }
+    //        }
+    //        else if( textureOverlay == null ) {
+    //            textureOverlay = new ResourceLocation( tex );
+    //            updateTextures = true;
+    //        }
+    //        else {
+    //            final ResourceLocation newTexture = new ResourceLocation( tex );
+    //            if( !newTexture.toString().equals( textureOverlay.toString() ) ) {
+    //                texture = newTexture;
+    //                updateTextures = true;
+    //            }
+    //        }
+    //    }
     
     /** @return The render scale for the entity, including any applied random scaling. */
     public float getRenderScale() { return theEntity.getEntityData().get( renderScale ); }
@@ -428,9 +424,9 @@ public class SpecialMobData<T extends LivingEntity & ISpecialMob<T>> {
     public void writeToNBT( CompoundNBT tag ) {
         tag.putFloat( TAG_RENDER_SCALE, getRenderScale() );
         
-        tag.putString( TAG_TEXTURE, texture.toString() );
-        tag.putString( TAG_TEXTURE_EYES, textureEyes == null ? "" : textureEyes.toString() );
-        tag.putString( TAG_TEXTURE_OVER, textureOverlay == null ? "" : textureOverlay.toString() );
+        //        tag.putString( TAG_TEXTURE, texture.toString() );
+        //        tag.putString( TAG_TEXTURE_EYES, textureEyes == null ? "" : textureEyes.toString() );
+        //        tag.putString( TAG_TEXTURE_OVER, textureOverlay == null ? "" : textureOverlay.toString() );
         
         // Capabilities
         tag.putInt( TAG_EXPERIENCE, theEntity.getExperience() );
@@ -483,20 +479,20 @@ public class SpecialMobData<T extends LivingEntity & ISpecialMob<T>> {
             setRenderScale( tag.getFloat( TAG_RENDER_SCALE ) );
         }
         
-        try {
-            if( tag.contains( TAG_TEXTURE, NBT_TYPE_STRING ) ) {
-                loadTexture( tag.getString( TAG_TEXTURE ) );
-            }
-            if( tag.contains( TAG_TEXTURE_EYES, NBT_TYPE_STRING ) ) {
-                loadTextureEyes( tag.getString( TAG_TEXTURE_EYES ) );
-            }
-            if( tag.contains( TAG_TEXTURE_OVER, NBT_TYPE_STRING ) ) {
-                loadTextureOverlay( tag.getString( TAG_TEXTURE_OVER ) );
-            }
-        }
-        catch( Exception ex ) {
-            SpecialMobs.LOG.warn( "Failed to load textures from NBT! " + theEntity.toString() );
-        }
+        //        try {
+        //            if( tag.contains( TAG_TEXTURE, NBT_TYPE_STRING ) ) {
+        //                loadTexture( tag.getString( TAG_TEXTURE ) );
+        //            }
+        //            if( tag.contains( TAG_TEXTURE_EYES, NBT_TYPE_STRING ) ) {
+        //                loadTextureEyes( tag.getString( TAG_TEXTURE_EYES ) );
+        //            }
+        //            if( tag.contains( TAG_TEXTURE_OVER, NBT_TYPE_STRING ) ) {
+        //                loadTextureOverlay( tag.getString( TAG_TEXTURE_OVER ) );
+        //            }
+        //        }
+        //        catch( Exception ex ) {
+        //            SpecialMobs.LOG.warn( "Failed to load textures from NBT! " + theEntity.toString() );
+        //        }
         
         // Capabilities
         if( tag.contains( TAG_EXPERIENCE, NBT_TYPE_NUMERICAL ) ) {

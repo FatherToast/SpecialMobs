@@ -5,6 +5,7 @@ import com.electronwill.nightconfig.core.io.*;
 import fathertoast.specialmobs.common.config.field.AbstractConfigField;
 import fathertoast.specialmobs.common.core.SpecialMobs;
 
+import javax.annotation.Nullable;
 import java.io.Writer;
 import java.util.Iterator;
 import java.util.List;
@@ -85,7 +86,7 @@ public class ToastTomlWriter implements ConfigWriter {
     }
     
     /** Writes a literal array of single-line strings. */
-    public void writeStringArray( List<String> list, CharacterOutput output ) {
+    public void writeStringArray( @Nullable List<String> list, CharacterOutput output ) {
         if( list == null || list.isEmpty() ) {
             writeLine( "[]", output );
             return;

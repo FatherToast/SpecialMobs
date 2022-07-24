@@ -227,6 +227,30 @@ public class ToastConfigSpec {
         }
     }
     
+    /** Represents an appendix header comment. */
+    private static class AppendixHeader extends Format {
+        /** The appendix comment. */
+        private final List<String> COMMENT;
+        
+        /** Create a new header action that will insert the opening file comment. */
+        private AppendixHeader( List<String> comment ) {
+            COMMENT = comment;
+        }
+        
+        /** Called when the config is saved. */
+        @Override
+        public void write( ToastTomlWriter writer, CharacterOutput output ) {
+            writer.decreaseIndentLevel();
+            writer.writeNewLine( output );
+            writer.writeNewLine( output );
+            
+            writer.writeComment( "Appendix:", output );
+            writer.writeComment( COMMENT, output );
+            
+            writer.increaseIndentLevel();
+        }
+    }
+    
     /** Represents a category comment. */
     private static class Category extends Format {
         /** The category comment. */
@@ -355,6 +379,9 @@ public class ToastConfigSpec {
     /** @param comment The file comment to insert. */
     public void header( List<String> comment ) { ACTIONS.add( new Header( this, comment ) ); }
     
+    /** @param comment The appendix comment to insert. */
+    public void appendixHeader( String... comment ) { ACTIONS.add( new AppendixHeader( TomlHelper.newComment( comment ) ) ); }
+    
     /** Inserts a detailed description of how to use the registry entry list field. */
     public void describeRegistryEntryList() { ACTIONS.add( new Comment( RegistryEntryListField.verboseDescription() ) ); }
     
@@ -366,6 +393,12 @@ public class ToastConfigSpec {
     
     /** Inserts a detailed description of how to use the block list field. */
     public void describeBlockList() { ACTIONS.add( new Comment( BlockListField.verboseDescription() ) ); }
+    
+    /** Inserts the first part of a detailed description of how to use the environment list field. Should go with the other field descriptions. */
+    public void describeEnvironmentListPart1of2() { ACTIONS.add( new Comment( EnvironmentListField.verboseDescription() ) ); }
+    
+    /** Inserts the second and last part of a detailed description of how to use the environment list field. Should go at the bottom of the file. */
+    public void describeEnvironmentListPart2of2() { ACTIONS.add( new Comment( EnvironmentListField.environmentDescriptions() ) ); }
     
     /**
      * @param name    The category name.

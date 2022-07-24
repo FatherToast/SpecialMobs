@@ -2,6 +2,7 @@ package fathertoast.specialmobs.common.config.util;
 
 import fathertoast.specialmobs.common.config.field.AbstractConfigField;
 import fathertoast.specialmobs.common.core.SpecialMobs;
+import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.Attribute;
 import net.minecraft.entity.ai.attributes.AttributeModifierMap;
@@ -10,12 +11,17 @@ import net.minecraft.entity.ai.attributes.ModifiableAttributeInstance;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.registries.ForgeRegistries;
 
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
+
 /**
  * One attribute-operation-value entry in an attribute list. Uses a 'lazy' implementation so the attribute registry is
  * not polled until this entry is actually used.
  * <p>
  * See also {@link ConfigDrivenAttributeModifierMap}
  */
+@ParametersAreNonnullByDefault
+@MethodsReturnNonnullByDefault
 @SuppressWarnings( "unused" )
 public class AttributeEntry {
     /** The field containing this entry. We save a reference to help improve error/warning reports. */
@@ -48,7 +54,7 @@ public class AttributeEntry {
     }
     
     /** Creates an entry with the specified values. */
-    public AttributeEntry( AbstractConfigField field, ResourceLocation regKey, boolean multiply, double value ) {
+    public AttributeEntry( @Nullable AbstractConfigField field, @Nullable ResourceLocation regKey, boolean multiply, double value ) {
         FIELD = field;
         ATTRIBUTE_KEY = regKey;
         MULTIPLY = multiply;
@@ -95,7 +101,7 @@ public class AttributeEntry {
     }
     
     /** Applies this attribute change to the attribute instance. Assumes that the instance is for this entry's target attribute. */
-    private void apply( ModifiableAttributeInstance attributeInstance ) {
+    private void apply( @Nullable ModifiableAttributeInstance attributeInstance ) {
         if( attributeInstance == null )
             throw new IllegalStateException( "Attempted to modify non-registered attribute " + ATTRIBUTE_KEY );
         

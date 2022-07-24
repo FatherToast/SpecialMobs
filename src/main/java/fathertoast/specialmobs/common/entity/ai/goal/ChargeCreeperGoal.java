@@ -38,6 +38,7 @@ public class ChargeCreeperGoal<T extends MobEntity & IAmmoUser> extends Goal {
     }
     
     /** Builder that enables the entity to leap while mounted. */
+    @SuppressWarnings( "unused" )
     public ChargeCreeperGoal<T> canUseWhileMounted() {
         canUseWhileMounted = true;
         return this;

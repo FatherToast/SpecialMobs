@@ -7,6 +7,7 @@ import fathertoast.specialmobs.common.core.SpecialMobs;
 import fathertoast.specialmobs.common.entity.ISpecialMob;
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.entity.SpecialMobData;
+import fathertoast.specialmobs.common.entity.ai.AIHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import net.minecraft.block.BlockState;
@@ -15,6 +16,7 @@ import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.ai.attributes.AttributeModifierMap;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.ai.attributes.ModifiableAttributeInstance;
+import net.minecraft.entity.ai.goal.RangedAttackGoal;
 import net.minecraft.entity.monster.AbstractRaiderEntity;
 import net.minecraft.entity.monster.WitchEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -53,9 +55,10 @@ public class _SpecialWitchEntity extends WitchEntity implements ISpecialMob<_Spe
     
     @SpecialMob.BestiaryInfoSupplier
     public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
-        bestiaryInfo.color( 0xA80E0E )
+        bestiaryInfo.color( 0x51A03E )
                 .vanillaTextureBaseOnly( "textures/entity/witch.png" )
-                .experience( 5 );
+                .experience( 5 )
+                .throwAttack( 1.0, 1.0, 60, 10.0 );
     }
     
     @SpecialMob.AttributeSupplier
@@ -82,7 +85,6 @@ public class _SpecialWitchEntity extends WitchEntity implements ISpecialMob<_Spe
     @Override
     protected void registerGoals() {
         super.registerGoals();
-        //TODO reapply vanilla attack AI to use SMD ranged attack stats
         registerVariantGoals();
     }
     
@@ -90,6 +92,7 @@ public class _SpecialWitchEntity extends WitchEntity implements ISpecialMob<_Spe
     protected void registerVariantGoals() { }
     
     /** Override to change starting equipment or stats. */
+    @SuppressWarnings( "unused" )
     public void finalizeVariantSpawn( IServerWorld world, DifficultyInstance difficulty, @Nullable SpawnReason spawnReason,
                                       @Nullable ILivingEntityData groupData ) { }
     
@@ -101,7 +104,7 @@ public class _SpecialWitchEntity extends WitchEntity implements ISpecialMob<_Spe
     }
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
-    protected void onVariantAttack( Entity target ) { }
+    protected void onVariantAttack( @SuppressWarnings( "unused" ) Entity target ) { }
     
     /** Called to attack the target with a ranged attack. */
     @Override
@@ -120,7 +123,7 @@ public class _SpecialWitchEntity extends WitchEntity implements ISpecialMob<_Spe
         final PotionEntity thrownPotion = new PotionEntity( level, this );
         thrownPotion.setItem( potion );
         thrownPotion.xRot += 20.0F;
-        thrownPotion.shoot( dX, dY + (double) (dH * 0.2F), dZ, 0.75F, 8.0F );
+        thrownPotion.shoot( dX, dY + (double) (dH * 0.2F), dZ, 0.75F, 8.0F * getSpecialData().getRangedAttackSpread() );
         if( !isSilent() ) {
             level.playSound( null, getX(), getY(), getZ(), SoundEvents.WITCH_THROW, getSoundSource(),
                     1.0F, 0.8F + random.nextFloat() * 0.4F );
@@ -170,6 +173,7 @@ public class _SpecialWitchEntity extends WitchEntity implements ISpecialMob<_Spe
     }
     
     /** Override to modify potion support. Return an empty item stack to cancel the potion throw. */
+    @SuppressWarnings( "unused" )
     protected ItemStack pickVariantSupportPotion( ItemStack originalPotion, AbstractRaiderEntity target, float distance ) {
         return originalPotion;
     }
@@ -234,6 +238,8 @@ public class _SpecialWitchEntity extends WitchEntity implements ISpecialMob<_Spe
     public _SpecialWitchEntity( EntityType<? extends _SpecialWitchEntity> entityType, World world ) {
         super( entityType, world );
         usingTime = Integer.MAX_VALUE; // Effectively disable vanilla witch potion drinking logic in combo with "fake drinking"
+        recalculateAttackGoal();
+        
         getSpecialData().initialize();
     }
     
@@ -242,6 +248,15 @@ public class _SpecialWitchEntity extends WitchEntity implements ISpecialMob<_Spe
     protected void defineSynchedData() {
         super.defineSynchedData();
         specialData = new SpecialMobData<>( this, SCALE );
+    }
+    
+    /** Called to update this entity's attack AI based on NBT data. */
+    public void recalculateAttackGoal() {
+        if( level != null && !level.isClientSide ) {
+            AIHelper.removeGoals( goalSelector, RangedAttackGoal.class );
+            goalSelector.addGoal( 2, new RangedAttackGoal( this, getSpecialData().getRangedWalkSpeed(),
+                    getSpecialData().getRangedAttackCooldown(), getSpecialData().getRangedAttackMaxRange() ) );
+        }
     }
     
     /** Called each AI tick to update potion-drinking behavior. */
@@ -327,6 +342,7 @@ public class _SpecialWitchEntity extends WitchEntity implements ISpecialMob<_Spe
     public ItemStack makePotion( Potion type ) { return newPotion( Items.POTION, type ); }
     
     /** @return A new regular potion with custom effects. */
+    @SuppressWarnings( "unused" )
     public ItemStack makePotion( Collection<EffectInstance> effects ) { return newPotion( Items.POTION, effects ); }
     
     /** @return A new splash potion with standard effects. */
@@ -339,6 +355,7 @@ public class _SpecialWitchEntity extends WitchEntity implements ISpecialMob<_Spe
     public ItemStack makeLingeringPotion( Potion type ) { return newPotion( Items.LINGERING_POTION, type ); }
     
     /** @return A new lingering splash potion with custom effects. */
+    @SuppressWarnings( "unused" )
     public ItemStack makeLingeringPotion( Collection<EffectInstance> effects ) { return newPotion( Items.LINGERING_POTION, effects ); }
     
     /** @return A new potion with standard effects. */
@@ -509,5 +526,7 @@ public class _SpecialWitchEntity extends WitchEntity implements ISpecialMob<_Spe
         
         getSpecialData().readFromNBT( saveTag );
         readVariantSaveData( saveTag );
+        
+        recalculateAttackGoal();
     }
 }

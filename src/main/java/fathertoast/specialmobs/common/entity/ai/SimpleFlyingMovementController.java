@@ -1,6 +1,5 @@
 package fathertoast.specialmobs.common.entity.ai;
 
-import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.ai.attributes.Attributes;
@@ -9,13 +8,9 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.vector.Vector3d;
 
-import javax.annotation.ParametersAreNonnullByDefault;
-
 /**
  * Simple movement controller that can be used by flying entities, which takes their movement speed attribute into account.
  */
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
 public class SimpleFlyingMovementController extends MovementController {
     
     private int floatDuration;

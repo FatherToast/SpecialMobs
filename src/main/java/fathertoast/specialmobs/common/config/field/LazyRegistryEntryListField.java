@@ -17,7 +17,7 @@ import javax.annotation.Nullable;
 public class LazyRegistryEntryListField<T extends IForgeRegistryEntry<T>> extends RegistryEntryListField<T> {
     
     /** Creates a new field. */
-    public LazyRegistryEntryListField( String key, RegistryEntryList<T> defaultValue, String... description ) {
+    public LazyRegistryEntryListField( String key, RegistryEntryList<T> defaultValue, @Nullable String... description ) {
         super( key, defaultValue, description );
     }
     

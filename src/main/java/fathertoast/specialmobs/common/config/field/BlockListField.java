@@ -28,7 +28,7 @@ public class BlockListField extends GenericField<BlockList> {
     }
     
     /** Creates a new field. */
-    public BlockListField( String key, BlockList defaultValue, String... description ) {
+    public BlockListField( String key, BlockList defaultValue, @Nullable String... description ) {
         super( key, defaultValue, description );
     }
     
@@ -53,6 +53,15 @@ public class BlockListField extends GenericField<BlockList> {
         value = new BlockList( this, TomlHelper.parseStringList( raw ) );
     }
     
+    
+    // Convenience methods
+    
+    /** @return Returns true if there are no entries in this block list. */
+    public boolean isEmpty() { return get().isEmpty(); }
+    
+    /** @return Returns true if the block is contained in this list. */
+    public boolean matches( BlockState blockState ) { return get().matches( blockState ); }
+    
     /**
      * Represents two block list fields, a blacklist and a whitelist, combined into one.
      */
@@ -73,7 +82,7 @@ public class BlockListField extends GenericField<BlockList> {
         
         /** @return Returns true if the block is contained in this list. */
         public boolean matches( BlockState blockState ) {
-            return blockState != null && !BLACKLIST.get().matches( blockState ) && WHITELIST.get().matches( blockState );
+            return !BLACKLIST.get().matches( blockState ) && WHITELIST.get().matches( blockState );
         }
     }
 }

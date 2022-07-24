@@ -15,20 +15,6 @@ public class MainConfig extends Config.AbstractConfig {
         super( dir, fileName,
                 "This config contains options that apply to the mod as a whole, including some master settings",
                 "toggles for convenience." );
-        SPEC.newLine();
-        SPEC.comment(
-                "Terminology used in Special Mobs configs:",
-                " * Mob                 - An entity that is 'alive', short for \"Mobile\" or MobEntity.",
-                " * Family              - The group of mobs based on (but not including) a particular vanilla mob; e.g., Creepers.",
-                " * Species             - A specific type of mob within a family; e.g., Fire Creepers or vanilla-replacement Creepers.",
-                " * Vanilla Replacement - The one species within a family that is intended to be a replica of the base vanilla mob.",
-                " * Special Variant     - Any species that is not the family's vanilla replacement. Includes species that are",
-                "                         replicas of 'vanilla special variants'; i.e. Husks and Strays.",
-                " * Mob Replacer        - The tool that watches vanilla mob spawns and cancels them to spawn this mod's entities." );
-        SPEC.newLine();
-        SPEC.describeAttributeList();
-        SPEC.newLine();
-        SPEC.describeRegistryEntryList();
         
         GENERAL = new General( SPEC );
     }

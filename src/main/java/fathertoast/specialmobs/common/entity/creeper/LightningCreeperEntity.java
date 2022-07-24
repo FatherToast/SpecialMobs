@@ -21,7 +21,7 @@ public class LightningCreeperEntity extends _SpecialCreeperEntity {
     
     @SpecialMob.BestiaryInfoSupplier
     public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
-        bestiaryInfo.color( 0x499CAE )
+        bestiaryInfo.color( 0x499CAE ).theme( BestiaryInfo.Theme.STORM )
                 .uniqueTextureBaseOnly()
                 .addExperience( 1 ).fireImmune();
     }
@@ -53,7 +53,9 @@ public class LightningCreeperEntity extends _SpecialCreeperEntity {
     
     /** Override to change this creeper's explosion power multiplier. */
     @Override
-    protected float getVariantExplosionPower( float radius ) { return radius * (isPowered() ? 2.0F : 1.0F / 3.0F); }
+    protected float getVariantExplosionPower( float radius ) {
+        return isSupercharged() || isPowered() ? super.getVariantExplosionPower( radius ) : radius / 3.0F;
+    }
     
     /** Override to change this creeper's explosion. */
     @Override

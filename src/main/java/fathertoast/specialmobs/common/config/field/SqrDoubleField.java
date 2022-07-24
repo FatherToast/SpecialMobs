@@ -11,12 +11,12 @@ public class SqrDoubleField extends DoubleField {
     private double valueSqr;
     
     /** Creates a new field that accepts a common range of values. */
-    public SqrDoubleField( String key, double defaultValue, Range range, String... description ) {
+    public SqrDoubleField( String key, double defaultValue, Range range, @Nullable String... description ) {
         super( key, defaultValue, range, description );
     }
     
     /** Creates a new field that accepts a specialized range of values. */
-    public SqrDoubleField( String key, double defaultValue, double min, double max, String... description ) {
+    public SqrDoubleField( String key, double defaultValue, double min, double max, @Nullable String... description ) {
         super( key, defaultValue, min, max, description );
     }
     

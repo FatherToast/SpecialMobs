@@ -1,11 +1,19 @@
 package fathertoast.specialmobs.common.config.util;
 
 import com.electronwill.nightconfig.core.file.FileConfig;
+import fathertoast.specialmobs.common.core.SpecialMobs;
+import net.minecraftforge.eventbus.api.EventPriority;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.event.server.FMLServerAboutToStartEvent;
 import net.minecraftforge.fml.loading.FMLPaths;
 
 import java.io.File;
 
-public abstract class ConfigUtil {
+@Mod.EventBusSubscriber( modid = SpecialMobs.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE )
+public final class ConfigUtil {
+    /** The current "version" of the dynamic registries. This is incremented each time dynamic registries are loaded. */
+    public static byte DYNAMIC_REGISTRY_VERSION;
     
     /** The plus or minus symbol (+/-). */
     public static final String PLUS_OR_MINUS = "\u00b1";
@@ -44,4 +52,12 @@ public abstract class ConfigUtil {
     
     /** @return A string representation of the file from the game directory. */
     public static String toRelativePath( File gameFile ) { return FMLPaths.GAMEDIR.get().relativize( gameFile.toPath() ).toString(); }
+    
+    /**
+     * Called when a server (integrated or dedicated) is about to start.
+     *
+     * @param event The event data.
+     */
+    @SubscribeEvent( priority = EventPriority.NORMAL )
+    public static void onServerAboutToStart( FMLServerAboutToStartEvent event ) { DYNAMIC_REGISTRY_VERSION++; }
 }

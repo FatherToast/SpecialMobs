@@ -5,7 +5,6 @@ import fathertoast.specialmobs.client.renderer.entity.layers.SpecialCreeperCharg
 import fathertoast.specialmobs.client.renderer.entity.layers.SpecialMobEyesLayer;
 import fathertoast.specialmobs.client.renderer.entity.layers.SpecialMobOverlayLayer;
 import fathertoast.specialmobs.common.entity.ISpecialMob;
-import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.client.renderer.entity.CreeperRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.client.renderer.entity.layers.CreeperChargeLayer;
@@ -15,10 +14,6 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-import javax.annotation.ParametersAreNonnullByDefault;
-
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
 @OnlyIn( Dist.CLIENT )
 public class SpecialCreeperRenderer extends CreeperRenderer {
     

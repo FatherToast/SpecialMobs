@@ -24,9 +24,9 @@ public class LightningEndermanEntity extends _SpecialEndermanEntity {
     
     @SpecialMob.BestiaryInfoSupplier
     public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
-        bestiaryInfo.color( 0x4BB4B5 )
+        bestiaryInfo.color( 0x4BB4B5 ).theme( BestiaryInfo.Theme.STORM )
                 .uniqueTextureWithEyes()
-                .addExperience( 2 ).fireImmune();
+                .addExperience( 2 ).fireImmune().waterInsensitive();
     }
     
     @SpecialMob.LanguageProvider

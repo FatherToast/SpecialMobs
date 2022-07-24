@@ -14,13 +14,13 @@ public class EnumField<T extends Enum<T>> extends GenericField<T> {
     private final T[] valuesValid;
     
     /** Creates a new field that accepts any enum value. */
-    public EnumField( String key, T defaultValue, String... description ) {
+    public EnumField( String key, T defaultValue, @Nullable String... description ) {
         //noinspection unchecked
         this( key, defaultValue, (T[]) defaultValue.getClass().getEnumConstants(), description );
     }
     
     /** Creates a new field that accepts the specified set of enum values. */
-    public EnumField( String key, T defaultValue, T[] validValues, String... description ) {
+    public EnumField( String key, T defaultValue, T[] validValues, @Nullable String... description ) {
         super( key, defaultValue, description );
         valuesValid = validValues;
     }
@@ -55,6 +55,7 @@ public class EnumField<T extends Enum<T>> extends GenericField<T> {
     }
     
     /** @return Attempts to parse the string literal as one of the valid values for this field and returns it, or null if invalid. */
+    @Nullable
     private T parseValue( String name ) {
         for( T val : valuesValid ) {
             if( val.name().equalsIgnoreCase( name ) ) return val;

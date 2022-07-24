@@ -10,8 +10,7 @@ import java.util.Arrays;
 import java.util.List;
 
 @SuppressWarnings( { "unused", "WeakerAccess", "UnusedReturnValue" } )
-public
-class LootPoolBuilder {
+public class LootPoolBuilder {
     
     private final String name;
     

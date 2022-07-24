@@ -32,7 +32,7 @@ public class BlockEntry implements Cloneable {
         this( block.getBlock() );
         
         // Add all the properties present in the block state
-        StateBuilder state = new StateBuilder();
+        StateBuilder state = new StateBuilder( BLOCK );
         for( Property<? extends Comparable<?>> property : block.getProperties() ) {
             state.add( property, block.getValue( property ) );
         }
@@ -45,13 +45,8 @@ public class BlockEntry implements Cloneable {
     public BlockEntry( AbstractConfigField field, String line ) {
         // Parse the base block
         final String[] pair = line.split( "\\[", 2 );
-        final ResourceLocation regKey = new ResourceLocation( pair[0] );
-        if( !ForgeRegistries.BLOCKS.containsKey( regKey ) ) {
-            BLOCK = Blocks.AIR;
-        }
-        else {
-            BLOCK = ForgeRegistries.BLOCKS.getValue( regKey );
-        }
+        final Block block = ForgeRegistries.BLOCKS.getValue( new ResourceLocation( pair[0] ) );
+        BLOCK = block == null ? Blocks.AIR : block;
         
         // We are done constructing if the entry is invalid or does not specify block states
         if( BLOCK == Blocks.AIR || pair.length < 2 ) {
@@ -143,7 +138,7 @@ public class BlockEntry implements Cloneable {
         final StateContainer<Block, BlockState> stateContainer = block.getStateDefinition();
         
         // Parse the state and build the matcher
-        final StateBuilder builder = new StateBuilder();
+        final StateBuilder builder = new StateBuilder( block );
         final String[] properties = stateString.split( "," );
         for( String combinedEntry : properties ) {
             // Parse an individual property key-value pair
@@ -271,9 +266,6 @@ public class BlockEntry implements Cloneable {
         /** Can be used for building default configs to make block entries with target states. */
         public StateBuilder( Block block ) { BLOCK = block; }
         
-        /** Used by block entries to build target states. Can not be built into a block entry when using this constructor. */
-        private StateBuilder() { BLOCK = null; }
-        
         /** @return Returns true if this state builder has no properties set. */
         @SuppressWarnings( "BooleanMethodIsAlwaysInverted" )
         public boolean isEmpty() { return propertiesToMatch.isEmpty(); }
@@ -289,7 +281,7 @@ public class BlockEntry implements Cloneable {
         
         /** @return Returns a block entry reflecting the current state of this builder. */
         public BlockEntry toBlockEntry() {
-            BlockEntry target = new BlockEntry( BLOCK );
+            final BlockEntry target = new BlockEntry( BLOCK );
             if( !isEmpty() ) {
                 target.MATCHERS.add( toTargetState() );
             }
