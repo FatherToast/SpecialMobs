@@ -2,8 +2,14 @@ package fathertoast.specialmobs.common.entity;
 
 import fathertoast.specialmobs.common.config.Config;
 import fathertoast.specialmobs.common.entity.creeper._SpecialCreeperEntity;
+import fathertoast.specialmobs.common.util.References;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.block.FlowingFluidBlock;
+import net.minecraft.block.material.Material;
 import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.enchantment.FrostWalkerEnchantment;
 import net.minecraft.entity.*;
 import net.minecraft.entity.monster.CreeperEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -14,11 +20,14 @@ import net.minecraft.item.*;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.EffectType;
 import net.minecraft.potion.Effects;
+import net.minecraft.tags.FluidTags;
 import net.minecraft.tags.ITag;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.Hand;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvents;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.Difficulty;
@@ -325,7 +334,7 @@ public final class MobHelper {
      * Floats the entity upward if they are in a given fluid type. Used by entities that walk on fluids so their
      * AI doesn't break if they wind up inside that fluid.
      * <p>
-     * Should be called in the entity's #tick() loop right after super.
+     * Should be called in the entity's {@link Entity#tick()} loop right after super.
      *
      * @param entity       The entity to float.
      * @param acceleration How fast the entity floats upward.
@@ -339,6 +348,45 @@ public final class MobHelper {
             }
             else {
                 entity.setDeltaMovement( entity.getDeltaMovement().scale( 0.5 ).add( 0.0, acceleration, 0.0 ) );
+            }
+        }
+    }
+    
+    /**
+     * Manually provides the frost walker enchantment's effects without any equipment requirements.
+     * <p>
+     * Should be called in the entity's {@link LivingEntity#onChangedBlock(BlockPos)} method right after super.
+     *
+     * @param entity The entity.
+     * @param pos    The block pos argument from #onChangedBlock.
+     */
+    public static void updateFrostWalker( LivingEntity entity, BlockPos pos ) {
+        final boolean actualOnGround = entity.isOnGround();
+        entity.setOnGround( true ); // Spoof the frost walker enchant requirement to be on the ground
+        FrostWalkerEnchantment.onEntityMoved( entity, entity.level, pos, 1 );
+        entity.setOnGround( actualOnGround );
+    }
+    
+    /**
+     * Pops the entity upward if they are on top of the water, so that their frost walker ability can take effect.
+     * <p>
+     * Should be called in the entity's {@link Entity#tick()} loop after both super and the call to floatInFluid.
+     *
+     * @param entity The entity to pop.
+     */
+    public static void hopOnFluid( Entity entity ) {
+        if( entity.tickCount > 1 && entity.level.random.nextInt( 20 ) == 0 ) {
+            if( ISelectionContext.of( entity ).isAbove( FlowingFluidBlock.STABLE_SHAPE, entity.blockPosition(), true ) &&
+                    !entity.level.getFluidState( entity.blockPosition().above() ).is( FluidTags.WATER ) ) {
+                // Break water plants, otherwise frost walker will not work
+                final BlockState block = entity.level.getBlockState( entity.blockPosition() );
+                if( block.getMaterial() == Material.WATER_PLANT || block.getMaterial() == Material.REPLACEABLE_WATER_PLANT ) {
+                    final TileEntity tileEntity = block.hasTileEntity() ? entity.level.getBlockEntity( entity.blockPosition() ) : null;
+                    Block.dropResources( block, entity.level, entity.blockPosition(), tileEntity );
+                    entity.level.setBlock( entity.blockPosition(), Blocks.WATER.defaultBlockState(), References.SetBlockFlags.DEFAULTS );
+                }
+                
+                entity.setDeltaMovement( entity.getDeltaMovement().scale( 0.5 ).add( 0.0, 0.4, 0.0 ) );
             }
         }
     }

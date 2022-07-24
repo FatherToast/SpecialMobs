@@ -117,7 +117,7 @@ public class SandCreeperEntity extends _SpecialCreeperEntity {
         }
         
         if( block.getBlock() instanceof FlowingFluidBlock ) {
-            level.setBlock( pos, Blocks.AIR.defaultBlockState(), References.SET_BLOCK_FLAGS );
+            level.setBlock( pos, Blocks.AIR.defaultBlockState(), References.SetBlockFlags.DEFAULTS );
             return;
         }
         
@@ -125,7 +125,7 @@ public class SandCreeperEntity extends _SpecialCreeperEntity {
         if( material == Material.WATER_PLANT || material == Material.REPLACEABLE_WATER_PLANT ) {
             final TileEntity tileEntity = block.hasTileEntity() ? level.getBlockEntity( pos ) : null;
             Block.dropResources( block, level, pos, tileEntity );
-            level.setBlock( pos, Blocks.AIR.defaultBlockState(), References.SET_BLOCK_FLAGS );
+            level.setBlock( pos, Blocks.AIR.defaultBlockState(), References.SetBlockFlags.DEFAULTS );
         }
     }
     

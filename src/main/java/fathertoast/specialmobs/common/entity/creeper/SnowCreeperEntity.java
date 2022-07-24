@@ -6,13 +6,14 @@ import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.entity.ai.AIHelper;
 import fathertoast.specialmobs.common.entity.ai.FluidPathNavigator;
+import fathertoast.specialmobs.common.entity.skeleton.StraySkeletonEntity;
 import fathertoast.specialmobs.common.util.ExplosionHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.enchantment.FrostWalkerEnchantment;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.item.Items;
@@ -20,10 +21,10 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.pathfinding.PathNavigator;
 import net.minecraft.pathfinding.PathNodeType;
 import net.minecraft.potion.Effects;
-import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.IServerWorld;
 import net.minecraft.world.World;
@@ -39,7 +40,7 @@ public class SnowCreeperEntity extends _SpecialCreeperEntity {
     @SpecialMob.BestiaryInfoSupplier
     public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
         bestiaryInfo.color( 0xE8F8F8 ).weight( BestiaryInfo.DefaultWeight.LOW ).theme( BestiaryInfo.Theme.ICE )
-                .uniqueTextureBaseOnly()
+                .uniqueTextureWithEyes()
                 .addExperience( 2 ).effectImmune( Effects.MOVEMENT_SLOWDOWN )
                 .addToAttribute( Attributes.MAX_HEALTH, 10.0 );
     }
@@ -95,99 +96,165 @@ public class SnowCreeperEntity extends _SpecialCreeperEntity {
     public void tick() {
         super.tick();
         MobHelper.floatInFluid( this, 0.06, FluidTags.WATER );
+        MobHelper.hopOnFluid( this );
     }
     
     /** Called whenever this entity's block position changes. */
     @Override
     protected void onChangedBlock( BlockPos pos ) {
         super.onChangedBlock( pos );
-        updateFrostWalker( pos );
+        MobHelper.updateFrostWalker( this, pos );
     }
     
     /** Override to change this creeper's explosion power multiplier. */
     @Override
-    protected float getVariantExplosionPower( float radius ) { return super.getVariantExplosionPower( radius ) + 2.0F; }
+    protected float getVariantExplosionPower( float radius ) { return super.getVariantExplosionPower( radius ) + 3.0F; }
     
     /** Override to change this creeper's explosion. */
     @Override
     protected void makeVariantExplosion( float explosionPower ) {
         final Explosion.Mode explosionMode = ExplosionHelper.getMode( this );
         final ExplosionHelper explosion = new ExplosionHelper( this,
-                explosionMode == Explosion.Mode.NONE ? explosionPower : 1.0F, explosionMode, false );
+                explosionMode == Explosion.Mode.NONE ? explosionPower : 2.0F, false, false );
         if( !explosion.initializeExplosion() ) return;
         explosion.finalizeExplosion();
         
-        if( explosionMode == Explosion.Mode.NONE ) return;
-        
-        final BlockState ice = Blocks.ICE.defaultBlockState();
         final int radius = (int) Math.floor( explosionPower );
-        final int rMinusOneSq = (radius - 1) * (radius - 1);
         final BlockPos center = new BlockPos( explosion.getPos() );
-        //TODO make ice arena and then populate with some strays
         
-        //        for( int y = -radius; y <= radius; y++ ) {
-        //            for( int x = -radius; x <= radius; x++ ) {
-        //                for( int z = -radius; z <= radius; z++ ) {
-        //                    final int distSq = x * x + y * y + z * z;
-        //
-        //                    if( distSq <= radius * radius ) {
-        //                        final BlockPos pos = center.offset( x, y, z );
-        //                        final BlockState stateAtPos = level.getBlockState( pos );
-        //
-        //                        if( stateAtPos.getMaterial().isReplaceable() || stateAtPos.is( BlockTags.LEAVES ) ) {
-        //                            if( distSq > rMinusOneSq ) {
-        //                                // "Coral" casing
-        //                                level.setBlock( pos, random.nextFloat() < 0.25F ? brainCoral : hornCoral, References.SET_BLOCK_FLAGS );
-        //                            }
-        //                            else {
-        //                                final float fillChoice = random.nextFloat();
-        //
-        //                                if( fillChoice < 0.1F && seaPickle.canSurvive( level, pos ) ) {
-        //                                    level.setBlock( pos, seaPickle, References.SET_BLOCK_FLAGS );
-        //                                }
-        //                                else if( fillChoice < 0.3F && seaGrass.canSurvive( level, pos ) ) {
-        //                                    level.setBlock( pos, seaGrass, References.SET_BLOCK_FLAGS );
-        //                                }
-        //                                else {
-        //                                    // Water fill
-        //                                    level.setBlock( pos, water, References.SET_BLOCK_FLAGS );
-        //
-        //                                    // Prevent greater radiuses from spawning a bazillion pufferfish
-        //                                    if( random.nextFloat() < 0.01F && pufferCount < 10 ) {
-        //                                        spawnStray( pos );
-        //                                        pufferCount++;
-        //                                    }
-        //                                }
-        //                            }
-        //                        }
-        //                    }
-        //                }
-        //            }
-        //        }
+        if( explosionMode != Explosion.Mode.NONE ) {
+            final BlockState ice = Blocks.ICE.defaultBlockState();
+            final int rMinusOneSq = (radius - 1) * (radius - 1);
+            
+            for( int y = -radius; y <= radius; y++ ) {
+                for( int x = -radius; x <= radius; x++ ) {
+                    for( int z = -radius; z <= radius; z++ ) {
+                        final int distSq = x * x + y * y + z * z;
+                        
+                        if( distSq <= radius * radius ) {
+                            final BlockPos pos = center.offset( x, y, z );
+                            
+                            // Freeze top layer of water and temporary ice within affected volume
+                            final BlockState block = level.getBlockState( pos );
+                            if( block.is( Blocks.FROSTED_ICE ) || block.getFluidState().is( FluidTags.WATER ) ) {
+                                final BlockState blockAbove = level.getBlockState( pos.above() );
+                                if( !blockAbove.getMaterial().blocksMotion() && !blockAbove.getFluidState().is( FluidTags.WATER ) )
+                                    level.setBlock( pos, ice, References.SetBlockFlags.DEFAULTS );
+                            }
+                            
+                            // Attempt to place pillars along circumference only
+                            if( y == 0 && distSq > rMinusOneSq ) placePillar( pos, radius );
+                        }
+                    }
+                }
+            }
+        }
+        
+        final int strays = radius / 2;
+        for( int count = 0; count < strays; count++ ) {
+            for( int attempt = 0; attempt < 8; attempt++ ) {
+                if( trySpawnStray( center, radius ) ) break;
+            }
+        }
     }
     
-    /** Helper method to simplify spawning strays. */
-    private void spawnStray( BlockPos pos ) {
-        //TODO
-        //        if( !(level instanceof IServerWorld) ) return;
-        //        final PufferfishEntity lePuffPuff = EntityType.PUFFERFISH.create( level );
-        //        if( lePuffPuff != null ) {
-        //            lePuffPuff.setPos( pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5 );
-        //            level.addFreshEntity( lePuffPuff );
-        //        }
+    /** Try to place an ice pillar at the location. */
+    private void placePillar( BlockPos pos, int radius ) {
+        final BlockPos.Mutable currentPos = pos.mutable();
+        if( shouldReplace( currentPos ) ) findGroundBelow( currentPos, radius );
+        else if( findGroundAbove( currentPos, radius ) ) return;
+        
+        final BlockState ice = Blocks.PACKED_ICE.defaultBlockState();
+        final int maxY = Math.min( currentPos.getY() + 4, level.getMaxBuildHeight() - 2 );
+        int height = -2; // This is minimum pillar height
+        if( pos.getY() > currentPos.getY() ) height -= (pos.getY() - currentPos.getY()) / 2;
+        
+        while( currentPos.getY() < maxY && shouldReplace( currentPos ) ) {
+            level.setBlock( currentPos, ice, References.SetBlockFlags.DEFAULTS );
+            currentPos.move( 0, 1, 0 );
+            
+            if( ++height >= 0 && random.nextBoolean() ) break;
+        }
+    }
+    
+    /** Attempts to find the ground. Resets the position if none can be found. */
+    private void findGroundBelow( BlockPos.Mutable currentPos, int radius ) {
+        final int yI = currentPos.getY();
+        final int minY = Math.max( yI - radius, 0 );
+        
+        while( currentPos.getY() > minY ) {
+            currentPos.move( 0, -1, 0 );
+            if( !shouldReplace( currentPos ) ) {
+                // Move back up one to ensure the current pos is replaceable
+                currentPos.move( 0, 1, 0 );
+                return;
+            }
+        }
+        // Initial y was replaceable, so we can default to this
+        currentPos.setY( yI );
+    }
+    
+    /** @return Attempts to find the ground. Returns true if the pillar should be canceled. */
+    private boolean findGroundAbove( BlockPos.Mutable currentPos, int radius ) {
+        final int yI = currentPos.getY();
+        final int maxY = Math.min( yI + radius, level.getMaxBuildHeight() - 2 );
+        
+        while( currentPos.getY() < maxY ) {
+            currentPos.move( 0, 1, 0 );
+            // Found a replaceable pos
+            if( shouldReplace( currentPos ) ) return false;
+        }
+        // Initial y was not replaceable, so we must cancel the entire operation
+        return true;
+    }
+    
+    /** @return True if a generating pillar should replace the block at a particular position. */
+    private boolean shouldReplace( BlockPos pos ) {
+        final BlockState stateAtPos = level.getBlockState( pos );
+        return (stateAtPos.getMaterial().isReplaceable() || stateAtPos.is( BlockTags.LEAVES )) &&
+                !stateAtPos.getFluidState().is( FluidTags.WATER );
+    }
+    
+    /** @return Helper method to simplify spawning strays. Returns true if it spawns one. */
+    private boolean trySpawnStray( BlockPos center, int radius ) {
+        if( !(level instanceof IServerWorld) ) return false;
+        final StraySkeletonEntity stray = StraySkeletonEntity.SPECIES.entityType.get().create( level );
+        if( stray == null ) return false;
+        
+        // Pick a random position within the ice prison, then cancel if we can't spawn at that position
+        final float angle = random.nextFloat() * 2.0F * (float) Math.PI;
+        final float distance = random.nextFloat() * (radius - 1);
+        final BlockPos.Mutable currentPos = center.mutable().move(
+                MathHelper.floor( MathHelper.cos( angle ) * distance ),
+                0,
+                MathHelper.floor( MathHelper.sin( angle ) * distance )
+        );
+        if( shouldReplace( currentPos ) ) findGroundBelow( currentPos, radius );
+        else if( findGroundAbove( currentPos, radius ) ) {
+            stray.remove();
+            return false; // No floor found
+        }
+        stray.moveTo( currentPos, angle * 180.0F / (float) Math.PI + 180.0F, 0.0F );
+        while( !level.noCollision( stray.getBoundingBox() ) ) {
+            if( currentPos.getY() > center.getY() + radius ) {
+                stray.remove();
+                return false; // Too high
+            }
+            currentPos.move( 0, 1, 0 );
+            stray.moveTo( currentPos, stray.yRot, stray.xRot );
+        }
+        
+        stray.setTarget( getTarget() );
+        stray.finalizeSpawn( (IServerWorld) level, level.getCurrentDifficultyAt( blockPosition() ),
+                SpawnReason.MOB_SUMMONED, null, null );
+        level.addFreshEntity( stray );
+        stray.spawnAnim();
+        return true;
     }
     
     /** Override to load data from this entity's NBT data. */
     @Override
     public void readVariantSaveData( CompoundNBT saveTag ) {
         setPathfindingMalus( PathNodeType.WATER, PathNodeType.WALKABLE.getMalus() );
-    }
-    
-    /** Called to make the frost walker ice platform around this entity, as needed. */
-    private void updateFrostWalker( BlockPos pos ) {
-        final boolean actualOnGround = onGround;
-        onGround = true; // Spoof the frost walker enchant requirement to be on the ground
-        FrostWalkerEnchantment.onEntityMoved( this, level, pos, 1 );
-        onGround = actualOnGround;
     }
 }

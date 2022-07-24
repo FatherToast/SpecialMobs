@@ -6,10 +6,12 @@ import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
+import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.Attributes;
+import net.minecraft.item.Items;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.Effects;
 import net.minecraft.world.World;
@@ -42,7 +44,8 @@ public class RunicEndermanEntity extends _SpecialEndermanEntity {
     @SpecialMob.LootTableProvider
     public static void buildLootTable( LootTableBuilder loot ) {
         addBaseLoot( loot );
-        //TODO add drops
+        loot.addClusterDrop( "common", Blocks.STONE );
+        loot.addRareDrop( "rare", Items.END_CRYSTAL );
     }
     
     @SpecialMob.Factory
@@ -68,4 +71,6 @@ public class RunicEndermanEntity extends _SpecialEndermanEntity {
             livingTarget.addEffect( new EffectInstance( Effects.LEVITATION, duration ) );
         }
     }
+    
+    // NOTE would be fun to try and make this mob shoot an 'end crystal laser' to deal ranged damage and/or knockback
 }

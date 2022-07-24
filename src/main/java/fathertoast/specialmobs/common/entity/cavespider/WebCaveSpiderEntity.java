@@ -97,7 +97,7 @@ public class WebCaveSpiderEntity extends _SpecialCaveSpiderEntity {
     /** @return Attempts to place a cobweb at the given position and returns true if successful. */
     private boolean tryPlaceWeb( BlockPos pos ) {
         if( level.getBlockState( pos ).getMaterial().isReplaceable() ) {
-            level.setBlock( pos, Blocks.COBWEB.defaultBlockState(), References.SET_BLOCK_FLAGS );
+            level.setBlock( pos, Blocks.COBWEB.defaultBlockState(), References.SetBlockFlags.DEFAULTS );
             webCount--;
             return true;
         }

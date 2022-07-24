@@ -108,20 +108,20 @@ public class DrowningCreeperEntity extends _SpecialCreeperEntity {
                         if( stateAtPos.getMaterial().isReplaceable() || stateAtPos.is( BlockTags.LEAVES ) ) {
                             if( distSq > rMinusOneSq ) {
                                 // "Coral" casing
-                                level.setBlock( pos, random.nextFloat() < 0.25F ? brainCoral : hornCoral, References.SET_BLOCK_FLAGS );
+                                level.setBlock( pos, random.nextFloat() < 0.25F ? brainCoral : hornCoral, References.SetBlockFlags.DEFAULTS );
                             }
                             else {
                                 final float fillChoice = random.nextFloat();
                                 
                                 if( fillChoice < 0.1F && seaPickle.canSurvive( level, pos ) ) {
-                                    level.setBlock( pos, seaPickle, References.SET_BLOCK_FLAGS );
+                                    level.setBlock( pos, seaPickle, References.SetBlockFlags.DEFAULTS );
                                 }
                                 else if( fillChoice < 0.3F && seaGrass.canSurvive( level, pos ) ) {
-                                    level.setBlock( pos, seaGrass, References.SET_BLOCK_FLAGS );
+                                    level.setBlock( pos, seaGrass, References.SetBlockFlags.DEFAULTS );
                                 }
                                 else {
                                     // Water fill
-                                    level.setBlock( pos, water, References.SET_BLOCK_FLAGS );
+                                    level.setBlock( pos, water, References.SetBlockFlags.DEFAULTS );
                                     
                                     // Prevent greater radiuses from spawning a bazillion pufferfish
                                     if( random.nextFloat() < 0.01F && pufferCount < 10 ) {

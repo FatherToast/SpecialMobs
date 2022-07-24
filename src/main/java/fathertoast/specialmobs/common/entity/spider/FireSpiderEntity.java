@@ -60,7 +60,7 @@ public class FireSpiderEntity extends _SpecialSpiderEntity {
         if( !level.isClientSide() && target instanceof LivingEntity ) {
             final BlockPos pos = target.blockPosition();
             if( level.getBlockState( pos ).getMaterial().isReplaceable() ) {
-                level.setBlock( pos, Blocks.FIRE.defaultBlockState(), References.SET_BLOCK_FLAGS );
+                level.setBlock( pos, Blocks.FIRE.defaultBlockState(), References.SetBlockFlags.DEFAULTS );
             }
         }
         target.setSecondsOnFire( 5 );
