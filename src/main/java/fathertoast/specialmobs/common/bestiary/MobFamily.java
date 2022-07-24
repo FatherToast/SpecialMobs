@@ -45,7 +45,7 @@ public class MobFamily<T extends LivingEntity, V extends FamilyConfig> {
     
     public static final MobFamily<ZombieEntity, FamilyConfig> ZOMBIE = new MobFamily<>( FamilyConfig::newLessSpecial,
             "Zombie", "zombies", 0x00AFAF, new EntityType[] { EntityType.ZOMBIE, EntityType.HUSK },
-            "Brute", "Fire", /*"Fishing",*/ "Giant", "Hungry", "Husk", "MadScientist", "Plague"
+            "Brute", "Fire", "Fishing", "Giant", "Hungry", "Husk", "MadScientist", "Plague"
     );//TODO fishing
     // TODO Drowned family and zombie transform mechanic
     //    public static final MobFamily<ZombieEntity, FamilyConfig> DROWNED = new MobFamily<>( FamilyConfig::new,
@@ -54,7 +54,7 @@ public class MobFamily<T extends LivingEntity, V extends FamilyConfig> {
     //    );
     public static final MobFamily<ZombifiedPiglinEntity, FamilyConfig> ZOMBIFIED_PIGLIN = new MobFamily<>( FamilyConfig::new,
             "ZombifiedPiglin", "zombified piglins", 0xEA9393, new EntityType[] { EntityType.ZOMBIFIED_PIGLIN },
-            "Brute", /*"Fishing",*/ "Giant", "Hungry", "Knight", "Plague", "Vampire"//TODO figure out crossbows
+            "Brute", "Fishing", "Giant", "Hungry", "Knight", "Plague", "Vampire"//TODO figure out crossbows
     );//TODO fishing
     
     public static final MobFamily<AbstractSkeletonEntity, SkeletonFamilyConfig> SKELETON = new MobFamily<>( SkeletonFamilyConfig::new,
@@ -86,7 +86,7 @@ public class MobFamily<T extends LivingEntity, V extends FamilyConfig> {
     
     public static final MobFamily<SilverfishEntity, SilverfishFamilyConfig> SILVERFISH = new MobFamily<>( SilverfishFamilyConfig::new,
             "Silverfish", "silverfish", 0x6E6E6E, new EntityType[] { EntityType.SILVERFISH },
-            "Blinding", "Desiccated", /*"Fishing",*/ "Flying", "Poison", /*"Puffer",*/ "Tough"
+            "Albino", "Blinding", "Desiccated", "Fire", "Fishing", "Flying", "Poison", "Puffer", "Tough"
     );//TODO fishing, puffer
     
     public static final MobFamily<EndermanEntity, FamilyConfig> ENDERMAN = new MobFamily<>( FamilyConfig::new,

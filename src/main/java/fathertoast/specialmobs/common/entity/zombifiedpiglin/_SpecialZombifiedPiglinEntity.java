@@ -54,7 +54,7 @@ public class _SpecialZombifiedPiglinEntity extends ZombifiedPiglinEntity impleme
     public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
         bestiaryInfo.color( 0x4C7129 )
                 .vanillaTextureBaseOnly( "textures/entity/piglin/zombified_piglin.png" )
-                .experience( 5 ).undead().fireImmune()
+                .experience( 5 ).undead()
                 .bowAttack( 2.0, 1.0, 0.8, 20, 15.0 );
     }
     

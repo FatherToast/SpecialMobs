@@ -55,7 +55,7 @@ public class _SpecialWitherSkeletonEntity extends WitherSkeletonEntity implement
         bestiaryInfo.color( 0x474D4D )
                 .vanillaTextureBaseOnly( "textures/entity/skeleton/wither_skeleton.png" )
                 .familySize( 1.2F )
-                .experience( 5 ).undead().fireImmune()
+                .experience( 5 ).undead()
                 .bowAttack( 2.0, 1.0, 1.0, 20, 15.0 );
     }
     

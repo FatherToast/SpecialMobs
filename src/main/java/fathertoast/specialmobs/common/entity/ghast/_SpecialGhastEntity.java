@@ -49,7 +49,7 @@ public class _SpecialGhastEntity extends GhastEntity implements IRangedAttackMob
     public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
         bestiaryInfo.color( 0xBCBCBC )
                 .vanillaTextureWithAnimation( "textures/entity/ghast/ghast.png", "textures/entity/ghast/ghast_shooting.png" )
-                .experience( 5 ).fireImmune()
+                .experience( 5 )
                 .fireballAttack( 0.0, 20, 40, 64.0 );
     }
     

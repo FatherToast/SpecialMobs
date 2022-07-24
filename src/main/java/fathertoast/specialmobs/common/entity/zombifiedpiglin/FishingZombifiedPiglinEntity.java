@@ -6,6 +6,7 @@ import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.config.Config;
 import fathertoast.specialmobs.common.config.species.SpeciesConfig;
 import fathertoast.specialmobs.common.config.species.ZombieSpeciesConfig;
+import fathertoast.specialmobs.common.entity.ai.AIHelper;
 import fathertoast.specialmobs.common.entity.ai.IAngler;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootEntryItemBuilder;
@@ -87,6 +88,7 @@ public class FishingZombifiedPiglinEntity extends _SpecialZombifiedPiglinEntity 
     /** Override to change this entity's AI goals. */
     @Override
     protected void registerVariantGoals() {
+        AIHelper.replaceWaterAvoidingRandomWalking( this, 1.0 );
         //TODO add angler AI @ attack priority
     }
     

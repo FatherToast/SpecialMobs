@@ -87,7 +87,7 @@ public class DesiccatedSilverfishEntity extends _SpecialSilverfishEntity {
     /** Called each tick to update this entity's movement. */
     @Override
     public void aiStep() {
-        if( absorbCount > 0 && spongebob() ) spawnAnim();
+        if( !level.isClientSide() && absorbCount > 0 && spongebob() ) spawnAnim();
         super.aiStep();
     }
     

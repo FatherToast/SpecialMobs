@@ -46,7 +46,7 @@ public class _SpecialBlazeEntity extends BlazeEntity implements IRangedAttackMob
     public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
         bestiaryInfo.color( 0xFFF87E )
                 .vanillaTextureBaseOnly( "textures/entity/blaze.png" )
-                .experience( 10 ).fireImmune().waterSensitive()
+                .experience( 10 ).waterSensitive()
                 .fireballAttack( 1.0, 60, 100, 48.0 );
     }
     
