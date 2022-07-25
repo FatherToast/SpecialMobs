@@ -42,8 +42,9 @@ public class SpecialMobs {
      *          o nether spawns
      *          o end spawns
      *          ? ocean/water spawns
-     *  + potions
-     *      + vulnerability (opposite of resistance)
+     *  - potions
+     *      - vulnerability (opposite of resistance)
+     *      ? gravity (opposite of levitation)
      *  o entities
      *      - nbt-driven capabilities (special mob data)
      *      o fish hook
