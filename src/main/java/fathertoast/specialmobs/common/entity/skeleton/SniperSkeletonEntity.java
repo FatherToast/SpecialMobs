@@ -8,8 +8,15 @@ import fathertoast.specialmobs.common.config.species.SpeciesConfig;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.Attributes;
+import net.minecraft.entity.projectile.AbstractArrowEntity;
+import net.minecraft.entity.projectile.ProjectileHelper;
+import net.minecraft.item.BowItem;
+import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.util.SoundEvents;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 
 @SpecialMob
@@ -60,4 +67,45 @@ public class SniperSkeletonEntity extends _SpecialSkeletonEntity {
     //--------------- Variant-Specific Implementations ----------------
     
     public SniperSkeletonEntity( EntityType<? extends _SpecialSkeletonEntity> entityType, World world ) { super( entityType, world ); }
+    
+    /** Called to attack the target with a ranged attack. */
+    @Override
+    public void performRangedAttack( LivingEntity target, float damageMulti ) {
+        // Would be nice if we could lead the target, maybe someday when we can more easily read player velocity
+        final double dX = target.getX() - getX();
+        final double dY = target.getY( 0.5 ) - getEyeY() + 0.1;
+        final double dZ = target.getZ() - getZ();
+        final double dH = MathHelper.sqrt( dX * dX + dZ * dZ );
+        
+        final double g = 0.05; // Gravitational acceleration for AbstractArrowEntity
+        final float v = 1.6F;
+        final double radical = v * v * v * v - g * (g * dH * dH + 2 * dY * v * v);
+        if( radical < 0.0 ) {
+            // No firing solution, just fall back to the default
+            super.performRangedAttack( target, damageMulti );
+            return;
+        }
+        final double angle = Math.atan( (v * v - Math.sqrt( radical )) / (g * dH) ); // Use the flatter trajectory (-sqrt)
+        final double vY = Math.sin( angle );
+        final double vH = Math.cos( angle );
+        
+        final ItemStack arrowItem = getProjectile( getItemInHand( ProjectileHelper.getWeaponHoldingHand(
+                this, item -> item instanceof BowItem ) ) );
+        AbstractArrowEntity arrow = getArrow( arrowItem, damageMulti );
+        if( getMainHandItem().getItem() instanceof BowItem )
+            arrow = ((BowItem) getMainHandItem().getItem()).customArrow( arrow );
+        
+        arrow.shoot( dX / dH * vH, vY, dZ / dH * vH, v,
+                getSpecialData().getRangedAttackSpread() * (14 - 4 * level.getDifficulty().getId()) );
+        
+        playSound( SoundEvents.SKELETON_SHOOT, 1.0F, 1.0F / (random.nextFloat() * 0.4F + 0.8F) );
+        level.addFreshEntity( arrow );
+    }
+    
+    /** Override to modify this entity's ranged attack projectile. */
+    @Override
+    protected AbstractArrowEntity getVariantArrow( AbstractArrowEntity arrow, ItemStack arrowItem, float damageMulti ) {
+        arrow.setKnockback( arrow.knockback + 2 );
+        return arrow;
+    }
 }

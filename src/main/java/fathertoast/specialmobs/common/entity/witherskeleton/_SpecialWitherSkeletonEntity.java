@@ -117,7 +117,7 @@ public class _SpecialWitherSkeletonEntity extends WitherSkeletonEntity implement
             arrow = ((BowItem) getMainHandItem().getItem()).customArrow( arrow );
         
         final double dX = target.getX() - getX();
-        final double dY = target.getY( 1.0 / 3.0 ) - arrow.getY();
+        final double dY = target.getY( 0.3333 ) - arrow.getY();
         final double dZ = target.getZ() - getZ();
         final double dH = MathHelper.sqrt( dX * dX + dZ * dZ );
         arrow.shoot( dX, dY + dH * 0.2, dZ, 1.6F,

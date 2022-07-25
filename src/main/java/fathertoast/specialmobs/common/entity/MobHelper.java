@@ -11,6 +11,7 @@ import net.minecraft.block.material.Material;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.FrostWalkerEnchantment;
 import net.minecraft.entity.*;
+import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.monster.CreeperEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.AbstractArrowEntity;
@@ -30,11 +31,14 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.IServerWorld;
+import net.minecraftforge.common.ForgeHooks;
+import net.minecraftforge.event.entity.living.LivingKnockBackEvent;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -135,6 +139,81 @@ public final class MobHelper {
     private static boolean hasSmite( ItemStack item ) {
         //TODO Consider Tinkers compat if this doesn't already work - must have smite modifier
         return EnchantmentHelper.getDamageBonus( item, CreatureAttribute.UNDEAD ) > 0.0F;
+    }
+    
+    /**
+     * Knocks the target away from the source. Power is on the same scale as "level of Knockback enchantment".
+     * If the power is negative, this pulls the target toward the source instead.
+     */
+    @SuppressWarnings( "unused" )
+    public static void knockback( Entity source, LivingEntity target, float power, float upwardMulti ) {
+        knockback( source, 0.6, target, power, upwardMulti, 0.5 );
+    }
+    
+    /**
+     * Knocks the target away from the source. Power is on the same scale as "level of Knockback enchantment".
+     * If the power is negative, this pulls the target toward the source instead.
+     * Momentum is the amount of original velocity maintained by the entity after knockback.
+     */
+    public static void knockback( Entity source, double sourceMomentum, LivingEntity target, float power, float upwardMulti, double momentum ) {
+        final float angle = source.yRot * (float) Math.PI / 180.0F;
+        knockback( target, power, upwardMulti, MathHelper.sin( angle ), -MathHelper.cos( angle ), momentum );
+        source.setDeltaMovement( source.getDeltaMovement().multiply( sourceMomentum, 1.0, sourceMomentum ) );
+    }
+    
+    /**
+     * Knocks the target backward (based on its own facing). Power is on the same scale as "level of Knockback enchantment".
+     * If the power is negative, this pushes the target forward instead.
+     */
+    @SuppressWarnings( "unused" )
+    public static void knockback( LivingEntity target, float power, float upwardMulti ) {
+        knockback( target, power, upwardMulti, 0.5 );
+    }
+    
+    /**
+     * Knocks the target backward (based on its own facing). Power is on the same scale as "level of Knockback enchantment".
+     * If the power is negative, this pushes the target forward instead.
+     * Momentum is the amount of original velocity maintained by the entity after knockback.
+     */
+    public static void knockback( LivingEntity target, float power, float upwardMulti, double momentum ) {
+        final float angle = target.yRot * (float) Math.PI / 180.0F;
+        knockback( target, power, upwardMulti, -MathHelper.sin( angle ), MathHelper.cos( angle ), momentum );
+    }
+    
+    /**
+     * Knocks the target backward (opposite direction from the [x, z] vector provided).
+     * Power is on the same scale as "level of Knockback enchantment".
+     * If the power is negative, this pushes the target forward instead.
+     */
+    @SuppressWarnings( "unused" )
+    public static void knockback( LivingEntity target, float power, float upwardMulti, double forwardX, double forwardZ ) {
+        knockback( target, power, upwardMulti, forwardX, forwardZ, 0.5 );
+    }
+    
+    /**
+     * Knocks the target backward (opposite direction from the [x, z] vector provided).
+     * Power is on the same scale as "level of Knockback enchantment".
+     * If the power is negative, this pushes the target forward instead.
+     * Momentum is the amount of original velocity maintained by the entity after knockback.
+     */
+    public static void knockback( LivingEntity target, float power, float upwardMulti, double forwardX, double forwardZ, double momentum ) {
+        final LivingKnockBackEvent event = power < 0.0F ?
+                ForgeHooks.onLivingKnockBack( target, -power * 0.5F, -forwardX, -forwardZ ) :
+                ForgeHooks.onLivingKnockBack( target, power * 0.5F, forwardX, forwardZ );
+        if( event.isCanceled() ) return;
+        
+        power = (float) (event.getStrength() * (1.0 - target.getAttributeValue( Attributes.KNOCKBACK_RESISTANCE )));
+        if( power > 0.0F ) {
+            target.hasImpulse = true;
+            final Vector3d v = target.getDeltaMovement().scale( momentum );
+            final Vector3d vKB = new Vector3d( -event.getRatioX(), 0.0, -event.getRatioZ() ).normalize().scale( power );
+            final double vY = v.y + power * upwardMulti;
+            target.setDeltaMovement(
+                    v.x + vKB.x,
+                    target.isOnGround() ? Math.max( 0.2, vY ) : vY,
+                    v.z + vKB.z );
+            target.hurtMarked = true;
+        }
     }
     
     /**

@@ -56,8 +56,8 @@ public class SpecialMobs {
      *          - chance to spawn charged during thunderstorms
      *          + scope
      *      - zombies
-     *          o villager infection
-     *          + transformations
+     *          o villager infection (is this still reasonably applicable?)
+     *          + transformations (husk -> any other non-water-sensitive zombie -> any drowned)
      *          - ranged attack AI (using bow)
      *          - use shields
      *      + drowned

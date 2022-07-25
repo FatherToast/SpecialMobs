@@ -5,6 +5,7 @@ import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.config.species.SkeletonSpeciesConfig;
 import fathertoast.specialmobs.common.config.species.SpeciesConfig;
+import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import net.minecraft.entity.EntityType;
@@ -70,6 +71,7 @@ public class SpitfireWitherSkeletonEntity extends _SpecialWitherSkeletonEntity {
     @Override
     protected void onVariantAttack( LivingEntity target ) {
         target.setSecondsOnFire( 10 );
+        MobHelper.knockback( this, target, 3.0F, 1.0F );
     }
     
     /** Called to attack the target with a ranged attack. */

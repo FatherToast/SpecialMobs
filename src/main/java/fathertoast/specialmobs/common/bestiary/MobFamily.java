@@ -49,9 +49,9 @@ public class MobFamily<T extends LivingEntity, V extends FamilyConfig> {
     );//TODO fishing
     // TODO Drowned family and zombie transform mechanic
     //    public static final MobFamily<ZombieEntity, FamilyConfig> DROWNED = new MobFamily<>( FamilyConfig::new,
-    //            "Zombie", "zombies", 0x8FF1D7, new EntityType[] { EntityType.DROWNED }, //VR egg: 0x799C65
+    //            "Drowned", "drowned", 0x8FF1D7, new EntityType[] { EntityType.DROWNED }, //VR egg: 0x799C65
     //            "Brute", /*"Fishing",*/ "Giant", "Hungry", "Knight", "Plague"
-    //    );
+    //    );// ice/fire themes? (cold/warm ocean)
     public static final MobFamily<ZombifiedPiglinEntity, FamilyConfig> ZOMBIFIED_PIGLIN = new MobFamily<>( FamilyConfig::new,
             "ZombifiedPiglin", "zombified piglins", 0xEA9393, new EntityType[] { EntityType.ZOMBIFIED_PIGLIN },
             "Brute", "Fishing", "Giant", "Hungry", "Knight", "Plague", "Vampire"//TODO figure out crossbows
@@ -59,7 +59,7 @@ public class MobFamily<T extends LivingEntity, V extends FamilyConfig> {
     
     public static final MobFamily<AbstractSkeletonEntity, SkeletonFamilyConfig> SKELETON = new MobFamily<>( SkeletonFamilyConfig::new,
             "Skeleton", "skeletons", 0xC1C1C1, new EntityType[] { EntityType.SKELETON, EntityType.STRAY },
-            "Brute", "Fire", "Gatling", "Giant", "Knight", "Ninja", "Poison", "Sniper", "Spitfire", "Stray"
+            "Brute", "Fire", "Gatling", "Giant", "Knight", "Ninja", "Poison", "Sniper", "Spitfire", "Stray", "Weathered"
     );
     public static final MobFamily<AbstractSkeletonEntity, SkeletonFamilyConfig> WITHER_SKELETON = new MobFamily<>( SkeletonFamilyConfig::new,
             "WitherSkeleton", "wither skeletons", 0x141414, new EntityType[] { EntityType.WITHER_SKELETON },

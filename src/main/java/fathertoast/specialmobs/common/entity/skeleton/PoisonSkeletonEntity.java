@@ -27,7 +27,7 @@ public class PoisonSkeletonEntity extends _SpecialSkeletonEntity {
     @SpecialMob.BestiaryInfoSupplier
     public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
         bestiaryInfo.color( 0x779C68 ).theme( BestiaryInfo.Theme.FOREST )
-                .uniqueTextureWithOverlay()
+                .uniqueTexturesAll()
                 .addExperience( 1 );
     }
     

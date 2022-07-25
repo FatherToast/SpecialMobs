@@ -62,6 +62,7 @@ public class BruteSkeletonEntity extends _SpecialSkeletonEntity {
     @Override
     protected void onVariantAttack( LivingEntity target ) {
         MobHelper.causeLifeLoss( target, 2.0F );
+        MobHelper.knockback( this, target, 2.0F, 1.0F );
     }
     
     /** Override to modify this entity's ranged attack projectile. */

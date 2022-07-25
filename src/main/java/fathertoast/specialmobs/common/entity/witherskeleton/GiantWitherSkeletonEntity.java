@@ -3,10 +3,14 @@ package fathertoast.specialmobs.common.entity.witherskeleton;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
+import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.Attributes;
+import net.minecraft.entity.projectile.AbstractArrowEntity;
+import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.world.World;
 
@@ -20,7 +24,7 @@ public class GiantWitherSkeletonEntity extends _SpecialWitherSkeletonEntity {
     
     @SpecialMob.BestiaryInfoSupplier
     public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
-        bestiaryInfo.color( 0x474D4D )
+        bestiaryInfo.color( 0x474D4D ).theme( BestiaryInfo.Theme.MOUNTAIN )
                 .size( 1.8F, 0.95F, 3.6F )
                 .addExperience( 1 )
                 .addToAttribute( Attributes.MAX_HEALTH, 20.0 )
@@ -53,6 +57,19 @@ public class GiantWitherSkeletonEntity extends _SpecialWitherSkeletonEntity {
     public GiantWitherSkeletonEntity( EntityType<? extends _SpecialWitherSkeletonEntity> entityType, World world ) {
         super( entityType, world );
         maxUpStep = 1.0F;
+    }
+    
+    /** Override to apply effects when this entity hits a target with a melee attack. */
+    @Override
+    protected void onVariantAttack( LivingEntity target ) {
+        MobHelper.knockback( this, target, 4.0F, 1.0F );
+    }
+    
+    /** Override to modify this entity's ranged attack projectile. */
+    @Override
+    protected AbstractArrowEntity getVariantArrow( AbstractArrowEntity arrow, ItemStack arrowItem, float damageMulti ) {
+        arrow.setKnockback( arrow.knockback + 2 );
+        return arrow;
     }
     
     /** Sets this entity as a baby. */

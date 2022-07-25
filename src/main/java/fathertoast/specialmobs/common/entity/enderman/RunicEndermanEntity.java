@@ -63,6 +63,7 @@ public class RunicEndermanEntity extends _SpecialEndermanEntity {
     @Override
     protected void onVariantAttack( LivingEntity target ) {
         MobHelper.applyEffect( target, Effects.LEVITATION );
+        MobHelper.knockback( this, target, 2.0F, 0.0F );
     }
     
     // NOTE would be fun to try and make this mob shoot an 'end crystal laser' to deal ranged damage and/or knockback

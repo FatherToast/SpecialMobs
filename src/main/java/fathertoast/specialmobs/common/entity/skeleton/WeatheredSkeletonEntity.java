@@ -1,8 +1,10 @@
-package fathertoast.specialmobs.common.entity.zombifiedpiglin;
+package fathertoast.specialmobs.common.entity.skeleton;
 
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
+import fathertoast.specialmobs.common.config.species.SkeletonSpeciesConfig;
+import fathertoast.specialmobs.common.config.species.SpeciesConfig;
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
@@ -23,68 +25,77 @@ import net.minecraft.world.World;
 import javax.annotation.Nullable;
 
 @SpecialMob
-public class BruteZombifiedPiglinEntity extends _SpecialZombifiedPiglinEntity {
+public class WeatheredSkeletonEntity extends _SpecialSkeletonEntity {
     
     //--------------- Static Special Mob Hooks ----------------
     
     @SpecialMob.SpeciesReference
-    public static MobFamily.Species<BruteZombifiedPiglinEntity> SPECIES;
+    public static MobFamily.Species<WeatheredSkeletonEntity> SPECIES;
     
     @SpecialMob.BestiaryInfoSupplier
     public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
-        bestiaryInfo.color( 0xFFF87E )
-                .uniqueTextureBaseOnly()
-                .size( 1.2F, 0.7F, 2.35F )
-                .addExperience( 2 )
-                .addToAttribute( Attributes.MAX_HEALTH, 10.0 ).addToAttribute( Attributes.ARMOR, 10.0 );
+        bestiaryInfo.color( 0xE6CC94 ).theme( BestiaryInfo.Theme.DESERT )
+                .uniqueTextureWithOverlay()
+                .addExperience( 1 )
+                .multiplyAttribute( Attributes.MOVEMENT_SPEED, 1.2 );
+    }
+    
+    @SpecialMob.ConfigSupplier
+    public static SpeciesConfig createConfig( MobFamily.Species<?> species ) {
+        return new SkeletonSpeciesConfig( species, 0.5, 0.0 );
     }
     
     @SpecialMob.LanguageProvider
     public static String[] getTranslations( String langKey ) {
-        return References.translations( langKey, "Zombified Piglin Brute",
+        return References.translations( langKey, "Weathered Skeleton",
                 "", "", "", "", "", "" );//TODO
     }
     
     @SpecialMob.LootTableProvider
     public static void buildLootTable( LootTableBuilder loot ) {
         addBaseLoot( loot );
-        loot.addCommonDrop( "common", Items.FLINT, 1 );
-        loot.addRareDrop( "rare", Items.IRON_INGOT );
+        loot.addClusterDrop( "uncommon", Items.GOLD_NUGGET, 4 );
     }
     
     @SpecialMob.Factory
-    public static EntityType.IFactory<BruteZombifiedPiglinEntity> getVariantFactory() { return BruteZombifiedPiglinEntity::new; }
+    public static EntityType.IFactory<WeatheredSkeletonEntity> getVariantFactory() { return WeatheredSkeletonEntity::new; }
     
     /** @return This entity's mob species. */
     @SpecialMob.SpeciesSupplier
     @Override
-    public MobFamily.Species<? extends BruteZombifiedPiglinEntity> getSpecies() { return SPECIES; }
+    public MobFamily.Species<? extends WeatheredSkeletonEntity> getSpecies() { return SPECIES; }
     
     
     //--------------- Variant-Specific Implementations ----------------
     
-    public BruteZombifiedPiglinEntity( EntityType<? extends _SpecialZombifiedPiglinEntity> entityType, World world ) { super( entityType, world ); }
+    public WeatheredSkeletonEntity( EntityType<? extends _SpecialSkeletonEntity> entityType, World world ) { super( entityType, world ); }
     
     /** Override to change starting equipment or stats. */
-    @Override
     public void finalizeVariantSpawn( IServerWorld world, DifficultyInstance difficulty, @Nullable SpawnReason spawnReason,
                                       @Nullable ILivingEntityData groupData ) {
-        // A reference to the vanilla piglin brutes
-        if( getItemBySlot( EquipmentSlotType.MAINHAND ).getItem() == Items.GOLDEN_SWORD ) {
-            setItemSlot( EquipmentSlotType.MAINHAND, new ItemStack( Items.GOLDEN_AXE ) );
+        if( getItemBySlot( EquipmentSlotType.MAINHAND ).getItem() == Items.IRON_SWORD ) {
+            setItemSlot( EquipmentSlotType.MAINHAND, new ItemStack( Items.GOLDEN_SWORD ) );
+            
+            if( getItemBySlot( EquipmentSlotType.OFFHAND ).isEmpty() ) {
+                setItemSlot( EquipmentSlotType.OFFHAND, new ItemStack( Items.GOLDEN_SWORD ) );
+            }
         }
+        
     }
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override
     protected void onVariantAttack( LivingEntity target ) {
-        MobHelper.causeLifeLoss( target, 2.0F );
-        MobHelper.knockback( this, target, 2.0F, 1.0F );
+        MobHelper.applyEffect( target, Effects.HUNGER );
     }
     
     /** Override to modify this entity's ranged attack projectile. */
     @Override
     protected AbstractArrowEntity getVariantArrow( AbstractArrowEntity arrow, ItemStack arrowItem, float damageMulti ) {
-        return MobHelper.tipArrow( arrow, Effects.HARM );
+        return MobHelper.tipArrow( arrow, Effects.HUNGER );
     }
+    
+    /** @return Called each tick to check if the sun should set this entity on fire. */
+    @Override
+    protected boolean isSunBurnTick() { return false; }
 }

@@ -60,5 +60,6 @@ public class FighterGhastEntity extends _SpecialGhastEntity {
     @Override
     protected void onVariantAttack( LivingEntity target ) {
         MobHelper.causeLifeLoss( target, 2.0F );
+        MobHelper.knockback( this, target, 2.0F, 0.5F );
     }
 }
