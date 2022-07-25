@@ -3,6 +3,7 @@ package fathertoast.specialmobs.common.entity.witch;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
+import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import net.minecraft.entity.EntityType;
@@ -78,7 +79,7 @@ public class ShadowsWitchEntity extends _SpecialWitchEntity {
     public void aiStep() {
         final LivingEntity target = getTarget();
         if( !level.isClientSide() && isAlive() && target != null && target.hasEffect( Effects.BLINDNESS ) && random.nextInt( 10 ) == 0 ) {
-            target.removeEffect( Effects.NIGHT_VISION ); // Prevent blind + night vision combo (black screen)
+            MobHelper.removeNightVision( target );
         }
         super.aiStep();
     }

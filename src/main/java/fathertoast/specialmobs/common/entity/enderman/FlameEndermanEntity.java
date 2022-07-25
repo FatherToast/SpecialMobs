@@ -72,12 +72,10 @@ public class FlameEndermanEntity extends _SpecialEndermanEntity {
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override
-    protected void onVariantAttack( Entity target ) {
-        target.setSecondsOnFire( 5 );
-        if( target instanceof LivingEntity ) {
-            for( int i = 0; i < 64; i++ ) {
-                if( teleport() ) break;
-            }
+    protected void onVariantAttack( LivingEntity target ) {
+        target.setSecondsOnFire( 4 );
+        for( int i = 0; i < 64; i++ ) {
+            if( teleport() ) break;
         }
     }
     

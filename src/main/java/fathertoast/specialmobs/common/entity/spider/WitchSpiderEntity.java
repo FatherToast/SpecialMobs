@@ -6,7 +6,6 @@ import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.Attributes;
@@ -58,11 +57,9 @@ public class WitchSpiderEntity extends _SpecialSpiderEntity {
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override
-    protected void onVariantAttack( Entity target ) {
-        if( target instanceof LivingEntity ) {
-            ((LivingEntity) target).addEffect( MobHelper.nextWitchSpiderEffect( random, level, true ) );
-            MobHelper.stealBuffEffect( this, (LivingEntity) target );
-        }
+    protected void onVariantAttack( LivingEntity target ) {
+        MobHelper.applyWitchSpiderEffect( target, random, true );
+        MobHelper.stealBuffEffect( this, target );
     }
     
     /** @return True if the effect can be applied to this entity. */

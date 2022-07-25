@@ -4,15 +4,14 @@ import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.config.Config;
+import fathertoast.specialmobs.common.core.register.SMEffects;
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.item.Items;
-import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.Effects;
 import net.minecraft.world.World;
 
@@ -60,18 +59,11 @@ public class DesertSpiderEntity extends _SpecialSpiderEntity {
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override
-    protected void onVariantAttack( Entity target ) {
-        if( target instanceof LivingEntity ) {
-            final LivingEntity livingTarget = (LivingEntity) target;
-            final int duration = MobHelper.getDebuffDuration( level.getDifficulty() );
-            
-            if( Config.MAIN.GENERAL.enableNausea.get() ) {
-                livingTarget.addEffect( new EffectInstance( Effects.CONFUSION, duration, 0 ) );
-            }
-            livingTarget.addEffect( new EffectInstance( Effects.BLINDNESS, duration, 0 ) );
-            
-            livingTarget.addEffect( new EffectInstance( Effects.MOVEMENT_SLOWDOWN, duration, 2 ) );
-            livingTarget.addEffect( new EffectInstance( Effects.DAMAGE_RESISTANCE, duration, -3 ) ); // 40% inc damage taken
-        }
+    protected void onVariantAttack( LivingEntity target ) {
+        if( Config.MAIN.GENERAL.enableNausea.get() ) MobHelper.applyEffect( target, Effects.CONFUSION );
+        MobHelper.applyEffect( target, Effects.BLINDNESS );
+        MobHelper.removeNightVision( target );
+        MobHelper.applyEffect( target, Effects.MOVEMENT_SLOWDOWN, 2 );
+        MobHelper.applyEffect( target, SMEffects.VULNERABILITY.get(), 2 );
     }
 }

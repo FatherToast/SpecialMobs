@@ -6,7 +6,6 @@ import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import net.minecraft.block.Blocks;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.Items;
@@ -56,8 +55,8 @@ public class FireSpiderEntity extends _SpecialSpiderEntity {
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override
-    protected void onVariantAttack( Entity target ) {
-        if( !level.isClientSide() && target instanceof LivingEntity ) {
+    protected void onVariantAttack( LivingEntity target ) {
+        if( !level.isClientSide() ) {
             final BlockPos pos = target.blockPosition();
             if( level.getBlockState( pos ).getMaterial().isReplaceable() ) {
                 level.setBlock( pos, Blocks.FIRE.defaultBlockState(), References.SetBlockFlags.DEFAULTS );

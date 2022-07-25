@@ -63,7 +63,7 @@ public class RegistryEntryList<T extends IForgeRegistryEntry<T>> implements IStr
                     PRINT_LIST.add( regKey.toString() );
                 }
                 else {
-                    SpecialMobs.LOG.warn( "Invalid entry for {} \"{}\"! Deleting entry. Invalid entry: {}",
+                    SpecialMobs.LOG.warn( "Invalid or duplicate entry for {} \"{}\"! Deleting entry. Invalid entry: {}",
                             field.getClass(), field.getKey(), line );
                 }
             }

@@ -97,13 +97,13 @@ public class _SpecialCreeperEntity extends CreeperEntity implements IExplodingMo
     /** Called when this entity successfully damages a target to apply on-hit effects. */
     @Override
     public void doEnchantDamageEffects( LivingEntity attacker, Entity target ) {
-        onVariantAttack( target );
+        if( target instanceof LivingEntity ) onVariantAttack( (LivingEntity) target );
         super.doEnchantDamageEffects( attacker, target );
     }
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @SuppressWarnings( "unused" ) // Not normally used for creepers
-    protected void onVariantAttack( Entity target ) { }
+    protected void onVariantAttack( LivingEntity target ) { }
     
     /** Called to perform this creeper's explosion 'attack'. */
     @Override

@@ -2,9 +2,11 @@ package fathertoast.specialmobs.common.core;
 
 import fathertoast.specialmobs.common.compat.top.SMTheOneProbe;
 import fathertoast.specialmobs.common.config.Config;
+import fathertoast.specialmobs.common.core.register.SMEffects;
 import fathertoast.specialmobs.common.core.register.SMEntities;
 import fathertoast.specialmobs.common.core.register.SMItems;
 import fathertoast.specialmobs.common.event.BiomeEvents;
+import fathertoast.specialmobs.common.event.GameEvents;
 import fathertoast.specialmobs.common.network.PacketHandler;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
@@ -118,14 +120,15 @@ public class SpecialMobs {
         
         packetHandler.registerMessages();
         
-        //MinecraftForge.EVENT_BUS.register( new SMEventListener() );
         MinecraftForge.EVENT_BUS.register( new BiomeEvents() );
+        MinecraftForge.EVENT_BUS.register( new GameEvents() );
         
         IEventBus eventBus = FMLJavaModLoadingContext.get().getModEventBus();
         
         eventBus.addListener( SMEntities::createAttributes );
         eventBus.addListener( this::sendIMCMessages );
         
+        SMEffects.REGISTRY.register( eventBus );
         SMEntities.REGISTRY.register( eventBus );
         SMItems.REGISTRY.register( eventBus );
     }

@@ -5,7 +5,6 @@ import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.Attributes;
@@ -61,11 +60,11 @@ public class ThiefEndermanEntity extends _SpecialEndermanEntity {
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override
-    protected void onVariantAttack( Entity target ) {
-        if( !level.isClientSide() && target instanceof LivingEntity && target.isAlive() && teleportTargetDelay <= 0 ) {
+    protected void onVariantAttack( LivingEntity target ) {
+        if( !level.isClientSide() && target.isAlive() && teleportTargetDelay <= 0 ) {
             for( int i = 0; i < 64; i++ ) {
-                if( teleportTarget( (LivingEntity) target ) ) {
-                    teleportTargetDelay = 160; // 8s cooldown
+                if( teleportTarget( target ) ) {
+                    teleportTargetDelay = 160;
                     for( int j = 0; j < 16; j++ ) {
                         if( teleportTowards( target ) ) break;
                     }

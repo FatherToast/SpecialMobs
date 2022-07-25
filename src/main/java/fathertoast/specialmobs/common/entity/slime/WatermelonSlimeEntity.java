@@ -6,7 +6,6 @@ import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.entity.ai.goal.SpecialLeapAtTargetGoal;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.Attributes;
@@ -71,17 +70,15 @@ public class WatermelonSlimeEntity extends _SpecialSlimeEntity {
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override
-    protected void onVariantAttack( Entity target ) {
-        if( target instanceof LivingEntity ) {
-            final float forwardPower = 0.8F;
-            final float upwardPower = 0.5F;
-            final Vector3d vKnockback = new Vector3d( target.getX() - getX(), 0.0, target.getZ() - getZ() )
-                    .normalize().scale( forwardPower ).add( getDeltaMovement().scale( 0.2F ) );
-            target.setDeltaMovement( vKnockback.x, 0.4 * upwardPower, vKnockback.z );
-            target.hurtMarked = true;
-            
-            setDeltaMovement( getDeltaMovement().multiply( 0.2, 1.0, 0.2 ) );
-        }
+    protected void onVariantAttack( LivingEntity target ) {
+        final float forwardPower = 0.8F;
+        final float upwardPower = 0.5F;
+        final Vector3d vKnockback = new Vector3d( target.getX() - getX(), 0.0, target.getZ() - getZ() )
+                .normalize().scale( forwardPower ).add( getDeltaMovement().scale( 0.2F ) );
+        target.setDeltaMovement( vKnockback.x, 0.4 * upwardPower, vKnockback.z );
+        target.hurtMarked = true;
+        
+        setDeltaMovement( getDeltaMovement().multiply( 0.2, 1.0, 0.2 ) );
     }
     
     private static final IParticleData JUMP_PARTICLE = new ItemParticleData( ParticleTypes.ITEM, Items.MELON_SLICE.getDefaultInstance() );

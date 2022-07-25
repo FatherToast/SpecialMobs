@@ -142,12 +142,12 @@ public class _SpecialWitherSkeletonEntity extends WitherSkeletonEntity implement
     /** Called when this entity successfully damages a target to apply on-hit effects. */
     @Override
     public void doEnchantDamageEffects( LivingEntity attacker, Entity target ) {
-        onVariantAttack( target );
+        if( target instanceof LivingEntity ) onVariantAttack( (LivingEntity) target );
         super.doEnchantDamageEffects( attacker, target );
     }
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
-    protected void onVariantAttack( Entity target ) { }
+    protected void onVariantAttack( LivingEntity target ) { }
     
     /** Override to save data to this entity's NBT data. */
     public void addVariantSaveData( @SuppressWarnings( "unused" ) CompoundNBT saveTag ) { }

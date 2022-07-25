@@ -2,6 +2,7 @@ package fathertoast.specialmobs.datagen;
 
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.core.SpecialMobs;
+import fathertoast.specialmobs.common.core.register.SMEffects;
 import fathertoast.specialmobs.common.core.register.SMItems;
 import fathertoast.specialmobs.common.util.AnnotationHelper;
 import fathertoast.specialmobs.common.util.References;
@@ -61,15 +62,16 @@ public class SMLanguageProvider extends LanguageProvider {
         
         // Items
         for( RegistryObject<Item> regObject : SMItems.REGISTRY.getEntries() ) {
-            Item item = regObject.get();
-            
             // Lazy method of avoiding duplicate entries for now
-            if( item instanceof ForgeSpawnEggItem ) {
-                continue;
-            }
+            if( regObject.get() instanceof ForgeSpawnEggItem ) continue;
+            
             final String[] itemTranslations = AnnotationHelper.getTranslations( regObject.get() );
             translationList.add( itemTranslations );
         }
+        
+        // Misc
+        translationList.add( References.translations( SMEffects.VULNERABILITY.get().getDescriptionId(), "Vulnerability",
+                "", "", "", "", "", "" ) ); //TODO
         
         TRANSLATIONS = translationList.toArray( new String[0][0] );
         

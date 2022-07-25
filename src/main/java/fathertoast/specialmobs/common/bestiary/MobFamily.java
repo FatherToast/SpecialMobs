@@ -68,7 +68,7 @@ public class MobFamily<T extends LivingEntity, V extends FamilyConfig> {
     
     public static final MobFamily<SlimeEntity, SlimeFamilyConfig> SLIME = new MobFamily<>( SlimeFamilyConfig::new,
             "Slime", "slimes", 0x51A03E, new EntityType[] { EntityType.SLIME },
-            "Blackberry", "Blueberry", "Caramel", "Grape", "Lemon", "Strawberry", "Watermelon"
+            "Blackberry", "Blueberry", "Caramel", "Frozen", "Grape", "Lemon", "Potion", "Strawberry", "Watermelon"
     );
     public static final MobFamily<MagmaCubeEntity, FamilyConfig> MAGMA_CUBE = new MobFamily<>( FamilyConfig::newMoreSpecial,
             "MagmaCube", "magma cubes", 0x340000, new EntityType[] { EntityType.MAGMA_CUBE },

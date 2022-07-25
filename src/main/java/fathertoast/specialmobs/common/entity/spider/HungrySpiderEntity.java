@@ -6,7 +6,6 @@ import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
@@ -81,7 +80,7 @@ public class HungrySpiderEntity extends _SpecialSpiderEntity {
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override
-    protected void onVariantAttack( Entity target ) {
+    protected void onVariantAttack( LivingEntity target ) {
         if( level.isClientSide() ) return;
         
         if( target instanceof PlayerEntity && ForgeEventFactory.getMobGriefingEvent( level, this ) ) {
@@ -98,8 +97,8 @@ public class HungrySpiderEntity extends _SpecialSpiderEntity {
                 playSound( SoundEvents.PLAYER_BURP, 0.5F, random.nextFloat() * 0.1F + 0.9F );
             }
         }
-        else if( target instanceof LivingEntity ) {
-            MobHelper.stealLife( this, (LivingEntity) target, 2.0F );
+        else {
+            MobHelper.stealLife( this, target, 2.0F );
         }
     }
     

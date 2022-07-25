@@ -8,7 +8,6 @@ import fathertoast.specialmobs.common.config.species.WebSpiderSpeciesConfig;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import net.minecraft.block.Blocks;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.Attributes;
@@ -78,8 +77,8 @@ public class WebSpiderEntity extends _SpecialSpiderEntity {
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override
-    protected void onVariantAttack( Entity target ) {
-        if( !level.isClientSide() && webCount > 0 && target instanceof LivingEntity && !(target instanceof SpiderEntity) ) {
+    protected void onVariantAttack( LivingEntity target ) {
+        if( !level.isClientSide() && webCount > 0 && !(target instanceof SpiderEntity) ) {
             final BlockPos pos = target.blockPosition();
             if( !tryPlaceWeb( pos ) && target.getBbHeight() > 1.0F ) {
                 tryPlaceWeb( pos.above() );

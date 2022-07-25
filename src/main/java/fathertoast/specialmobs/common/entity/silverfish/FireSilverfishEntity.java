@@ -5,8 +5,8 @@ import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.monster.SilverfishEntity;
 import net.minecraft.item.Items;
 import net.minecraft.potion.EffectInstance;
@@ -60,7 +60,7 @@ public class FireSilverfishEntity extends _SpecialSilverfishEntity {
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override
-    protected void onVariantAttack( Entity target ) {
+    protected void onVariantAttack( LivingEntity target ) {
         target.setSecondsOnFire( 5 );
     }
     
