@@ -31,7 +31,7 @@ public class FishingSilverfishEntity extends _SpecialSilverfishEntity implements
                 .addExperience( 2 ).drownImmune().fluidPushImmune()
                 .spitAttack( 0.0, 1.0, 40, 40, 10.0 )
                 .addToAttribute( Attributes.MAX_HEALTH, 4.0 )
-                .multiplyAttribute( Attributes.MOVEMENT_SPEED, 0.9 );
+                .multiplyAttribute( Attributes.MOVEMENT_SPEED, 0.8 );
     }
     
     @SpecialMob.ConfigSupplier

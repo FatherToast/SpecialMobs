@@ -30,7 +30,7 @@ public class SpecialMobEyesLayer<T extends Entity, M extends EntityModel<T>> ext
         
         final IVertexBuilder vertexBuilder = buffer.getBuffer( RenderType.eyes( eyesTexture ) );
         getParentModel().renderToBuffer( matrixStack, vertexBuilder, LightTexture.pack( 15, 15 ), OverlayTexture.NO_OVERLAY,
-                1.0F, 1.0F, 1.0F, 1.0F );
+                1.0F, 1.0F, 1.0F, 1.0F ); // RGBA
     }
     
     @Override

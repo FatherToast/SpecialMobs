@@ -12,13 +12,15 @@ import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.entity.*;
+import net.minecraft.entity.EntityType;
+import net.minecraft.entity.ILivingEntityData;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
-import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.Effects;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.DamageSource;
@@ -96,13 +98,13 @@ public class NinjaWitherSkeletonEntity extends _SpecialWitherSkeletonEntity impl
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override
-    protected void onVariantAttack( Entity target ) { revealTo( target, true ); }
+    protected void onVariantAttack( LivingEntity target ) { revealTo( target, true ); }
     
     /** @return Attempts to damage this entity; returns true if the hit was successful. */
     @Override
     public boolean hurt( DamageSource source, float amount ) {
         if( super.hurt( source, amount ) ) {
-            revealTo( source.getEntity(), false );
+            if( source.getEntity() instanceof LivingEntity ) revealTo( (LivingEntity) source.getEntity(), false );
             return true;
         }
         return false;
@@ -171,21 +173,18 @@ public class NinjaWitherSkeletonEntity extends _SpecialWitherSkeletonEntity impl
     }
     
     /** Reveals this ninja and sets its target so that it doesn't immediately re-disguise itself. */
-    public void revealTo( @Nullable Entity target, boolean ambush ) {
+    public void revealTo( LivingEntity target, boolean ambush ) {
         if( getHiddenDragon() == null ) return;
         setHiddenDragon( null );
         
-        if( target instanceof LivingEntity && !(target instanceof PlayerEntity && ((PlayerEntity) target).isCreative()) ) {
-            final LivingEntity livingTarget = (LivingEntity) target;
-            setTarget( livingTarget );
+        if( !(target instanceof PlayerEntity && ((PlayerEntity) target).isCreative()) ) {
+            setTarget( target );
             
             if( ambush ) {
-                final int duration = MobHelper.getDebuffDuration( level.getDifficulty() );
-                
-                livingTarget.addEffect( new EffectInstance( Effects.POISON, duration ) );
-                livingTarget.addEffect( new EffectInstance( Effects.MOVEMENT_SLOWDOWN, duration ) );
-                livingTarget.addEffect( new EffectInstance( Effects.BLINDNESS, duration ) );
-                livingTarget.removeEffect( Effects.NIGHT_VISION ); // Prevent blind + night vision combo (black screen)
+                MobHelper.applyEffect( target, Effects.POISON );
+                MobHelper.applyEffect( target, Effects.MOVEMENT_SLOWDOWN );
+                MobHelper.applyEffect( target, Effects.BLINDNESS );
+                MobHelper.removeNightVision( target );
             }
         }
     }

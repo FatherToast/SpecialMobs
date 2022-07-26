@@ -3,9 +3,11 @@ package fathertoast.specialmobs.common.entity.spider;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
+import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.item.Items;
 import net.minecraft.world.World;
@@ -51,4 +53,10 @@ public class GiantSpiderEntity extends _SpecialSpiderEntity {
     //--------------- Variant-Specific Implementations ----------------
     
     public GiantSpiderEntity( EntityType<? extends _SpecialSpiderEntity> entityType, World world ) { super( entityType, world ); }
+    
+    /** Override to apply effects when this entity hits a target with a melee attack. */
+    @Override
+    protected void onVariantAttack( LivingEntity target ) {
+        MobHelper.knockback( this, target, 3.0F, 0.5F );
+    }
 }

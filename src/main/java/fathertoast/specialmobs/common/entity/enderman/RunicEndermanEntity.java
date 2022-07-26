@@ -7,12 +7,10 @@ import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import net.minecraft.block.Blocks;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.item.Items;
-import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.Effects;
 import net.minecraft.world.World;
 
@@ -63,13 +61,9 @@ public class RunicEndermanEntity extends _SpecialEndermanEntity {
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override
-    protected void onVariantAttack( Entity target ) {
-        if( target instanceof LivingEntity ) {
-            final LivingEntity livingTarget = (LivingEntity) target;
-            final int duration = MobHelper.getDebuffDuration( level.getDifficulty() );
-            
-            livingTarget.addEffect( new EffectInstance( Effects.LEVITATION, duration ) );
-        }
+    protected void onVariantAttack( LivingEntity target ) {
+        MobHelper.applyEffect( target, Effects.LEVITATION );
+        MobHelper.knockback( this, target, 2.0F, 0.0F );
     }
     
     // NOTE would be fun to try and make this mob shoot an 'end crystal laser' to deal ranged damage and/or knockback

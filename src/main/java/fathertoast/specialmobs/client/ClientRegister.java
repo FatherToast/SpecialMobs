@@ -6,6 +6,7 @@ import fathertoast.specialmobs.common.core.SpecialMobs;
 import fathertoast.specialmobs.common.core.register.SMEntities;
 import fathertoast.specialmobs.common.entity.ghast.CorporealShiftGhastEntity;
 import fathertoast.specialmobs.common.entity.skeleton.NinjaSkeletonEntity;
+import fathertoast.specialmobs.common.entity.slime.PotionSlimeEntity;
 import fathertoast.specialmobs.common.entity.witherskeleton.NinjaWitherSkeletonEntity;
 import fathertoast.specialmobs.common.entity.zombie.MadScientistZombieEntity;
 import fathertoast.specialmobs.common.entity.zombifiedpiglin.VampireZombifiedPiglinEntity;
@@ -57,6 +58,8 @@ public class ClientRegister {
         
         registerSpeciesRenderer( NinjaSkeletonEntity.SPECIES, NinjaSkeletonRenderer::new );
         registerSpeciesRenderer( NinjaWitherSkeletonEntity.SPECIES, NinjaSkeletonRenderer::new );
+        
+        registerSpeciesRenderer( PotionSlimeEntity.SPECIES, PotionSlimeRenderer::new );
         
         registerSpeciesRenderer( CorporealShiftGhastEntity.SPECIES, CorporealShiftGhastRenderer::new );
         

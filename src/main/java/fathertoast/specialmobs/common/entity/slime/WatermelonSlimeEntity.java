@@ -3,10 +3,10 @@ package fathertoast.specialmobs.common.entity.slime;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
+import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.entity.ai.goal.SpecialLeapAtTargetGoal;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.Attributes;
@@ -14,7 +14,6 @@ import net.minecraft.item.Items;
 import net.minecraft.particles.IParticleData;
 import net.minecraft.particles.ItemParticleData;
 import net.minecraft.particles.ParticleTypes;
-import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 
 @SpecialMob
@@ -66,22 +65,13 @@ public class WatermelonSlimeEntity extends _SpecialSlimeEntity {
     @Override
     protected void registerVariantGoals() {
         goalSelector.addGoal( 0, new SpecialLeapAtTargetGoal(
-                this, 10, 0.0F, 5.0F, 1.16F, 1.0F ) );
+                this, 5, 0.0F, 5.0F, 1.16F, 1.0F ) );
     }
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override
-    protected void onVariantAttack( Entity target ) {
-        if( target instanceof LivingEntity ) {
-            final float forwardPower = 0.8F;
-            final float upwardPower = 0.5F;
-            final Vector3d vKnockback = new Vector3d( target.getX() - getX(), 0.0, target.getZ() - getZ() )
-                    .normalize().scale( forwardPower ).add( getDeltaMovement().scale( 0.2F ) );
-            target.setDeltaMovement( vKnockback.x, 0.4 * upwardPower, vKnockback.z );
-            target.hurtMarked = true;
-            
-            setDeltaMovement( getDeltaMovement().multiply( 0.2, 1.0, 0.2 ) );
-        }
+    protected void onVariantAttack( LivingEntity target ) {
+        MobHelper.knockback( this, 0.2, target, getSize(), 0.5F, 0.5 );
     }
     
     private static final IParticleData JUMP_PARTICLE = new ItemParticleData( ParticleTypes.ITEM, Items.MELON_SLICE.getDefaultInstance() );

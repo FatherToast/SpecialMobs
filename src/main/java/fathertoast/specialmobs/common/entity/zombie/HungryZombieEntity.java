@@ -6,7 +6,10 @@ import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
-import net.minecraft.entity.*;
+import net.minecraft.entity.EntityType;
+import net.minecraft.entity.ILivingEntityData;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Food;
@@ -72,7 +75,7 @@ public class HungryZombieEntity extends _SpecialZombieEntity {
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override
-    protected void onVariantAttack( Entity target ) {
+    protected void onVariantAttack( LivingEntity target ) {
         if( level.isClientSide() ) return;
         
         if( target instanceof PlayerEntity && ForgeEventFactory.getMobGriefingEvent( level, this ) ) {
@@ -85,8 +88,6 @@ public class HungryZombieEntity extends _SpecialZombieEntity {
             }
         }
         // Take a bite out of the target if they have no food to eat
-        if( target instanceof LivingEntity ) {
-            MobHelper.stealLife( this, (LivingEntity) target, 2.0F );
-        }
+        MobHelper.stealLife( this, target, 2.0F );
     }
 }

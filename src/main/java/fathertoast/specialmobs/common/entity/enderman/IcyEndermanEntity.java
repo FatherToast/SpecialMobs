@@ -11,7 +11,6 @@ import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.enchantment.FrostWalkerEnchantment;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.fluid.Fluid;
@@ -19,7 +18,6 @@ import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.pathfinding.PathNavigator;
 import net.minecraft.pathfinding.PathNodeType;
-import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.Effects;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.util.DamageSource;
@@ -77,14 +75,9 @@ public class IcyEndermanEntity extends _SpecialEndermanEntity {
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override
-    protected void onVariantAttack( Entity target ) {
-        if( target instanceof LivingEntity ) {
-            final LivingEntity livingTarget = (LivingEntity) target;
-            final int duration = MobHelper.getShortDebuffDuration( level.getDifficulty() );
-            
-            livingTarget.addEffect( new EffectInstance( Effects.MOVEMENT_SLOWDOWN, duration, 4 ) );
-            livingTarget.addEffect( new EffectInstance( Effects.DIG_SLOWDOWN, duration, 2 ) );
-        }
+    protected void onVariantAttack( LivingEntity target ) {
+        MobHelper.applyEffect( target, Effects.MOVEMENT_SLOWDOWN, 5, 0.5F );
+        MobHelper.applyEffect( target, Effects.DIG_SLOWDOWN, 3 );
     }
     
     /** Override to change this entity's AI goals. */

@@ -7,15 +7,12 @@ import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import net.minecraft.enchantment.Enchantments;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.projectile.AbstractArrowEntity;
-import net.minecraft.entity.projectile.ArrowEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.Effects;
 import net.minecraft.util.DamageSource;
 import net.minecraft.world.World;
@@ -67,19 +64,14 @@ public class VampireZombifiedPiglinEntity extends _SpecialZombifiedPiglinEntity 
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override
-    protected void onVariantAttack( Entity target ) {
-        if( target instanceof LivingEntity ) {
-            MobHelper.stealLife( this, (LivingEntity) target, 2.0F );
-        }
+    protected void onVariantAttack( LivingEntity target ) {
+        MobHelper.stealLife( this, target, 2.0F );
     }
     
     /** Override to modify this entity's ranged attack projectile. */
     @Override
     protected AbstractArrowEntity getVariantArrow( AbstractArrowEntity arrow, ItemStack arrowItem, float damageMulti ) {
-        if( arrow instanceof ArrowEntity ) {
-            ((ArrowEntity) arrow).addEffect( new EffectInstance( Effects.HARM, 0, 1 ) );
-        }
-        return arrow;
+        return MobHelper.tipArrow( arrow, Effects.HARM, 2 );
     }
     
     /** @return Attempts to damage this entity; returns true if the hit was successful. */

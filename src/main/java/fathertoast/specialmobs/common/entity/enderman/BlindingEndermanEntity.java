@@ -3,12 +3,12 @@ package fathertoast.specialmobs.common.entity.enderman;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
+import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.Items;
-import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.Effects;
 import net.minecraft.world.World;
 
@@ -60,8 +60,8 @@ public class BlindingEndermanEntity extends _SpecialEndermanEntity {
         // Apply blinding effect while near target
         final LivingEntity target = getTarget();
         if( target != null && distanceToSqr( target ) < 100.0 ) {
-            target.addEffect( new EffectInstance( Effects.BLINDNESS, 50 ) );
-            target.removeEffect( Effects.NIGHT_VISION ); // Prevent blind + night vision combo (black screen)
+            MobHelper.applyDurationEffect( target, Effects.BLINDNESS, 50 );
+            MobHelper.removeNightVision( target );
         }
     }
 }

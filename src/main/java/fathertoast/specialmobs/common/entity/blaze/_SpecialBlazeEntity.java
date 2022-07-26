@@ -46,7 +46,7 @@ public class _SpecialBlazeEntity extends BlazeEntity implements IRangedAttackMob
     public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
         bestiaryInfo.color( 0xFFF87E )
                 .vanillaTextureBaseOnly( "textures/entity/blaze.png" )
-                .experience( 10 ).fireImmune().waterSensitive()
+                .experience( 10 ).waterSensitive()
                 .fireballAttack( 1.0, 60, 100, 48.0 );
     }
     
@@ -100,12 +100,12 @@ public class _SpecialBlazeEntity extends BlazeEntity implements IRangedAttackMob
     /** Called when this entity successfully damages a target to apply on-hit effects. */
     @Override
     public void doEnchantDamageEffects( LivingEntity attacker, Entity target ) {
-        onVariantAttack( target );
+        if( target instanceof LivingEntity ) onVariantAttack( (LivingEntity) target );
         super.doEnchantDamageEffects( attacker, target );
     }
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
-    protected void onVariantAttack( Entity target ) { }
+    protected void onVariantAttack( LivingEntity target ) { }
     
     /** Called to attack the target with a ranged attack. */
     @Override

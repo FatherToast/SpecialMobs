@@ -65,24 +65,14 @@ public class StraySkeletonEntity extends _SpecialSkeletonEntity {
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override
-    protected void onVariantAttack( Entity target ) {
-        if( target instanceof LivingEntity ) {
-            final LivingEntity livingTarget = (LivingEntity) target;
-            final int duration = MobHelper.getDebuffDuration( level.getDifficulty() );
-            
-            livingTarget.addEffect( new EffectInstance( Effects.MOVEMENT_SLOWDOWN, duration * 2 ) );
-        }
+    protected void onVariantAttack( LivingEntity target ) {
+        MobHelper.applyEffect( target, Effects.MOVEMENT_SLOWDOWN, 2.0F );
     }
     
     /** Override to modify this entity's ranged attack projectile. */
     @Override
     protected AbstractArrowEntity getVariantArrow( AbstractArrowEntity arrow, ItemStack arrowItem, float damageMulti ) {
-        if( arrow instanceof ArrowEntity ) {
-            final int duration = MobHelper.getDebuffDuration( level.getDifficulty() );
-            
-            ((ArrowEntity) arrow).addEffect( new EffectInstance( Effects.MOVEMENT_SLOWDOWN, duration * 2 ) );
-        }
-        return arrow;
+        return MobHelper.tipArrow( arrow, Effects.MOVEMENT_SLOWDOWN, 2.0F );
     }
     
     

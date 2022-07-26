@@ -8,7 +8,6 @@ import fathertoast.specialmobs.common.config.species.SpeciesConfig;
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.Attributes;
@@ -65,9 +64,7 @@ public class InfernoBlazeEntity extends _SpecialBlazeEntity {
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override
-    protected void onVariantAttack( Entity target ) {
-        if( target instanceof LivingEntity ) {
-            MobHelper.causeLifeLoss( (LivingEntity) target, 2.0F );
-        }
+    protected void onVariantAttack( LivingEntity target ) {
+        MobHelper.causeLifeLoss( target, 2.0F );
     }
 }

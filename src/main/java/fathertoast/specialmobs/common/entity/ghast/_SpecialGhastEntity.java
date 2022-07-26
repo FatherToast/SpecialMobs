@@ -49,7 +49,7 @@ public class _SpecialGhastEntity extends GhastEntity implements IRangedAttackMob
     public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
         bestiaryInfo.color( 0xBCBCBC )
                 .vanillaTextureWithAnimation( "textures/entity/ghast/ghast.png", "textures/entity/ghast/ghast_shooting.png" )
-                .experience( 5 ).fireImmune()
+                .experience( 5 )
                 .fireballAttack( 0.0, 20, 40, 64.0 );
     }
     
@@ -129,12 +129,12 @@ public class _SpecialGhastEntity extends GhastEntity implements IRangedAttackMob
     /** Called when this entity successfully damages a target to apply on-hit effects. */
     @Override
     public void doEnchantDamageEffects( LivingEntity attacker, Entity target ) {
-        onVariantAttack( target );
+        if( target instanceof LivingEntity ) onVariantAttack( (LivingEntity) target );
         super.doEnchantDamageEffects( attacker, target );
     }
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
-    protected void onVariantAttack( Entity target ) { }
+    protected void onVariantAttack( LivingEntity target ) { }
     
     /** Override to save data to this entity's NBT data. */
     public void addVariantSaveData( CompoundNBT saveTag ) { }

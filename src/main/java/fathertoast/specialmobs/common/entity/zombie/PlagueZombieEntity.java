@@ -7,12 +7,10 @@ import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import net.minecraft.block.Blocks;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.projectile.AbstractArrowEntity;
-import net.minecraft.entity.projectile.ArrowEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.world.World;
@@ -61,18 +59,13 @@ public class PlagueZombieEntity extends _SpecialZombieEntity {
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override
-    protected void onVariantAttack( Entity target ) {
-        if( target instanceof LivingEntity ) {
-            ((LivingEntity) target).addEffect( MobHelper.nextPlagueEffect( random, level ) );
-        }
+    protected void onVariantAttack( LivingEntity target ) {
+        MobHelper.applyPlagueEffect( target, random );
     }
     
     /** Override to modify this entity's ranged attack projectile. */
     @Override
     protected AbstractArrowEntity getVariantArrow( AbstractArrowEntity arrow, ItemStack arrowItem, float damageMulti ) {
-        if( arrow instanceof ArrowEntity ) {
-            ((ArrowEntity) arrow).addEffect( MobHelper.nextPlagueEffect( random, level ) );
-        }
-        return arrow;
+        return MobHelper.tipPlagueArrow( arrow, random );
     }
 }

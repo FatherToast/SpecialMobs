@@ -18,7 +18,6 @@ import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.pathfinding.PathNavigator;
 import net.minecraft.pathfinding.PathNodeType;
-import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.Effects;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.util.DamageSource;
@@ -116,7 +115,7 @@ public class WindWitchEntity extends _SpecialWitchEntity {
                 }
             }
             else {
-                addEffect( new EffectInstance( Effects.INVISIBILITY, 30 ) );
+                MobHelper.applyDurationEffect( this, Effects.INVISIBILITY, 30 );
                 for( int i = 0; i < 16; i++ ) {
                     if( teleport() ) {
                         teleportDelay = 30;

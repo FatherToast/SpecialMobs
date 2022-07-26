@@ -8,8 +8,8 @@ import fathertoast.specialmobs.common.entity.ai.AIHelper;
 import fathertoast.specialmobs.common.entity.ai.FluidPathNavigator;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
@@ -66,7 +66,7 @@ public class StrawberrySlimeEntity extends _SpecialSlimeEntity {
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override
-    protected void onVariantAttack( Entity target ) {
+    protected void onVariantAttack( LivingEntity target ) {
         target.setSecondsOnFire( getSize() * 3 );
     }
     

@@ -7,7 +7,6 @@ import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import net.minecraft.entity.CreatureAttribute;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.Attributes;
@@ -63,10 +62,9 @@ public class UnholyGhastEntity extends _SpecialGhastEntity {
     public UnholyGhastEntity( EntityType<? extends _SpecialGhastEntity> entityType, World world ) { super( entityType, world ); }
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
-    protected void onVariantAttack( Entity target ) {
-        if( target instanceof LivingEntity ) {
-            MobHelper.stealLife( this, (LivingEntity) target, 2.0F );
-        }
+    @Override
+    protected void onVariantAttack( LivingEntity target ) {
+        MobHelper.stealLife( this, target, 2.0F );
     }
     
     /** @return Attempts to damage this entity; returns true if the hit was successful. */

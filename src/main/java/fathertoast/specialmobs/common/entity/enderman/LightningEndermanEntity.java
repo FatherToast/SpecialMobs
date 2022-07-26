@@ -6,7 +6,6 @@ import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.util.ExplosionHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.LightningBoltEntity;
@@ -56,12 +55,10 @@ public class LightningEndermanEntity extends _SpecialEndermanEntity {
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override
-    protected void onVariantAttack( Entity target ) {
-        if( target instanceof LivingEntity ) {
-            ExplosionHelper.spawnLightning( level, target.getX(), target.getY(), target.getZ() );
-            for( int i = 0; i < 64; i++ ) {
-                if( teleport() ) break;
-            }
+    protected void onVariantAttack( LivingEntity target ) {
+        ExplosionHelper.spawnLightning( level, target.getX(), target.getY(), target.getZ() );
+        for( int i = 0; i < 64; i++ ) {
+            if( teleport() ) break;
         }
     }
     

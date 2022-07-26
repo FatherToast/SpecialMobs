@@ -227,8 +227,12 @@ public class BestiaryInfo {
             owningSpecies = species;
             entityTypeBuilder = typeBuilder;
             
-            // Special variants should copy many of the vanilla replacement's stats
-            if( species.specialVariantName != null ) {
+            if( species.specialVariantName == null ) {
+                // Fire immunity should be copied from the entity type
+                if( species.family.replaceableTypes[0].fireImmune() ) isImmuneToFire = true;
+            }
+            else {
+                // Special variants should copy many of the vanilla replacement's stats
                 final BestiaryInfo parent = species.family.vanillaReplacement.bestiaryInfo;
                 
                 baseScale = parent.baseScale;

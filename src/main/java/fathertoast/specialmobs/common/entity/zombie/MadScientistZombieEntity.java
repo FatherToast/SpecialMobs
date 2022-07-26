@@ -12,12 +12,14 @@ import fathertoast.specialmobs.common.entity.ai.IAmmoUser;
 import fathertoast.specialmobs.common.entity.ai.goal.ChargeCreeperGoal;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
-import net.minecraft.entity.*;
+import net.minecraft.entity.EntityType;
+import net.minecraft.entity.ILivingEntityData;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.monster.CreeperEntity;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.Effects;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.IServerWorld;
@@ -104,12 +106,9 @@ public class MadScientistZombieEntity extends _SpecialZombieEntity implements IA
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override
-    protected void onVariantAttack( Entity target ) {
-        if( target instanceof LivingEntity && hasAmmo() ) {
-            final LivingEntity livingTarget = (LivingEntity) target;
-            final int duration = MobHelper.getDebuffDuration( level.getDifficulty() );
-            
-            livingTarget.addEffect( new EffectInstance( Effects.POISON, duration ) );
+    protected void onVariantAttack( LivingEntity target ) {
+        if( hasAmmo() ) {
+            MobHelper.applyEffect( target, Effects.POISON );
         }
     }
     

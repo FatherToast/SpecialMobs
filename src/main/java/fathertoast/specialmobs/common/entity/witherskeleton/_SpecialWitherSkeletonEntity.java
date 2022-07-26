@@ -55,7 +55,7 @@ public class _SpecialWitherSkeletonEntity extends WitherSkeletonEntity implement
         bestiaryInfo.color( 0x474D4D )
                 .vanillaTextureBaseOnly( "textures/entity/skeleton/wither_skeleton.png" )
                 .familySize( 1.2F )
-                .experience( 5 ).undead().fireImmune()
+                .experience( 5 ).undead()
                 .bowAttack( 2.0, 1.0, 1.0, 20, 15.0 );
     }
     
@@ -117,7 +117,7 @@ public class _SpecialWitherSkeletonEntity extends WitherSkeletonEntity implement
             arrow = ((BowItem) getMainHandItem().getItem()).customArrow( arrow );
         
         final double dX = target.getX() - getX();
-        final double dY = target.getY( 1.0 / 3.0 ) - arrow.getY();
+        final double dY = target.getY( 0.3333 ) - arrow.getY();
         final double dZ = target.getZ() - getZ();
         final double dH = MathHelper.sqrt( dX * dX + dZ * dZ );
         arrow.shoot( dX, dY + dH * 0.2, dZ, 1.6F,
@@ -142,12 +142,12 @@ public class _SpecialWitherSkeletonEntity extends WitherSkeletonEntity implement
     /** Called when this entity successfully damages a target to apply on-hit effects. */
     @Override
     public void doEnchantDamageEffects( LivingEntity attacker, Entity target ) {
-        onVariantAttack( target );
+        if( target instanceof LivingEntity ) onVariantAttack( (LivingEntity) target );
         super.doEnchantDamageEffects( attacker, target );
     }
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
-    protected void onVariantAttack( Entity target ) { }
+    protected void onVariantAttack( LivingEntity target ) { }
     
     /** Override to save data to this entity's NBT data. */
     public void addVariantSaveData( @SuppressWarnings( "unused" ) CompoundNBT saveTag ) { }

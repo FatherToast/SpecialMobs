@@ -11,13 +11,11 @@ import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.CreatureAttribute;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.Effects;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.tileentity.TileEntity;
@@ -87,19 +85,14 @@ public class DesiccatedSilverfishEntity extends _SpecialSilverfishEntity {
     /** Called each tick to update this entity's movement. */
     @Override
     public void aiStep() {
-        if( absorbCount > 0 && spongebob() ) spawnAnim();
+        if( !level.isClientSide() && absorbCount > 0 && spongebob() ) spawnAnim();
         super.aiStep();
     }
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override
-    protected void onVariantAttack( Entity target ) {
-        if( target instanceof LivingEntity ) {
-            final LivingEntity livingTarget = (LivingEntity) target;
-            final int duration = MobHelper.getDebuffDuration( level.getDifficulty() );
-            
-            livingTarget.addEffect( new EffectInstance( Effects.HUNGER, duration ) );
-        }
+    protected void onVariantAttack( LivingEntity target ) {
+        MobHelper.applyEffect( target, Effects.HUNGER );
     }
     
     /** @return This entity's creature type. */

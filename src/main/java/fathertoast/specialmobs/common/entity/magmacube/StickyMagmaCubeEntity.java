@@ -62,7 +62,7 @@ public class StickyMagmaCubeEntity extends _SpecialMagmaCubeEntity {
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override
-    protected void onVariantAttack( Entity target ) {
+    protected void onVariantAttack( LivingEntity target ) {
         if( grabTime <= -20 && getPassengers().isEmpty() ) {
             if( target.startRiding( this, true ) ) grabTime = 20;
         }

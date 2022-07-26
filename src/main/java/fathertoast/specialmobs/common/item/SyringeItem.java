@@ -3,7 +3,6 @@ package fathertoast.specialmobs.common.item;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.config.Config;
 import fathertoast.specialmobs.common.entity.MobHelper;
-import fathertoast.specialmobs.common.entity.creeper._SpecialCreeperEntity;
 import fathertoast.specialmobs.common.util.References;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.entity.LivingEntity;
@@ -13,7 +12,6 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Rarity;
-import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.Effects;
 import net.minecraft.util.*;
 import net.minecraft.world.World;
@@ -44,10 +42,10 @@ public class SyringeItem extends Item {
                 return ActionResult.pass( usedItem );
             }
             else {
-                player.addEffect( new EffectInstance( Effects.MOVEMENT_SPEED, 300, 2 ) );
-                player.addEffect( new EffectInstance( Effects.DOLPHINS_GRACE, 300 ) );
-                if( Config.MAIN.GENERAL.enableNausea.get() )
-                    player.addEffect( new EffectInstance( Effects.CONFUSION, 400 ) );
+                MobHelper.applyEffect( player, Effects.MOVEMENT_SPEED, 3, 300 );
+                MobHelper.applyEffect( player, Effects.DOLPHINS_GRACE, 1, 300 );
+                if( Config.MAIN.GENERAL.enableNausea.get() ) MobHelper.applyEffect( player, Effects.CONFUSION, 1, 400 );
+                
                 world.playSound( null, player.getX(), player.getY(), player.getZ(), SoundEvents.BEE_STING, SoundCategory.PLAYERS, 0.9F, 1.0F );
                 usedItem.hurtAndBreak( 1, player, ( entity ) -> entity.broadcastBreakEvent( hand ) );
                 if( !player.isCreative() ) {

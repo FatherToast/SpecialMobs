@@ -3,7 +3,6 @@ package fathertoast.specialmobs.common.entity.blaze;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
-import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.util.ExplosionHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
@@ -66,14 +65,6 @@ public class JoltBlazeEntity extends _SpecialBlazeEntity {
     //--------------- Variant-Specific Implementations ----------------
     
     public JoltBlazeEntity( EntityType<? extends _SpecialBlazeEntity> entityType, World world ) { super( entityType, world ); }
-    
-    /** Override to apply effects when this entity hits a target with a melee attack. */
-    @Override
-    protected void onVariantAttack( Entity target ) {
-        if( target instanceof LivingEntity ) {
-            MobHelper.causeLifeLoss( (LivingEntity) target, 2.0F );
-        }
-    }
     
     /** Called each tick to update this entity's movement. */
     @Override

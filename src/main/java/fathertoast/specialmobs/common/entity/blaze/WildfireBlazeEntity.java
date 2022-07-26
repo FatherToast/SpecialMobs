@@ -81,7 +81,7 @@ public class WildfireBlazeEntity extends _SpecialBlazeEntity {
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override
-    protected void onVariantAttack( Entity target ) {
+    protected void onVariantAttack( LivingEntity target ) {
         target.setSecondsOnFire( 8 );
     }
     

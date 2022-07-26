@@ -11,12 +11,15 @@ import net.minecraft.block.material.Material;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.FrostWalkerEnchantment;
 import net.minecraft.entity.*;
+import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.monster.CreeperEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.AbstractArrowEntity;
+import net.minecraft.entity.projectile.ArrowEntity;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.*;
+import net.minecraft.potion.Effect;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.EffectType;
 import net.minecraft.potion.Effects;
@@ -28,12 +31,14 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.IServerWorld;
-import net.minecraft.world.World;
+import net.minecraftforge.common.ForgeHooks;
+import net.minecraftforge.event.entity.living.LivingKnockBackEvent;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -137,6 +142,81 @@ public final class MobHelper {
     }
     
     /**
+     * Knocks the target away from the source. Power is on the same scale as "level of Knockback enchantment".
+     * If the power is negative, this pulls the target toward the source instead.
+     */
+    @SuppressWarnings( "unused" )
+    public static void knockback( Entity source, LivingEntity target, float power, float upwardMulti ) {
+        knockback( source, 0.6, target, power, upwardMulti, 0.5 );
+    }
+    
+    /**
+     * Knocks the target away from the source. Power is on the same scale as "level of Knockback enchantment".
+     * If the power is negative, this pulls the target toward the source instead.
+     * Momentum is the amount of original velocity maintained by the entity after knockback.
+     */
+    public static void knockback( Entity source, double sourceMomentum, LivingEntity target, float power, float upwardMulti, double momentum ) {
+        final float angle = source.yRot * (float) Math.PI / 180.0F;
+        knockback( target, power, upwardMulti, MathHelper.sin( angle ), -MathHelper.cos( angle ), momentum );
+        source.setDeltaMovement( source.getDeltaMovement().multiply( sourceMomentum, 1.0, sourceMomentum ) );
+    }
+    
+    /**
+     * Knocks the target backward (based on its own facing). Power is on the same scale as "level of Knockback enchantment".
+     * If the power is negative, this pushes the target forward instead.
+     */
+    @SuppressWarnings( "unused" )
+    public static void knockback( LivingEntity target, float power, float upwardMulti ) {
+        knockback( target, power, upwardMulti, 0.5 );
+    }
+    
+    /**
+     * Knocks the target backward (based on its own facing). Power is on the same scale as "level of Knockback enchantment".
+     * If the power is negative, this pushes the target forward instead.
+     * Momentum is the amount of original velocity maintained by the entity after knockback.
+     */
+    public static void knockback( LivingEntity target, float power, float upwardMulti, double momentum ) {
+        final float angle = target.yRot * (float) Math.PI / 180.0F;
+        knockback( target, power, upwardMulti, -MathHelper.sin( angle ), MathHelper.cos( angle ), momentum );
+    }
+    
+    /**
+     * Knocks the target backward (opposite direction from the [x, z] vector provided).
+     * Power is on the same scale as "level of Knockback enchantment".
+     * If the power is negative, this pushes the target forward instead.
+     */
+    @SuppressWarnings( "unused" )
+    public static void knockback( LivingEntity target, float power, float upwardMulti, double forwardX, double forwardZ ) {
+        knockback( target, power, upwardMulti, forwardX, forwardZ, 0.5 );
+    }
+    
+    /**
+     * Knocks the target backward (opposite direction from the [x, z] vector provided).
+     * Power is on the same scale as "level of Knockback enchantment".
+     * If the power is negative, this pushes the target forward instead.
+     * Momentum is the amount of original velocity maintained by the entity after knockback.
+     */
+    public static void knockback( LivingEntity target, float power, float upwardMulti, double forwardX, double forwardZ, double momentum ) {
+        final LivingKnockBackEvent event = power < 0.0F ?
+                ForgeHooks.onLivingKnockBack( target, -power * 0.5F, -forwardX, -forwardZ ) :
+                ForgeHooks.onLivingKnockBack( target, power * 0.5F, forwardX, forwardZ );
+        if( event.isCanceled() ) return;
+        
+        power = (float) (event.getStrength() * (1.0 - target.getAttributeValue( Attributes.KNOCKBACK_RESISTANCE )));
+        if( power > 0.0F ) {
+            target.hasImpulse = true;
+            final Vector3d v = target.getDeltaMovement().scale( momentum );
+            final Vector3d vKB = new Vector3d( -event.getRatioX(), 0.0, -event.getRatioZ() ).normalize().scale( power );
+            final double vY = v.y + power * upwardMulti;
+            target.setDeltaMovement(
+                    v.x + vKB.x,
+                    target.isOnGround() ? Math.max( 0.2, vY ) : vY,
+                    v.z + vKB.z );
+            target.hurtMarked = true;
+        }
+    }
+    
+    /**
      * Reduces the target's life directly. Will not reduce health below 1.
      *
      * @param target The entity to cause life loss on.
@@ -204,8 +284,114 @@ public final class MobHelper {
         }
     }
     
+    /** Removes night vision from the target. Typically used when blindness is involved due to the awkward interaction. */
+    public static void removeNightVision( LivingEntity target ) { target.removeEffect( Effects.NIGHT_VISION ); }
+    
+    /** Applies a random 'plague' potion effect to the target. */
+    public static void applyPlagueEffect( LivingEntity target, Random random ) {
+        applyEffectFromTemplate( target, PLAGUE_EFFECTS[random.nextInt( PLAGUE_EFFECTS.length -
+                (Config.MAIN.GENERAL.enableNausea.get() ? 0 : 1) )] );
+    }
+    
+    /** Applies a random 'witch spider' potion effect to the target, optionally including poison in the effect pool. */
+    public static void applyWitchSpiderEffect( LivingEntity target, Random random, boolean includePoison ) {
+        applyEffectFromTemplate( target, WITCH_EFFECTS[random.nextInt( WITCH_EFFECTS.length - (includePoison ? 0 : 1) )] );
+    }
+    
+    /** Applies a potion effect to the target with default duration. */
+    public static void applyEffect( LivingEntity target, Effect effect ) { applyEffect( target, effect, 1, 1.0F ); }
+    
+    /** Applies a potion effect to the target with default duration and a specified level (amplifier + 1). */
+    public static void applyEffect( LivingEntity target, Effect effect, int level ) {
+        applyEffect( target, effect, level, 1.0F );
+    }
+    
+    /** Applies a potion effect to the target with default duration and a specified level (amplifier + 1). */
+    public static void applyEffect( LivingEntity target, Effect effect, float durationMulti ) {
+        applyEffect( target, effect, 1, durationMulti );
+    }
+    
+    /** Applies a potion effect to the target with default duration and a specified level (amplifier + 1). */
+    public static void applyEffect( LivingEntity target, Effect effect, int level, float durationMulti ) {
+        applyEffect( target, effect, level, effect.isInstantenous() ? 1 :
+                (int) (MobHelper.defaultEffectDuration( target.level.getDifficulty() ) * durationMulti) );
+    }
+    
+    /** Applies a potion effect to the target with a specified level (amplifier + 1) and duration. */
+    public static void applyDurationEffect( LivingEntity target, Effect effect, int duration ) {
+        applyEffect( target, effect, 1, duration );
+    }
+    
+    /** Applies a potion effect to the target with a specified level (amplifier + 1) and duration. */
+    public static void applyEffect( LivingEntity target, Effect effect, int level, int duration ) {
+        target.addEffect( new EffectInstance( effect, duration, level - 1 ) );
+    }
+    
+    /** Applies a potion effect to the target based on a template effect. The template's duration is used as a multiplier. */
+    public static void applyEffectFromTemplate( LivingEntity target, EffectInstance template ) {
+        applyEffectFromTemplate( target, template, MobHelper.defaultEffectDuration( target.level.getDifficulty() ) );
+    }
+    
+    /** Applies a potion effect to the target based on a template effect. The template's duration is used as a multiplier. */
+    public static void applyEffectFromTemplate( LivingEntity target, EffectInstance template, int baseDuration ) {
+        target.addEffect( new EffectInstance( template.getEffect(), template.getEffect().isInstantenous() ? 1 :
+                baseDuration * template.getDuration(), template.getAmplifier() ) );
+    }
+    
+    /** Applies a random 'plague' potion effect to the arrow. */
+    public static AbstractArrowEntity tipPlagueArrow( AbstractArrowEntity arrow, Random random ) {
+        return tipArrowFromTemplate( arrow, PLAGUE_EFFECTS[random.nextInt( PLAGUE_EFFECTS.length -
+                (Config.MAIN.GENERAL.enableNausea.get() ? 0 : 1) )] );
+    }
+    
+    //    /** Applies a random 'witch spider' potion effect to the arrow, optionally including poison in the effect pool. */
+    //    public static AbstractArrowEntity tipWitchSpiderArrow( AbstractArrowEntity arrow, Random random, boolean includePoison ) {
+    //        return tipArrowFromTemplate( arrow, WITCH_EFFECTS[random.nextInt( WITCH_EFFECTS.length - (includePoison ? 0 : 1) )] );
+    //    }
+    
+    /** Applies a potion effect to the arrow with default duration. */
+    public static AbstractArrowEntity tipArrow( AbstractArrowEntity arrow, Effect effect ) {
+        return tipArrow( arrow, effect, 1, 1.0F );
+    }
+    
+    /** Applies a potion effect to the arrow with default duration and a specified level (amplifier + 1). */
+    public static AbstractArrowEntity tipArrow( AbstractArrowEntity arrow, Effect effect, int level ) {
+        return tipArrow( arrow, effect, level, 1.0F );
+    }
+    
+    /** Applies a potion effect to the arrow with default duration and a specified level (amplifier + 1). */
+    public static AbstractArrowEntity tipArrow( AbstractArrowEntity arrow, Effect effect, float durationMulti ) {
+        return tipArrow( arrow, effect, 1, durationMulti );
+    }
+    
+    /** Applies a potion effect to the arrow with default duration and a specified level (amplifier + 1). */
+    public static AbstractArrowEntity tipArrow( AbstractArrowEntity arrow, Effect effect, int level, float durationMulti ) {
+        return tipArrow( arrow, effect, level, effect.isInstantenous() ? 1 :
+                (int) (MobHelper.defaultEffectDuration( arrow.level.getDifficulty() ) * durationMulti) );
+    }
+    
+    /** Applies a potion effect to the arrow with a specified level (amplifier + 1) and duration. */
+    public static AbstractArrowEntity tipArrow( AbstractArrowEntity arrow, Effect effect, int level, int duration ) {
+        if( arrow instanceof ArrowEntity )
+            ((ArrowEntity) arrow).addEffect( new EffectInstance( effect, duration, level - 1 ) );
+        return arrow;
+    }
+    
+    /** Applies a potion effect to the arrow based on a template effect. The template's duration is used as a multiplier. */
+    public static AbstractArrowEntity tipArrowFromTemplate( AbstractArrowEntity arrow, EffectInstance template ) {
+        return tipArrowFromTemplate( arrow, template, MobHelper.defaultEffectDuration( arrow.level.getDifficulty() ) );
+    }
+    
+    /** Applies a potion effect to the arrow based on a template effect. The template's duration is used as a multiplier. */
+    public static AbstractArrowEntity tipArrowFromTemplate( AbstractArrowEntity arrow, EffectInstance template, int baseDuration ) {
+        if( arrow instanceof ArrowEntity )
+            ((ArrowEntity) arrow).addEffect( new EffectInstance( template.getEffect(), template.getEffect().isInstantenous() ? 1 :
+                    baseDuration * template.getDuration(), template.getAmplifier() ) );
+        return arrow;
+    }
+    
     /** @return The base debuff duration. */
-    public static int getDebuffDuration( Difficulty difficulty ) {
+    public static int defaultEffectDuration( Difficulty difficulty ) {
         switch( difficulty ) {
             case PEACEFUL:
             case EASY:
@@ -215,52 +401,6 @@ public final class MobHelper {
             default:
                 return 300;
         }
-    }
-    
-    /** @return The base debuff duration for effects that should be shorter than normal. */
-    public static int getShortDebuffDuration( Difficulty difficulty ) {
-        switch( difficulty ) {
-            case PEACEFUL:
-            case EASY:
-                return 40;
-            case NORMAL:
-                return 60;
-            default:
-                return 80;
-        }
-    }
-    
-    /**
-     * Makes a random potion effect for a plague-type mob to apply on hit.
-     *
-     * @param random The rng to draw from.
-     * @param world  The context.
-     * @return A newly created potion effect instance we can apply to an entity.
-     */
-    public static EffectInstance nextPlagueEffect( Random random, World world ) {
-        final int duration = MobHelper.getDebuffDuration( world.getDifficulty() );
-        
-        final EffectInstance potion = PLAGUE_EFFECTS[random.nextInt( PLAGUE_EFFECTS.length -
-                (Config.MAIN.GENERAL.enableNausea.get() ? 0 : 1) )];
-        return new EffectInstance( potion.getEffect(), duration * potion.getDuration(), potion.getAmplifier() );
-    }
-    
-    /**
-     * Makes a random potion effect for a witch-spider-type mob to apply on hit,
-     * optionally including poison in the effect pool.
-     * <p>
-     * For example, witch cave spiders do not include poison in the pool because they apply poison already.
-     *
-     * @param random        The rng to draw from.
-     * @param world         The context.
-     * @param includePoison Whether to include poison in the potion pool.
-     * @return A newly created potion effect instance we can apply to an entity.
-     */
-    public static EffectInstance nextWitchSpiderEffect( Random random, World world, boolean includePoison ) {
-        final int duration = MobHelper.getDebuffDuration( world.getDifficulty() );
-        
-        final EffectInstance potion = WITCH_EFFECTS[random.nextInt( WITCH_EFFECTS.length - (includePoison ? 0 : 1) )];
-        return new EffectInstance( potion.getEffect(), duration * potion.getDuration(), potion.getAmplifier() );
     }
     
     /**
@@ -360,10 +500,21 @@ public final class MobHelper {
      * @param entity The entity.
      * @param pos    The block pos argument from #onChangedBlock.
      */
-    public static void updateFrostWalker( LivingEntity entity, BlockPos pos ) {
+    public static void updateFrostWalker( LivingEntity entity, BlockPos pos ) { updateFrostWalker( entity, pos, 1 ); }
+    
+    /**
+     * Manually provides the frost walker enchantment's effects without any equipment requirements.
+     * <p>
+     * Should be called in the entity's {@link LivingEntity#onChangedBlock(BlockPos)} method right after super.
+     *
+     * @param entity The entity.
+     * @param pos    The block pos argument from #onChangedBlock.
+     * @param level  The level of enchantment. Platform radius is 2 + level.
+     */
+    public static void updateFrostWalker( LivingEntity entity, BlockPos pos, int level ) {
         final boolean actualOnGround = entity.isOnGround();
         entity.setOnGround( true ); // Spoof the frost walker enchant requirement to be on the ground
-        FrostWalkerEnchantment.onEntityMoved( entity, entity.level, pos, 1 );
+        FrostWalkerEnchantment.onEntityMoved( entity, entity.level, pos, level );
         entity.setOnGround( actualOnGround );
     }
     
@@ -375,7 +526,7 @@ public final class MobHelper {
      * @param entity The entity to pop.
      */
     public static void hopOnFluid( Entity entity ) {
-        if( entity.tickCount > 1 && entity.level.random.nextInt( 20 ) == 0 ) {
+        if( entity.tickCount > 1 && entity.isOnGround() && entity.level.random.nextInt( 10 ) == 0 ) {
             if( ISelectionContext.of( entity ).isAbove( FlowingFluidBlock.STABLE_SHAPE, entity.blockPosition(), true ) &&
                     !entity.level.getFluidState( entity.blockPosition().above() ).is( FluidTags.WATER ) ) {
                 // Break water plants, otherwise frost walker will not work

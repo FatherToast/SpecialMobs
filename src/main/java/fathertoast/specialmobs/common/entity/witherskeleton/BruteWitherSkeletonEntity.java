@@ -6,15 +6,12 @@ import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.projectile.AbstractArrowEntity;
-import net.minecraft.entity.projectile.ArrowEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.Effects;
 import net.minecraft.world.World;
 
@@ -63,18 +60,14 @@ public class BruteWitherSkeletonEntity extends _SpecialWitherSkeletonEntity {
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override
-    protected void onVariantAttack( Entity target ) {
-        if( target instanceof LivingEntity ) {
-            MobHelper.causeLifeLoss( (LivingEntity) target, 2.0F );
-        }
+    protected void onVariantAttack( LivingEntity target ) {
+        MobHelper.causeLifeLoss( target, 2.0F );
+        MobHelper.knockback( this, target, 2.0F, 1.0F );
     }
     
     /** Override to modify this entity's ranged attack projectile. */
     @Override
     protected AbstractArrowEntity getVariantArrow( AbstractArrowEntity arrow, ItemStack arrowItem, float damageMulti ) {
-        if( arrow instanceof ArrowEntity ) {
-            ((ArrowEntity) arrow).addEffect( new EffectInstance( Effects.HARM ) );
-        }
-        return arrow;
+        return MobHelper.tipArrow( arrow, Effects.HARM );
     }
 }
