@@ -45,7 +45,7 @@ public class MobFamily<T extends LivingEntity, V extends FamilyConfig> {
     
     public static final MobFamily<ZombieEntity, FamilyConfig> ZOMBIE = new MobFamily<>( FamilyConfig::newLessSpecial,
             "Zombie", "zombies", 0x00AFAF, new EntityType[] { EntityType.ZOMBIE, EntityType.HUSK },
-            "Brute", "Fire", "Fishing", "Giant", "Hungry", "Husk", "MadScientist", "Plague"
+            "Brute", "Fire", "Fishing", "Frozen", "Giant", "Hungry", "Husk", "MadScientist", "Plague"
     );//TODO fishing
     // TODO Drowned family and zombie transform mechanic
     //    public static final MobFamily<ZombieEntity, FamilyConfig> DROWNED = new MobFamily<>( FamilyConfig::new,
