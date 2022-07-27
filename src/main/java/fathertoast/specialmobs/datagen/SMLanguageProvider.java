@@ -135,7 +135,8 @@ public class SMLanguageProvider extends LanguageProvider {
     protected void addTranslations() {
         final int k = translationKey.ordinal() + 1;
         for( String[] translationArray : TRANSLATIONS ) {
-            add( translationArray[0], translationArray[k] );
+            if( translationArray[k] != null && !translationArray[k].isEmpty() )
+                add( translationArray[0], translationArray[k] );
         }
     }
 }
