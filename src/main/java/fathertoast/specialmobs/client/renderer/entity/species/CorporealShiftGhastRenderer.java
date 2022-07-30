@@ -1,12 +1,12 @@
-package fathertoast.specialmobs.client.renderer.entity;
+package fathertoast.specialmobs.client.renderer.entity.species;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
-import fathertoast.specialmobs.client.renderer.entity.layers.SpecialGhastEyesLayer;
 import fathertoast.specialmobs.client.misc.SMRenderTypes;
-import fathertoast.specialmobs.common.core.SpecialMobs;
+import fathertoast.specialmobs.client.renderer.entity.layers.SpecialGhastEyesLayer;
 import fathertoast.specialmobs.common.entity.ISpecialMob;
 import fathertoast.specialmobs.common.entity.SpecialMobData;
 import fathertoast.specialmobs.common.entity.ghast.CorporealShiftGhastEntity;
+import fathertoast.specialmobs.common.util.References;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
@@ -22,8 +22,8 @@ public class CorporealShiftGhastRenderer extends MobRenderer<CorporealShiftGhast
     
     private static final Function<ResourceLocation, RenderType> INCORPOREAL = ( resourceLocation ) -> SMRenderTypes.entityCutoutNoCullBlend( resourceLocation, SMRenderTypes.INCORPOREAL_ALPHA );
     
-    private static final ResourceLocation EYES = SpecialMobs.resourceLoc( SpecialMobs.TEXTURE_PATH + "ghast/corporeal_shift_eyes.png" );
-    private static final ResourceLocation SHOOT_EYES = SpecialMobs.resourceLoc( SpecialMobs.TEXTURE_PATH + "ghast/corporeal_shift_shooting_eyes.png" );
+    private static final ResourceLocation EYES = References.getEntityEyesTexture( "ghast", "corporeal_shift" );
+    private static final ResourceLocation SHOOT_EYES = References.getEntityShootingEyesTexture( "ghast", "corporeal_shift" );
     
     private final float baseShadowRadius;
     

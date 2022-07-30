@@ -6,6 +6,7 @@ import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
 import net.minecraft.nbt.StringNBT;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 
 import java.util.UUID;
@@ -23,12 +24,41 @@ public final class References {
     public static final String VANILLA_REPLACEMENT_FORMAT = "%s._Special%sEntity";
     public static final String SPECIAL_VARIANT_FORMAT = "%s.%sEntity";
     
-    public static final String TEXTURE_FORMAT = SpecialMobs.TEXTURE_PATH + "%s/%s%s.png";
+    private static final String TEXTURE_FORMAT = "textures/entity/%s/%s%s.png";
     public static final String TEXTURE_BASE_SUFFIX = "";
     public static final String TEXTURE_EYES_SUFFIX = "_eyes";
     public static final String TEXTURE_OVERLAY_SUFFIX = "_overlay";
     public static final String TEXTURE_SHOOTING_SUFFIX = "_shooting";
-    //public static final String TEXTURE_SHOOTING_EYES_SUFFIX = "_shooting_eyes";
+    public static final String TEXTURE_SHOOTING_EYES_SUFFIX = "_shooting_eyes";
+    
+    public static ResourceLocation getEntityTexture( String path, String fileName ) { return getEntityTexture( path, fileName, "" ); }
+    
+    @SuppressWarnings( "unused" )
+    public static ResourceLocation getEntityBaseTexture( String path, String fileName ) {
+        return getEntityTexture( path, fileName, TEXTURE_BASE_SUFFIX );
+    }
+    
+    public static ResourceLocation getEntityEyesTexture( String path, String fileName ) {
+        return getEntityTexture( path, fileName, TEXTURE_EYES_SUFFIX );
+    }
+    
+    @SuppressWarnings( "unused" )
+    public static ResourceLocation getEntityOverlayTexture( String path, String fileName ) {
+        return getEntityTexture( path, fileName, TEXTURE_OVERLAY_SUFFIX );
+    }
+    
+    @SuppressWarnings( "unused" )
+    public static ResourceLocation getEntityShootingTexture( String path, String fileName ) {
+        return getEntityTexture( path, fileName, TEXTURE_SHOOTING_SUFFIX );
+    }
+    
+    public static ResourceLocation getEntityShootingEyesTexture( String path, String fileName ) {
+        return getEntityTexture( path, fileName, TEXTURE_SHOOTING_EYES_SUFFIX );
+    }
+    
+    public static ResourceLocation getEntityTexture( String path, String fileName, String suffix ) {
+        return SpecialMobs.resourceLoc( String.format( TEXTURE_FORMAT, path, fileName, suffix ) );
+    }
     
     
     //--------------- EVENT CODES ----------------
@@ -72,6 +102,10 @@ public final class References {
     public static final int NBT_TYPE_STRING = StringNBT.valueOf( "" ).getId(); // 8
     public static final int NBT_TYPE_LIST = new ListNBT().getId(); // 9
     public static final int NBT_TYPE_COMPOUND = new CompoundNBT().getId(); // 10
+    
+    // Projectiles
+    public static final String TAG_DAMAGE = "Damage";
+    public static final String TAG_KNOCKBACK = "Knockback";
     
     public static final String TAG_FORGE_DATA = "ForgeData";
     

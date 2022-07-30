@@ -1,6 +1,6 @@
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-package fathertoast.specialmobs.client.renderer.entity;
+package fathertoast.specialmobs.client.renderer.entity.family;
 
 import mcp.MethodsReturnNonnullByDefault;
 

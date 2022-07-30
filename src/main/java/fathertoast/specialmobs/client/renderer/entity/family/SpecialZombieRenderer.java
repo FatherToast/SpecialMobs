@@ -1,42 +1,36 @@
-package fathertoast.specialmobs.client.renderer.entity;
+package fathertoast.specialmobs.client.renderer.entity.family;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
-import fathertoast.specialmobs.client.renderer.entity.layers.SpecialCreeperChargeLayer;
 import fathertoast.specialmobs.client.renderer.entity.layers.SpecialMobEyesLayer;
 import fathertoast.specialmobs.client.renderer.entity.layers.SpecialMobOverlayLayer;
 import fathertoast.specialmobs.common.entity.ISpecialMob;
-import net.minecraft.client.renderer.entity.CreeperRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
-import net.minecraft.client.renderer.entity.layers.CreeperChargeLayer;
-import net.minecraft.client.renderer.entity.model.CreeperModel;
-import net.minecraft.entity.monster.CreeperEntity;
+import net.minecraft.client.renderer.entity.ZombieRenderer;
+import net.minecraft.client.renderer.entity.model.ZombieModel;
+import net.minecraft.entity.monster.ZombieEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 @OnlyIn( Dist.CLIENT )
-public class SpecialCreeperRenderer extends CreeperRenderer {
+public class SpecialZombieRenderer extends ZombieRenderer {
     
     private final float baseShadowRadius;
     
-    public SpecialCreeperRenderer( EntityRendererManager rendererManager ) {
+    public SpecialZombieRenderer( EntityRendererManager rendererManager ) {
         super( rendererManager );
         baseShadowRadius = shadowRadius;
-        // Get rid of this one since we have our own implementation
-        layers.removeIf( ( layer ) -> layer instanceof CreeperChargeLayer );
-        
         addLayer( new SpecialMobEyesLayer<>( this ) );
-        addLayer( new SpecialMobOverlayLayer<>( this, new CreeperModel<>( 0.25F ) ) );
-        addLayer( new SpecialCreeperChargeLayer<>( this, new CreeperModel<>( 2.0F ) ) );
+        addLayer( new SpecialMobOverlayLayer<>( this, new ZombieModel<>( 0.25F, true ) ) );
     }
     
     @Override
-    public ResourceLocation getTextureLocation( CreeperEntity entity ) {
+    public ResourceLocation getTextureLocation( ZombieEntity entity ) {
         return ((ISpecialMob<?>) entity).getSpecialData().getTexture();
     }
     
     @Override
-    protected void scale( CreeperEntity entity, MatrixStack matrixStack, float partialTick ) {
+    protected void scale( ZombieEntity entity, MatrixStack matrixStack, float partialTick ) {
         super.scale( entity, matrixStack, partialTick );
         
         final float scale = ((ISpecialMob<?>) entity).getSpecialData().getRenderScale();

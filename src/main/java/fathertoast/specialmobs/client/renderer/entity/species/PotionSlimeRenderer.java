@@ -1,5 +1,6 @@
-package fathertoast.specialmobs.client.renderer.entity;
+package fathertoast.specialmobs.client.renderer.entity.species;
 
+import fathertoast.specialmobs.client.renderer.entity.family.SpecialSlimeRenderer;
 import fathertoast.specialmobs.client.renderer.entity.layers.SpecialMobTintedLayer;
 import fathertoast.specialmobs.common.entity.slime.PotionSlimeEntity;
 import net.minecraft.client.renderer.entity.EntityRendererManager;

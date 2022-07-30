@@ -1,5 +1,6 @@
 package fathertoast.specialmobs.common.entity.projectile;
 
+import fathertoast.specialmobs.common.core.register.SMEntities;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.projectile.DamagingProjectileEntity;
@@ -7,17 +8,17 @@ import net.minecraft.world.World;
 
 public class SpecialFishHookEntity extends DamagingProjectileEntity {
     
-    protected SpecialFishHookEntity( EntityType<? extends SpecialFishHookEntity> entityType, World world ) {
+    public SpecialFishHookEntity( EntityType<? extends SpecialFishHookEntity> entityType, World world ) {
         super( entityType, world );
     }
     
-    public SpecialFishHookEntity( EntityType<? extends SpecialFishHookEntity> entityType, double x, double y, double z,
+    public SpecialFishHookEntity( double x, double y, double z,
                                   double dX, double dY, double dZ, World world ) {
-        super( entityType, x, y, z, dX, dY, dZ, world );
+        super( SMEntities.FISHING_BOBBER.get(), x, y, z, dX, dY, dZ, world );
     }
     
-    public SpecialFishHookEntity( EntityType<? extends SpecialFishHookEntity> entityType, LivingEntity shooter,
+    public SpecialFishHookEntity( LivingEntity shooter,
                                   double dX, double dY, double dZ, World world ) {
-        super( entityType, shooter, dX, dY, dZ, world );
+        super( SMEntities.FISHING_BOBBER.get(), shooter, dX, dY, dZ, world );
     }
 }

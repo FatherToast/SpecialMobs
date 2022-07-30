@@ -8,6 +8,8 @@ import fathertoast.specialmobs.common.config.species.SpiderSpeciesConfig;
 import fathertoast.specialmobs.common.entity.ISpecialMob;
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.entity.SpecialMobData;
+import fathertoast.specialmobs.common.entity.ai.goal.PassiveRangedAttackGoal;
+import fathertoast.specialmobs.common.entity.projectile.BugSpitEntity;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import net.minecraft.block.BlockState;
@@ -22,6 +24,7 @@ import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.util.DamageSource;
+import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.IServerWorld;
@@ -30,7 +33,7 @@ import net.minecraft.world.World;
 import javax.annotation.Nullable;
 
 @SpecialMob
-public class _SpecialSpiderEntity extends SpiderEntity implements ISpecialMob<_SpecialSpiderEntity> {
+public class _SpecialSpiderEntity extends SpiderEntity implements IRangedAttackMob, ISpecialMob<_SpecialSpiderEntity> {
     
     //--------------- Static Special Mob Hooks ----------------
     
@@ -42,7 +45,7 @@ public class _SpecialSpiderEntity extends SpiderEntity implements ISpecialMob<_S
         bestiaryInfo.color( 0xA80E0E )
                 .vanillaTextureWithEyes( "textures/entity/spider/spider.png", "textures/entity/spider_eyes.png" )
                 .experience( 5 ).spider()
-                .spitAttack( 2.0, 1.0, 20, 40, 10.0 );
+                .spitAttack( 2.0, 1.4, 20, 40, 12.0 );
     }
     
     protected static final double DEFAULT_SPIT_CHANCE = 0.1;
@@ -79,6 +82,8 @@ public class _SpecialSpiderEntity extends SpiderEntity implements ISpecialMob<_S
     @Override
     protected void registerGoals() {
         super.registerGoals();
+        goalSelector.addGoal( 4, new PassiveRangedAttackGoal<>( this, 0.5F ) );
+        
         registerVariantGoals();
     }
     
@@ -89,6 +94,14 @@ public class _SpecialSpiderEntity extends SpiderEntity implements ISpecialMob<_S
     @SuppressWarnings( "unused" )
     public void finalizeVariantSpawn( IServerWorld world, DifficultyInstance difficulty, @Nullable SpawnReason spawnReason,
                                       @Nullable ILivingEntityData groupData ) { }
+    
+    /** Called to attack the target with a ranged attack. */
+    @Override
+    public void performRangedAttack( LivingEntity target, float damageMulti ) {
+        final BugSpitEntity spit = new BugSpitEntity( this, target );
+        playSound( SoundEvents.SPIDER_HURT, 0.6F, random.nextFloat() * 0.4F + 1.6F );
+        level.addFreshEntity( spit );
+    }
     
     /** Called when this entity successfully damages a target to apply on-hit effects. */
     @Override

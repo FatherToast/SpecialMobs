@@ -3,7 +3,6 @@ package fathertoast.specialmobs.common.bestiary;
 import fathertoast.specialmobs.common.config.field.DoubleField;
 import fathertoast.specialmobs.common.config.util.*;
 import fathertoast.specialmobs.common.config.util.environment.biome.BiomeCategory;
-import fathertoast.specialmobs.common.core.SpecialMobs;
 import fathertoast.specialmobs.common.util.References;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
@@ -394,9 +393,8 @@ public class BestiaryInfo {
         
         /** @return The given strings converted to a texture resource location. */
         private ResourceLocation toTexture( String suffix ) {
-            return SpecialMobs.resourceLoc( String.format( References.TEXTURE_FORMAT,
-                    ConfigUtil.camelCaseToLowerUnderscore( owningSpecies.family.name ),
-                    ConfigUtil.camelCaseToLowerUnderscore( owningSpecies.specialVariantName ), suffix ) );
+            return References.getEntityTexture( ConfigUtil.camelCaseToLowerUnderscore( owningSpecies.family.name ),
+                    ConfigUtil.camelCaseToLowerUnderscore( owningSpecies.specialVariantName ), suffix );
         }
         
         

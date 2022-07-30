@@ -1,4 +1,4 @@
-package fathertoast.specialmobs.client.renderer.entity;
+package fathertoast.specialmobs.client.renderer.entity.species;
 
 import com.google.common.collect.ImmutableList;
 import net.minecraft.client.renderer.RenderType;

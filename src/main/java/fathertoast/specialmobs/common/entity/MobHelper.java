@@ -145,7 +145,6 @@ public final class MobHelper {
      * Knocks the target away from the source. Power is on the same scale as "level of Knockback enchantment".
      * If the power is negative, this pulls the target toward the source instead.
      */
-    @SuppressWarnings( "unused" )
     public static void knockback( Entity source, LivingEntity target, float power, float upwardMulti ) {
         knockback( source, 0.6, target, power, upwardMulti, 0.5 );
     }
