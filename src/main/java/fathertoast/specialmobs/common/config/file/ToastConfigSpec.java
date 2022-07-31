@@ -38,6 +38,12 @@ public class ToastConfigSpec {
     /** The list of actions to perform, in a specific order, when reading or writing the config file. */
     private final List<Action> ACTIONS = new ArrayList<>();
     
+    /**
+     * This is set to true once the config is ready for use.
+     * Used to assist in keeping everything straight during the multi-threaded initialization mess.
+     */
+    private volatile boolean initialized;
+    
     /** True while this config spec is currently writing. */
     volatile boolean writing;
     
@@ -73,6 +79,9 @@ public class ToastConfigSpec {
         }
     }
     
+    /** @return True if the config is initialized, and therefore safe to use (though specific field types may still be unsafe). */
+    public boolean isInitialized() { return initialized; }
+    
     /** Loads the config from disk. */
     public void initialize() {
         SpecialMobs.LOG.info( "First-time loading config file {}", ConfigUtil.toRelativePath( CONFIG_FILE ) );
@@ -92,6 +101,8 @@ public class ToastConfigSpec {
             SpecialMobs.LOG.error( "Failed to watch config file {} - this file will NOT update in-game until restarted!",
                     ConfigUtil.toRelativePath( CONFIG_FILE ) );
         }
+        
+        initialized = true;
     }
     
     /** Called when a change to the config file is detected. */

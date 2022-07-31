@@ -89,6 +89,10 @@ public class DesiccatedSilverfishEntity extends _SpecialSilverfishEntity {
         super.aiStep();
     }
     
+    /** Override to change the color of this entity's spit attack. */
+    @Override
+    protected int getVariantSpitColor() { return Effects.HUNGER.getColor(); }
+    
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override
     protected void onVariantAttack( LivingEntity target ) {

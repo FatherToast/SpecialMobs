@@ -3,7 +3,6 @@ package fathertoast.specialmobs.common.bestiary;
 import fathertoast.specialmobs.common.config.field.DoubleField;
 import fathertoast.specialmobs.common.config.util.*;
 import fathertoast.specialmobs.common.config.util.environment.biome.BiomeCategory;
-import fathertoast.specialmobs.common.core.SpecialMobs;
 import fathertoast.specialmobs.common.util.References;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
@@ -394,9 +393,8 @@ public class BestiaryInfo {
         
         /** @return The given strings converted to a texture resource location. */
         private ResourceLocation toTexture( String suffix ) {
-            return SpecialMobs.resourceLoc( String.format( References.TEXTURE_FORMAT,
-                    ConfigUtil.camelCaseToLowerUnderscore( owningSpecies.family.name ),
-                    ConfigUtil.camelCaseToLowerUnderscore( owningSpecies.specialVariantName ), suffix ) );
+            return References.getEntityTexture( ConfigUtil.camelCaseToLowerUnderscore( owningSpecies.family.name ),
+                    ConfigUtil.camelCaseToLowerUnderscore( owningSpecies.specialVariantName ), suffix );
         }
         
         
@@ -563,6 +561,17 @@ public class BestiaryInfo {
         public Builder spitAttackMultiplied( double damage, double spread, float cooldown, double range ) {
             return multiplyRangedDamage( damage ).multiplyRangedSpread( spread )
                     .multiplyRangedCooldown( cooldown ).multiplyRangedMaxCooldown( cooldown ).multiplyRangedMaxRange( range );
+        }
+        
+        /** Converts the entity to a fishing rod user by disabling unused ranged attack stats (for a bow user). */
+        public Builder convertBowToFishing() { return rangedDamage( -1.0 ).rangedWalkSpeed( -1.0 ); }
+        
+        /** Converts the entity to a fishing rod user by disabling unused ranged attack stats (for a spit shooter). */
+        public Builder convertSpitToFishing() { return rangedDamage( -1.0 ).rangedMaxCooldown( -1 ); }
+        
+        /** Sets the species fishing rod user stats. */
+        public Builder fishingAttack( double spread, int cooldown, double range ) {
+            return rangedSpread( spread ).rangedCooldown( cooldown ).rangedMaxRange( range );
         }
         
         /** Sets the species as unable to use ranged attacks (for any ranged user). */

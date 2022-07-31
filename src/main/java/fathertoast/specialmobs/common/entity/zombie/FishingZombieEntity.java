@@ -8,6 +8,7 @@ import fathertoast.specialmobs.common.config.species.SpeciesConfig;
 import fathertoast.specialmobs.common.config.species.ZombieSpeciesConfig;
 import fathertoast.specialmobs.common.entity.ai.AIHelper;
 import fathertoast.specialmobs.common.entity.ai.IAngler;
+import fathertoast.specialmobs.common.entity.ai.goal.AnglerGoal;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootEntryItemBuilder;
 import fathertoast.specialmobs.datagen.loot.LootHelper;
@@ -17,8 +18,8 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ILivingEntityData;
 import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.ai.attributes.Attributes;
+import net.minecraft.entity.ai.goal.ZombieAttackGoal;
 import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.item.FishingRodItem;
 import net.minecraft.item.IDyeableArmorItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -43,7 +44,7 @@ public class FishingZombieEntity extends _SpecialZombieEntity implements IAngler
     public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
         bestiaryInfo.color( 0x2D41F4 ).weight( BestiaryInfo.DefaultWeight.LOW ).theme( BestiaryInfo.Theme.FISHING )
                 .addExperience( 2 ).drownImmune().fluidPushImmune()
-                .bowAttack( 0.0, 1.0, 1.0, 40, 10.0 )
+                .convertBowToFishing().fishingAttack( 1.0, 40, 15.0 )
                 .multiplyAttribute( Attributes.MOVEMENT_SPEED, 0.8 );
     }
     
@@ -89,8 +90,14 @@ public class FishingZombieEntity extends _SpecialZombieEntity implements IAngler
     @Override
     protected void registerVariantGoals() {
         AIHelper.replaceWaterAvoidingRandomWalking( this, 1.0 );
-        //TODO add angler AI @ attack priority
+        
+        goalSelector.addGoal( getVariantAttackPriority(), new ZombieAttackGoal( this, 1.0, false ) );
+        goalSelector.addGoal( getVariantAttackPriority(), new AnglerGoal<>( this ) );
     }
+    
+    /** Called to set this entity's attack AI based on current equipment. */
+    @Override
+    public void reassessWeaponGoal() { } // Disable bow use
     
     /** Override to change starting equipment or stats. */
     @Override
@@ -132,7 +139,7 @@ public class FishingZombieEntity extends _SpecialZombieEntity implements IAngler
         // Display a stick in place of the "cast fishing rod" when the fancy render is disabled
         if( level.isClientSide() && !Config.MAIN.GENERAL.fancyFishingMobs.get() && EquipmentSlotType.MAINHAND.equals( slot ) ) {
             final ItemStack held = super.getItemBySlot( slot );
-            if( !held.isEmpty() && held.getItem() instanceof FishingRodItem && isLineOut() ) {
+            if( held.getItem() == Items.FISHING_ROD && isLineOut() ) {
                 return new ItemStack( Items.STICK );
             }
             return held;

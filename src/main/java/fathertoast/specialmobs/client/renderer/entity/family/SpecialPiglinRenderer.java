@@ -1,4 +1,4 @@
-package fathertoast.specialmobs.client.renderer.entity;
+package fathertoast.specialmobs.client.renderer.entity.family;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import fathertoast.specialmobs.client.renderer.entity.layers.SpecialMobEyesLayer;

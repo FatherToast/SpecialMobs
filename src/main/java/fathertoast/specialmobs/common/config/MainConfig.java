@@ -1,6 +1,7 @@
 package fathertoast.specialmobs.common.config;
 
-import fathertoast.specialmobs.common.config.field.*;
+import fathertoast.specialmobs.common.config.field.BooleanField;
+import fathertoast.specialmobs.common.config.field.DoubleField;
 import fathertoast.specialmobs.common.config.file.ToastConfigSpec;
 import fathertoast.specialmobs.common.config.util.ConfigUtil;
 
@@ -58,7 +59,8 @@ public class MainConfig extends Config.AbstractConfig {
                     "Use this if the screen warping from nausea hurts your face or makes you sick." ) );
             fancyFishingMobs = SPEC.define( new BooleanField( "fancy_fishing_mobs", true,
                     "Overrides the default fishing rod item animation so that it is compatible with fishing mobs from this mod.",
-                    "Set to false if it causes problems with another mod. Fishing mobs will instead render a stick while casting." ) );
+                    "Set to false if it causes problems with another mod. Fishing mobs will instead render a stick while casting.",
+                    "You must restart the client for changes to this setting to take effect." ) );
         }
     }
 }

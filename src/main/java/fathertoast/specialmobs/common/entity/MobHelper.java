@@ -141,11 +141,22 @@ public final class MobHelper {
         return EnchantmentHelper.getDamageBonus( item, CreatureAttribute.UNDEAD ) > 0.0F;
     }
     
+    /** Pulls the target. */
+    public static void pull( @Nullable Entity angler, @Nullable Entity fish, double power ) {
+        if( angler instanceof LivingEntity && fish instanceof LivingEntity ) {
+            fish.setDeltaMovement( fish.getDeltaMovement().scale( 0.2 ).add(
+                    (angler.getX() - fish.getX()) * power,
+                    Math.min( (angler.getY() - fish.getY()) * power + Math.sqrt( fish.distanceTo( angler ) ) * 0.1, 2.0 ),
+                    (angler.getZ() - fish.getZ()) * power ) );
+            fish.hurtMarked = true;
+            ((LivingEntity) angler).swing( Hand.MAIN_HAND );
+        }
+    }
+    
     /**
      * Knocks the target away from the source. Power is on the same scale as "level of Knockback enchantment".
      * If the power is negative, this pulls the target toward the source instead.
      */
-    @SuppressWarnings( "unused" )
     public static void knockback( Entity source, LivingEntity target, float power, float upwardMulti ) {
         knockback( source, 0.6, target, power, upwardMulti, 0.5 );
     }

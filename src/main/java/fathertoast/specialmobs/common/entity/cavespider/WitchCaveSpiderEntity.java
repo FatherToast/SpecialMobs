@@ -55,6 +55,10 @@ public class WitchCaveSpiderEntity extends _SpecialCaveSpiderEntity {
     
     public WitchCaveSpiderEntity( EntityType<? extends _SpecialCaveSpiderEntity> entityType, World world ) { super( entityType, world ); }
     
+    /** Override to change the color of this entity's spit attack. */
+    @Override
+    protected int getVariantSpitColor() { return 0x6B0023; } // Witch-spider red
+    
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override
     protected void onVariantAttack( LivingEntity target ) {

@@ -5,7 +5,10 @@ import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.config.species.SilverfishSpeciesConfig;
 import fathertoast.specialmobs.common.config.species.SpeciesConfig;
+import fathertoast.specialmobs.common.entity.ai.AIHelper;
 import fathertoast.specialmobs.common.entity.ai.IAngler;
+import fathertoast.specialmobs.common.entity.ai.goal.AnglerGoal;
+import fathertoast.specialmobs.common.entity.ai.goal.PassiveRangedAttackGoal;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootEntryItemBuilder;
 import fathertoast.specialmobs.datagen.loot.LootPoolBuilder;
@@ -29,7 +32,7 @@ public class FishingSilverfishEntity extends _SpecialSilverfishEntity implements
                 .uniqueTextureBaseOnly()
                 .size( 1.2F, 0.5F, 0.4F )
                 .addExperience( 2 ).drownImmune().fluidPushImmune()
-                .spitAttack( 0.0, 1.0, 40, 40, 10.0 )
+                .convertSpitToFishing().fishingAttack( 1.0, 40, 10.0 )
                 .addToAttribute( Attributes.MAX_HEALTH, 4.0 )
                 .multiplyAttribute( Attributes.MOVEMENT_SPEED, 0.8 );
     }
@@ -72,7 +75,8 @@ public class FishingSilverfishEntity extends _SpecialSilverfishEntity implements
     /** Override to change this entity's AI goals. */
     @Override
     protected void registerVariantGoals() {
-        //TODO add angler AI @ 4
+        AIHelper.removeGoals( goalSelector, PassiveRangedAttackGoal.class ); // Disable spit attack use
+        goalSelector.addGoal( 4, new AnglerGoal<>( this ) );
     }
     
     

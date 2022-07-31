@@ -2,8 +2,8 @@ package fathertoast.specialmobs.client.renderer.entity.layers;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
-import fathertoast.specialmobs.common.core.SpecialMobs;
 import fathertoast.specialmobs.common.entity.creeper._SpecialCreeperEntity;
+import fathertoast.specialmobs.common.util.References;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.IEntityRenderer;
@@ -20,7 +20,7 @@ public class SpecialCreeperChargeLayer<T extends CreeperEntity, M extends Entity
     
     private static final ResourceLocation[] CHARGED = new ResourceLocation[] {
             new ResourceLocation( "textures/entity/creeper/creeper_armor.png" ),
-            SpecialMobs.resourceLoc( "textures/entity/creeper/super_charged.png" )
+            References.getEntityTexture( "creeper", "super_charged" )
     };
     
     private final M model;

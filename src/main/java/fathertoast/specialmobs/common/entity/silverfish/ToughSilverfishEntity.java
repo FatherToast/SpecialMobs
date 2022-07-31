@@ -54,4 +54,8 @@ public class ToughSilverfishEntity extends _SpecialSilverfishEntity {
     //--------------- Variant-Specific Implementations ----------------
     
     public ToughSilverfishEntity( EntityType<? extends _SpecialSilverfishEntity> entityType, World world ) { super( entityType, world ); }
+    
+    /** Override to change the color of this entity's spit attack. */
+    @Override
+    protected int getVariantSpitColor() { return 0x271E3D; } // Obsidian purple
 }

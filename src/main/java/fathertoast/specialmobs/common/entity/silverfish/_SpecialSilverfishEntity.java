@@ -9,10 +9,13 @@ import fathertoast.specialmobs.common.entity.ISpecialMob;
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.entity.SpecialMobData;
 import fathertoast.specialmobs.common.entity.ai.AIHelper;
+import fathertoast.specialmobs.common.entity.ai.goal.PassiveRangedAttackGoal;
 import fathertoast.specialmobs.common.entity.ai.goal.SpecialHurtByTargetGoal;
+import fathertoast.specialmobs.common.entity.projectile.BugSpitEntity;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.material.MaterialColor;
 import net.minecraft.entity.*;
 import net.minecraft.entity.ai.attributes.AttributeModifierMap;
 import net.minecraft.entity.ai.attributes.Attributes;
@@ -25,6 +28,7 @@ import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.util.DamageSource;
+import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.IServerWorld;
@@ -34,7 +38,7 @@ import javax.annotation.Nullable;
 import java.util.List;
 
 @SpecialMob
-public class _SpecialSilverfishEntity extends SilverfishEntity implements ISpecialMob<_SpecialSilverfishEntity> {
+public class _SpecialSilverfishEntity extends SilverfishEntity implements IRangedAttackMob, ISpecialMob<_SpecialSilverfishEntity> {
     
     //--------------- Static Special Mob Hooks ----------------
     
@@ -46,7 +50,7 @@ public class _SpecialSilverfishEntity extends SilverfishEntity implements ISpeci
         bestiaryInfo.color( 0x303030 )
                 .vanillaTextureBaseOnly( "textures/entity/silverfish.png" )
                 .experience( 5 )
-                .spitAttack( 1.0, 1.3, 40, 40, 10.0 );
+                .spitAttack( 1.0, 1.0, 30, 60, 10.0 );
     }
     
     protected static final double DEFAULT_SPIT_CHANCE = 0.05;
@@ -83,6 +87,7 @@ public class _SpecialSilverfishEntity extends SilverfishEntity implements ISpeci
     @Override
     protected void registerGoals() {
         super.registerGoals();
+        goalSelector.addGoal( 4, new PassiveRangedAttackGoal<>( this ) );
         AIHelper.replaceHurtByTarget( this, new SpecialHurtByTargetGoal( this, SilverfishEntity.class ).setAlertOthers() );
         
         registerVariantGoals();
@@ -95,6 +100,18 @@ public class _SpecialSilverfishEntity extends SilverfishEntity implements ISpeci
     @SuppressWarnings( "unused" )
     public void finalizeVariantSpawn( IServerWorld world, DifficultyInstance difficulty, @Nullable SpawnReason spawnReason,
                                       @Nullable ILivingEntityData groupData ) { }
+    
+    /** Called to attack the target with a ranged attack. */
+    @Override
+    public void performRangedAttack( LivingEntity target, float damageMulti ) {
+        final BugSpitEntity spit = new BugSpitEntity( this, target );
+        spit.setColor( getVariantSpitColor() );
+        playSound( SoundEvents.SILVERFISH_HURT, 0.6F, random.nextFloat() * 0.4F + 1.6F );
+        level.addFreshEntity( spit );
+    }
+    
+    /** Override to change the color of this entity's spit attack. */
+    protected int getVariantSpitColor() { return MaterialColor.STONE.col; }
     
     /** Called when this entity successfully damages a target to apply on-hit effects. */
     @Override

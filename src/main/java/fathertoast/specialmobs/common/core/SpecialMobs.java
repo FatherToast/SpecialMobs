@@ -47,8 +47,8 @@ public class SpecialMobs {
      *      ? gravity (opposite of levitation)
      *  o entities
      *      - nbt-driven capabilities (special mob data)
-     *      o fish hook
-     *      o bug spit
+     *      - fish hook
+     *      - bug spit
      *      + bestiary
      *      - configurable stats
      *  - monster families (see doc for specifics)
@@ -77,12 +77,12 @@ public class SpecialMobs {
      *          - smallest size can deal damage
      *      - magma cubes
      *      - spiders
-     *          o ranged attack AI (spitter)
+     *          - ranged attack AI (spitter)
      *      - cave spiders
-     *          o ranged attack AI (spitter)
+     *          - ranged attack AI (spitter)
      *          + natural spawning
      *      - silverfish
-     *          + ranged attack AI (spitter)
+     *          - ranged attack AI (spitter)
      *          + puffer
      *      - endermen
      *      - witches
@@ -105,9 +105,6 @@ public class SpecialMobs {
     /** Our mod ID. */
     @SuppressWarnings( "SpellCheckingInspection" )
     public static final String MOD_ID = "specialmobs";
-    
-    /** The path to the textures folder. */
-    public static final String TEXTURE_PATH = "textures/entity/";
     
     /** Logger instance for the mod. */
     public static final Logger LOG = LogManager.getLogger( MOD_ID );

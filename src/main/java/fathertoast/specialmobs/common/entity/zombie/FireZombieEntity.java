@@ -26,7 +26,7 @@ public class FireZombieEntity extends _SpecialZombieEntity {
     @SpecialMob.BestiaryInfoSupplier
     public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
         bestiaryInfo.color( 0xDC1A00 ).theme( BestiaryInfo.Theme.FIRE )
-                .uniqueTextureBaseOnly()
+                .uniqueTextureWithEyes()
                 .addExperience( 1 ).fireImmune().waterSensitive();
     }
     
@@ -68,10 +68,6 @@ public class FireZombieEntity extends _SpecialZombieEntity {
         arrow.setSecondsOnFire( 100 );
         return arrow;
     }
-    
-    /** @return True if this entity should appear to be on fire. */
-    @Override
-    public boolean isOnFire() { return isAlive() && !isInWaterRainOrBubble(); }
     
     /** @return The sound this entity makes idly. */
     @Override
