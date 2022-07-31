@@ -3,6 +3,7 @@ package fathertoast.specialmobs.common.core.register;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.config.util.ConfigDrivenAttributeModifierMap;
 import fathertoast.specialmobs.common.core.SpecialMobs;
+import fathertoast.specialmobs.common.entity.projectile.BoneShrapnelEntity;
 import fathertoast.specialmobs.common.entity.projectile.BugSpitEntity;
 import fathertoast.specialmobs.common.entity.projectile.IncorporealFireballEntity;
 import fathertoast.specialmobs.common.entity.projectile.SpecialFishingBobberEntity;
@@ -31,6 +32,10 @@ public class SMEntities {
     public static final RegistryObject<EntityType<SpecialFishingBobberEntity>> FISHING_BOBBER = register( "fishing_bobber",
             EntityType.Builder.<SpecialFishingBobberEntity>of( SpecialFishingBobberEntity::new, EntityClassification.MISC ).noSave().noSummon()
                     .sized( 0.25F, 0.25F ).clientTrackingRange( 4 ).updateInterval( 5 ) );
+
+    public static final RegistryObject<EntityType<BoneShrapnelEntity>> BONE_SHRAPNEL = register( "bone_shrapnel",
+            EntityType.Builder.<BoneShrapnelEntity>of( BoneShrapnelEntity::new, EntityClassification.MISC ).noSave().noSummon()
+                    .sized(0.25F, 0.25F ).clientTrackingRange( 4 ).updateInterval( 5 ) );
 
     
     /** Registers an entity type to the deferred register. */
