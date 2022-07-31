@@ -30,7 +30,7 @@ public class RunicEndermanEntity extends _SpecialEndermanEntity {
                 .addToAttribute( Attributes.ARMOR, 10.0 )
                 .addToAttribute( Attributes.ATTACK_DAMAGE, 1.0 )
                 .multiplyAttribute( Attributes.MOVEMENT_SPEED, 0.8 );
-        
+
     }
     
     @SpecialMob.LanguageProvider
@@ -64,6 +64,12 @@ public class RunicEndermanEntity extends _SpecialEndermanEntity {
     protected void onVariantAttack( LivingEntity target ) {
         MobHelper.applyEffect( target, Effects.LEVITATION );
         MobHelper.knockback( this, target, 2.0F, 0.0F );
+    }
+
+    /** Override to change this entity's AI goals. */
+    @Override
+    protected void registerVariantGoals() {
+        super.registerVariantGoals();
     }
     
     // NOTE would be fun to try and make this mob shoot an 'end crystal laser' to deal ranged damage and/or knockback

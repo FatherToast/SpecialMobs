@@ -46,7 +46,7 @@ public class IncorporealFireballEntity extends AbstractFireballEntity {
         target = ghast.getTarget();
     }
     
-    public IncorporealFireballEntity(World world, PlayerEntity owner, LivingEntity target, double x, double y, double z ) {
+    public IncorporealFireballEntity(World world, @Nullable PlayerEntity owner, LivingEntity target, double x, double y, double z ) {
         super( SMEntities.CORPOREAL_FIREBALL.get(), owner, x, y, z, world );
         this.target = target;
     }
