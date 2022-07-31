@@ -13,6 +13,9 @@ import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.entity.projectile.ProjectileHelper;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.IPacket;
+import net.minecraft.network.datasync.DataParameter;
+import net.minecraft.network.datasync.DataSerializers;
+import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.particles.ParticleTypes;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.math.EntityRayTraceResult;
@@ -27,12 +30,13 @@ public class BugSpitEntity extends ProjectileEntity {
     private static final float DRAG_FACTOR = 0.99F;
     private static final float GRAVITY_ACCEL = 0.06F;
     
+    /** The parameter for color tint. */
+    private static final DataParameter<Integer> COLOR = EntityDataManager.defineId( BugSpitEntity.class, DataSerializers.INT );
+    
     private float damageAmount = 2.0F;
     private int knockback;
     
-    public BugSpitEntity( EntityType<? extends BugSpitEntity> entityType, World world ) {
-        super( entityType, world );
-    }
+    public BugSpitEntity( EntityType<? extends BugSpitEntity> entityType, World world ) { super( entityType, world ); }
     
     public BugSpitEntity( LivingEntity shooter, LivingEntity target ) {
         super( SMEntities.BUG_SPIT.get(), shooter.level );
@@ -67,10 +71,18 @@ public class BugSpitEntity extends ProjectileEntity {
     
     /** Called from the Entity.class constructor to define data watcher variables. */
     @Override
-    protected void defineSynchedData() { }
+    protected void defineSynchedData() { entityData.define( COLOR, 0xFFFFFF ); }
     
     @Override
     public IPacket<?> getAddEntityPacket() { return NetworkHooks.getEntitySpawningPacket( this ); }
+    
+    /** Sets the RGB color of this spit attack. */
+    public void setColor( int color ) {
+        entityData.set( COLOR, color );
+    }
+    
+    /** @return The RGB color of this spit attack. */
+    public int getColor() { return entityData.get( COLOR ); }
     
     /** Called when the entity is added to the world. */
     @Override
@@ -107,9 +119,7 @@ public class BugSpitEntity extends ProjectileEntity {
         // Check collision
         final Vector3d v = getDeltaMovement();
         final RayTraceResult rayTrace = ProjectileHelper.getHitResult( this, this::canHitEntity );
-        //noinspection ConstantConditions - Vanilla does the null check, so let's keep that just in case
-        if( rayTrace != null && rayTrace.getType() != RayTraceResult.Type.MISS &&
-                !ForgeEventFactory.onProjectileImpact( this, rayTrace ) ) {
+        if( rayTrace.getType() != RayTraceResult.Type.MISS && !ForgeEventFactory.onProjectileImpact( this, rayTrace ) ) {
             onHit( rayTrace );
         }
         
@@ -169,7 +179,7 @@ public class BugSpitEntity extends ProjectileEntity {
     public void addAdditionalSaveData( CompoundNBT tag ) {
         super.addAdditionalSaveData( tag );
         
-        tag.putFloat( References.TAG_DAMAGE, getDamage() );
+        tag.putFloat( References.TAG_RANGED_DAMAGE, getDamage() );
         tag.putInt( References.TAG_KNOCKBACK, getKnockback() );
     }
     
@@ -178,8 +188,8 @@ public class BugSpitEntity extends ProjectileEntity {
     public void readAdditionalSaveData( CompoundNBT tag ) {
         super.readAdditionalSaveData( tag );
         
-        if( tag.contains( References.TAG_DAMAGE, References.NBT_TYPE_NUMERICAL ) )
-            setDamage( tag.getFloat( References.TAG_DAMAGE ) );
+        if( tag.contains( References.TAG_RANGED_DAMAGE, References.NBT_TYPE_NUMERICAL ) )
+            setDamage( tag.getFloat( References.TAG_RANGED_DAMAGE ) );
         if( tag.contains( References.TAG_KNOCKBACK, References.NBT_TYPE_NUMERICAL ) )
             setKnockback( tag.getInt( References.TAG_KNOCKBACK ) );
     }

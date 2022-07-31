@@ -11,6 +11,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.EffectType;
+import net.minecraft.potion.Effects;
 import net.minecraft.world.World;
 
 @SpecialMob
@@ -54,6 +55,10 @@ public class WitchSpiderEntity extends _SpecialSpiderEntity {
     //--------------- Variant-Specific Implementations ----------------
     
     public WitchSpiderEntity( EntityType<? extends _SpecialSpiderEntity> entityType, World world ) { super( entityType, world ); }
+    
+    /** Override to change the color of this entity's spit attack. */
+    @Override
+    protected int getVariantSpitColor() { return 0x6B0023; } // Witch-spider red
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override

@@ -3,6 +3,7 @@ package fathertoast.specialmobs.datagen;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.core.SpecialMobs;
 import fathertoast.specialmobs.common.core.register.SMEffects;
+import fathertoast.specialmobs.common.core.register.SMEntities;
 import fathertoast.specialmobs.common.core.register.SMItems;
 import fathertoast.specialmobs.common.util.AnnotationHelper;
 import fathertoast.specialmobs.common.util.References;
@@ -60,6 +61,14 @@ public class SMLanguageProvider extends LanguageProvider {
             translationList.add( spawnEggTranslations );
         }
         
+        // Other entities
+        translationList.add( References.translations( SMEntities.BUG_SPIT.get().getDescriptionId(), "Bug Spit",
+                "", "", "", "", "", "" ) ); //TODO
+        translationList.add( References.translations( SMEntities.CORPOREAL_FIREBALL.get().getDescriptionId(), "Bug Spit",
+                "", "", "", "", "", "" ) ); //TODO
+        translationList.add( References.translations( SMEntities.FISHING_BOBBER.get().getDescriptionId(), "Fishing Bobber",
+                "", "", "", "", "", "" ) ); //TODO
+        
         // Items
         for( RegistryObject<Item> regObject : SMItems.REGISTRY.getEntries() ) {
             // Lazy method of avoiding duplicate entries for now
@@ -91,12 +100,15 @@ public class SMLanguageProvider extends LanguageProvider {
                 SpecialMobs.LOG.error( "Translation key {} has no lang codes assigned!", key.name() );
             }
             final int k = key.ordinal() + 1;
+            boolean missedAny = false;
             for( String[] translationArray : TRANSLATIONS ) {
                 if( translationArray[k] == null || translationArray[k].equals( "" ) ) {
                     SpecialMobs.LOG.error( "Translation key {} is missing a translation for lang key \"{}\"!",
                             key.name(), translationArray[0] );
+                    missedAny = true;
                 }
             }
+            if( missedAny && key == TranslationKey.ENGLISH ) throw new IllegalStateException( "Come on, man!" );
         }
         SpecialMobs.LOG.info( "Translation key verification complete!" );
     }

@@ -58,6 +58,10 @@ public class FireSilverfishEntity extends _SpecialSilverfishEntity {
     
     public FireSilverfishEntity( EntityType<? extends _SpecialSilverfishEntity> entityType, World world ) { super( entityType, world ); }
     
+    /** Override to change the color of this entity's spit attack. */
+    @Override
+    protected int getVariantSpitColor() { return 0xDFA21B; } // Fire orange
+    
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override
     protected void onVariantAttack( LivingEntity target ) {

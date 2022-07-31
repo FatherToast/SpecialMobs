@@ -2,6 +2,7 @@ package fathertoast.specialmobs.client.renderer.entity.layers;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import fathertoast.specialmobs.common.entity.ISpecialMob;
+import fathertoast.specialmobs.common.util.References;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.entity.IEntityRenderer;
 import net.minecraft.client.renderer.entity.layers.LayerRenderer;
@@ -28,10 +29,7 @@ public abstract class SpecialMobTintedLayer<T extends LivingEntity, M extends En
         if( overlayTexture == null ) return;
         
         final int color = getColor( entity );
-        final float r = (float) ((color >> 16) & 0xff) / (float) 0xff;
-        final float g = (float) ((color >> 8) & 0xff) / (float) 0xff;
-        final float b = (float) (color & 0xff) / (float) 0xff;
-        
-        renderColoredCutoutModel( getParentModel(), overlayTexture, matrixStack, buffer, packedLight, entity, r, g, b );
+        renderColoredCutoutModel( getParentModel(), overlayTexture, matrixStack, buffer, packedLight, entity,
+                References.getRed( color ), References.getGreen( color ), References.getBlue( color ) );
     }
 }

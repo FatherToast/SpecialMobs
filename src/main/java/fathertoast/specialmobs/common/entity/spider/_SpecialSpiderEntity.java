@@ -23,6 +23,7 @@ import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.potion.EffectInstance;
+import net.minecraft.potion.Effects;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.vector.Vector3d;
@@ -99,9 +100,13 @@ public class _SpecialSpiderEntity extends SpiderEntity implements IRangedAttackM
     @Override
     public void performRangedAttack( LivingEntity target, float damageMulti ) {
         final BugSpitEntity spit = new BugSpitEntity( this, target );
+        spit.setColor( getVariantSpitColor() );
         playSound( SoundEvents.SPIDER_HURT, 0.6F, random.nextFloat() * 0.4F + 1.6F );
         level.addFreshEntity( spit );
     }
+    
+    /** Override to change the color of this entity's spit attack. */
+    protected int getVariantSpitColor() { return Effects.POISON.getColor(); }
     
     /** Called when this entity successfully damages a target to apply on-hit effects. */
     @Override

@@ -456,17 +456,17 @@ public class SpecialMobData<T extends LivingEntity & ISpecialMob<T>> {
         
         // Ranged attack stats (optional)
         if( getRangedAttackDamage() >= 0.0F )
-            tag.putFloat( TAG_ARROW_DAMAGE, getRangedAttackDamage() );
+            tag.putFloat( TAG_RANGED_DAMAGE, getRangedAttackDamage() );
         if( getRangedAttackSpread() >= 0.0F )
-            tag.putFloat( TAG_ARROW_SPREAD, getRangedAttackSpread() );
+            tag.putFloat( TAG_RANGED_SPREAD, getRangedAttackSpread() );
         if( getRangedWalkSpeed() >= 0.0F )
-            tag.putFloat( TAG_ARROW_WALK_SPEED, getRangedWalkSpeed() );
+            tag.putFloat( TAG_RANGED_WALK_SPEED, getRangedWalkSpeed() );
         if( getRangedAttackCooldown() >= 0 )
-            tag.putShort( TAG_ARROW_REFIRE_MIN, (short) getRangedAttackCooldown() );
+            tag.putShort( TAG_RANGED_COOLDOWN_MIN, (short) getRangedAttackCooldown() );
         if( getRangedAttackMaxCooldown() >= 0 )
-            tag.putShort( TAG_ARROW_REFIRE_MAX, (short) getRangedAttackMaxCooldown() );
+            tag.putShort( TAG_RANGED_COOLDOWN_MAX, (short) getRangedAttackMaxCooldown() );
         if( getRangedAttackMaxRange() >= 0.0F )
-            tag.putFloat( TAG_ARROW_RANGE, getRangedAttackMaxRange() );
+            tag.putFloat( TAG_MAX_RANGE, getRangedAttackMaxRange() );
     }
     
     /**
@@ -545,23 +545,23 @@ public class SpecialMobData<T extends LivingEntity & ISpecialMob<T>> {
         }
         
         // Ranged attack stats
-        if( tag.contains( TAG_ARROW_DAMAGE, NBT_TYPE_NUMERICAL ) ) {
-            setRangedAttackDamage( tag.getFloat( TAG_ARROW_DAMAGE ) );
+        if( tag.contains( TAG_RANGED_DAMAGE, NBT_TYPE_NUMERICAL ) ) {
+            setRangedAttackDamage( tag.getFloat( TAG_RANGED_DAMAGE ) );
         }
-        if( tag.contains( TAG_ARROW_SPREAD, NBT_TYPE_NUMERICAL ) ) {
-            setRangedAttackSpread( tag.getFloat( TAG_ARROW_SPREAD ) );
+        if( tag.contains( TAG_RANGED_SPREAD, NBT_TYPE_NUMERICAL ) ) {
+            setRangedAttackSpread( tag.getFloat( TAG_RANGED_SPREAD ) );
         }
-        if( tag.contains( TAG_ARROW_WALK_SPEED, NBT_TYPE_NUMERICAL ) ) {
-            setRangedWalkSpeed( tag.getFloat( TAG_ARROW_WALK_SPEED ) );
+        if( tag.contains( TAG_RANGED_WALK_SPEED, NBT_TYPE_NUMERICAL ) ) {
+            setRangedWalkSpeed( tag.getFloat( TAG_RANGED_WALK_SPEED ) );
         }
-        if( tag.contains( TAG_ARROW_REFIRE_MIN, NBT_TYPE_NUMERICAL ) ) {
-            setRangedAttackCooldown( tag.getShort( TAG_ARROW_REFIRE_MIN ) );
+        if( tag.contains( TAG_RANGED_COOLDOWN_MIN, NBT_TYPE_NUMERICAL ) ) {
+            setRangedAttackCooldown( tag.getShort( TAG_RANGED_COOLDOWN_MIN ) );
         }
-        if( tag.contains( TAG_ARROW_REFIRE_MAX, NBT_TYPE_NUMERICAL ) ) {
-            setRangedAttackMaxCooldown( tag.getShort( TAG_ARROW_REFIRE_MAX ) );
+        if( tag.contains( TAG_RANGED_COOLDOWN_MAX, NBT_TYPE_NUMERICAL ) ) {
+            setRangedAttackMaxCooldown( tag.getShort( TAG_RANGED_COOLDOWN_MAX ) );
         }
-        if( tag.contains( TAG_ARROW_RANGE, NBT_TYPE_NUMERICAL ) ) {
-            setRangedAttackMaxRange( tag.getFloat( TAG_ARROW_RANGE ) );
+        if( tag.contains( TAG_MAX_RANGE, NBT_TYPE_NUMERICAL ) ) {
+            setRangedAttackMaxRange( tag.getFloat( TAG_MAX_RANGE ) );
         }
     }
 }

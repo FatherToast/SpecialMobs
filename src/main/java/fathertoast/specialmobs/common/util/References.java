@@ -18,6 +18,34 @@ public final class References {
             "Baby speed boost", 0.5, AttributeModifier.Operation.MULTIPLY_BASE );
     
     
+    //--------------- COLOR METHODS ----------------
+    
+    /** @return The red portion of an ARGB color int. Returned value will be in the range 0x00 - 0xFF. */
+    public static int getRedBits( int color ) { return (color >> 16) & 0xFF; }
+    
+    /** @return The green portion of an ARGB color int. Returned value will be in the range 0x00 - 0xFF. */
+    public static int getGreenBits( int color ) { return (color >> 8) & 0xFF; }
+    
+    /** @return The blue portion of an ARGB color int. Returned value will be in the range 0x00 - 0xFF. */
+    public static int getBlueBits( int color ) { return color & 0xFF; }
+    
+    /** @return The alpha (opacity) portion of an ARGB color int. Returned value will be in the range 0x00 - 0xFF. */
+    public static int getAlphaBits( int color ) { return (color >> 24) & 0xFF; }
+    
+    /** @return The red portion of an ARGB color int. Returned value will be in the range 0.0 - 1.0. */
+    public static float getRed( int color ) { return (float) getRedBits( color ) / 0xFF; }
+    
+    /** @return The green portion of an ARGB color int. Returned value will be in the range 0.0 - 1.0. */
+    public static float getGreen( int color ) { return (float) getGreenBits( color ) / 0xFF; }
+    
+    /** @return The blue portion of an ARGB color int. Returned value will be in the range 0.0 - 1.0. */
+    public static float getBlue( int color ) { return (float) getBlueBits( color ) / 0xFF; }
+    
+    /** @return The alpha (opacity) portion of an ARGB color int. Returned value will be in the range 0.0 - 1.0. */
+    @SuppressWarnings( "unused" ) // Nobody likes you, Booster
+    public static float getAlpha( int color ) { return (float) getAlphaBits( color ) / 0xFF; }
+    
+    
     //--------------- BESTIARY REFLECTION ----------------
     
     public static final String ENTITY_PACKAGE = "fathertoast." + SpecialMobs.MOD_ID + ".common.entity.";
@@ -104,11 +132,10 @@ public final class References {
     public static final int NBT_TYPE_COMPOUND = new CompoundNBT().getId(); // 10
     
     // Projectiles
-    public static final String TAG_DAMAGE = "Damage";
     public static final String TAG_KNOCKBACK = "Knockback";
     
+    // Forge data
     public static final String TAG_FORGE_DATA = "ForgeData";
-    
     public static final String TAG_INIT = "SpecialMobsInit";
     
     // Special mob data
@@ -129,12 +156,12 @@ public final class References {
     public static final String TAG_WATER_DAMAGE = "WaterDamage";
     public static final String TAG_STICKY_IMMUNE = "StickyImmune";
     public static final String TAG_POTION_IMMUNE = "PotionImmune";
-    public static final String TAG_ARROW_DAMAGE = "ArrowDamage";
-    public static final String TAG_ARROW_SPREAD = "ArrowSpread";
-    public static final String TAG_ARROW_WALK_SPEED = "ArrowWalkSpeed";
-    public static final String TAG_ARROW_REFIRE_MIN = "ArrowRefireMin";
-    public static final String TAG_ARROW_REFIRE_MAX = "ArrowRefireMax";
-    public static final String TAG_ARROW_RANGE = "ArrowRange";
+    public static final String TAG_RANGED_DAMAGE = "RangedDamage";
+    public static final String TAG_RANGED_SPREAD = "RangedSpread";
+    public static final String TAG_RANGED_WALK_SPEED = "RangedWalkSpeed";
+    public static final String TAG_RANGED_COOLDOWN_MIN = "RangedCDMin";
+    public static final String TAG_RANGED_COOLDOWN_MAX = "RangedCDMax";
+    public static final String TAG_MAX_RANGE = "MaxRange";
     
     // Creepers
     public static final String TAG_SUPERCHARGED = "Supercharged";

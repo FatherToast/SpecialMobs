@@ -3,6 +3,7 @@ package fathertoast.specialmobs.common.entity.witch;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
+import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import net.minecraft.entity.EntityType;
@@ -13,7 +14,7 @@ import net.minecraft.item.Items;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.Effects;
 import net.minecraft.potion.Potions;
-import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.util.SoundEvents;
 import net.minecraft.world.World;
 
 import java.util.Collection;
@@ -90,13 +91,8 @@ public class DominationWitchEntity extends _SpecialWitchEntity {
                     (target.hasEffect( Effects.WEAKNESS ) || target.hasEffect( Effects.LEVITATION )) && canSee( target ) ) {
                 pullDelay = 100;
                 
-                target.setDeltaMovement( new Vector3d(
-                        getX() - target.getX(),
-                        getY() - target.getY(),
-                        getZ() - target.getZ() )
-                        .scale( 0.32 )
-                        .add( 0.0, Math.sqrt( Math.sqrt( distanceSq ) ) * 0.1, 0.0 ) );
-                target.hurtMarked = true;
+                playSound( SoundEvents.FISHING_BOBBER_RETRIEVE, 1.0F, 0.4F / (random.nextFloat() * 0.4F + 0.8F) );
+                MobHelper.pull( this, target, 0.32 );
             }
         }
         super.aiStep();

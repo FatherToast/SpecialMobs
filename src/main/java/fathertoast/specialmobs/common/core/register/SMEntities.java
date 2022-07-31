@@ -5,7 +5,7 @@ import fathertoast.specialmobs.common.config.util.ConfigDrivenAttributeModifierM
 import fathertoast.specialmobs.common.core.SpecialMobs;
 import fathertoast.specialmobs.common.entity.projectile.BugSpitEntity;
 import fathertoast.specialmobs.common.entity.projectile.IncorporealFireballEntity;
-import fathertoast.specialmobs.common.entity.projectile.SpecialFishHookEntity;
+import fathertoast.specialmobs.common.entity.projectile.SpecialFishingBobberEntity;
 import fathertoast.specialmobs.common.util.AnnotationHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityClassification;
@@ -28,8 +28,8 @@ public class SMEntities {
             EntityType.Builder.<IncorporealFireballEntity>of( IncorporealFireballEntity::new, EntityClassification.MISC )
                     .sized( 1.0F, 1.0F ).clientTrackingRange( 4 ).updateInterval( 3 ) );
     
-    public static final RegistryObject<EntityType<SpecialFishHookEntity>> FISHING_BOBBER = register( "fishing_bobber",
-            EntityType.Builder.<SpecialFishHookEntity>of( SpecialFishHookEntity::new, EntityClassification.MISC ).noSave().noSummon()
+    public static final RegistryObject<EntityType<SpecialFishingBobberEntity>> FISHING_BOBBER = register( "fishing_bobber",
+            EntityType.Builder.<SpecialFishingBobberEntity>of( SpecialFishingBobberEntity::new, EntityClassification.MISC ).noSave().noSummon()
                     .sized( 0.25F, 0.25F ).clientTrackingRange( 4 ).updateInterval( 5 ) );
     
     

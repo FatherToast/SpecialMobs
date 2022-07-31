@@ -15,6 +15,7 @@ import fathertoast.specialmobs.common.entity.projectile.BugSpitEntity;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.material.MaterialColor;
 import net.minecraft.entity.*;
 import net.minecraft.entity.ai.attributes.AttributeModifierMap;
 import net.minecraft.entity.ai.attributes.Attributes;
@@ -104,9 +105,13 @@ public class _SpecialSilverfishEntity extends SilverfishEntity implements IRange
     @Override
     public void performRangedAttack( LivingEntity target, float damageMulti ) {
         final BugSpitEntity spit = new BugSpitEntity( this, target );
+        spit.setColor( getVariantSpitColor() );
         playSound( SoundEvents.SILVERFISH_HURT, 0.6F, random.nextFloat() * 0.4F + 1.6F );
         level.addFreshEntity( spit );
     }
+    
+    /** Override to change the color of this entity's spit attack. */
+    protected int getVariantSpitColor() { return MaterialColor.STONE.col; }
     
     /** Called when this entity successfully damages a target to apply on-hit effects. */
     @Override

@@ -39,7 +39,7 @@ public class PassiveRangedAttackGoal<T extends MobEntity & ISpecialMob<? super T
         final SpecialMobData<?> data = mob.getSpecialData();
         
         final double distSqr = target.distanceToSqr( mob );
-        if( distSqr < data.getRangedAttackMaxRange() * data.getRangedAttackMaxRange() && mob.canSee( target ) ) {
+        if( distSqr <= data.getRangedAttackMaxRange() * data.getRangedAttackMaxRange() && mob.canSee( target ) ) {
             attackTime++;
             if( attackTime >= data.getRangedAttackCooldown() ) {
                 attackTime = MathHelper.floor( (data.getRangedAttackCooldown() - data.getRangedAttackMaxCooldown()) *

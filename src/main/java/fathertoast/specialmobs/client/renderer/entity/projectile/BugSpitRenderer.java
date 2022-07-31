@@ -32,9 +32,10 @@ public class BugSpitRenderer extends EntityRenderer<BugSpitEntity> {
         matrixStack.mulPose( Vector3f.ZP.rotationDegrees( MathHelper.lerp( partialTicks, entity.xRotO, entity.xRot ) ) );
         
         model.setupAnim( entity, partialTicks, 0.0F, -0.1F, 0.0F, 0.0F );
+        final int color = entity.getColor();
         final IVertexBuilder vertexBuilder = buffer.getBuffer( model.renderType( TEXTURE_LOCATION ) );
         model.renderToBuffer( matrixStack, vertexBuilder, packedLight, OverlayTexture.NO_OVERLAY,
-                1.0F, 1.0F, 1.0F, 1.0F ); // RGBA
+                References.getRed( color ), References.getGreen( color ), References.getBlue( color ), 1.0F ); // RGBA
         matrixStack.popPose();
         
         super.render( entity, rotation, partialTicks, matrixStack, buffer, packedLight );

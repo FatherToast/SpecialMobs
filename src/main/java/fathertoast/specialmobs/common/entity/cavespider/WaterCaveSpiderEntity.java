@@ -85,6 +85,10 @@ public class WaterCaveSpiderEntity extends _SpecialCaveSpiderEntity {
     @Override
     public boolean canStandOnFluid( Fluid fluid ) { return fluid.is( FluidTags.WATER ); }
     
+    /** Override to change the color of this entity's spit attack. */
+    @Override
+    protected int getVariantSpitColor() { return 0x385DC6; } // Water blue
+    
     /** Called each tick to update this entity. */
     @Override
     public void tick() {

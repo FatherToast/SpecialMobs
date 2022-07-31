@@ -61,6 +61,10 @@ public class AlbinoSilverfishEntity extends _SpecialSilverfishEntity {
     
     public AlbinoSilverfishEntity( EntityType<? extends _SpecialSilverfishEntity> entityType, World world ) { super( entityType, world ); }
     
+    /** Override to change the color of this entity's spit attack. */
+    @Override
+    protected int getVariantSpitColor() { return Effects.MOVEMENT_SLOWDOWN.getColor(); }
+    
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override
     protected void onVariantAttack( LivingEntity target ) {

@@ -47,7 +47,7 @@ public class SpecialMobs {
      *      ? gravity (opposite of levitation)
      *  o entities
      *      - nbt-driven capabilities (special mob data)
-     *      o fish hook
+     *      - fish hook
      *      - bug spit
      *      + bestiary
      *      - configurable stats

@@ -563,6 +563,17 @@ public class BestiaryInfo {
                     .multiplyRangedCooldown( cooldown ).multiplyRangedMaxCooldown( cooldown ).multiplyRangedMaxRange( range );
         }
         
+        /** Converts the entity to a fishing rod user by disabling unused ranged attack stats (for a bow user). */
+        public Builder convertBowToFishing() { return rangedDamage( -1.0 ).rangedWalkSpeed( -1.0 ); }
+        
+        /** Converts the entity to a fishing rod user by disabling unused ranged attack stats (for a spit shooter). */
+        public Builder convertSpitToFishing() { return rangedDamage( -1.0 ).rangedMaxCooldown( -1 ); }
+        
+        /** Sets the species fishing rod user stats. */
+        public Builder fishingAttack( double spread, int cooldown, double range ) {
+            return rangedSpread( spread ).rangedCooldown( cooldown ).rangedMaxRange( range );
+        }
+        
         /** Sets the species as unable to use ranged attacks (for any ranged user). */
         public Builder disableRangedAttack() { return rangedMaxRange( 0.0 ); }
         

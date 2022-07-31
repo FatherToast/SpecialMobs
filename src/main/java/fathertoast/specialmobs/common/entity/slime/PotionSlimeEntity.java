@@ -150,18 +150,18 @@ public class PotionSlimeEntity extends _SpecialSlimeEntity {
     @Override
     protected boolean spawnCustomParticles() {
         final int color = getPotionColor();
-        final float r = (float) ((color >> 16) & 0xff) / (float) 0xff;
-        final float g = (float) ((color >> 8) & 0xff) / (float) 0xff;
-        final float b = (float) (color & 0xff) / (float) 0xff;
+        final float r = References.getRed( color );
+        final float g = References.getGreen( color );
+        final float b = References.getBlue( color );
         
         final int size = getSize();
         for( int i = 0; i < size * 8; i++ ) {
             final float angle = random.nextFloat() * 2.0F * (float) Math.PI;
-            final float distance = random.nextFloat() * 0.25F + 0.25F;
+            final float distance = (random.nextFloat() * 0.25F + 0.25F) * size;
             level.addParticle( getParticleType(),
-                    getX() + MathHelper.sin( angle ) * size * distance,
+                    getX() + MathHelper.sin( angle ) * distance,
                     getY(),
-                    getZ() + MathHelper.cos( angle ) * size * distance,
+                    getZ() + MathHelper.cos( angle ) * distance,
                     r, g, b );
         }
         return true;
