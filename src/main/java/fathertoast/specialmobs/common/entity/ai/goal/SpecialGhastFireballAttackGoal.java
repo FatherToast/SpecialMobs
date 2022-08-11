@@ -41,7 +41,7 @@ public class SpecialGhastFireballAttackGoal extends Goal {
         if( target.distanceToSqr( ghast ) < data.getRangedAttackMaxRange() * data.getRangedAttackMaxRange() && ghast.canSee( target ) ) {
             chargeTime++;
             if( chargeTime == (data.getRangedAttackCooldown() >> 1) && !ghast.isSilent() ) {
-                ghast.level.levelEvent( null, References.EVENT_GHAST_WARN, ghast.blockPosition(), 0 );
+                References.LevelEvent.GHAST_WARN.play( ghast );
             }
             if( chargeTime >= data.getRangedAttackCooldown() ) {
                 ghast.performRangedAttack( target, 1.0F );

@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
+import java.util.function.Function;
 
 /**
  * Represents a config field with a double value.
@@ -214,12 +215,19 @@ public class DoubleField extends AbstractConfigField {
         
         /** @return Returns a random item from this weighted list. Null if none of the items have a positive weight. */
         @Nullable
-        public T next( Random random, World world, @Nullable BlockPos pos ) {
+        public T next( Random random, World world, @Nullable BlockPos pos ) { return next( random, world, pos, null ); }
+        
+        /** @return Returns a random item from this weighted list. Null if none of the items have a positive weight. */
+        @Nullable
+        public T next( Random random, World world, @Nullable BlockPos pos, @Nullable Function<T, Boolean> selector ) {
             // Due to the 'nebulous' nature of environment-based weights, we must recalculate weights for EVERY call
             final double[] weights = new double[UNDERLYING_LIST.size()];
             double targetWeight = 0.0;
             for( int i = 0; i < weights.length; i++ ) {
-                targetWeight += weights[i] = UNDERLYING_LIST.get( i ).WEIGHT.get( world, pos );
+                final Entry<T> entry = UNDERLYING_LIST.get( i );
+                if( selector == null || selector.apply( entry.VALUE ) ) {
+                    targetWeight += weights[i] = entry.WEIGHT.get( world, pos );
+                }
             }
             if( targetWeight <= 0.0 ) return null;
             

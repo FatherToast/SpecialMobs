@@ -60,7 +60,7 @@ public class _SpecialZombieEntity extends ZombieEntity implements IRangedAttackM
     }
     
     protected static final double DEFAULT_BOW_CHANCE = 0.05;
-    protected static final double DEFAULT_SHIELD_CHANCE = 0.05;
+    protected static final double DEFAULT_SHIELD_CHANCE = 0.02;
     
     @SpecialMob.ConfigSupplier
     public static SpeciesConfig createConfig( MobFamily.Species<?> species ) {
@@ -207,6 +207,19 @@ public class _SpecialZombieEntity extends ZombieEntity implements IRangedAttackM
         }
     }
     
+    /** @return True if this zombie can convert in water. */
+    @Override
+    protected boolean convertsInWater() { return !isSensitiveToWater(); }
+    
+    // TODO Drowned transform
+    //    /** Performs this zombie's drowning conversion. */
+    //    @Override
+    //    protected void doUnderWaterConversion() {
+    //        // Select a random drowned
+    //        convertToZombieType( MobFamily.DROWNED.nextVariant( level, blockPosition() ).entityType.get() );
+    //        References.LevelEvent.ZOMBIE_CONVERTED_TO_DROWNED.play( this );
+    //    }
+    
     
     //--------------- ISpecialMob Implementation ----------------
     
@@ -228,6 +241,18 @@ public class _SpecialZombieEntity extends ZombieEntity implements IRangedAttackM
     /** Sets the experience that should be dropped by this entity. */
     @Override
     public final void setExperience( int xp ) { xpReward = xp; }
+    
+    /** Converts this entity to one of another type. */
+    @Nullable
+    @Override
+    public <T extends MobEntity> T convertTo( EntityType<T> entityType, boolean keepEquipment ) {
+        final T replacement = super.convertTo( entityType, keepEquipment );
+        if( replacement instanceof ISpecialMob && level instanceof IServerWorld ) {
+            MobHelper.finalizeSpawn( replacement, (IServerWorld) level, level.getCurrentDifficultyAt( blockPosition() ),
+                    SpawnReason.CONVERSION, null );
+        }
+        return replacement;
+    }
     
     /** Called on spawn to initialize properties based on the world, difficulty, and the group it spawns with. */
     @Nullable

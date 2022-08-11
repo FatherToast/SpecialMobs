@@ -77,7 +77,7 @@ public class SpitfireWitherSkeletonEntity extends _SpecialWitherSkeletonEntity {
     /** Called to attack the target with a ranged attack. */
     @Override
     public void performRangedAttack( LivingEntity target, float damageMulti ) {
-        if( !isSilent() ) level.levelEvent( null, References.EVENT_BLAZE_SHOOT, blockPosition(), 0 );
+        References.LevelEvent.BLAZE_SHOOT.play( this );
         
         final float accelVariance = MathHelper.sqrt( distanceTo( target ) ) * 0.5F * getSpecialData().getRangedAttackSpread();
         

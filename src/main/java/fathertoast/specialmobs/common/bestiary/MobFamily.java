@@ -197,9 +197,14 @@ public class MobFamily<T extends LivingEntity, V extends FamilyConfig> {
     
     /** Pick a new species from this family, based on the location. */
     public Species<? extends T> nextVariant( World world, @Nullable BlockPos pos ) {
-        final Species<?> species = config.GENERAL.specialVariantList.next( world.random, world, pos );
+        return nextVariant( world, pos, null, vanillaReplacement );
+    }
+    
+    /** Pick a new species from this family, based on the location. */
+    public Species<? extends T> nextVariant( World world, @Nullable BlockPos pos, @Nullable Function<Species<?>, Boolean> selector, Species<? extends T> fallback ) {
+        final Species<?> species = config.GENERAL.specialVariantList.next( world.random, world, pos, selector );
         //noinspection unchecked
-        return species == null ? vanillaReplacement : (Species<? extends T>) species;
+        return species == null ? fallback : (Species<? extends T>) species;
     }
     
     

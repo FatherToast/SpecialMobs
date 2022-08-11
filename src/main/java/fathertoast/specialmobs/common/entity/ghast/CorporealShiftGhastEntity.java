@@ -116,7 +116,7 @@ public class CorporealShiftGhastEntity extends _SpecialGhastEntity {
             return;
         }
         
-        if( !isSilent() ) level.levelEvent( null, References.EVENT_GHAST_SHOOT, blockPosition(), 0 );
+        References.LevelEvent.GHAST_SHOOT.play( this );
         
         final float accelVariance = MathHelper.sqrt( distanceTo( target ) ) * 0.5F * getSpecialData().getRangedAttackSpread();
         final Vector3d lookVec = getViewVector( 1.0F ).scale( getBbWidth() );

@@ -3,6 +3,8 @@ package fathertoast.specialmobs.common.entity.zombie;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
+import fathertoast.specialmobs.common.config.species.HuskZombieSpeciesConfig;
+import fathertoast.specialmobs.common.config.species.SpeciesConfig;
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
@@ -17,6 +19,8 @@ import net.minecraft.util.DamageSource;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.SoundEvents;
 import net.minecraft.world.World;
+
+import java.util.function.Function;
 
 @SpecialMob
 public class HuskZombieEntity extends _SpecialZombieEntity {
@@ -33,6 +37,15 @@ public class HuskZombieEntity extends _SpecialZombieEntity {
                 .size( 1.0625F, 0.6F, 1.95F )
                 .addExperience( 1 );
     }
+    
+    @SpecialMob.ConfigSupplier
+    public static SpeciesConfig createConfig( MobFamily.Species<?> species ) {
+        return new HuskZombieSpeciesConfig( species, DEFAULT_BOW_CHANCE, DEFAULT_SHIELD_CHANCE );
+    }
+    
+    /** @return This entity's species config. */
+    @Override
+    public HuskZombieSpeciesConfig getConfig() { return (HuskZombieSpeciesConfig) getSpecies().config; }
     
     @SpecialMob.AttributeSupplier
     public static AttributeModifierMap.MutableAttribute createAttributes() { return HuskEntity.createAttributes(); }
@@ -71,6 +84,22 @@ public class HuskZombieEntity extends _SpecialZombieEntity {
     @Override
     protected AbstractArrowEntity getVariantArrow( AbstractArrowEntity arrow, ItemStack arrowItem, float damageMulti ) {
         return MobHelper.tipArrow( arrow, Effects.HUNGER );
+    }
+    
+    /** Returns true if the species is not a husk and not damaged by water. */
+    private static final Function<MobFamily.Species<?>, Boolean> HUSK_CONVERSION_SELECTOR =
+            ( species ) -> species != SPECIES && !species.config.GENERAL.isDamagedByWater.get();
+    
+    /** Performs this zombie's drowning conversion. */
+    @Override
+    protected void doUnderWaterConversion() {
+        // Select a random non-husk, non-water-sensitive zombie; defaults to a normal zombie
+        convertToZombieType(
+                getConfig().HUSK.convertVariantChance.rollChance( random, level, blockPosition() ) ?
+                        MobFamily.ZOMBIE.nextVariant( level, blockPosition(), HUSK_CONVERSION_SELECTOR, _SpecialZombieEntity.SPECIES ).entityType.get() :
+                        _SpecialZombieEntity.SPECIES.entityType.get()
+        );
+        References.LevelEvent.HUSK_CONVERTED_TO_ZOMBIE.play( this );
     }
     
     

@@ -34,7 +34,7 @@ public class SkeletonCreeperEntity extends _SpecialCreeperEntity {
     public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
         bestiaryInfo.color( 0xC1C1C1 ).theme( BestiaryInfo.Theme.FOREST )
                 .uniqueTextureBaseOnly()
-                .addExperience( 1 )
+                .addExperience( 1 ).undead()
                 .addToAttribute( Attributes.MAX_HEALTH, -4.0 )
                 .multiplyAttribute( Attributes.MOVEMENT_SPEED, 1.2 );
     }

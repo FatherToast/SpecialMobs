@@ -159,7 +159,7 @@ public class IcyEndermanEntity extends _SpecialEndermanEntity {
             teleportTo( x, y, z );
             
             if( level.noCollision( this ) && !level.containsAnyLiquid( getBoundingBox() ) ) {
-                if( spawnParticles ) level.broadcastEntityEvent( this, References.EVENT_TELEPORT_TRAIL_PARTICLES );
+                if( spawnParticles ) References.EntityEvent.TELEPORT_TRAIL_PARTICLES.broadcast( this );
                 getNavigation().stop();
                 return true;
             }

@@ -431,7 +431,7 @@ public class BestiaryInfo {
         //--------------- Creature Type Templates ----------------
         
         /** Sets the standard species stats implied by being undead. */
-        public Builder undead() { return effectImmune( Effects.REGENERATION, Effects.POISON ); }
+        public Builder undead() { return drownImmune().effectImmune( Effects.REGENERATION, Effects.POISON ); }
         
         /** Sets the standard species stats implied by being a spider. */
         public Builder spider() { return webImmune().effectImmune( Effects.POISON ); }

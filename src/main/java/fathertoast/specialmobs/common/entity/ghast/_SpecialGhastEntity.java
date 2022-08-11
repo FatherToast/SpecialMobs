@@ -106,7 +106,7 @@ public class _SpecialGhastEntity extends GhastEntity implements IRangedAttackMob
     /** Called to attack the target with a ranged attack. */
     @Override
     public void performRangedAttack( LivingEntity target, float damageMulti ) {
-        if( !isSilent() ) level.levelEvent( null, References.EVENT_GHAST_SHOOT, blockPosition(), 0 );
+        References.LevelEvent.GHAST_SHOOT.play( this );
         
         final float accelVariance = MathHelper.sqrt( distanceTo( target ) ) * 0.5F * getSpecialData().getRangedAttackSpread();
         final Vector3d lookVec = getViewVector( 1.0F ).scale( getBbWidth() );
@@ -199,6 +199,18 @@ public class _SpecialGhastEntity extends GhastEntity implements IRangedAttackMob
     /** Sets the experience that should be dropped by this entity. */
     @Override
     public final void setExperience( int xp ) { xpReward = xp; }
+    
+    /** Converts this entity to one of another type. */
+    @Nullable
+    @Override
+    public <T extends MobEntity> T convertTo( EntityType<T> entityType, boolean keepEquipment ) {
+        final T replacement = super.convertTo( entityType, keepEquipment );
+        if( replacement instanceof ISpecialMob && level instanceof IServerWorld ) {
+            MobHelper.finalizeSpawn( replacement, (IServerWorld) level, level.getCurrentDifficultyAt( blockPosition() ),
+                    SpawnReason.CONVERSION, null );
+        }
+        return replacement;
+    }
     
     /** Called on spawn to initialize properties based on the world, difficulty, and the group it spawns with. */
     @Nullable

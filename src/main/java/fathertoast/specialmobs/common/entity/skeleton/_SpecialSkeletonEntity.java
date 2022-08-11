@@ -302,6 +302,18 @@ public class _SpecialSkeletonEntity extends AbstractSkeletonEntity implements IS
     @Override
     public final void setExperience( int xp ) { xpReward = xp; }
     
+    /** Converts this entity to one of another type. */
+    @Nullable
+    @Override
+    public <T extends MobEntity> T convertTo( EntityType<T> entityType, boolean keepEquipment ) {
+        final T replacement = super.convertTo( entityType, keepEquipment );
+        if( replacement instanceof ISpecialMob && level instanceof IServerWorld ) {
+            MobHelper.finalizeSpawn( replacement, (IServerWorld) level, level.getCurrentDifficultyAt( blockPosition() ),
+                    SpawnReason.CONVERSION, null );
+        }
+        return replacement;
+    }
+    
     /** Called on spawn to initialize properties based on the world, difficulty, and the group it spawns with. */
     @Nullable
     @Override

@@ -45,7 +45,7 @@ public class SpecialMobs {
      *  - potions
      *      - vulnerability (opposite of resistance)
      *      ? gravity (opposite of levitation)
-     *  o entities
+     *  - entities
      *      - nbt-driven capabilities (special mob data)
      *      - fish hook
      *      - bug spit
@@ -54,7 +54,7 @@ public class SpecialMobs {
      *  - monster families (see doc for specifics)
      *      - creepers
      *          - chance to spawn charged during thunderstorms
-     *          + scope
+     *          + scope - perhaps delay this until 1.18 where spyglasses will be in the game
      *      - zombies
      *          o villager infection (is this still reasonably applicable?)
      *          + transformations (husk -> any other non-water-sensitive zombie -> any drowned)
