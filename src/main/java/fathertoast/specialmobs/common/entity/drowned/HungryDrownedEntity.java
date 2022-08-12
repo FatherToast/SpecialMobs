@@ -1,10 +1,9 @@
-package fathertoast.specialmobs.common.entity.zombie;
+package fathertoast.specialmobs.common.entity.drowned;
 
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.entity.MobHelper;
-import fathertoast.specialmobs.common.entity.drowned.HungryDrownedEntity;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import net.minecraft.entity.EntityType;
@@ -12,7 +11,6 @@ import net.minecraft.entity.ILivingEntityData;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.entity.monster.ZombieEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Food;
 import net.minecraft.item.ItemStack;
@@ -26,12 +24,12 @@ import net.minecraftforge.event.ForgeEventFactory;
 import javax.annotation.Nullable;
 
 @SpecialMob
-public class HungryZombieEntity extends _SpecialZombieEntity {
+public class HungryDrownedEntity extends _SpecialDrownedEntity {
     
     //--------------- Static Special Mob Hooks ----------------
     
     @SpecialMob.SpeciesReference
-    public static MobFamily.Species<HungryZombieEntity> SPECIES;
+    public static MobFamily.Species<HungryDrownedEntity> SPECIES;
     
     @SpecialMob.BestiaryInfoSupplier
     public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
@@ -44,7 +42,7 @@ public class HungryZombieEntity extends _SpecialZombieEntity {
     
     @SpecialMob.LanguageProvider
     public static String[] getTranslations( String langKey ) {
-        return References.translations( langKey, "Hungry Zombie",
+        return References.translations( langKey, "Drowned Hunger",
                 "", "", "", "", "", "" );//TODO
     }
     
@@ -56,17 +54,17 @@ public class HungryZombieEntity extends _SpecialZombieEntity {
     }
     
     @SpecialMob.Factory
-    public static EntityType.IFactory<HungryZombieEntity> getVariantFactory() { return HungryZombieEntity::new; }
+    public static EntityType.IFactory<HungryDrownedEntity> getVariantFactory() { return HungryDrownedEntity::new; }
     
     /** @return This entity's mob species. */
     @SpecialMob.SpeciesSupplier
     @Override
-    public MobFamily.Species<? extends HungryZombieEntity> getSpecies() { return SPECIES; }
+    public MobFamily.Species<? extends HungryDrownedEntity> getSpecies() { return SPECIES; }
     
     
     //--------------- Variant-Specific Implementations ----------------
     
-    public HungryZombieEntity( EntityType<? extends _SpecialZombieEntity> entityType, World world ) { super( entityType, world ); }
+    public HungryDrownedEntity( EntityType<? extends _SpecialDrownedEntity> entityType, World world ) { super( entityType, world ); }
     
     /** Override to change starting equipment or stats. */
     @Override
@@ -74,10 +72,6 @@ public class HungryZombieEntity extends _SpecialZombieEntity {
                                       @Nullable ILivingEntityData groupData ) {
         setCanPickUpLoot( false );
     }
-    
-    /** Override to change the entity this converts to when drowned. */
-    @Override
-    protected EntityType<? extends ZombieEntity> getVariantConversionType() { return HungryDrownedEntity.SPECIES.entityType.get(); }
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override

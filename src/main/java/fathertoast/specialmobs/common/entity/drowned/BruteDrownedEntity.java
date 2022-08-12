@@ -1,29 +1,24 @@
-package fathertoast.specialmobs.common.entity.zombie;
+package fathertoast.specialmobs.common.entity.drowned;
 
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.entity.MobHelper;
-import fathertoast.specialmobs.common.entity.drowned.BruteDrownedEntity;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.entity.monster.ZombieEntity;
-import net.minecraft.entity.projectile.AbstractArrowEntity;
-import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.potion.Effects;
 import net.minecraft.world.World;
 
 @SpecialMob
-public class BruteZombieEntity extends _SpecialZombieEntity {
+public class BruteDrownedEntity extends _SpecialDrownedEntity {
     
     //--------------- Static Special Mob Hooks ----------------
     
     @SpecialMob.SpeciesReference
-    public static MobFamily.Species<BruteZombieEntity> SPECIES;
+    public static MobFamily.Species<BruteDrownedEntity> SPECIES;
     
     @SpecialMob.BestiaryInfoSupplier
     public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
@@ -36,7 +31,7 @@ public class BruteZombieEntity extends _SpecialZombieEntity {
     
     @SpecialMob.LanguageProvider
     public static String[] getTranslations( String langKey ) {
-        return References.translations( langKey, "Zombie Brute",
+        return References.translations( langKey, "Drowned Brute",
                 "", "", "", "", "", "" );//TODO
     }
     
@@ -48,32 +43,22 @@ public class BruteZombieEntity extends _SpecialZombieEntity {
     }
     
     @SpecialMob.Factory
-    public static EntityType.IFactory<BruteZombieEntity> getVariantFactory() { return BruteZombieEntity::new; }
+    public static EntityType.IFactory<BruteDrownedEntity> getVariantFactory() { return BruteDrownedEntity::new; }
     
     /** @return This entity's mob species. */
     @SpecialMob.SpeciesSupplier
     @Override
-    public MobFamily.Species<? extends BruteZombieEntity> getSpecies() { return SPECIES; }
+    public MobFamily.Species<? extends BruteDrownedEntity> getSpecies() { return SPECIES; }
     
     
     //--------------- Variant-Specific Implementations ----------------
     
-    public BruteZombieEntity( EntityType<? extends _SpecialZombieEntity> entityType, World world ) { super( entityType, world ); }
-    
-    /** Override to change the entity this converts to when drowned. */
-    @Override
-    protected EntityType<? extends ZombieEntity> getVariantConversionType() { return BruteDrownedEntity.SPECIES.entityType.get(); }
+    public BruteDrownedEntity( EntityType<? extends _SpecialDrownedEntity> entityType, World world ) { super( entityType, world ); }
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override
     protected void onVariantAttack( LivingEntity target ) {
         MobHelper.causeLifeLoss( target, 2.0F );
         MobHelper.knockback( this, target, 2.0F, 1.0F );
-    }
-    
-    /** Override to modify this entity's ranged attack projectile. */
-    @Override
-    protected AbstractArrowEntity getVariantArrow( AbstractArrowEntity arrow, ItemStack arrowItem, float damageMulti ) {
-        return MobHelper.tipArrow( arrow, Effects.HARM );
     }
 }

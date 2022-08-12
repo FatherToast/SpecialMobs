@@ -566,6 +566,9 @@ public class BestiaryInfo {
         /** Converts the entity to a fishing rod user by disabling unused ranged attack stats (for a bow user). */
         public Builder convertBowToFishing() { return rangedDamage( -1.0 ).rangedWalkSpeed( -1.0 ); }
         
+        /** Converts the entity to a fishing rod user by disabling unused ranged attack stats (for a throwing item user). */
+        public Builder convertThrowToFishing() { return rangedWalkSpeed( -1.0 ); }
+        
         /** Converts the entity to a fishing rod user by disabling unused ranged attack stats (for a spit shooter). */
         public Builder convertSpitToFishing() { return rangedDamage( -1.0 ).rangedMaxCooldown( -1 ); }
         

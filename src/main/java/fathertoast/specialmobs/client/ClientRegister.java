@@ -54,6 +54,7 @@ public class ClientRegister {
         // Family-based renderers
         registerFamilyRenderers( MobFamily.CREEPER, SpecialCreeperRenderer::new );
         registerFamilyRenderers( MobFamily.ZOMBIE, SpecialZombieRenderer::new );
+        registerFamilyRenderers( MobFamily.DROWNED, SpecialDrownedRenderer::new );
         registerFamilyRenderers( MobFamily.ZOMBIFIED_PIGLIN, SpecialPiglinRenderer::newMissingRightEar );
         registerFamilyRenderers( MobFamily.SKELETON, SpecialSkeletonRenderer::new );
         registerFamilyRenderers( MobFamily.WITHER_SKELETON, SpecialSkeletonRenderer::new );

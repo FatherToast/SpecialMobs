@@ -56,8 +56,7 @@ public class SpecialMobs {
      *          - chance to spawn charged during thunderstorms
      *          + scope - perhaps delay this until 1.18 where spyglasses will be in the game
      *      - zombies
-     *          o villager infection (is this still reasonably applicable?)
-     *          + transformations (husk -> any other non-water-sensitive zombie -> any drowned)
+     *          - transformations (husk -> any other non-water-sensitive zombie -> analogous drowned)
      *          - ranged attack AI (using bow)
      *          - use shields
      *      + drowned

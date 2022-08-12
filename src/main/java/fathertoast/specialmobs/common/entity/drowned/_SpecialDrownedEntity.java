@@ -1,32 +1,28 @@
-package fathertoast.specialmobs.common.entity.zombie;
+package fathertoast.specialmobs.common.entity.drowned;
 
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
+import fathertoast.specialmobs.common.config.species.DrownedSpeciesConfig;
 import fathertoast.specialmobs.common.config.species.SpeciesConfig;
-import fathertoast.specialmobs.common.config.species.ZombieSpeciesConfig;
 import fathertoast.specialmobs.common.entity.ISpecialMob;
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.entity.SpecialMobData;
 import fathertoast.specialmobs.common.entity.ai.AIHelper;
+import fathertoast.specialmobs.common.entity.ai.goal.SpecialDrownedAttackGoal;
 import fathertoast.specialmobs.common.entity.ai.goal.SpecialHurtByTargetGoal;
-import fathertoast.specialmobs.common.entity.drowned._SpecialDrownedEntity;
+import fathertoast.specialmobs.common.entity.ai.goal.SpecialTridentAttackGoal;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.*;
 import net.minecraft.entity.ai.attributes.AttributeModifierMap;
-import net.minecraft.entity.ai.goal.Goal;
-import net.minecraft.entity.ai.goal.RangedBowAttackGoal;
-import net.minecraft.entity.ai.goal.ZombieAttackGoal;
-import net.minecraft.entity.monster.ZombieEntity;
+import net.minecraft.entity.monster.DrownedEntity;
 import net.minecraft.entity.monster.ZombifiedPiglinEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.projectile.AbstractArrowEntity;
-import net.minecraft.entity.projectile.ProjectileHelper;
 import net.minecraft.entity.projectile.SnowballEntity;
+import net.minecraft.entity.projectile.TridentEntity;
 import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.item.BowItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
@@ -45,48 +41,48 @@ import net.minecraft.world.World;
 import javax.annotation.Nullable;
 
 @SpecialMob
-public class _SpecialZombieEntity extends ZombieEntity implements IRangedAttackMob, ISpecialMob<_SpecialZombieEntity> {
+public class _SpecialDrownedEntity extends DrownedEntity implements ISpecialMob<_SpecialDrownedEntity> {
     
     //--------------- Static Special Mob Hooks ----------------
     
     @SpecialMob.SpeciesReference
-    public static MobFamily.Species<_SpecialZombieEntity> SPECIES;
+    public static MobFamily.Species<_SpecialDrownedEntity> SPECIES;
     
     @SpecialMob.BestiaryInfoSupplier
     public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
         bestiaryInfo.color( 0x799C65 )
-                .vanillaTextureBaseOnly( "textures/entity/zombie/zombie.png" )
+                .vanillaTextureWithOverlay( "textures/entity/zombie/drowned.png", "textures/entity/zombie/drowned_outer_layer.png" )
                 .experience( 5 ).undead()
-                .bowAttack( 2.0, 1.4, 0.8, 30, 12.0 );
+                .throwAttack( 1.0, 1.0, 40, 10.0 );
     }
     
-    protected static final double DEFAULT_BOW_CHANCE = 0.05;
-    protected static final double DEFAULT_SHIELD_CHANCE = 0.02;
+    protected static final double DEFAULT_TRIDENT_CHANCE = 0.0625;
+    protected static final double DEFAULT_SHIELD_CHANCE = 0.0625;
     
     @SpecialMob.ConfigSupplier
     public static SpeciesConfig createConfig( MobFamily.Species<?> species ) {
-        return new ZombieSpeciesConfig( species, DEFAULT_BOW_CHANCE, DEFAULT_SHIELD_CHANCE );
+        return new DrownedSpeciesConfig( species, DEFAULT_TRIDENT_CHANCE, DEFAULT_SHIELD_CHANCE );
     }
     
     /** @return This entity's species config. */
-    public ZombieSpeciesConfig getConfig() { return (ZombieSpeciesConfig) getSpecies().config; }
+    public DrownedSpeciesConfig getConfig() { return (DrownedSpeciesConfig) getSpecies().config; }
     
     @SpecialMob.AttributeSupplier
-    public static AttributeModifierMap.MutableAttribute createAttributes() { return ZombieEntity.createAttributes(); }
+    public static AttributeModifierMap.MutableAttribute createAttributes() { return DrownedEntity.createAttributes(); }
     
     @SpecialMob.LanguageProvider
     public static String[] getTranslations( String langKey ) {
-        return References.translations( langKey, "Zombie",
+        return References.translations( langKey, "Drowned",
                 "", "", "", "", "", "" );//TODO
     }
     
     @SpecialMob.LootTableProvider
     public static void addBaseLoot( LootTableBuilder loot ) {
-        loot.addLootTable( "main", EntityType.ZOMBIE.getDefaultLootTable() );
+        loot.addLootTable( "main", EntityType.DROWNED.getDefaultLootTable() );
     }
     
     @SpecialMob.Factory
-    public static EntityType.IFactory<_SpecialZombieEntity> getFactory() { return _SpecialZombieEntity::new; }
+    public static EntityType.IFactory<_SpecialDrownedEntity> getFactory() { return _SpecialDrownedEntity::new; }
     
     
     //--------------- Variant-Specific Breakouts ----------------
@@ -95,8 +91,12 @@ public class _SpecialZombieEntity extends ZombieEntity implements IRangedAttackM
     @Override
     protected void registerGoals() {
         super.registerGoals();
-        AIHelper.removeGoals( goalSelector, ZombieAttackGoal.class );
-        AIHelper.replaceHurtByTarget( this, new SpecialHurtByTargetGoal( this, ZombieEntity.class )
+        
+        // We don't really want to remove the melee attack goal, so just re-add it afterward
+        AIHelper.removeGoals( goalSelector, 2 ); // DrownedEntity.TridentAttackGoal & DrownedEntity.AttackGoal
+        goalSelector.addGoal( 2, new SpecialDrownedAttackGoal( this, 1.0, false ) );
+        
+        AIHelper.replaceHurtByTarget( this, new SpecialHurtByTargetGoal( this, DrownedEntity.class )
                 .setAlertOthers( ZombifiedPiglinEntity.class ) );
         
         registerVariantGoals();
@@ -105,53 +105,9 @@ public class _SpecialZombieEntity extends ZombieEntity implements IRangedAttackM
     /** Override to change this entity's AI goals. */
     protected void registerVariantGoals() { }
     
-    /** Override to change this entity's attack goal priority. */
-    protected int getVariantAttackPriority() { return 2; }
-    
     /** Override to change starting equipment or stats. */
     public void finalizeVariantSpawn( IServerWorld world, DifficultyInstance difficulty, @Nullable SpawnReason spawnReason,
                                       @Nullable ILivingEntityData groupData ) { }
-    
-    /** Performs this zombie's drowning conversion. */
-    @Override
-    protected void doUnderWaterConversion() {
-        convertToZombieType( getVariantConversionType() );
-        References.LevelEvent.ZOMBIE_CONVERTED_TO_DROWNED.play( this );
-    }
-    
-    /** Override to change the entity this converts to when drowned. */
-    protected EntityType<? extends ZombieEntity> getVariantConversionType() { return _SpecialDrownedEntity.SPECIES.entityType.get(); }
-    
-    /** Called to attack the target with a ranged attack. */
-    @Override
-    public void performRangedAttack( LivingEntity target, float damageMulti ) {
-        final ItemStack arrowItem = getProjectile( getItemInHand( ProjectileHelper.getWeaponHoldingHand(
-                this, item -> item instanceof BowItem ) ) );
-        AbstractArrowEntity arrow = getArrow( arrowItem, damageMulti );
-        if( getMainHandItem().getItem() instanceof BowItem )
-            arrow = ((BowItem) getMainHandItem().getItem()).customArrow( arrow );
-        
-        final double dX = target.getX() - getX();
-        final double dY = target.getY( 0.3333 ) - arrow.getY();
-        final double dZ = target.getZ() - getZ();
-        final double dH = MathHelper.sqrt( dX * dX + dZ * dZ );
-        arrow.shoot( dX, dY + dH * 0.2, dZ, 1.6F,
-                getSpecialData().getRangedAttackSpread() * (14 - 4 * level.getDifficulty().getId()) );
-        
-        playSound( SoundEvents.SKELETON_SHOOT, 1.0F, 1.0F / (random.nextFloat() * 0.4F + 0.8F) );
-        level.addFreshEntity( arrow );
-    }
-    
-    /** @return The arrow for this zombie to shoot. */
-    protected AbstractArrowEntity getArrow( ItemStack arrowItem, float damageMulti ) {
-        return getVariantArrow( ProjectileHelper.getMobArrow( this, arrowItem,
-                damageMulti * getSpecialData().getRangedAttackDamage() ), arrowItem, damageMulti );
-    }
-    
-    /** Override to modify this entity's ranged attack projectile. */
-    protected AbstractArrowEntity getVariantArrow( AbstractArrowEntity arrow, ItemStack arrowItem, float damageMulti ) {
-        return arrow;
-    }
     
     /** Called when this entity successfully damages a target to apply on-hit effects. */
     @Override
@@ -173,14 +129,11 @@ public class _SpecialZombieEntity extends ZombieEntity implements IRangedAttackM
     //--------------- Family-Specific Implementations ----------------
     
     /** The parameter for special mob render scale. */
-    private static final DataParameter<Float> SCALE = EntityDataManager.defineId( _SpecialZombieEntity.class, DataSerializers.FLOAT );
+    private static final DataParameter<Float> SCALE = EntityDataManager.defineId( _SpecialDrownedEntity.class, DataSerializers.FLOAT );
     
-    /** This entity's attack AI. */
-    private Goal currentAttackAI;
-    
-    public _SpecialZombieEntity( EntityType<? extends _SpecialZombieEntity> entityType, World world ) {
+    public _SpecialDrownedEntity( EntityType<? extends _SpecialDrownedEntity> entityType, World world ) {
         super( entityType, world );
-        reassessWeaponGoal();
+        recalculateAttackGoal();
         
         getSpecialData().initialize();
     }
@@ -192,49 +145,46 @@ public class _SpecialZombieEntity extends ZombieEntity implements IRangedAttackM
         specialData = new SpecialMobData<>( this, SCALE );
     }
     
-    /** Called to set the item equipped in a particular slot. */
-    @Override
-    public void setItemSlot( EquipmentSlotType slot, ItemStack item ) {
-        super.setItemSlot( slot, item );
-        if( !level.isClientSide ) reassessWeaponGoal();
-    }
-    
-    /** Called to set this entity's attack AI based on current equipment. */
-    public void reassessWeaponGoal() {
+    /** Called to update this entity's attack AI based on NBT data. */
+    public void recalculateAttackGoal() {
         if( level != null && !level.isClientSide ) {
-            if( currentAttackAI != null ) goalSelector.removeGoal( currentAttackAI );
-            
-            final SpecialMobData<_SpecialZombieEntity> data = getSpecialData();
-            final ItemStack weapon = getItemInHand( ProjectileHelper.getWeaponHoldingHand(
-                    this, item -> item instanceof BowItem ) );
-            if( data.getRangedAttackMaxRange() > 0.0F && weapon.getItem() == Items.BOW ) {
-                currentAttackAI = new RangedBowAttackGoal<>( this, data.getRangedWalkSpeed(),
-                        data.getRangedAttackCooldown(), data.getRangedAttackMaxRange() );
+            AIHelper.removeGoals( goalSelector, SpecialTridentAttackGoal.class );
+            if( getSpecialData().getRangedAttackMaxRange() > 0.0F ) {
+                goalSelector.addGoal( 2, new SpecialTridentAttackGoal( this, getSpecialData().getRangedWalkSpeed(),
+                        getSpecialData().getRangedAttackCooldown(), getSpecialData().getRangedAttackMaxRange() ) );
             }
-            else {
-                currentAttackAI = new ZombieAttackGoal( this, 1.0, false );
-            }
-            goalSelector.addGoal( getVariantAttackPriority(), currentAttackAI );
         }
     }
     
-    /** @return True if this zombie can convert in water. */
+    /** Called to attack the target with a ranged attack. */
     @Override
-    protected boolean convertsInWater() { return !isSensitiveToWater(); }
+    public void performRangedAttack( LivingEntity target, float damageMulti ) {
+        final TridentEntity trident = new TridentEntity( level, this, new ItemStack( Items.TRIDENT ) );
+        
+        final double dX = target.getX() - getX();
+        final double dY = target.getY( 0.3333 ) - trident.getY();
+        final double dZ = target.getZ() - getZ();
+        final double dH = MathHelper.sqrt( dX * dX + dZ * dZ );
+        trident.shoot( dX, dY + dH * 0.2, dZ, 1.6F,
+                getSpecialData().getRangedAttackSpread() * (14 - level.getDifficulty().getId() * 4) );
+        
+        playSound( SoundEvents.DROWNED_SHOOT, 1.0F, 1.0F / (getRandom().nextFloat() * 0.4F + 0.8F) );
+        level.addFreshEntity( trident );
+    }
     
     
     //--------------- ISpecialMob Implementation ----------------
     
-    private SpecialMobData<_SpecialZombieEntity> specialData;
+    private SpecialMobData<_SpecialDrownedEntity> specialData;
     
     /** @return This mob's special data. */
     @Override
-    public SpecialMobData<_SpecialZombieEntity> getSpecialData() { return specialData; }
+    public SpecialMobData<_SpecialDrownedEntity> getSpecialData() { return specialData; }
     
     /** @return This entity's mob species. */
     @SpecialMob.SpeciesSupplier
     @Override
-    public MobFamily.Species<? extends _SpecialZombieEntity> getSpecies() { return SPECIES; }
+    public MobFamily.Species<? extends _SpecialDrownedEntity> getSpecies() { return SPECIES; }
     
     /** @return The experience that should be dropped by this entity. */
     @Override
@@ -273,15 +223,26 @@ public class _SpecialZombieEntity extends ZombieEntity implements IRangedAttackM
     @Override
     public void finalizeSpecialSpawn( IServerWorld world, DifficultyInstance difficulty, @Nullable SpawnReason spawnReason,
                                       @Nullable ILivingEntityData groupData ) {
-        if( getSpecialData().getRangedAttackMaxRange() > 0.0F && getConfig().ZOMBIES.bowEquipChance.rollChance( random ) ) {
-            setItemSlot( EquipmentSlotType.MAINHAND, new ItemStack( Items.BOW ) );
+        // Completely re-roll held item
+        final ItemStack heldItem = getItemBySlot( EquipmentSlotType.MAINHAND );
+        if( heldItem.isEmpty() || heldItem.getItem() == Items.TRIDENT || heldItem.getItem() == Items.FISHING_ROD ) {
+            final double heldItemChoice = random.nextDouble();
+            if( getSpecialData().getRangedAttackMaxRange() > 0.0F && heldItemChoice < getConfig().DROWNED.tridentEquipChance.get() ) {
+                setItemSlot( EquipmentSlotType.MAINHAND, new ItemStack( Items.TRIDENT ) );
+            }
+            else if( heldItemChoice >= 0.9625 ) { // Vanilla's 3.75% chance; not configurable because not important
+                setItemSlot( EquipmentSlotType.MAINHAND, new ItemStack( Items.FISHING_ROD ) );
+            }
+            else {
+                setItemSlot( EquipmentSlotType.MAINHAND, ItemStack.EMPTY );
+            }
         }
-        else if( getConfig().ZOMBIES.shieldEquipChance.rollChance( random ) ) {
+        
+        if( getConfig().DROWNED.shieldEquipChance.rollChance( random ) ) {
             setItemSlot( EquipmentSlotType.OFFHAND, new ItemStack( Items.SHIELD ) );
         }
         
         finalizeVariantSpawn( world, difficulty, spawnReason, groupData );
-        reassessWeaponGoal();
     }
     
     
@@ -384,6 +345,6 @@ public class _SpecialZombieEntity extends ZombieEntity implements IRangedAttackM
         getSpecialData().readFromNBT( saveTag );
         readVariantSaveData( saveTag );
         
-        reassessWeaponGoal();
+        recalculateAttackGoal();
     }
 }

@@ -12,6 +12,7 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.AttributeModifierMap;
 import net.minecraft.entity.monster.HuskEntity;
+import net.minecraft.entity.monster.ZombieEntity;
 import net.minecraft.entity.projectile.AbstractArrowEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.Effects;
@@ -93,13 +94,17 @@ public class HuskZombieEntity extends _SpecialZombieEntity {
     /** Performs this zombie's drowning conversion. */
     @Override
     protected void doUnderWaterConversion() {
-        // Select a random non-husk, non-water-sensitive zombie; defaults to a normal zombie
-        convertToZombieType(
-                getConfig().HUSK.convertVariantChance.rollChance( random, level, blockPosition() ) ?
-                        MobFamily.ZOMBIE.nextVariant( level, blockPosition(), HUSK_CONVERSION_SELECTOR, _SpecialZombieEntity.SPECIES ).entityType.get() :
-                        _SpecialZombieEntity.SPECIES.entityType.get()
-        );
+        convertToZombieType( getVariantConversionType() );
         References.LevelEvent.HUSK_CONVERTED_TO_ZOMBIE.play( this );
+    }
+    
+    /** Override to change the entity this converts to when drowned. */
+    @Override
+    protected EntityType<? extends ZombieEntity> getVariantConversionType() {
+        // Select a random non-husk, non-water-sensitive zombie; defaults to a normal zombie
+        return getConfig().HUSK.convertVariantChance.rollChance( random, level, blockPosition() ) ?
+                MobFamily.ZOMBIE.nextVariant( level, blockPosition(), HUSK_CONVERSION_SELECTOR, _SpecialZombieEntity.SPECIES ).entityType.get() :
+                _SpecialZombieEntity.SPECIES.entityType.get();
     }
     
     

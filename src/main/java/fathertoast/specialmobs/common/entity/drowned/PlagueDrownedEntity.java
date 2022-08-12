@@ -1,29 +1,25 @@
-package fathertoast.specialmobs.common.entity.zombie;
+package fathertoast.specialmobs.common.entity.drowned;
 
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.entity.MobHelper;
-import fathertoast.specialmobs.common.entity.drowned.PlagueDrownedEntity;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.entity.monster.ZombieEntity;
-import net.minecraft.entity.projectile.AbstractArrowEntity;
-import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.world.World;
 
 @SpecialMob
-public class PlagueZombieEntity extends _SpecialZombieEntity {
+public class PlagueDrownedEntity extends _SpecialDrownedEntity {
     
     //--------------- Static Special Mob Hooks ----------------
     
     @SpecialMob.SpeciesReference
-    public static MobFamily.Species<PlagueZombieEntity> SPECIES;
+    public static MobFamily.Species<PlagueDrownedEntity> SPECIES;
     
     @SpecialMob.BestiaryInfoSupplier
     public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
@@ -35,7 +31,7 @@ public class PlagueZombieEntity extends _SpecialZombieEntity {
     
     @SpecialMob.LanguageProvider
     public static String[] getTranslations( String langKey ) {
-        return References.translations( langKey, "Plague Zombie",
+        return References.translations( langKey, "Drowned Plague",
                 "", "", "", "", "", "" );//TODO
     }
     
@@ -47,31 +43,21 @@ public class PlagueZombieEntity extends _SpecialZombieEntity {
     }
     
     @SpecialMob.Factory
-    public static EntityType.IFactory<PlagueZombieEntity> getVariantFactory() { return PlagueZombieEntity::new; }
+    public static EntityType.IFactory<PlagueDrownedEntity> getVariantFactory() { return PlagueDrownedEntity::new; }
     
     /** @return This entity's mob species. */
     @SpecialMob.SpeciesSupplier
     @Override
-    public MobFamily.Species<? extends PlagueZombieEntity> getSpecies() { return SPECIES; }
+    public MobFamily.Species<? extends PlagueDrownedEntity> getSpecies() { return SPECIES; }
     
     
     //--------------- Variant-Specific Implementations ----------------
     
-    public PlagueZombieEntity( EntityType<? extends _SpecialZombieEntity> entityType, World world ) { super( entityType, world ); }
-    
-    /** Override to change the entity this converts to when drowned. */
-    @Override
-    protected EntityType<? extends ZombieEntity> getVariantConversionType() { return PlagueDrownedEntity.SPECIES.entityType.get(); }
+    public PlagueDrownedEntity( EntityType<? extends _SpecialDrownedEntity> entityType, World world ) { super( entityType, world ); }
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override
     protected void onVariantAttack( LivingEntity target ) {
         MobHelper.applyPlagueEffect( target, random );
-    }
-    
-    /** Override to modify this entity's ranged attack projectile. */
-    @Override
-    protected AbstractArrowEntity getVariantArrow( AbstractArrowEntity arrow, ItemStack arrowItem, float damageMulti ) {
-        return MobHelper.tipPlagueArrow( arrow, random );
     }
 }
