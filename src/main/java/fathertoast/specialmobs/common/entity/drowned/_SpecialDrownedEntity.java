@@ -131,6 +131,8 @@ public class _SpecialDrownedEntity extends DrownedEntity implements ISpecialMob<
     /** The parameter for special mob render scale. */
     private static final DataParameter<Float> SCALE = EntityDataManager.defineId( _SpecialDrownedEntity.class, DataSerializers.FLOAT );
     
+    private boolean needsToBeDeeper;
+    
     public _SpecialDrownedEntity( EntityType<? extends _SpecialDrownedEntity> entityType, World world ) {
         super( entityType, world );
         recalculateAttackGoal();
@@ -170,6 +172,35 @@ public class _SpecialDrownedEntity extends DrownedEntity implements ISpecialMob<
         
         playSound( SoundEvents.DROWNED_SHOOT, 1.0F, 1.0F / (getRandom().nextFloat() * 0.4F + 0.8F) );
         level.addFreshEntity( trident );
+    }
+    
+    /** Called each tick to update this entity's swimming state. */
+    @Override
+    public void updateSwimming() {
+        if( !level.isClientSide && isEffectiveAi() ) needsToBeDeeper = true;
+        super.updateSwimming();
+    }
+    
+    /** Moves this entity in the desired direction. Input magnitude of < 1 scales down movement speed. */
+    @Override
+    public void travel( Vector3d input ) {
+        if( isEffectiveAi() ) needsToBeDeeper = true;
+        super.travel( input );
+    }
+    
+    /** @return Water drag coefficient. */
+    @Override
+    protected float getWaterSlowDown() { return 0.9F; } // Improve mobility in shallow water
+    
+    /** @return True if this entity is in water. */
+    @Override
+    public boolean isInWater() {
+        // Hacky way to fix vanilla drowned AI breaking in shallow water
+        if( needsToBeDeeper ) {
+            needsToBeDeeper = false;
+            return isUnderWater();
+        }
+        return super.isInWater();
     }
     
     

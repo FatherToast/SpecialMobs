@@ -82,7 +82,6 @@ public class SpecialMobs {
      *          + natural spawning
      *      - silverfish
      *          - ranged attack AI (spitter)
-     *          + puffer
      *      - endermen
      *      - witches
      *          - ability to equip held items (wonky)

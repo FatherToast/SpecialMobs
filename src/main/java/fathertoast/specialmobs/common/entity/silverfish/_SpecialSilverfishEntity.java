@@ -89,6 +89,8 @@ public class _SpecialSilverfishEntity extends SilverfishEntity implements IRange
         super.registerGoals();
         goalSelector.addGoal( 4, new PassiveRangedAttackGoal<>( this ) );
         AIHelper.replaceHurtByTarget( this, new SpecialHurtByTargetGoal( this, SilverfishEntity.class ).setAlertOthers() );
+        // Someday, it would be nice to replace SilverfishEntity.HideInStoneGoal with one that
+        // expands the allowed stone types and preserves species on hide/reveal
         
         registerVariantGoals();
     }

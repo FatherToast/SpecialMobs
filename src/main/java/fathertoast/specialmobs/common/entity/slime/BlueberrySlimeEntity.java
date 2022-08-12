@@ -3,21 +3,20 @@ package fathertoast.specialmobs.common.entity.slime;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
-import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.entity.ai.AIHelper;
-import fathertoast.specialmobs.common.entity.ai.FluidPathNavigator;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
+import net.minecraft.block.FlowingFluidBlock;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.fluid.Fluid;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.particles.IParticleData;
 import net.minecraft.particles.ParticleTypes;
-import net.minecraft.pathfinding.PathNavigator;
 import net.minecraft.pathfinding.PathNodeType;
 import net.minecraft.tags.FluidTags;
+import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.world.World;
 
 @SpecialMob
@@ -71,21 +70,28 @@ public class BlueberrySlimeEntity extends _SpecialSlimeEntity {
         AIHelper.removeGoals( goalSelector, 1 ); // SlimeEntity.FloatGoal
     }
     
-    /** @return A new path navigator for this entity to use. */
-    @Override
-    protected PathNavigator createNavigation( World world ) {
-        return new FluidPathNavigator( this, world, true, false );
-    }
-    
-    /** @return Whether this entity can stand on a particular type of fluid. */
-    @Override
-    public boolean canStandOnFluid( Fluid fluid ) { return fluid.is( FluidTags.WATER ); }
-    
     /** Called each tick to update this entity. */
     @Override
     public void tick() {
         super.tick();
-        MobHelper.floatInFluid( this, 0.06, FluidTags.WATER );
+        
+        // Hacky way of attacking submerged targets; drop down on them when directly above
+        double floatAccel = 0.06;
+        final LivingEntity target = getTarget();
+        if( target != null && target.getY( 0.5 ) < getY( 0.5 ) ) {
+            //
+            final double dX = target.getX() - getX();
+            final double dZ = target.getZ() - getZ();
+            final float range = (target.getBbWidth() + getBbWidth() + 0.1F) / 2.0F;
+            if( dX * dX + dZ * dZ < range * range )
+                floatAccel = -0.12;
+        }
+        if( tickCount > 1 && getFluidHeight( FluidTags.WATER ) > 0.0 ) {
+            if( !ISelectionContext.of( this ).isAbove( FlowingFluidBlock.STABLE_SHAPE, blockPosition(), true ) ||
+                    level.getFluidState( blockPosition().above() ).is( FluidTags.WATER ) ) {
+                setDeltaMovement( getDeltaMovement().scale( 0.5 ).add( 0.0, floatAccel, 0.0 ) );
+            }
+        }
     }
     
     // The below two methods are here to effectively override the private Entity#isInRain to always return true (always wet)
@@ -94,6 +100,10 @@ public class BlueberrySlimeEntity extends _SpecialSlimeEntity {
     
     @Override
     public boolean isInWaterRainOrBubble() { return true; }
+    
+    /** @return Water drag coefficient. */
+    @Override
+    protected float getWaterSlowDown() { return 0.9F; }
     
     /** Override to load data from this entity's NBT data. */
     @Override

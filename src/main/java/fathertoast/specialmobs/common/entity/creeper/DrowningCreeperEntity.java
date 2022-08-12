@@ -3,6 +3,11 @@ package fathertoast.specialmobs.common.entity.creeper;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
+import fathertoast.specialmobs.common.entity.ai.AIHelper;
+import fathertoast.specialmobs.common.entity.ai.AmphibiousMovementController;
+import fathertoast.specialmobs.common.entity.ai.IAmphibiousMob;
+import fathertoast.specialmobs.common.entity.ai.goal.AmphibiousGoToWaterGoal;
+import fathertoast.specialmobs.common.entity.ai.goal.AmphibiousSwimUpGoal;
 import fathertoast.specialmobs.common.util.ExplosionHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootEntryItemBuilder;
@@ -11,18 +16,26 @@ import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.MoverType;
 import net.minecraft.entity.ai.attributes.Attributes;
+import net.minecraft.entity.ai.goal.SwimGoal;
 import net.minecraft.entity.passive.fish.PufferfishEntity;
 import net.minecraft.item.Items;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.pathfinding.GroundPathNavigator;
+import net.minecraft.pathfinding.PathNodeType;
+import net.minecraft.pathfinding.SwimmerPathNavigator;
 import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.IServerWorld;
 import net.minecraft.world.World;
 
 @SpecialMob
-public class DrowningCreeperEntity extends _SpecialCreeperEntity {
+public class DrowningCreeperEntity extends _SpecialCreeperEntity implements IAmphibiousMob {
     
     //--------------- Static Special Mob Hooks ----------------
     
@@ -66,7 +79,23 @@ public class DrowningCreeperEntity extends _SpecialCreeperEntity {
     
     //--------------- Variant-Specific Implementations ----------------
     
-    public DrowningCreeperEntity( EntityType<? extends _SpecialCreeperEntity> entityType, World world ) { super( entityType, world ); }
+    public DrowningCreeperEntity( EntityType<? extends _SpecialCreeperEntity> entityType, World world ) {
+        super( entityType, world );
+        moveControl = new AmphibiousMovementController<>( this );
+        waterNavigation = new SwimmerPathNavigator( this, world );
+        groundNavigation = new GroundPathNavigator( this, world );
+        maxUpStep = 1.0F;
+        setPathfindingMalus( PathNodeType.WATER, PathNodeType.WALKABLE.getMalus() );
+    }
+    
+    /** Override to change this entity's AI goals. */
+    @Override
+    protected void registerVariantGoals() {
+        AIHelper.removeGoals( goalSelector, SwimGoal.class );
+        AIHelper.insertGoal( goalSelector, 5, new AmphibiousGoToWaterGoal<>( this, 1.0 ).alwaysEnabled() );
+        AIHelper.insertGoal( goalSelector, 6, new AmphibiousSwimUpGoal<>( this, 1.0 ) );
+        AIHelper.replaceWaterAvoidingRandomWalking( this, 0.8 );
+    }
     
     /** Override to change this creeper's explosion power multiplier. */
     @Override
@@ -92,7 +121,7 @@ public class DrowningCreeperEntity extends _SpecialCreeperEntity {
         final int rMinusOneSq = (radius - 1) * (radius - 1);
         final BlockPos center = new BlockPos( explosion.getPos() );
         
-        // Track how many pufferfish have been spawned
+        // Track how many pufferfish have been spawned so we don't spawn a bunch of them
         spawnPufferfish( center.above( 1 ) );
         int pufferCount = 1;
         
@@ -123,8 +152,7 @@ public class DrowningCreeperEntity extends _SpecialCreeperEntity {
                                     // Water fill
                                     level.setBlock( pos, water, References.SetBlockFlags.DEFAULTS );
                                     
-                                    // Prevent greater radiuses from spawning a bazillion pufferfish
-                                    if( random.nextFloat() < 0.01F && pufferCount < 10 ) {
+                                    if( random.nextFloat() < 0.0075F && pufferCount < 5 ) {
                                         spawnPufferfish( pos );
                                         pufferCount++;
                                     }
@@ -153,4 +181,72 @@ public class DrowningCreeperEntity extends _SpecialCreeperEntity {
     
     @Override
     public boolean isInWaterRainOrBubble() { return true; }
+    
+    /** Override to load data from this entity's NBT data. */
+    @Override
+    public void readVariantSaveData( CompoundNBT saveTag ) {
+        setPathfindingMalus( PathNodeType.WATER, PathNodeType.WALKABLE.getMalus() );
+    }
+    
+    
+    //--------------- IAmphibiousMob Implementation ----------------
+    
+    private final SwimmerPathNavigator waterNavigation;
+    private final GroundPathNavigator groundNavigation;
+    
+    private boolean swimmingUp;
+    
+    /** Called each tick to update this entity's swimming state. */
+    @Override
+    public void updateSwimming() {
+        if( !level.isClientSide ) {
+            if( isEffectiveAi() && isUnderWater() && shouldSwim() ) {
+                setNavigatorToSwim();
+                setSwimming( true );
+            }
+            else {
+                setNavigatorToGround();
+                setSwimming( false );
+            }
+        }
+    }
+    
+    /** Moves this entity in the desired direction. Input magnitude of < 1 scales down movement speed. */
+    @Override
+    public void travel( Vector3d input ) {
+        if( isEffectiveAi() && isUnderWater() && shouldSwim() ) {
+            moveRelative( 0.01F, input );
+            move( MoverType.SELF, getDeltaMovement() );
+            setDeltaMovement( getDeltaMovement().scale( 0.9 ) );
+        }
+        else super.travel( input );
+    }
+    
+    /** @return Water drag coefficient. */
+    @Override
+    protected float getWaterSlowDown() { return 0.9F; }
+    
+    /** @return True if this mob should use its swimming navigator for its current goal. */
+    @Override
+    public boolean shouldSwim() {
+        if( swimmingUp ) return true;
+        final LivingEntity target = getTarget();
+        return target != null && target.isInWater();
+    }
+    
+    /** Sets whether this mob should swim upward. */
+    @Override
+    public void setSwimmingUp( boolean value ) { swimmingUp = value; }
+    
+    /** @return True if this mob should swim upward. */
+    @Override
+    public boolean isSwimmingUp() { return swimmingUp; }
+    
+    /** Sets this mob's current navigator to swimming mode. */
+    @Override
+    public void setNavigatorToSwim() { navigation = waterNavigation; }
+    
+    /** Sets this mob's current navigator to ground mode. */
+    @Override
+    public void setNavigatorToGround() { navigation = groundNavigation; }
 }

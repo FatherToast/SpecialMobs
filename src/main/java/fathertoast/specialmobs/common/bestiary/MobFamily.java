@@ -86,7 +86,7 @@ public class MobFamily<T extends LivingEntity, V extends FamilyConfig> {
     public static final MobFamily<SilverfishEntity, SilverfishFamilyConfig> SILVERFISH = new MobFamily<>( SilverfishFamilyConfig::new,
             "Silverfish", "silverfish", 0x6E6E6E, new EntityType[] { EntityType.SILVERFISH },
             "Albino", "Blinding", "Desiccated", "Fire", "Fishing", "Flying", "Poison", "Puffer", "Tough"
-    );//TODO puffer
+    );
     
     public static final MobFamily<EndermanEntity, FamilyConfig> ENDERMAN = new MobFamily<>( FamilyConfig::new,
             "Enderman", "endermen", 0x161616, new EntityType[] { EntityType.ENDERMAN },
