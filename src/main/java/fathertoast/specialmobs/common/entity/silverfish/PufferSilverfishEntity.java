@@ -25,7 +25,7 @@ public class PufferSilverfishEntity extends AmphibiousSilverfishEntity {
     
     @SpecialMob.BestiaryInfoSupplier
     public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
-        bestiaryInfo.color( 0xE6E861 ).theme( BestiaryInfo.Theme.WATER )
+        bestiaryInfo.color( 0xE6E861 ).weight( BestiaryInfo.DefaultWeight.LOW ).theme( BestiaryInfo.Theme.WATER )
                 .uniqueTextureBaseOnly()
                 .addExperience( 1 ).drownImmune().effectImmune( Effects.POISON );
     }

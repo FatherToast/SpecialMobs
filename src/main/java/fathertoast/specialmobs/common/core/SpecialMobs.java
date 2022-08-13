@@ -59,7 +59,9 @@ public class SpecialMobs {
      *          - transformations (husk -> any other non-water-sensitive zombie -> analogous drowned)
      *          - ranged attack AI (using bow)
      *          - use shields
-     *      + drowned
+     *      - drowned
+     *          - AI functions in shallow water
+     *          - use shields
      *      - zombified piglins
      *          - ranged attack AI (using bow)
      *          + ranged attack AI (using crossbow)
