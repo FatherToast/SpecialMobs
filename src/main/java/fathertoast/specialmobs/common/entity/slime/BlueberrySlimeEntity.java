@@ -4,9 +4,11 @@ import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.entity.ai.AIHelper;
+import fathertoast.specialmobs.common.event.NaturalSpawnManager;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import net.minecraft.block.FlowingFluidBlock;
+import net.minecraft.entity.EntitySpawnPlacementRegistry;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.Attributes;
@@ -17,6 +19,7 @@ import net.minecraft.particles.ParticleTypes;
 import net.minecraft.pathfinding.PathNodeType;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.util.math.shapes.ISelectionContext;
+import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
 
 @SpecialMob
@@ -34,6 +37,16 @@ public class BlueberrySlimeEntity extends _SpecialSlimeEntity {
                 .addExperience( 1 ).drownImmune().fluidPushImmune()
                 .addToAttribute( Attributes.ATTACK_DAMAGE, 2.0 );
     }
+    
+    @SpecialMob.SpawnPlacementRegistrar
+    public static void registerSpeciesSpawnPlacement( MobFamily.Species<? extends BlueberrySlimeEntity> species ) {
+        NaturalSpawnManager.registerSpawnPlacement( species, EntitySpawnPlacementRegistry.PlacementType.IN_WATER,
+                _SpecialSlimeEntity::checkFamilySpawnRules );
+    }
+    
+    /** @return True if this entity's position is currently obstructed. */
+    @Override
+    public boolean checkSpawnObstruction( IWorldReader world ) { return world.isUnobstructed( this ); }
     
     @SpecialMob.LanguageProvider
     public static String[] getTranslations( String langKey ) {

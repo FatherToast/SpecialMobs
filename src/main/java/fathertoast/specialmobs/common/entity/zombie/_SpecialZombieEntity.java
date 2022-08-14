@@ -11,6 +11,7 @@ import fathertoast.specialmobs.common.entity.SpecialMobData;
 import fathertoast.specialmobs.common.entity.ai.AIHelper;
 import fathertoast.specialmobs.common.entity.ai.goal.SpecialHurtByTargetGoal;
 import fathertoast.specialmobs.common.entity.drowned._SpecialDrownedEntity;
+import fathertoast.specialmobs.common.event.NaturalSpawnManager;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import net.minecraft.block.BlockState;
@@ -73,6 +74,11 @@ public class _SpecialZombieEntity extends ZombieEntity implements IRangedAttackM
     
     @SpecialMob.AttributeSupplier
     public static AttributeModifierMap.MutableAttribute createAttributes() { return ZombieEntity.createAttributes(); }
+    
+    @SpecialMob.SpawnPlacementRegistrar
+    public static void registerSpawnPlacement( MobFamily.Species<? extends _SpecialZombieEntity> species ) {
+        NaturalSpawnManager.registerSpawnPlacement( species );
+    }
     
     @SpecialMob.LanguageProvider
     public static String[] getTranslations( String langKey ) {
@@ -297,7 +303,7 @@ public class _SpecialZombieEntity extends ZombieEntity implements IRangedAttackM
     /** @return The eye height of this entity when standing. */
     @Override
     protected float getStandingEyeHeight( Pose pose, EntitySize size ) {
-        return super.getStandingEyeHeight( pose, size ) * getSpecialData().getBaseScale();// * (isBaby() ? 0.53448F : 1.0F); - Handled in super
+        return super.getStandingEyeHeight( pose, size ) * getSpecialData().getHeightScale(); // Age handled in super
     }
     
     /** @return Whether this entity is immune to fire damage. */

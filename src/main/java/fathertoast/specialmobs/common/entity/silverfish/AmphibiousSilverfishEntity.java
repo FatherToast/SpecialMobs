@@ -1,7 +1,11 @@
 package fathertoast.specialmobs.common.entity.silverfish;
 
+import fathertoast.specialmobs.common.bestiary.MobFamily;
+import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.entity.ai.AmphibiousMovementController;
 import fathertoast.specialmobs.common.entity.ai.IAmphibiousMob;
+import fathertoast.specialmobs.common.event.NaturalSpawnManager;
+import net.minecraft.entity.EntitySpawnPlacementRegistry;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MoverType;
@@ -10,12 +14,24 @@ import net.minecraft.pathfinding.GroundPathNavigator;
 import net.minecraft.pathfinding.PathNodeType;
 import net.minecraft.pathfinding.SwimmerPathNavigator;
 import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
 
 /**
  * A bare-bones implementation of an amphibious silverfish. Just fix the AI and it's good to go.
  */
 public abstract class AmphibiousSilverfishEntity extends _SpecialSilverfishEntity implements IAmphibiousMob {
+    
+    @SpecialMob.SpawnPlacementRegistrar
+    public static void registerSpeciesSpawnPlacement( MobFamily.Species<? extends AmphibiousSilverfishEntity> species ) {
+        NaturalSpawnManager.registerSpawnPlacement( species, EntitySpawnPlacementRegistry.PlacementType.IN_WATER,
+                _SpecialSilverfishEntity::checkFamilySpawnRules );
+    }
+    
+    /** @return True if this entity's position is currently obstructed. */
+    @Override
+    public boolean checkSpawnObstruction( IWorldReader world ) { return world.isUnobstructed( this ); }
+    
     
     private final SwimmerPathNavigator waterNavigation;
     private final GroundPathNavigator groundNavigation;

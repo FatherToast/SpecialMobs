@@ -6,6 +6,7 @@ import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.entity.ISpecialMob;
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.entity.SpecialMobData;
+import fathertoast.specialmobs.common.event.NaturalSpawnManager;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import net.minecraft.block.BlockState;
@@ -23,12 +24,14 @@ import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.util.DamageSource;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.IServerWorld;
 import net.minecraft.world.World;
 
 import javax.annotation.Nullable;
+import java.util.Random;
 
 @SpecialMob
 public class _SpecialSlimeEntity extends SlimeEntity implements ISpecialMob<_SpecialSlimeEntity> {
@@ -48,6 +51,18 @@ public class _SpecialSlimeEntity extends SlimeEntity implements ISpecialMob<_Spe
     @SpecialMob.AttributeSupplier
     public static AttributeModifierMap.MutableAttribute createAttributes() {
         return MonsterEntity.createMonsterAttributes(); // Slimes define their attributes elsewhere based on size
+    }
+    
+    @SpecialMob.SpawnPlacementRegistrar
+    public static void registerSpawnPlacement( MobFamily.Species<? extends _SpecialSlimeEntity> species ) {
+        NaturalSpawnManager.registerSpawnPlacement( species, _SpecialSlimeEntity::checkFamilySpawnRules );
+    }
+    
+    public static boolean checkFamilySpawnRules( EntityType<? extends SlimeEntity> type, IServerWorld world,
+                                                 SpawnReason reason, BlockPos pos, Random random ) {
+        //noinspection unchecked
+        return SlimeEntity.checkSlimeSpawnRules( (EntityType<SlimeEntity>) type, world, reason, pos, random ) &&
+                NaturalSpawnManager.checkSpawnRulesConfigured( type, world, reason, pos, random );
     }
     
     @SpecialMob.LanguageProvider
@@ -212,11 +227,11 @@ public class _SpecialSlimeEntity extends SlimeEntity implements ISpecialMob<_Spe
         getSpecialData().tick();
     }
     
-    /** @return The eye height of this entity when standing. */
-    @Override
-    protected float getStandingEyeHeight( Pose pose, EntitySize size ) {
-        return super.getStandingEyeHeight( pose, size ) * getSpecialData().getBaseScale() * (isBaby() ? 0.53448F : 1.0F);
-    }
+    //    /** @return The eye height of this entity when standing. */
+    //    @Override
+    //    protected float getStandingEyeHeight( Pose pose, EntitySize size ) {
+    //        return super.getStandingEyeHeight( pose, size ) * getSpecialData().getHeightScaleByAge();
+    //    }
     
     /** @return Whether this entity is immune to fire damage. */
     @Override

@@ -10,6 +10,7 @@ import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.entity.SpecialMobData;
 import fathertoast.specialmobs.common.entity.ai.AIHelper;
 import fathertoast.specialmobs.common.entity.ai.goal.SpecialHurtByTargetGoal;
+import fathertoast.specialmobs.common.event.NaturalSpawnManager;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import net.minecraft.block.BlockState;
@@ -34,6 +35,7 @@ import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.SoundEvents;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.DifficultyInstance;
@@ -41,6 +43,7 @@ import net.minecraft.world.IServerWorld;
 import net.minecraft.world.World;
 
 import javax.annotation.Nullable;
+import java.util.Random;
 
 @SpecialMob
 public class _SpecialZombifiedPiglinEntity extends ZombifiedPiglinEntity implements IRangedAttackMob, ISpecialMob<_SpecialZombifiedPiglinEntity> {
@@ -71,6 +74,18 @@ public class _SpecialZombifiedPiglinEntity extends ZombifiedPiglinEntity impleme
     
     @SpecialMob.AttributeSupplier
     public static AttributeModifierMap.MutableAttribute createAttributes() { return ZombifiedPiglinEntity.createAttributes(); }
+    
+    @SpecialMob.SpawnPlacementRegistrar
+    public static void registerSpawnPlacement( MobFamily.Species<? extends _SpecialZombifiedPiglinEntity> species ) {
+        NaturalSpawnManager.registerSpawnPlacement( species, _SpecialZombifiedPiglinEntity::checkFamilySpawnRules );
+    }
+    
+    public static boolean checkFamilySpawnRules( EntityType<? extends ZombifiedPiglinEntity> type, IServerWorld world,
+                                                 SpawnReason reason, BlockPos pos, Random random ) {
+        //noinspection unchecked
+        return ZombifiedPiglinEntity.checkZombifiedPiglinSpawnRules( (EntityType<ZombifiedPiglinEntity>) type, world, reason, pos, random ) &&
+                NaturalSpawnManager.checkSpawnRulesConfigured( type, world, reason, pos, random );
+    }
     
     @SpecialMob.LanguageProvider
     public static String[] getTranslations( String langKey ) {
@@ -280,7 +295,7 @@ public class _SpecialZombifiedPiglinEntity extends ZombifiedPiglinEntity impleme
     /** @return The eye height of this entity when standing. */
     @Override
     protected float getStandingEyeHeight( Pose pose, EntitySize size ) {
-        return super.getStandingEyeHeight( pose, size ) * getSpecialData().getBaseScale();// * (isBaby() ? 0.53448F : 1.0F); - Handled in super
+        return super.getStandingEyeHeight( pose, size ) * getSpecialData().getHeightScale(); // Age handled in super
     }
     
     /** @return Whether this entity is immune to fire damage. */

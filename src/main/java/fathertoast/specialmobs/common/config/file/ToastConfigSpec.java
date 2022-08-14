@@ -8,8 +8,10 @@ import com.electronwill.nightconfig.core.io.ParsingException;
 import com.electronwill.nightconfig.core.io.WritingException;
 import fathertoast.specialmobs.common.config.field.*;
 import fathertoast.specialmobs.common.config.util.ConfigUtil;
+import fathertoast.specialmobs.common.config.util.RestartNote;
 import fathertoast.specialmobs.common.core.SpecialMobs;
 
+import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -315,10 +317,10 @@ public class ToastConfigSpec {
         private final AbstractConfigField FIELD;
         
         /** Create a new field action that will load/create and save the field value. */
-        private Field( ToastConfigSpec parent, AbstractConfigField field ) {
+        private Field( ToastConfigSpec parent, AbstractConfigField field, @Nullable RestartNote restartNote ) {
             PARENT = parent;
             FIELD = field;
-            FIELD.finalizeComment();
+            FIELD.finalizeComment( restartNote );
         }
         
         /** Called when the config is loaded. */
@@ -352,14 +354,21 @@ public class ToastConfigSpec {
      * @param field The field to define in this config spec.
      * @return The same field for convenience in constructing.
      */
-    public <T extends AbstractConfigField> T define( T field ) {
+    public <T extends AbstractConfigField> T define( T field ) { return define( field, null ); }
+    
+    /**
+     * @param field       The field to define in this config spec.
+     * @param restartNote Note to provide for the field's restart requirements.
+     * @return The same field for convenience in constructing.
+     */
+    public <T extends AbstractConfigField> T define( T field, @Nullable RestartNote restartNote ) {
         // Double check just to make sure we don't screw up the spec
         for( Action action : ACTIONS ) {
             if( action instanceof Field && field.getKey().equalsIgnoreCase( ((Field) action).FIELD.getKey() ) ) {
                 throw new IllegalStateException( "Attempted to register duplicate field key '" + field.getKey() + "' in config " + NAME );
             }
         }
-        ACTIONS.add( new Field( this, field ) );
+        ACTIONS.add( new Field( this, field, restartNote ) );
         return field;
     }
     

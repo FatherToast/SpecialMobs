@@ -5,16 +5,17 @@ import fathertoast.specialmobs.common.config.Config;
 import fathertoast.specialmobs.common.core.register.SMEffects;
 import fathertoast.specialmobs.common.core.register.SMEntities;
 import fathertoast.specialmobs.common.core.register.SMItems;
-import fathertoast.specialmobs.common.event.BiomeEvents;
 import fathertoast.specialmobs.common.event.GameEvents;
+import fathertoast.specialmobs.common.event.NaturalSpawnManager;
 import fathertoast.specialmobs.common.network.PacketHandler;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.InterModComms;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.FMLConstructModEvent;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.InterModEnqueueEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.ForgeRegistryEntry;
@@ -118,24 +119,26 @@ public class SpecialMobs {
         
         packetHandler.registerMessages();
         
-        MinecraftForge.EVENT_BUS.register( new BiomeEvents() );
+        final IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
+        
+        SMEffects.REGISTRY.register( modEventBus );
+        SMEntities.REGISTRY.register( modEventBus );
+        SMItems.REGISTRY.register( modEventBus );
+        
+        modEventBus.addListener( SMEntities::createAttributes );
+        modEventBus.addListener( this::setup );
+        modEventBus.addListener( this::sendIMCMessages );
+        
+        MinecraftForge.EVENT_BUS.addListener( EventPriority.LOW, NaturalSpawnManager::onBiomeLoad );
         MinecraftForge.EVENT_BUS.register( new GameEvents() );
-        
-        IEventBus eventBus = FMLJavaModLoadingContext.get().getModEventBus();
-        
-        eventBus.addListener( SMEntities::createAttributes );
-        eventBus.addListener( this::sendIMCMessages );
-        
-        SMEffects.REGISTRY.register( eventBus );
-        SMEntities.REGISTRY.register( eventBus );
-        SMItems.REGISTRY.register( eventBus );
     }
     
-    // TODO - This could very well help out the config malformation issue
-    //        Only problem here is that this event is never fired apparently.
-    //        Perhaps DeferredWorkQueue.runLater() could work (ignore deprecation, simply marked for removal)
-    public void onParallelDispatch( FMLConstructModEvent event ) {
-        event.enqueueWork( Config::initialize );
+    //    public void onParallelDispatch( FMLConstructModEvent event ) {
+    //        event.enqueueWork( Config::initialize );
+    //    }
+    
+    public void setup( FMLCommonSetupEvent event ) {
+        NaturalSpawnManager.registerSpawnPlacements();
     }
     
     public void sendIMCMessages( InterModEnqueueEvent event ) {

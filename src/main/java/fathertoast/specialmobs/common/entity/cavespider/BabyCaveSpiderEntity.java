@@ -5,7 +5,9 @@ import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
+import net.minecraft.entity.EntitySize;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.Pose;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.item.Items;
 import net.minecraft.world.World;
@@ -51,4 +53,10 @@ public class BabyCaveSpiderEntity extends _SpecialCaveSpiderEntity {
     //--------------- Variant-Specific Implementations ----------------
     
     public BabyCaveSpiderEntity( EntityType<? extends _SpecialCaveSpiderEntity> entityType, World world ) { super( entityType, world ); }
+    
+    /** @return The eye height of this entity when standing. */
+    @Override
+    protected float getStandingEyeHeight( Pose pose, EntitySize size ) {
+        return super.getStandingEyeHeight( pose, size ) * 0.8F; // Convert to normal spider height scale; prevents suffocation
+    }
 }

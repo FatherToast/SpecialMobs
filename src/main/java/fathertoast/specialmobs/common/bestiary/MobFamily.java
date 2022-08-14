@@ -222,6 +222,13 @@ public class MobFamily<T extends LivingEntity, V extends FamilyConfig> {
      * @see MobFamily
      */
     public static class Species<T extends LivingEntity> {
+        /** Maps each species's entity type back to the species. */
+        private static final Map<EntityType<?>, Species<?>> TYPE_TO_SPECIES_MAP = new HashMap<>();
+        
+        /** @return The entity type's species, or null if the entity type does not represent any mob species. */
+        @Nullable
+        public static Species<?> of( EntityType<?> entityType ) { return TYPE_TO_SPECIES_MAP.get( entityType ); }
+        
         /** The special mob family this species belongs to. */
         public final MobFamily<? super T, ?> family;
         /** The name of this special variant; or null for vanilla replacement species. */
@@ -241,6 +248,9 @@ public class MobFamily<T extends LivingEntity, V extends FamilyConfig> {
         
         /** This species's config. */
         public final SpeciesConfig config;
+        
+        /** The scale of this species's height in relation to the base vanilla entity's height. */
+        private float heightScale = -1.0F;
         
         /** Constructs a new mob species. For vanilla replacements, the variant name is null. */
         private Species( MobFamily<? super T, ?> parentFamily, String packageRoot, @Nullable String variantName ) {
@@ -300,6 +310,20 @@ public class MobFamily<T extends LivingEntity, V extends FamilyConfig> {
                     //          - this is okay for us because we only replace vanilla mobs
                     .clientTrackingRange( original.clientTrackingRange() ).updateInterval( original.updateInterval() )
                     .setShouldReceiveVelocityUpdates( original.trackDeltas() );
+        }
+        
+        /** Registers this species's spawn placement and links the (now loaded) entity type to this species. */
+        public void registerSpawnPlacement() {
+            TYPE_TO_SPECIES_MAP.put( entityType.get(), this );
+            AnnotationHelper.registerSpawnPlacement( this );
+        }
+        
+        /** @return The height scale. Used to calculate eye height for families that are not auto-scaled. */
+        public float getHeightScale() {
+            if( heightScale < 0.0F ) {
+                heightScale = entityType.get().getHeight() / family.replaceableTypes[0].getHeight();
+            }
+            return heightScale;
         }
     }
 }

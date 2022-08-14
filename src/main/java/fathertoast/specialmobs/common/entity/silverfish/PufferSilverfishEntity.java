@@ -71,4 +71,8 @@ public class PufferSilverfishEntity extends AmphibiousSilverfishEntity {
     protected void onVariantAttack( LivingEntity target ) {
         MobHelper.applyEffect( target, Effects.POISON );
     }
+    
+    /** @return Water drag coefficient. */
+    @Override
+    protected float getWaterSlowDown() { return 0.95F; }
 }

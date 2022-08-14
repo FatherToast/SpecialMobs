@@ -6,6 +6,7 @@ import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.entity.ISpecialMob;
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.entity.SpecialMobData;
+import fathertoast.specialmobs.common.event.NaturalSpawnManager;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import net.minecraft.block.BlockState;
@@ -42,6 +43,11 @@ public class _SpecialEndermanEntity extends EndermanEntity implements ISpecialMo
     
     @SpecialMob.AttributeSupplier
     public static AttributeModifierMap.MutableAttribute createAttributes() { return EndermanEntity.createAttributes(); }
+    
+    @SpecialMob.SpawnPlacementRegistrar
+    public static void registerSpawnPlacement( MobFamily.Species<? extends _SpecialEndermanEntity> species ) {
+        NaturalSpawnManager.registerSpawnPlacement( species );
+    }
     
     @SpecialMob.LanguageProvider
     public static String[] getTranslations( String langKey ) {
@@ -176,7 +182,7 @@ public class _SpecialEndermanEntity extends EndermanEntity implements ISpecialMo
     /** @return The eye height of this entity when standing. */
     @Override
     protected float getStandingEyeHeight( Pose pose, EntitySize size ) {
-        return super.getStandingEyeHeight( pose, size ) * getSpecialData().getBaseScale() * (isBaby() ? 0.53448F : 1.0F);
+        return super.getStandingEyeHeight( pose, size ) * getSpecialData().getHeightScaleByAge();
     }
     
     /** @return Whether this entity is immune to fire damage. */

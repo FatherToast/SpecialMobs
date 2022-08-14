@@ -6,10 +6,12 @@ import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.config.species.HuskZombieSpeciesConfig;
 import fathertoast.specialmobs.common.config.species.SpeciesConfig;
 import fathertoast.specialmobs.common.entity.MobHelper;
+import fathertoast.specialmobs.common.event.NaturalSpawnManager;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.ai.attributes.AttributeModifierMap;
 import net.minecraft.entity.monster.HuskEntity;
 import net.minecraft.entity.monster.ZombieEntity;
@@ -19,8 +21,11 @@ import net.minecraft.potion.Effects;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.SoundEvents;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IServerWorld;
 import net.minecraft.world.World;
 
+import java.util.Random;
 import java.util.function.Function;
 
 @SpecialMob
@@ -50,6 +55,22 @@ public class HuskZombieEntity extends _SpecialZombieEntity {
     
     @SpecialMob.AttributeSupplier
     public static AttributeModifierMap.MutableAttribute createAttributes() { return HuskEntity.createAttributes(); }
+    
+    @SpecialMob.SpawnPlacementRegistrar
+    public static void registerSpeciesSpawnPlacement( MobFamily.Species<? extends HuskZombieEntity> species ) {
+        NaturalSpawnManager.registerSpawnPlacement( species, HuskZombieEntity::checkSpeciesSpawnRules );
+    }
+    
+    /**
+     * We cannot call the actual husk method because our husk variant does not extend the vanilla husk.
+     *
+     * @see net.minecraft.entity.monster.HuskEntity#checkHuskSpawnRules(EntityType, IServerWorld, SpawnReason, BlockPos, Random)
+     */
+    public static boolean checkSpeciesSpawnRules( EntityType<? extends HuskZombieEntity> type, IServerWorld world,
+                                                  SpawnReason reason, BlockPos pos, Random random ) {
+        return NaturalSpawnManager.checkSpawnRulesDefault( type, world, reason, pos, random ) &&
+                (reason == SpawnReason.SPAWNER || world.canSeeSky( pos ));
+    }
     
     @SpecialMob.LanguageProvider
     public static String[] getTranslations( String langKey ) {

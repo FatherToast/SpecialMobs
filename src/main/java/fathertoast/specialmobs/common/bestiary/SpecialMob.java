@@ -89,6 +89,22 @@ public @interface SpecialMob {
     @interface AttributeSupplier { }
     
     /**
+     * OVERRIDABLE. This is called during registration to register the species's spawn placement.
+     * 'Overridable' static methods inherit from their superclass if not defined in a subclass, but must be defined somewhere.
+     * This is 'overridable' because some species may have a different natural spawn placement from the rest of their family.
+     * <p>
+     * The annotated method must have a signature that follows the pattern:
+     * <p>
+     * {@code public static void METHOD_NAME( MobFamily.Species<?> species )}
+     *
+     * @see fathertoast.specialmobs.common.event.NaturalSpawnManager
+     * @see net.minecraft.entity.EntitySpawnPlacementRegistry
+     */
+    @Retention( RetentionPolicy.RUNTIME )
+    @Target( ElementType.METHOD )
+    @interface SpawnPlacementRegistrar { }
+    
+    /**
      * REQUIRED. This is called during data generation to build the mod's default lang files.
      * This is not 'overridable' because all species must have unique names.
      * <p>

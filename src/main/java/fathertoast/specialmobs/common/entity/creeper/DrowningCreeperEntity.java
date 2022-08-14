@@ -8,6 +8,7 @@ import fathertoast.specialmobs.common.entity.ai.AmphibiousMovementController;
 import fathertoast.specialmobs.common.entity.ai.IAmphibiousMob;
 import fathertoast.specialmobs.common.entity.ai.goal.AmphibiousGoToWaterGoal;
 import fathertoast.specialmobs.common.entity.ai.goal.AmphibiousSwimUpGoal;
+import fathertoast.specialmobs.common.event.NaturalSpawnManager;
 import fathertoast.specialmobs.common.util.ExplosionHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootEntryItemBuilder;
@@ -15,6 +16,7 @@ import fathertoast.specialmobs.datagen.loot.LootPoolBuilder;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.entity.EntitySpawnPlacementRegistry;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MoverType;
@@ -32,6 +34,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.IServerWorld;
+import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
 
 @SpecialMob
@@ -49,6 +52,15 @@ public class DrowningCreeperEntity extends _SpecialCreeperEntity implements IAmp
                 .addExperience( 2 ).drownImmune().fluidPushImmune()
                 .addToAttribute( Attributes.MAX_HEALTH, 10.0 );
     }
+    
+    @SpecialMob.SpawnPlacementRegistrar
+    public static void registerSpeciesSpawnPlacement( MobFamily.Species<? extends DrowningCreeperEntity> species ) {
+        NaturalSpawnManager.registerSpawnPlacement( species, EntitySpawnPlacementRegistry.PlacementType.IN_WATER );
+    }
+    
+    /** @return True if this entity's position is currently obstructed. */
+    @Override
+    public boolean checkSpawnObstruction( IWorldReader world ) { return world.isUnobstructed( this ); }
     
     @SpecialMob.LanguageProvider
     public static String[] getTranslations( String langKey ) {

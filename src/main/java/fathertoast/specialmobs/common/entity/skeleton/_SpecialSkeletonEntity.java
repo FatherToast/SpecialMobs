@@ -8,6 +8,7 @@ import fathertoast.specialmobs.common.config.species.SpeciesConfig;
 import fathertoast.specialmobs.common.entity.ISpecialMob;
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.entity.SpecialMobData;
+import fathertoast.specialmobs.common.event.NaturalSpawnManager;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import net.minecraft.block.BlockState;
@@ -74,6 +75,11 @@ public class _SpecialSkeletonEntity extends AbstractSkeletonEntity implements IS
     
     @SpecialMob.AttributeSupplier
     public static AttributeModifierMap.MutableAttribute createAttributes() { return SkeletonEntity.createAttributes(); }
+    
+    @SpecialMob.SpawnPlacementRegistrar
+    public static void registerSpawnPlacement( MobFamily.Species<? extends _SpecialSkeletonEntity> species ) {
+        NaturalSpawnManager.registerSpawnPlacement( species );
+    }
     
     @SpecialMob.LanguageProvider
     public static String[] getTranslations( String langKey ) {
@@ -358,7 +364,7 @@ public class _SpecialSkeletonEntity extends AbstractSkeletonEntity implements IS
     /** @return The eye height of this entity when standing. */
     @Override
     protected float getStandingEyeHeight( Pose pose, EntitySize size ) {
-        return super.getStandingEyeHeight( pose, size ) * getSpecialData().getBaseScale() * (isBaby() ? 0.53448F : 1.0F);
+        return super.getStandingEyeHeight( pose, size ) * getSpecialData().getHeightScaleByAge();
     }
     
     /** @return Whether this entity is immune to fire damage. */

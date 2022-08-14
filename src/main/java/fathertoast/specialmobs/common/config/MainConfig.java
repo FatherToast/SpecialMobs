@@ -2,14 +2,20 @@ package fathertoast.specialmobs.common.config;
 
 import fathertoast.specialmobs.common.config.field.BooleanField;
 import fathertoast.specialmobs.common.config.field.DoubleField;
+import fathertoast.specialmobs.common.config.field.EnvironmentListField;
 import fathertoast.specialmobs.common.config.file.ToastConfigSpec;
 import fathertoast.specialmobs.common.config.util.ConfigUtil;
+import fathertoast.specialmobs.common.config.util.EnvironmentEntry;
+import fathertoast.specialmobs.common.config.util.EnvironmentList;
+import fathertoast.specialmobs.common.config.util.RestartNote;
+import net.minecraft.world.gen.feature.structure.Structure;
 
 import java.io.File;
 
 public class MainConfig extends Config.AbstractConfig {
     
     public final General GENERAL;
+    public final NaturalSpawning NATURAL_SPAWNING;
     
     /** Builds the config spec that should be used for this config. */
     MainConfig( File dir, String fileName ) {
@@ -18,6 +24,7 @@ public class MainConfig extends Config.AbstractConfig {
                 "toggles for convenience." );
         
         GENERAL = new General( SPEC );
+        NATURAL_SPAWNING = new NaturalSpawning( SPEC );
     }
     
     public static class General extends Config.AbstractCategory {
@@ -61,6 +68,36 @@ public class MainConfig extends Config.AbstractConfig {
                     "Overrides the default fishing rod item animation so that it is compatible with fishing mobs from this mod.",
                     "Set to false if it causes problems with another mod. Fishing mobs will instead render a stick while casting.",
                     "You must restart the client for changes to this setting to take effect." ) );
+        }
+    }
+    
+    public static class NaturalSpawning extends Config.AbstractCategory {
+        
+        public final DoubleField caveSpiderSpawnMultiplier;
+        public final DoubleField.EnvironmentSensitive caveSpiderSpawnChance;
+        
+        NaturalSpawning( ToastConfigSpec parent ) {
+            super( parent, "natural_spawning",
+                    "Options to customize the additional natural monster spawning from this mod.",
+                    "Most changes to options in this category require the game to be restarted to take effect." );
+            
+            caveSpiderSpawnMultiplier = SPEC.define( new DoubleField( "cave_spider_spawn_multiplier", 0.5, DoubleField.Range.NON_NEGATIVE,
+                    "Option to add vanilla cave spiders as natural spawns. These spawns will be added to all biomes that can",
+                    "spawn regular spiders. Cave spider spawn weight is the same as the spider spawn weight, multiplied by",
+                    "this value. When this is set to 0, this added cave spider spawn feature is completely disabled.",
+                    "Finer tuning can be done with the spawn chances below." ), RestartNote.GAME );
+            caveSpiderSpawnChance = new DoubleField.EnvironmentSensitive(
+                    SPEC.define( new DoubleField( "cave_spider_chance.base", 0.0, DoubleField.Range.PERCENT,
+                            "The chance for added cave spider natural spawn attempts to succeed. Does not affect mob replacement." ) ),
+                    SPEC.define( new EnvironmentListField( "cave_spider_chance.exceptions", new EnvironmentList(
+                            EnvironmentEntry.builder( 1.0F ).belowDiamondLevel().build(),
+                            EnvironmentEntry.builder( 1.0F ).inStructure( Structure.MINESHAFT ).build(),
+                            EnvironmentEntry.builder( 0.33F ).belowSeaFloor().build() )
+                            .setRange( DoubleField.Range.PERCENT ),
+                            "The chance for added cave spider natural spawn attempts to succeed when specific environmental conditions are met." ) )
+            );
+            
+            //SPEC.newLine();
         }
     }
 }

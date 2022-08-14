@@ -7,6 +7,7 @@ import fathertoast.specialmobs.common.config.family.FamilyConfig;
 import fathertoast.specialmobs.common.config.field.*;
 import fathertoast.specialmobs.common.config.file.ToastConfigSpec;
 import fathertoast.specialmobs.common.config.util.ConfigUtil;
+import fathertoast.specialmobs.common.config.util.EnvironmentList;
 import net.minecraft.block.Block;
 import net.minecraft.potion.Effect;
 
@@ -46,6 +47,8 @@ public class SpeciesConfig extends Config.AbstractConfig {
     
     public static class General extends Config.AbstractCategory {
         
+        public final DoubleField.EnvironmentSensitive naturalSpawnChance;
+        
         public final DoubleField randomScaling;
         
         public final AttributeListField attributeChanges;
@@ -75,6 +78,17 @@ public class SpeciesConfig extends Config.AbstractConfig {
             super( parent, "general",
                     "Options standard to all mob species (that is, not specific to any particular mob species)." );
             final BestiaryInfo info = species.bestiaryInfo;
+            
+            naturalSpawnChance = new DoubleField.EnvironmentSensitive(
+                    SPEC.define( new DoubleField( "natural_spawn_chance.base", 1.0, DoubleField.Range.PERCENT,
+                            "The chance for " + speciesName + " to succeed at natural spawn attempts. Does not affect mob replacement.",
+                            "Note: Most species do NOT naturally spawn - they must be added by a mod or data pack for this option to do anything." ) ),
+                    SPEC.define( new EnvironmentListField( "natural_spawn_chance.exceptions", new EnvironmentList()
+                            .setRange( DoubleField.Range.PERCENT ),
+                            "The chance for " + speciesName + " to succeed at natural spawn attempts when specific environmental conditions are met." ) )
+            );
+            
+            SPEC.newLine();
             
             randomScaling = SPEC.define( new DoubleField( "random_scaling", -1.0, DoubleField.Range.SIGNED_PERCENT,
                     "When greater than 0, " + speciesName + " will have a random render scale applied. This is a visual effect only.",
