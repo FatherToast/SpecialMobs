@@ -114,7 +114,7 @@ public class MainConfig extends Config.AbstractConfig {
                     "Finer tuning can be done with the spawn chances below." ), RestartNote.GAME_PARTIAL );
             caveSpiderSpawnChance = new DoubleField.EnvironmentSensitive(
                     SPEC.define( new DoubleField( "cave_spider_chance.base", 0.0, DoubleField.Range.PERCENT,
-                            "The chance for added cave spider natural spawn attempts to succeed. Does not affect mob replacement." ) ),
+                            "The chance for added cave spider natural spawn attempts to succeed. Does not affect Mob Replacement." ) ),
                     SPEC.define( new EnvironmentListField( "cave_spider_chance.exceptions", new EnvironmentList(
                             EnvironmentEntry.builder( 1.0F ).belowDiamondLevel().build(),
                             EnvironmentEntry.builder( 1.0F ).inStructure( Structure.MINESHAFT ).build(),

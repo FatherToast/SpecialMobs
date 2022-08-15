@@ -73,7 +73,7 @@ public class SpeciesConfig extends Config.AbstractConfig {
             
             naturalSpawnChance = new DoubleField.EnvironmentSensitive(
                     SPEC.define( new DoubleField( "natural_spawn_chance.base", 1.0, DoubleField.Range.PERCENT,
-                            "The chance for " + speciesName + " to succeed at natural spawn attempts. Does not affect mob replacement.",
+                            "The chance for " + speciesName + " to succeed at natural spawn attempts. Does not affect Mob Replacement.",
                             "Note: Most species do NOT naturally spawn - they must be added by a mod or data pack for this option to do anything." ) ),
                     SPEC.define( new EnvironmentListField( "natural_spawn_chance.exceptions", getDefaultSpawnExceptions().setRange( DoubleField.Range.PERCENT ),
                             "The chance for " + speciesName + " to succeed at natural spawn attempts when specific environmental conditions are met." ) )
@@ -92,7 +92,9 @@ public class SpeciesConfig extends Config.AbstractConfig {
                     "Attribute modifiers for " + speciesName + ". If no attribute changes are defined here, " + speciesName,
                     "will have the exact same attributes as their parent vanilla mob." ) );
             
-            SPEC.newLine();
+            SPEC.increaseIndent();
+            SPEC.subcategory( SPECIAL_DATA_SUBCAT.substring( 0, SPECIAL_DATA_SUBCAT.length() - 1 ),
+                    "Special Mob Data. These are the values set to each " + species.getConfigNameSingular() + " on spawn (in their NBT)." );
             
             experience = SPEC.define( new IntField( SPECIAL_DATA_SUBCAT + "experience", info.experience, IntField.Range.NON_NEGATIVE,
                     "The amount of experience " + speciesName + " drop when killed by a player. Multiplied by 2.5 for babies.",
@@ -120,7 +122,15 @@ public class SpeciesConfig extends Config.AbstractConfig {
             immuneToPotions = SPEC.define( new LazyRegistryEntryListField<>( SPECIAL_DATA_SUBCAT + "immune_to_effects", info.immuneToPotions,
                     ConfigUtil.properCase( speciesName ) + " cannot be inflicted with any effects specified here (e.g. \"instant_damage\" or \"regeneration\")." ) );
             
-            SPEC.newLine();
+            if( hasNoRangedStats( info ) ) {
+                SPEC.decreaseIndent();
+                rangedAttackDamage = rangedAttackSpread = rangedWalkSpeed = rangedAttackMaxRange = null;
+                rangedAttackCooldown = rangedAttackMaxCooldown = null;
+                return;
+            }
+            
+            SPEC.subcategory( "ranged_stats",
+                    "Like Special Mob Data, these are set to NBT on spawn. Unlike SMD, ranged stats are not all applicable to all mobs." );
             
             rangedAttackDamage = info.rangedAttackDamage < 0.0F ? null :
                     SPEC.define( new DoubleField( SPECIAL_DATA_SUBCAT + "ranged_attack.damage", info.rangedAttackDamage, DoubleField.Range.NON_NEGATIVE,
@@ -141,6 +151,14 @@ public class SpeciesConfig extends Config.AbstractConfig {
                     SPEC.define( new DoubleField( SPECIAL_DATA_SUBCAT + "ranged_attack.max_range", info.rangedAttackMaxRange, DoubleField.Range.NON_NEGATIVE,
                             "The maximum distance (in blocks) at which " + speciesName + " can use their ranged attacks.",
                             "0 disables ranged attacks." ) );
+            
+            SPEC.decreaseIndent();
+        }
+        
+        /** @return True if the config should NOT have any ranged stat fields. */
+        private static boolean hasNoRangedStats( BestiaryInfo info ) {
+            return info.rangedAttackDamage < 0.0F && info.rangedAttackSpread < 0.0F && info.rangedWalkSpeed < 0.0F &&
+                    info.rangedAttackCooldown < 0 && info.rangedAttackMaxCooldown < 0 && info.rangedAttackMaxRange < 0.0F;
         }
         
         /** @return The next default natural spawn chance exceptions to use. */

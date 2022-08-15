@@ -75,6 +75,7 @@ public class SpecialMobs {
      *          - ranged attack AI (using bow)
      *          + ranged attack AI (using crossbow)
      *          - use shields
+     *          ? warped/crimson mobs
      *      - skeletons
      *          - use shields
      *          - melee chance
@@ -83,6 +84,7 @@ public class SpecialMobs {
      *          - use shields
      *          - bow chance
      *          - babies
+     *          ? warped/crimson mobs
      *      - slimes
      *          - smallest size can deal damage
      *      - magma cubes
