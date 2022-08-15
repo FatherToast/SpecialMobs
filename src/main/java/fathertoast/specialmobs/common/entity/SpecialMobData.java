@@ -311,14 +311,14 @@ public class SpecialMobData<T extends LivingEntity & ISpecialMob<T>> {
     private void setImmuneToFire( boolean value ) {
         isImmuneToFire = value;
         if( value ) {
-            theEntity.setPathfindingMalus( PathNodeType.LAVA, PathNodeType.WATER.getMalus() );
-            theEntity.setPathfindingMalus( PathNodeType.DANGER_FIRE, PathNodeType.OPEN.getMalus() );
-            theEntity.setPathfindingMalus( PathNodeType.DAMAGE_FIRE, PathNodeType.OPEN.getMalus() );
+            theEntity.setSpecialPathfindingMalus( PathNodeType.LAVA, PathNodeType.WATER.getMalus() );
+            theEntity.setSpecialPathfindingMalus( PathNodeType.DANGER_FIRE, PathNodeType.OPEN.getMalus() );
+            theEntity.setSpecialPathfindingMalus( PathNodeType.DAMAGE_FIRE, PathNodeType.OPEN.getMalus() );
         }
         else {
-            theEntity.setPathfindingMalus( PathNodeType.LAVA, PathNodeType.LAVA.getMalus() );
-            theEntity.setPathfindingMalus( PathNodeType.DANGER_FIRE, PathNodeType.DANGER_FIRE.getMalus() );
-            theEntity.setPathfindingMalus( PathNodeType.DAMAGE_FIRE, PathNodeType.DAMAGE_FIRE.getMalus() );
+            theEntity.setSpecialPathfindingMalus( PathNodeType.LAVA, PathNodeType.LAVA.getMalus() );
+            theEntity.setSpecialPathfindingMalus( PathNodeType.DANGER_FIRE, PathNodeType.DANGER_FIRE.getMalus() );
+            theEntity.setSpecialPathfindingMalus( PathNodeType.DAMAGE_FIRE, PathNodeType.DAMAGE_FIRE.getMalus() );
         }
     }
     
@@ -328,12 +328,12 @@ public class SpecialMobData<T extends LivingEntity & ISpecialMob<T>> {
         theEntity.clearFire();
         isImmuneToBurning = value;
         if( value ) {
-            theEntity.setPathfindingMalus( PathNodeType.DANGER_FIRE, PathNodeType.OPEN.getMalus() );
-            theEntity.setPathfindingMalus( PathNodeType.DAMAGE_FIRE, PathNodeType.DANGER_FIRE.getMalus() );
+            theEntity.setSpecialPathfindingMalus( PathNodeType.DANGER_FIRE, PathNodeType.OPEN.getMalus() );
+            theEntity.setSpecialPathfindingMalus( PathNodeType.DAMAGE_FIRE, PathNodeType.DANGER_FIRE.getMalus() );
         }
         else {
-            theEntity.setPathfindingMalus( PathNodeType.DANGER_FIRE, PathNodeType.DANGER_FIRE.getMalus() );
-            theEntity.setPathfindingMalus( PathNodeType.DAMAGE_FIRE, PathNodeType.DAMAGE_FIRE.getMalus() );
+            theEntity.setSpecialPathfindingMalus( PathNodeType.DANGER_FIRE, PathNodeType.DANGER_FIRE.getMalus() );
+            theEntity.setSpecialPathfindingMalus( PathNodeType.DAMAGE_FIRE, PathNodeType.DAMAGE_FIRE.getMalus() );
         }
     }
     
@@ -357,7 +357,7 @@ public class SpecialMobData<T extends LivingEntity & ISpecialMob<T>> {
     
     private void setDamagedByWater( boolean value ) {
         isDamagedByWater = value;
-        theEntity.setPathfindingMalus( PathNodeType.WATER, value ? PathNodeType.LAVA.getMalus() : PathNodeType.WATER.getMalus() );
+        theEntity.setSpecialPathfindingMalus( PathNodeType.WATER, value ? PathNodeType.LAVA.getMalus() : PathNodeType.WATER.getMalus() );
     }
     
     /**

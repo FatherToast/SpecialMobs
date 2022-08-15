@@ -25,7 +25,7 @@ public interface ISpecialMob<T extends LivingEntity & ISpecialMob<T>> {
     void setExperience( int xp );
     
     /** Sets the entity's pathfinding malus for a particular node type; negative value is un-walkable. */
-    void setPathfindingMalus( PathNodeType nodeType, float malus );
+    void setSpecialPathfindingMalus( PathNodeType nodeType, float malus );
     
     /** Called on spawn to initialize properties based on the world, difficulty, and the group it spawns with. */
     void finalizeSpecialSpawn( IServerWorld world, DifficultyInstance difficulty, @Nullable SpawnReason spawnReason,

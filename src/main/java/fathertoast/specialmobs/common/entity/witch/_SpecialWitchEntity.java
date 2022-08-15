@@ -29,6 +29,7 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
+import net.minecraft.pathfinding.PathNodeType;
 import net.minecraft.potion.*;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.util.DamageSource;
@@ -398,6 +399,11 @@ public class _SpecialWitchEntity extends WitchEntity implements ISpecialMob<_Spe
                                                   @Nullable ILivingEntityData groupData, @Nullable CompoundNBT eggTag ) {
         return MobHelper.finalizeSpawn( this, world, difficulty, spawnReason,
                 super.finalizeSpawn( world, difficulty, spawnReason, groupData, eggTag ) );
+    }
+
+    @Override
+    public void setSpecialPathfindingMalus(PathNodeType nodeType, float malus) {
+        this.setPathfindingMalus(nodeType, malus);
     }
     
     /** Called on spawn to set starting equipment. */

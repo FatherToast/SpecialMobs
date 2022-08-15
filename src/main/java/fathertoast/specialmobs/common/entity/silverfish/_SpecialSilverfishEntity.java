@@ -26,6 +26,7 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
+import net.minecraft.pathfinding.PathNodeType;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.SoundEvents;
@@ -178,6 +179,11 @@ public class _SpecialSilverfishEntity extends SilverfishEntity implements IRange
                                                   @Nullable ILivingEntityData groupData, @Nullable CompoundNBT eggTag ) {
         return MobHelper.finalizeSpawn( this, world, difficulty, spawnReason,
                 super.finalizeSpawn( world, difficulty, spawnReason, groupData, eggTag ) );
+    }
+
+    @Override
+    public void setSpecialPathfindingMalus(PathNodeType nodeType, float malus) {
+        this.setPathfindingMalus(nodeType, malus);
     }
     
     /** Called on spawn to set starting equipment. */

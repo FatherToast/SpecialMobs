@@ -24,6 +24,7 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
+import net.minecraft.pathfinding.PathNodeType;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.math.MathHelper;
@@ -194,6 +195,11 @@ public class _SpecialBlazeEntity extends BlazeEntity implements IRangedAttackMob
     public void finalizeSpecialSpawn( IServerWorld world, DifficultyInstance difficulty, @Nullable SpawnReason spawnReason,
                                       @Nullable ILivingEntityData groupData ) {
         finalizeVariantSpawn( world, difficulty, spawnReason, groupData );
+    }
+
+    @Override
+    public void setSpecialPathfindingMalus(PathNodeType nodeType, float malus) {
+        this.setPathfindingMalus(nodeType, malus);
     }
     
     

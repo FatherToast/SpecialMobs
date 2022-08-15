@@ -315,7 +315,12 @@ public class _SpecialCreeperEntity extends CreeperEntity implements IExplodingMo
     /** Sets the experience that should be dropped by this entity. */
     @Override
     public final void setExperience( int xp ) { xpReward = xp; }
-    
+
+    @Override
+    public void setSpecialPathfindingMalus(PathNodeType nodeType, float malus) {
+        this.setPathfindingMalus(nodeType, malus);
+    }
+
     /** Called on spawn to initialize properties based on the world, difficulty, and the group it spawns with. */
     @Nullable
     @Override
