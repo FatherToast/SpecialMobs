@@ -38,7 +38,7 @@ public class PotionSlimeSpeciesConfig extends SpeciesConfig {
                             Effects.DAMAGE_BOOST, Effects.WEAKNESS,
                             Effects.HEAL, Effects.HARM, Effects.HUNGER,
                             Effects.REGENERATION, Effects.POISON, Effects.WITHER,
-                            Effects.JUMP, Effects.SLOW_FALLING, Effects.LEVITATION,
+                            Effects.JUMP, Effects.LEVITATION, Effects.SLOW_FALLING, SMEffects.WEIGHT,
                             Effects.DAMAGE_RESISTANCE, SMEffects.VULNERABILITY,
                             Effects.FIRE_RESISTANCE, Effects.WATER_BREATHING,
                             Effects.BLINDNESS, Effects.NIGHT_VISION, Effects.CONFUSION,

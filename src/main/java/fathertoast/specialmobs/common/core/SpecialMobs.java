@@ -53,7 +53,7 @@ public class SpecialMobs {
      *          ? warped/crimson mobs
      *  - potions
      *      - vulnerability (opposite of resistance)
-     *      ? gravity (opposite of levitation)
+     *      - weight (opposite of levitation)
      *  - entities
      *      - nbt-driven capabilities (special mob data)
      *      - fish hook

@@ -25,7 +25,7 @@ public class PaleCaveSpiderEntity extends _SpecialCaveSpiderEntity {
     public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
         bestiaryInfo.color( 0xDED4C6 ).theme( BestiaryInfo.Theme.ICE )
                 .uniqueTextureWithEyes()
-                .addExperience( 1 )
+                .addExperience( 1 ).effectImmune( Effects.WEAKNESS )
                 .addToAttribute( Attributes.ARMOR, 15.0 );
     }
     

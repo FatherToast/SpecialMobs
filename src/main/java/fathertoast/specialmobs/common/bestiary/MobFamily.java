@@ -50,7 +50,7 @@ public class MobFamily<T extends LivingEntity, V extends FamilyConfig> {
     );
     public static final MobFamily<DrownedEntity, FamilyConfig> DROWNED = new MobFamily<>( FamilyConfig::new,
             "Drowned", "drowned", 0x8FF1D7, new EntityType[] { EntityType.DROWNED },
-            "Brute", "Fishing", /*"Frozen",*/ "Giant", "Hungry", "Knight", "Plague"//, "Tropical"
+            "Abyssal", "Brute", "Fishing", /*"Frozen",*/ "Giant", "Hungry", "Knight", "Plague"//, "Tropical"
     ); //TODO Textures! - brute, hungry, plague, frozen, tropical
     public static final MobFamily<ZombifiedPiglinEntity, FamilyConfig> ZOMBIFIED_PIGLIN = new MobFamily<>( FamilyConfig::new,
             "ZombifiedPiglin", "zombified piglins", 0xEA9393, new EntityType[] { EntityType.ZOMBIFIED_PIGLIN },

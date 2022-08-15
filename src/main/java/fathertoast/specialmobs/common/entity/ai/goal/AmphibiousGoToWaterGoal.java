@@ -1,6 +1,5 @@
 package fathertoast.specialmobs.common.entity.ai.goal;
 
-import fathertoast.specialmobs.common.entity.ai.IAmphibiousMob;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.ai.goal.Goal;
@@ -16,9 +15,9 @@ import java.util.Random;
  * <p>
  * {@link net.minecraft.entity.monster.DrownedEntity.GoToWaterGoal}
  */
-public class AmphibiousGoToWaterGoal<T extends MobEntity & IAmphibiousMob> extends Goal {
+public class AmphibiousGoToWaterGoal extends Goal {
     
-    private final T mob;
+    private final MobEntity mob;
     private final double speedModifier;
     
     private boolean disableAtNight = true;
@@ -27,14 +26,14 @@ public class AmphibiousGoToWaterGoal<T extends MobEntity & IAmphibiousMob> exten
     private double wantedY;
     private double wantedZ;
     
-    public AmphibiousGoToWaterGoal( T entity, double speed ) {
+    public AmphibiousGoToWaterGoal( MobEntity entity, double speed ) {
         mob = entity;
         speedModifier = speed;
         setFlags( EnumSet.of( Goal.Flag.MOVE ) );
     }
     
     /** Builder that allows this goal to run during the night. */
-    public AmphibiousGoToWaterGoal<T> alwaysEnabled() {
+    public AmphibiousGoToWaterGoal alwaysEnabled() {
         disableAtNight = false;
         return this;
     }

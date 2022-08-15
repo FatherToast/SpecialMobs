@@ -1,6 +1,5 @@
 package fathertoast.specialmobs.common.entity.ai.goal;
 
-import fathertoast.specialmobs.common.entity.ai.IAmphibiousMob;
 import net.minecraft.entity.CreatureEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.goal.MeleeAttackGoal;
@@ -13,14 +12,14 @@ import javax.annotation.Nullable;
  * <p>
  * {@link net.minecraft.entity.monster.DrownedEntity.AttackGoal}
  */
-public class AmphibiousMeleeAttackGoal<T extends CreatureEntity & IAmphibiousMob> extends MeleeAttackGoal {
+public class AmphibiousMeleeAttackGoal extends MeleeAttackGoal {
     
     /** @return True if the target is valid. */
     public static boolean isValidTarget( @Nullable LivingEntity target ) {
         return target != null && (!target.level.isDay() || target.isInWater());
     }
     
-    public AmphibiousMeleeAttackGoal( T entity, double speed, boolean longMemory ) { super( entity, speed, longMemory ); }
+    public AmphibiousMeleeAttackGoal( CreatureEntity entity, double speed, boolean longMemory ) { super( entity, speed, longMemory ); }
     
     /** @return Returns true if this AI can be activated. */
     @Override
@@ -32,9 +31,9 @@ public class AmphibiousMeleeAttackGoal<T extends CreatureEntity & IAmphibiousMob
     
     // Uncomment if ever needed
     //    /** A zombie attack version of the normal amphibious melee goal. */
-    //    public static class Zombie<T extends ZombieEntity & IAmphibiousMob> extends ZombieAttackGoal {
+    //    public static class Zombie extends ZombieAttackGoal {
     //
-    //        public Zombie( T entity, double speed, boolean longMemory ) { super( entity, speed, longMemory ); }
+    //        public Zombie( ZombieEntity entity, double speed, boolean longMemory ) { super( entity, speed, longMemory ); }
     //
     //        /** @return Returns true if this AI can be activated. */
     //        @Override

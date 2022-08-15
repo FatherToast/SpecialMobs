@@ -1,8 +1,9 @@
-package fathertoast.specialmobs.common.entity.silverfish;
+package fathertoast.specialmobs.common.entity.drowned;
 
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
+import fathertoast.specialmobs.common.core.register.SMEffects;
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.entity.ai.AIHelper;
 import fathertoast.specialmobs.common.entity.ai.goal.AmphibiousGoToWaterGoal;
@@ -10,69 +11,67 @@ import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.goal.SwimGoal;
+import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.item.Items;
 import net.minecraft.potion.Effects;
 import net.minecraft.world.World;
 
 @SpecialMob
-public class PufferSilverfishEntity extends AmphibiousSilverfishEntity {
+public class AbyssalDrownedEntity extends _SpecialDrownedEntity {
     
     //--------------- Static Special Mob Hooks ----------------
     
     @SpecialMob.SpeciesReference
-    public static MobFamily.Species<PufferSilverfishEntity> SPECIES;
+    public static MobFamily.Species<AbyssalDrownedEntity> SPECIES;
     
     @SpecialMob.BestiaryInfoSupplier
     public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
-        bestiaryInfo.color( 0xE6E861 ).weight( BestiaryInfo.DefaultWeight.LOW ).theme( BestiaryInfo.Theme.WATER )
-                .uniqueTextureBaseOnly()
-                .addExperience( 1 ).drownImmune().effectImmune( Effects.POISON );
+        bestiaryInfo.color( 0x223844 ).weight( BestiaryInfo.DefaultWeight.LOW )
+                .uniqueTexturesAll()
+                .addExperience( 2 ).effectImmune( SMEffects.WEIGHT, Effects.LEVITATION )
+                .addToAttribute( Attributes.MAX_HEALTH, 20.0 )
+                .multiplyAttribute( Attributes.MOVEMENT_SPEED, 1.2 );
     }
     
     @SpecialMob.LanguageProvider
     public static String[] getTranslations( String langKey ) {
-        return References.translations( langKey, "\"Pufferfish\"",
+        return References.translations( langKey, "Abyssal Drowned",
                 "", "", "", "", "", "" );//TODO
     }
     
     @SpecialMob.LootTableProvider
     public static void buildLootTable( LootTableBuilder loot ) {
         addBaseLoot( loot );
-        loot.addUncommonDrop( "uncommon", Items.PUFFERFISH );
+        loot.addUncommonDrop( "uncommon", Items.GOLD_NUGGET, Items.PRISMARINE_SHARD, Items.PRISMARINE_CRYSTALS );
+        loot.addRareDrop( "rare", Items.GOLD_INGOT );
     }
     
     @SpecialMob.Factory
-    public static EntityType.IFactory<PufferSilverfishEntity> getVariantFactory() { return PufferSilverfishEntity::new; }
+    public static EntityType.IFactory<AbyssalDrownedEntity> getVariantFactory() { return AbyssalDrownedEntity::new; }
     
     /** @return This entity's mob species. */
     @SpecialMob.SpeciesSupplier
     @Override
-    public MobFamily.Species<? extends PufferSilverfishEntity> getSpecies() { return SPECIES; }
+    public MobFamily.Species<? extends AbyssalDrownedEntity> getSpecies() { return SPECIES; }
     
     
     //--------------- Variant-Specific Implementations ----------------
     
-    public PufferSilverfishEntity( EntityType<? extends _SpecialSilverfishEntity> entityType, World world ) { super( entityType, world ); }
+    public AbyssalDrownedEntity( EntityType<? extends _SpecialDrownedEntity> entityType, World world ) { super( entityType, world ); }
     
     /** Override to change this entity's AI goals. */
     @Override
     protected void registerVariantGoals() {
-        AIHelper.removeGoals( goalSelector, SwimGoal.class );
-        AIHelper.insertGoal( goalSelector, 5, new AmphibiousGoToWaterGoal( this, 1.0 ).alwaysEnabled() );
+        // Disable all 'night time' behavior changes except for targeting
+        AIHelper.removeGoals( goalSelector, 1 ); // DrownedEntity.GoToWaterGoal
+        goalSelector.addGoal( 1, new AmphibiousGoToWaterGoal( this, 1.0 ).alwaysEnabled() );
+        AIHelper.removeGoals( goalSelector, 5 ); // DrownedEntity.GoToBeachGoal
+        AIHelper.removeGoals( goalSelector, 6 ); // DrownedEntity.SwimUpGoal
     }
-    
-    /** Override to change the color of this entity's spit attack. */
-    @Override
-    protected int getVariantSpitColor() { return 0x385DC6; } // Water blue
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override
     protected void onVariantAttack( LivingEntity target ) {
-        MobHelper.applyEffect( target, Effects.POISON );
+        MobHelper.applyEffect( target, SMEffects.WEIGHT.get(), 2 );
     }
-    
-    /** @return Water drag coefficient. */
-    @Override
-    protected float getWaterSlowDown() { return 0.95F; }
 }

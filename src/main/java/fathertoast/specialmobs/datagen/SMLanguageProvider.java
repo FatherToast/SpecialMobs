@@ -81,6 +81,8 @@ public class SMLanguageProvider extends LanguageProvider {
         // Misc
         translationList.add( References.translations( SMEffects.VULNERABILITY.get().getDescriptionId(), "Vulnerability",
                 "", "", "", "", "", "" ) ); //TODO
+        translationList.add( References.translations( SMEffects.WEIGHT.get().getDescriptionId(), "Weight",
+                "", "", "", "", "", "" ) ); //TODO
         
         TRANSLATIONS = translationList.toArray( new String[0][0] );
         

@@ -127,7 +127,7 @@ public class DrowningCreeperEntity extends _SpecialCreeperEntity implements IAmp
     @Override
     protected void registerVariantGoals() {
         AIHelper.removeGoals( goalSelector, SwimGoal.class );
-        AIHelper.insertGoal( goalSelector, 5, new AmphibiousGoToWaterGoal<>( this, 1.0 ).alwaysEnabled() );
+        AIHelper.insertGoal( goalSelector, 5, new AmphibiousGoToWaterGoal( this, 1.0 ).alwaysEnabled() );
         AIHelper.insertGoal( goalSelector, 6, new AmphibiousSwimUpGoal<>( this, 1.0 ) );
         AIHelper.replaceWaterAvoidingRandomWalking( this, 0.8 );
     }
