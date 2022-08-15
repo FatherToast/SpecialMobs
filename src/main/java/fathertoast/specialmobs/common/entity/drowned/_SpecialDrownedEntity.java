@@ -30,6 +30,7 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
+import net.minecraft.pathfinding.PathNodeType;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.SoundEvents;
@@ -240,7 +241,12 @@ public class _SpecialDrownedEntity extends DrownedEntity implements ISpecialMob<
     /** Sets the experience that should be dropped by this entity. */
     @Override
     public final void setExperience( int xp ) { xpReward = xp; }
-    
+
+    @Override
+    public void setSpecialPathfindingMalus(PathNodeType nodeType, float malus) {
+        this.setPathfindingMalus(nodeType, malus);
+    }
+
     /** Converts this entity to one of another type. */
     @Nullable
     @Override
