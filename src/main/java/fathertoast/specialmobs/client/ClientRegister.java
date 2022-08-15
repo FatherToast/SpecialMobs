@@ -8,6 +8,7 @@ import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.config.Config;
 import fathertoast.specialmobs.common.core.SpecialMobs;
 import fathertoast.specialmobs.common.core.register.SMEntities;
+import fathertoast.specialmobs.common.entity.creeper.EnderCreeperEntity;
 import fathertoast.specialmobs.common.entity.ghast.CorporealShiftGhastEntity;
 import fathertoast.specialmobs.common.entity.silverfish.PufferSilverfishEntity;
 import fathertoast.specialmobs.common.entity.skeleton.NinjaSkeletonEntity;
@@ -67,6 +68,8 @@ public class ClientRegister {
         registerFamilyRenderers( MobFamily.BLAZE, SpecialBlazeRenderer::new );
         
         // Species overrides
+        registerSpeciesRenderer( EnderCreeperEntity.SPECIES, EnderCreeperRenderer::new );
+        
         registerSpeciesRenderer( MadScientistZombieEntity.SPECIES, SpecialZombieVillagerRenderer::new );
         registerSpeciesRenderer( VampireZombifiedPiglinEntity.SPECIES, SpecialPiglinRenderer::newBothEars );
         

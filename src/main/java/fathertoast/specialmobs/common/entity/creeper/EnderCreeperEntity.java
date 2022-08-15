@@ -142,6 +142,8 @@ public class EnderCreeperEntity extends _SpecialCreeperEntity implements IAngera
         entityData.define( DATA_STARED_AT, false );
     }
     
+    public boolean isCreepy() { return entityData.get( DATA_CREEPY ); }
+    
     private boolean hasBeenStaredAt() { return entityData.get( DATA_STARED_AT ); }
     
     private void setBeingStaredAt() { entityData.set( DATA_STARED_AT, true ); }
