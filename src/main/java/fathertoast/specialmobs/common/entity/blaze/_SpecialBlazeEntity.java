@@ -11,6 +11,7 @@ import fathertoast.specialmobs.common.entity.SpecialMobData;
 import fathertoast.specialmobs.common.entity.ai.AIHelper;
 import fathertoast.specialmobs.common.entity.ai.goal.SpecialBlazeAttackGoal;
 import fathertoast.specialmobs.common.entity.ai.goal.SpecialHurtByTargetGoal;
+import fathertoast.specialmobs.common.event.NaturalSpawnManager;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import net.minecraft.block.BlockState;
@@ -62,6 +63,11 @@ public class _SpecialBlazeEntity extends BlazeEntity implements IRangedAttackMob
     @SpecialMob.AttributeSupplier
     public static AttributeModifierMap.MutableAttribute createAttributes() { return BlazeEntity.createAttributes(); }
     
+    @SpecialMob.SpawnPlacementRegistrar
+    public static void registerSpawnPlacement( MobFamily.Species<? extends _SpecialBlazeEntity> species ) {
+        NaturalSpawnManager.registerSpawnPlacement( species, NaturalSpawnManager::checkSpawnRulesIgnoreLight );
+    }
+    
     @SpecialMob.LanguageProvider
     public static String[] getTranslations( String langKey ) {
         return References.translations( langKey, "Blaze",
@@ -111,7 +117,7 @@ public class _SpecialBlazeEntity extends BlazeEntity implements IRangedAttackMob
     /** Called to attack the target with a ranged attack. */
     @Override
     public void performRangedAttack( LivingEntity target, float damageMulti ) {
-        if( !isSilent() ) level.levelEvent( null, References.EVENT_BLAZE_SHOOT, blockPosition(), 0 );
+        References.LevelEvent.BLAZE_SHOOT.play( this );
         
         final float accelVariance = MathHelper.sqrt( distanceTo( target ) ) * 0.5F * getSpecialData().getRangedAttackSpread();
         final double dX = target.getX() - getX() + getRandom().nextGaussian() * accelVariance;
@@ -177,6 +183,18 @@ public class _SpecialBlazeEntity extends BlazeEntity implements IRangedAttackMob
     @Override
     public final void setExperience( int xp ) { xpReward = xp; }
     
+    /** Converts this entity to one of another type. */
+    @Nullable
+    @Override
+    public <T extends MobEntity> T convertTo( EntityType<T> entityType, boolean keepEquipment ) {
+        final T replacement = super.convertTo( entityType, keepEquipment );
+        if( replacement instanceof ISpecialMob && level instanceof IServerWorld ) {
+            MobHelper.finalizeSpawn( replacement, (IServerWorld) level, level.getCurrentDifficultyAt( blockPosition() ),
+                    SpawnReason.CONVERSION, null );
+        }
+        return replacement;
+    }
+    
     /** Called on spawn to initialize properties based on the world, difficulty, and the group it spawns with. */
     @Nullable
     @Override
@@ -212,10 +230,10 @@ public class _SpecialBlazeEntity extends BlazeEntity implements IRangedAttackMob
         getSpecialData().tick();
     }
     
-    //    /** @return The eye height of this entity when standing. */ - Blazes use auto-scaled eye height
+    //    /** @return The eye height of this entity when standing. */
     //    @Override
     //    protected float getStandingEyeHeight( Pose pose, EntitySize size ) {
-    //        return super.getStandingEyeHeight( pose, size ) * getSpecialData().getBaseScale() * (isBaby() ? 0.53448F : 1.0F);
+    //        return super.getStandingEyeHeight( pose, size ) * getSpecialData().getHeightScaleByAge();
     //    }
     
     /** @return Whether this entity is immune to fire damage. */

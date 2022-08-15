@@ -14,7 +14,7 @@ public class MadScientistZombieSpeciesConfig extends ZombieSpeciesConfig {
     public MadScientistZombieSpeciesConfig( MobFamily.Species<?> species, double bowChance, double shieldChance, int minCharges, int maxCharges ) {
         super( species, bowChance, shieldChance );
         
-        MAD_SCIENTIST = new MadScientist( SPEC, species, speciesName, minCharges, maxCharges );
+        MAD_SCIENTIST = new MadScientist( SPEC, species, species.getConfigName(), minCharges, maxCharges );
     }
     
     public static class MadScientist extends Config.AbstractCategory {

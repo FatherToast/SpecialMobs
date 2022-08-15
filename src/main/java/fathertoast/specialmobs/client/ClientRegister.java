@@ -3,15 +3,14 @@ package fathertoast.specialmobs.client;
 import fathertoast.specialmobs.client.renderer.entity.family.*;
 import fathertoast.specialmobs.client.renderer.entity.projectile.BugSpitRenderer;
 import fathertoast.specialmobs.client.renderer.entity.projectile.SpecialFishingBobberRenderer;
-import fathertoast.specialmobs.client.renderer.entity.species.CorporealShiftGhastRenderer;
-import fathertoast.specialmobs.client.renderer.entity.species.NinjaSkeletonRenderer;
-import fathertoast.specialmobs.client.renderer.entity.species.PotionSlimeRenderer;
-import fathertoast.specialmobs.client.renderer.entity.species.SpecialZombieVillagerRenderer;
+import fathertoast.specialmobs.client.renderer.entity.species.*;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.config.Config;
 import fathertoast.specialmobs.common.core.SpecialMobs;
 import fathertoast.specialmobs.common.core.register.SMEntities;
+import fathertoast.specialmobs.common.entity.creeper.EnderCreeperEntity;
 import fathertoast.specialmobs.common.entity.ghast.CorporealShiftGhastEntity;
+import fathertoast.specialmobs.common.entity.silverfish.PufferSilverfishEntity;
 import fathertoast.specialmobs.common.entity.skeleton.NinjaSkeletonEntity;
 import fathertoast.specialmobs.common.entity.slime.PotionSlimeEntity;
 import fathertoast.specialmobs.common.entity.witherskeleton.NinjaWitherSkeletonEntity;
@@ -54,6 +53,7 @@ public class ClientRegister {
         // Family-based renderers
         registerFamilyRenderers( MobFamily.CREEPER, SpecialCreeperRenderer::new );
         registerFamilyRenderers( MobFamily.ZOMBIE, SpecialZombieRenderer::new );
+        registerFamilyRenderers( MobFamily.DROWNED, SpecialDrownedRenderer::new );
         registerFamilyRenderers( MobFamily.ZOMBIFIED_PIGLIN, SpecialPiglinRenderer::newMissingRightEar );
         registerFamilyRenderers( MobFamily.SKELETON, SpecialSkeletonRenderer::new );
         registerFamilyRenderers( MobFamily.WITHER_SKELETON, SpecialSkeletonRenderer::new );
@@ -68,6 +68,8 @@ public class ClientRegister {
         registerFamilyRenderers( MobFamily.BLAZE, SpecialBlazeRenderer::new );
         
         // Species overrides
+        registerSpeciesRenderer( EnderCreeperEntity.SPECIES, EnderCreeperRenderer::new );
+        
         registerSpeciesRenderer( MadScientistZombieEntity.SPECIES, SpecialZombieVillagerRenderer::new );
         registerSpeciesRenderer( VampireZombifiedPiglinEntity.SPECIES, SpecialPiglinRenderer::newBothEars );
         
@@ -75,6 +77,8 @@ public class ClientRegister {
         registerSpeciesRenderer( NinjaWitherSkeletonEntity.SPECIES, NinjaSkeletonRenderer::new );
         
         registerSpeciesRenderer( PotionSlimeEntity.SPECIES, PotionSlimeRenderer::new );
+        
+        registerSpeciesRenderer( PufferSilverfishEntity.SPECIES, ShortSilverfishRenderer::new );
         
         registerSpeciesRenderer( CorporealShiftGhastEntity.SPECIES, CorporealShiftGhastRenderer::new );
         

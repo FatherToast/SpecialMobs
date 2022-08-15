@@ -14,7 +14,7 @@ public class UndeadWitchSpeciesConfig extends SpeciesConfig {
     public UndeadWitchSpeciesConfig( MobFamily.Species<?> species, int minSummons, int maxSummons ) {
         super( species );
         
-        UNDEAD = new Undead( SPEC, species, speciesName, minSummons, maxSummons );
+        UNDEAD = new Undead( SPEC, species, species.getConfigName(), minSummons, maxSummons );
     }
     
     public static class Undead extends Config.AbstractCategory {

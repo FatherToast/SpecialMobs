@@ -15,6 +15,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.DimensionType;
 import net.minecraft.world.World;
+import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.feature.structure.Structure;
 
 import javax.annotation.Nullable;
@@ -206,6 +207,12 @@ public class EnvironmentEntry {
         /** Check if the biome belongs to a specific category. */
         public Builder notInBiomeCategory( BiomeCategory category ) { return in( new BiomeCategoryEnvironment( category, true ) ); }
         
+        /** Check if the biome is a specific one. */
+        public Builder inBiome( RegistryKey<Biome> biome ) { return in( new BiomeEnvironment( biome, false ) ); }
+        
+        /** Check if the biome is a specific one. */
+        public Builder notInBiome( RegistryKey<Biome> biome ) { return in( new BiomeEnvironment( biome, true ) ); }
+        
         
         // Position-based
         
@@ -232,22 +239,32 @@ public class EnvironmentEntry {
         private Builder aboveY( int y ) { return in( new YEnvironment( ComparisonOperator.LESS_OR_EQUAL.invert(), y ) ); }
         
         /** Check if the position is above/below sea level. */
-        public Builder belowSeaLevel() { return in( new YFromSeaEnvironment( ComparisonOperator.LESS_OR_EQUAL, 0 ) ); }
+        public Builder belowSeaLevel() { return belowSeaLevel( 0 ); }
         
         /** Check if the position is above/below sea level. */
-        public Builder aboveSeaLevel() { return in( new YFromSeaEnvironment( ComparisonOperator.LESS_OR_EQUAL.invert(), 0 ) ); }
+        public Builder aboveSeaLevel() { return aboveSeaLevel( 0 ); }
         
         /** Check if the position is above/below the average sea floor. */
-        public Builder belowSeaFloor() { return in( new YFromSeaEnvironment( ComparisonOperator.LESS_OR_EQUAL, -18 ) ); }
+        public Builder belowSeaDepths() { return belowSeaLevel( -6 ); }
         
         /** Check if the position is above/below the average sea floor. */
-        public Builder aboveSeaFloor() { return in( new YFromSeaEnvironment( ComparisonOperator.LESS_OR_EQUAL.invert(), -18 ) ); }
+        public Builder aboveSeaDepths() { return aboveSeaLevel( -6 ); }
+        
+        /** Check if the position is above/below the average sea floor. */
+        public Builder belowSeaFloor() { return belowSeaLevel( -18 ); }
+        
+        /** Check if the position is above/below the average sea floor. */
+        public Builder aboveSeaFloor() { return aboveSeaLevel( -18 ); }
         
         /** Check if the position is above/below 'mountain level' - that is, high enough to die from falling to sea level. */
-        public Builder aboveMountainLevel() { return in( new YFromSeaEnvironment( ComparisonOperator.GREATER_OR_EQUAL, 24 ) ); }
+        public Builder belowMountainLevel() { return belowSeaLevel( 25 ); }
         
         /** Check if the position is above/below 'mountain level' - that is, high enough to die from falling to sea level. */
-        public Builder belowMountainLevel() { return in( new YFromSeaEnvironment( ComparisonOperator.GREATER_OR_EQUAL.invert(), 24 ) ); }
+        public Builder aboveMountainLevel() { return aboveSeaLevel( 25 ); }
+        
+        private Builder belowSeaLevel( int dY ) { return in( new YFromSeaEnvironment( ComparisonOperator.LESS_OR_EQUAL, dY ) ); }
+        
+        private Builder aboveSeaLevel( int dY ) { return in( new YFromSeaEnvironment( ComparisonOperator.LESS_OR_EQUAL.invert(), dY ) ); }
         
         public Builder canSeeSky() { return inPositionWithState( PositionEnvironment.Value.CAN_SEE_SKY, false ); }
         

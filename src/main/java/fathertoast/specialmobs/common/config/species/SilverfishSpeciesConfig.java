@@ -17,7 +17,7 @@ public class SilverfishSpeciesConfig extends SpeciesConfig {
     public SilverfishSpeciesConfig( MobFamily.Species<?> species, double spitChance ) {
         super( species );
         
-        SILVERFISH = new Silverfish( SPEC, species, speciesName, spitChance );
+        SILVERFISH = new Silverfish( SPEC, species, species.getConfigName(), spitChance );
     }
     
     public static class Silverfish extends Config.AbstractCategory {

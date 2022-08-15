@@ -17,7 +17,7 @@ public class SkeletonSpeciesConfig extends SpeciesConfig {
     public SkeletonSpeciesConfig( MobFamily.Species<?> species, double bowChance, double shieldChance ) {
         super( species );
         
-        SKELETONS = new Skeletons( SPEC, species, speciesName, bowChance, shieldChance );
+        SKELETONS = new Skeletons( SPEC, species, species.getConfigName(), bowChance, shieldChance );
     }
     
     public static class Skeletons extends Config.AbstractCategory {

@@ -15,7 +15,7 @@ public class WildsWitchSpeciesConfig extends SpeciesConfig {
                                     int minSwarms, int maxSwarms, int minSwarmSize, int maxSwarmSize ) {
         super( species );
         
-        WILDS = new Wilds( SPEC, species, speciesName, minMounts, maxMounts, minSwarms, maxSwarms, minSwarmSize, maxSwarmSize );
+        WILDS = new Wilds( SPEC, species, species.getConfigName(), minMounts, maxMounts, minSwarms, maxSwarms, minSwarmSize, maxSwarmSize );
     }
     
     public static class Wilds extends Config.AbstractCategory {

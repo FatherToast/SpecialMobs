@@ -7,6 +7,8 @@ import fathertoast.specialmobs.common.config.species.SilverfishSpeciesConfig;
 import fathertoast.specialmobs.common.config.species.SpeciesConfig;
 import fathertoast.specialmobs.common.entity.ai.AIHelper;
 import fathertoast.specialmobs.common.entity.ai.IAngler;
+import fathertoast.specialmobs.common.entity.ai.goal.AmphibiousGoToShoreGoal;
+import fathertoast.specialmobs.common.entity.ai.goal.AmphibiousSwimUpGoal;
 import fathertoast.specialmobs.common.entity.ai.goal.AnglerGoal;
 import fathertoast.specialmobs.common.entity.ai.goal.PassiveRangedAttackGoal;
 import fathertoast.specialmobs.common.util.References;
@@ -15,11 +17,12 @@ import fathertoast.specialmobs.datagen.loot.LootPoolBuilder;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ai.attributes.Attributes;
+import net.minecraft.entity.ai.goal.SwimGoal;
 import net.minecraft.item.Items;
 import net.minecraft.world.World;
 
 @SpecialMob
-public class FishingSilverfishEntity extends _SpecialSilverfishEntity implements IAngler {
+public class FishingSilverfishEntity extends AmphibiousSilverfishEntity implements IAngler {
     
     //--------------- Static Special Mob Hooks ----------------
     
@@ -77,6 +80,10 @@ public class FishingSilverfishEntity extends _SpecialSilverfishEntity implements
     protected void registerVariantGoals() {
         AIHelper.removeGoals( goalSelector, PassiveRangedAttackGoal.class ); // Disable spit attack use
         goalSelector.addGoal( 4, new AnglerGoal<>( this ) );
+        
+        AIHelper.removeGoals( goalSelector, SwimGoal.class );
+        AIHelper.insertGoal( goalSelector, 5, new AmphibiousGoToShoreGoal<>( this, 1.0 ).alwaysEnabled() );
+        AIHelper.insertGoal( goalSelector, 6, new AmphibiousSwimUpGoal<>( this, 1.0 ).alwaysEnabled() );
     }
     
     

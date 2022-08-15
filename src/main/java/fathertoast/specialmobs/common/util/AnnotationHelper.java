@@ -82,6 +82,16 @@ public final class AnnotationHelper {
         }
     }
     
+    /** Registers the entity spawn placement for a special mob species. Throws an exception if anything goes wrong. */
+    public static void registerSpawnPlacement( MobFamily.Species<?> species ) {
+        try {
+            getMethodOrSuper( species.entityClass, SpecialMob.SpawnPlacementRegistrar.class ).invoke( null, species );
+        }
+        catch( NoSuchMethodException | InvocationTargetException | IllegalAccessException ex ) {
+            throw new RuntimeException( "Entity class for " + species.name + " has invalid spawn placement registration method", ex );
+        }
+    }
+    
     /** Gets the translations from a special mob species. Throws an exception if anything goes wrong. */
     public static String[] getTranslations( MobFamily.Species<?> species ) {
         try {

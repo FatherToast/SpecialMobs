@@ -15,7 +15,7 @@ import java.util.List;
 
 public class DimensionTypeGroupEnvironment extends DynamicRegistryGroupEnvironment<DimensionType> {
     
-    public DimensionTypeGroupEnvironment( RegistryKey<DimensionType> dimType, boolean invert ) { this( dimType.getRegistryName(), invert ); }
+    public DimensionTypeGroupEnvironment( RegistryKey<DimensionType> dimType, boolean invert ) { this( dimType.location(), invert ); }
     
     public DimensionTypeGroupEnvironment( ResourceLocation regKey, boolean invert ) { super( regKey, invert ); }
     

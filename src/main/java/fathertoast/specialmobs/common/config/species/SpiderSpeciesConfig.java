@@ -17,7 +17,7 @@ public class SpiderSpeciesConfig extends SpeciesConfig {
     public SpiderSpeciesConfig( MobFamily.Species<?> species, double spitChance ) {
         super( species );
         
-        SPIDERS = new Spiders( SPEC, species, speciesName, spitChance );
+        SPIDERS = new Spiders( SPEC, species, species.getConfigName(), spitChance );
     }
     
     public static class Spiders extends Config.AbstractCategory {

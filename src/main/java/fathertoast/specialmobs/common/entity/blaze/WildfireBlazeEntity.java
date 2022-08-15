@@ -96,7 +96,7 @@ public class WildfireBlazeEntity extends _SpecialBlazeEntity {
             final double vH = Math.sqrt( vX * vX + vZ * vZ );
             spawnBaby( vX / vH * 0.8 + getDeltaMovement().x * 0.2, vZ / vH * 0.8 + getDeltaMovement().z * 0.2, null );
             spawnAnim();
-            if( !isSilent() ) level.levelEvent( null, References.EVENT_BLAZE_SHOOT, blockPosition(), 0 );
+            References.LevelEvent.BLAZE_SHOOT.play( this );
         }
         else {
             super.performRangedAttack( target, damageMulti );
@@ -114,7 +114,7 @@ public class WildfireBlazeEntity extends _SpecialBlazeEntity {
                 groupData = spawnBaby( (random.nextDouble() - 0.5) * 0.3, (random.nextDouble() - 0.5) * 0.3, groupData );
             }
             spawnAnim();
-            if( !isSilent() ) level.levelEvent( null, References.EVENT_BLAZE_SHOOT, blockPosition(), 0 );
+            References.LevelEvent.BLAZE_SHOOT.play( this );
         }
         super.remove( keepData );
     }

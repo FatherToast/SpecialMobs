@@ -7,7 +7,9 @@ import fathertoast.specialmobs.common.core.SpecialMobs;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.entity.EntitySize;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.Pose;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
 import net.minecraft.nbt.StringNBT;
@@ -278,8 +280,17 @@ public class SpecialMobData<T extends LivingEntity & ISpecialMob<T>> {
     //** @return The render scale for the entity without its family scale factored in; used to correct scaling for pre-scaled vanilla values. */
     //public float getBaseScaleForPreScaledValues() { return getBaseScale() / getFamilyBaseScale(); }
     
+    /** @return The height scale. Used to calculate eye height for families that are not auto-scaled. */
+    public float getHeightScale() { return theEntity.getSpecies().getHeightScale(); }
+    
+    /**
+     * @return The height scale, including baby modifier if applicable. Used to calculate eye height for families that are not auto-scaled.
+     * Note: Baby scale is derived from {@link net.minecraft.entity.monster.ZombieEntity#getStandingEyeHeight(Pose, EntitySize)}.
+     */
+    public float getHeightScaleByAge() { return getHeightScale() * (theEntity.isBaby() ? 0.53448F : 1.0F); }
+    
     /** @return The base render scale for the entity, which is a property of the mob species. */
-    public float getBaseScale() { return theEntity.getSpecies().bestiaryInfo.baseScale; }
+    private float getBaseScale() { return theEntity.getSpecies().bestiaryInfo.baseScale; }
     
     /** @return A random render scale based on config settings. */
     private float nextScale() {

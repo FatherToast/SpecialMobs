@@ -21,7 +21,7 @@ public class SpecialZombieRenderer extends ZombieRenderer {
         super( rendererManager );
         baseShadowRadius = shadowRadius;
         addLayer( new SpecialMobEyesLayer<>( this ) );
-        addLayer( new SpecialMobOverlayLayer<>( this, new ZombieModel<>( 0.25F, true ) ) );
+        addLayer( new SpecialMobOverlayLayer<>( this, new ZombieModel<>( 0.25F, false ) ) );
     }
     
     @Override

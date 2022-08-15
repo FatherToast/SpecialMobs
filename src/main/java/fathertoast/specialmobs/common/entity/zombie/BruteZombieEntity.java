@@ -4,11 +4,13 @@ import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.entity.MobHelper;
+import fathertoast.specialmobs.common.entity.drowned.BruteDrownedEntity;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.Attributes;
+import net.minecraft.entity.monster.ZombieEntity;
 import net.minecraft.entity.projectile.AbstractArrowEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -57,6 +59,10 @@ public class BruteZombieEntity extends _SpecialZombieEntity {
     //--------------- Variant-Specific Implementations ----------------
     
     public BruteZombieEntity( EntityType<? extends _SpecialZombieEntity> entityType, World world ) { super( entityType, world ); }
+    
+    /** Override to change the entity this converts to when drowned. */
+    @Override
+    protected EntityType<? extends ZombieEntity> getVariantConversionType() { return BruteDrownedEntity.SPECIES.entityType.get(); }
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override

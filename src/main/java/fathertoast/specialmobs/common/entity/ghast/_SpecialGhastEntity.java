@@ -11,6 +11,7 @@ import fathertoast.specialmobs.common.entity.ai.SimpleFlyingMovementController;
 import fathertoast.specialmobs.common.entity.ai.goal.SpecialGhastFireballAttackGoal;
 import fathertoast.specialmobs.common.entity.ai.goal.SpecialGhastLookAroundGoal;
 import fathertoast.specialmobs.common.entity.ai.goal.SpecialGhastMeleeAttackGoal;
+import fathertoast.specialmobs.common.event.NaturalSpawnManager;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import net.minecraft.block.BlockState;
@@ -30,6 +31,7 @@ import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.pathfinding.PathNodeType;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.util.DamageSource;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.DifficultyInstance;
@@ -37,6 +39,7 @@ import net.minecraft.world.IServerWorld;
 import net.minecraft.world.World;
 
 import javax.annotation.Nullable;
+import java.util.Random;
 
 @SpecialMob
 public class _SpecialGhastEntity extends GhastEntity implements IRangedAttackMob, ISpecialMob<_SpecialGhastEntity> {
@@ -57,6 +60,18 @@ public class _SpecialGhastEntity extends GhastEntity implements IRangedAttackMob
     @SpecialMob.AttributeSupplier
     public static AttributeModifierMap.MutableAttribute createAttributes() {
         return GhastEntity.createAttributes().add( Attributes.ATTACK_DAMAGE, 4.0 );
+    }
+    
+    @SpecialMob.SpawnPlacementRegistrar
+    public static void registerSpawnPlacement( MobFamily.Species<? extends _SpecialGhastEntity> species ) {
+        NaturalSpawnManager.registerSpawnPlacement( species, _SpecialGhastEntity::checkFamilySpawnRules );
+    }
+    
+    public static boolean checkFamilySpawnRules( EntityType<? extends GhastEntity> type, IServerWorld world,
+                                                 SpawnReason reason, BlockPos pos, Random random ) {
+        //noinspection unchecked
+        return GhastEntity.checkGhastSpawnRules( (EntityType<GhastEntity>) type, world, reason, pos, random ) &&
+                NaturalSpawnManager.checkSpawnRulesConfigured( type, world, reason, pos, random );
     }
     
     @SpecialMob.LanguageProvider
@@ -107,7 +122,7 @@ public class _SpecialGhastEntity extends GhastEntity implements IRangedAttackMob
     /** Called to attack the target with a ranged attack. */
     @Override
     public void performRangedAttack( LivingEntity target, float damageMulti ) {
-        if( !isSilent() ) level.levelEvent( null, References.EVENT_GHAST_SHOOT, blockPosition(), 0 );
+        References.LevelEvent.GHAST_SHOOT.play( this );
         
         final float accelVariance = MathHelper.sqrt( distanceTo( target ) ) * 0.5F * getSpecialData().getRangedAttackSpread();
         final Vector3d lookVec = getViewVector( 1.0F ).scale( getBbWidth() );
@@ -201,6 +216,18 @@ public class _SpecialGhastEntity extends GhastEntity implements IRangedAttackMob
     @Override
     public final void setExperience( int xp ) { xpReward = xp; }
     
+    /** Converts this entity to one of another type. */
+    @Nullable
+    @Override
+    public <T extends MobEntity> T convertTo( EntityType<T> entityType, boolean keepEquipment ) {
+        final T replacement = super.convertTo( entityType, keepEquipment );
+        if( replacement instanceof ISpecialMob && level instanceof IServerWorld ) {
+            MobHelper.finalizeSpawn( replacement, (IServerWorld) level, level.getCurrentDifficultyAt( blockPosition() ),
+                    SpawnReason.CONVERSION, null );
+        }
+        return replacement;
+    }
+    
     /** Called on spawn to initialize properties based on the world, difficulty, and the group it spawns with. */
     @Nullable
     @Override
@@ -240,7 +267,7 @@ public class _SpecialGhastEntity extends GhastEntity implements IRangedAttackMob
     /** @return The eye height of this entity when standing. */
     @Override
     protected float getStandingEyeHeight( Pose pose, EntitySize size ) {
-        return super.getStandingEyeHeight( pose, size ) * getSpecialData().getBaseScale() * (isBaby() ? 0.53448F : 1.0F);
+        return super.getStandingEyeHeight( pose, size ) * getSpecialData().getHeightScaleByAge();
     }
     
     /** @return Whether this entity is immune to fire damage. */

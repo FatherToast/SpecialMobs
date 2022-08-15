@@ -4,22 +4,25 @@ import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.entity.MobHelper;
+import fathertoast.specialmobs.common.event.NaturalSpawnManager;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.ai.attributes.AttributeModifierMap;
 import net.minecraft.entity.monster.StrayEntity;
 import net.minecraft.entity.projectile.AbstractArrowEntity;
-import net.minecraft.entity.projectile.ArrowEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.Effects;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.SoundEvents;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IServerWorld;
 import net.minecraft.world.World;
+
+import java.util.Random;
 
 @SpecialMob
 public class StraySkeletonEntity extends _SpecialSkeletonEntity {
@@ -33,11 +36,27 @@ public class StraySkeletonEntity extends _SpecialSkeletonEntity {
     public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
         bestiaryInfo.color( 0xDDEAEA ).weight( BestiaryInfo.DefaultWeight.LOW ).theme( BestiaryInfo.Theme.ICE )
                 .vanillaTextureWithOverlay( "textures/entity/skeleton/stray.png", "textures/entity/skeleton/stray_overlay.png" )
-                .addExperience( 1 ).effectImmune( Effects.MOVEMENT_SLOWDOWN );
+                .addExperience( 1 );
     }
     
     @SpecialMob.AttributeSupplier
     public static AttributeModifierMap.MutableAttribute createAttributes() { return StrayEntity.createAttributes(); }
+    
+    @SpecialMob.SpawnPlacementRegistrar
+    public static void registerSpeciesSpawnPlacement( MobFamily.Species<? extends StraySkeletonEntity> species ) {
+        NaturalSpawnManager.registerSpawnPlacement( species, StraySkeletonEntity::checkSpeciesSpawnRules );
+    }
+    
+    /**
+     * We cannot call the actual stray method because our stray variant does not extend the vanilla stray.
+     *
+     * @see net.minecraft.entity.monster.StrayEntity#checkStraySpawnRules(EntityType, IServerWorld, SpawnReason, BlockPos, Random)
+     */
+    public static boolean checkSpeciesSpawnRules( EntityType<? extends StraySkeletonEntity> type, IServerWorld world,
+                                                  SpawnReason reason, BlockPos pos, Random random ) {
+        return NaturalSpawnManager.checkSpawnRulesDefault( type, world, reason, pos, random ) &&
+                (reason == SpawnReason.SPAWNER || world.canSeeSky( pos ));
+    }
     
     @SpecialMob.LanguageProvider
     public static String[] getTranslations( String langKey ) {

@@ -9,6 +9,7 @@ import fathertoast.specialmobs.common.config.species.ZombieSpeciesConfig;
 import fathertoast.specialmobs.common.entity.ai.AIHelper;
 import fathertoast.specialmobs.common.entity.ai.IAngler;
 import fathertoast.specialmobs.common.entity.ai.goal.AnglerGoal;
+import fathertoast.specialmobs.common.entity.drowned.FishingDrownedEntity;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootEntryItemBuilder;
 import fathertoast.specialmobs.datagen.loot.LootHelper;
@@ -19,6 +20,7 @@ import net.minecraft.entity.ILivingEntityData;
 import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.ai.goal.ZombieAttackGoal;
+import net.minecraft.entity.monster.ZombieEntity;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.IDyeableArmorItem;
 import net.minecraft.item.ItemStack;
@@ -111,6 +113,10 @@ public class FishingZombieEntity extends _SpecialZombieEntity implements IAngler
         }
         setCanPickUpLoot( false );
     }
+    
+    /** Override to change the entity this converts to when drowned. */
+    @Override
+    protected EntityType<? extends ZombieEntity> getVariantConversionType() { return FishingDrownedEntity.SPECIES.entityType.get(); }
     
     
     //--------------- IAngler Implementations ----------------

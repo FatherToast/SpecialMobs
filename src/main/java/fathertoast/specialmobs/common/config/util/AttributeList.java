@@ -1,6 +1,5 @@
 package fathertoast.specialmobs.common.config.util;
 
-import fathertoast.specialmobs.common.config.field.IStringArray;
 import fathertoast.specialmobs.common.config.file.TomlHelper;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.AttributeModifierMap;

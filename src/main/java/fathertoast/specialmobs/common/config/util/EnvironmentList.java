@@ -1,7 +1,6 @@
 package fathertoast.specialmobs.common.config.util;
 
 import fathertoast.specialmobs.common.config.field.DoubleField;
-import fathertoast.specialmobs.common.config.field.IStringArray;
 import fathertoast.specialmobs.common.config.file.TomlHelper;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;

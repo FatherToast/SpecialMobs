@@ -5,6 +5,7 @@ import com.electronwill.nightconfig.core.utils.StringUtils;
 import fathertoast.specialmobs.common.config.field.DoubleField;
 import fathertoast.specialmobs.common.config.field.IntField;
 import fathertoast.specialmobs.common.config.util.ConfigUtil;
+import fathertoast.specialmobs.common.config.util.IStringArray;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -57,6 +58,18 @@ public final class TomlHelper {
         return NullObject.NULL_OBJECT;
     }
     
+    /** Attempts to convert an object to a toml literal for the use of a comment. Prevents printing of excessively long lists. */
+    public static String toLiteralForComment( @Nullable Object value ) {
+        if( value instanceof IStringArray ) {
+            final List<String> list = ((IStringArray) value).toStringList();
+            if( list.size() > 10 ) {
+                String str = toLiteral( list.subList( 0, 9 ).toArray() );
+                return str.substring( 0, str.length() - 2 ) + ", ... ]";
+            }
+        }
+        return toLiteral( value );
+    }
+    
     /** Attempts to convert an object to a toml literal. May or may not be accurate. */
     public static String toLiteral( @Nullable Object value ) {
         if( value == null ) {
@@ -107,13 +120,13 @@ public final class TomlHelper {
     
     /** @return The default field info for a field with a value format/structure. */
     public static String fieldInfoFormat( String typeName, Object defaultValue, String format ) {
-        return String.format( "<%s> Format: %s, Default: %s", typeName, format, toLiteral( defaultValue ) );
+        return String.format( "<%s> Format: %s, Default: %s", typeName, format, toLiteralForComment( defaultValue ) );
     }
     
     /** @return The default field info for a field with a limited set of valid values. */
     public static String fieldInfoValidValues( String typeName, Object defaultValue, Object... validValues ) {
         return String.format( "<%s> Valid Values: { %s }, Default: %s",
-                typeName, TomlHelper.literalList( validValues ), toLiteral( defaultValue ) );
+                typeName, TomlHelper.literalList( validValues ), toLiteralForComment( defaultValue ) );
     }
     
     /** @return The default field info for a series of int fields (no defaults listed). */

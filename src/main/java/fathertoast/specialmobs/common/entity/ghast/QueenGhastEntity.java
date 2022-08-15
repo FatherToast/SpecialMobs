@@ -92,7 +92,7 @@ public class QueenGhastEntity extends _SpecialGhastEntity {
             final double vH = Math.sqrt( vX * vX + vZ * vZ );
             spawnBaby( vX / vH + getDeltaMovement().x * 0.2, vZ / vH + getDeltaMovement().z * 0.2, null );
             spawnAnim();
-            if( !isSilent() ) level.levelEvent( null, References.EVENT_GHAST_SHOOT, blockPosition(), 0 );
+            References.LevelEvent.GHAST_SHOOT.play( this );
         }
         else {
             super.performRangedAttack( target, damageMulti );
@@ -114,7 +114,7 @@ public class QueenGhastEntity extends _SpecialGhastEntity {
                 groupData = spawnBaby( (random.nextDouble() - 0.5) * 0.3, (random.nextDouble() - 0.5) * 0.3, groupData );
             }
             spawnAnim();
-            if( !isSilent() ) level.levelEvent( null, References.EVENT_BLAZE_SHOOT, blockPosition(), 0 );
+            References.LevelEvent.BLAZE_SHOOT.play( this );
         }
         super.remove( keepData );
     }

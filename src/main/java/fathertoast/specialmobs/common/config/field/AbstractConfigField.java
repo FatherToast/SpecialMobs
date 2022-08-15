@@ -3,6 +3,8 @@ package fathertoast.specialmobs.common.config.field;
 import com.electronwill.nightconfig.core.io.CharacterOutput;
 import fathertoast.specialmobs.common.config.file.ToastTomlWriter;
 import fathertoast.specialmobs.common.config.file.TomlHelper;
+import fathertoast.specialmobs.common.config.util.IStringArray;
+import fathertoast.specialmobs.common.config.util.RestartNote;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -46,8 +48,9 @@ public abstract class AbstractConfigField {
     public final List<String> getComment() { return COMMENT; }
     
     /** Adds procedural information to the comment and then makes it unmodifiable. */
-    public final void finalizeComment() {
+    public final void finalizeComment( @Nullable RestartNote restartNote ) {
         if( COMMENT == null ) return;
+        RestartNote.appendComment( COMMENT, restartNote );
         appendFieldInfo( COMMENT );
         ((ArrayList<String>) COMMENT).trimToSize();
         COMMENT = Collections.unmodifiableList( COMMENT );

@@ -8,8 +8,10 @@ import com.electronwill.nightconfig.core.io.ParsingException;
 import com.electronwill.nightconfig.core.io.WritingException;
 import fathertoast.specialmobs.common.config.field.*;
 import fathertoast.specialmobs.common.config.util.ConfigUtil;
+import fathertoast.specialmobs.common.config.util.RestartNote;
 import fathertoast.specialmobs.common.core.SpecialMobs;
 
+import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -19,8 +21,8 @@ import java.util.Objects;
 /**
  * A config spec maps read and write functions to the runtime variables used to hold them.
  * <p>
- * Contains helper functions to build a spec similarly to writing a default file, allowing insertion of
- * comments and formatting as desired.
+ * Contains helper functions at the bottom of this class to build a spec similarly to writing a default file,
+ * allowing insertion of fields, load actions, comments, and formatting as desired.
  */
 @SuppressWarnings( "unused" )
 public class ToastConfigSpec {
@@ -197,9 +199,7 @@ public class ToastConfigSpec {
         
         /** Called when the config is saved. */
         @Override
-        public void write( ToastTomlWriter writer, CharacterOutput output ) {
-            writer.changeIndentLevel( AMOUNT );
-        }
+        public void write( ToastTomlWriter writer, CharacterOutput output ) { writer.changeIndentLevel( AMOUNT ); }
     }
     
     /** Represents a comment. */
@@ -243,18 +243,16 @@ public class ToastConfigSpec {
         /** The appendix comment. */
         private final List<String> COMMENT;
         
-        /** Create a new header action that will insert the opening file comment. */
-        private AppendixHeader( List<String> comment ) {
-            COMMENT = comment;
-        }
+        /** Create a new appendix header action that will insert a closing file comment. */
+        private AppendixHeader( List<String> comment ) { COMMENT = comment; }
         
         /** Called when the config is saved. */
         @Override
         public void write( ToastTomlWriter writer, CharacterOutput output ) {
             writer.decreaseIndentLevel();
-            writer.writeNewLine( output );
-            writer.writeNewLine( output );
             
+            writer.writeNewLine( output );
+            writer.writeNewLine( output );
             writer.writeComment( "Appendix:", output );
             writer.writeComment( COMMENT, output );
             
@@ -281,9 +279,33 @@ public class ToastConfigSpec {
             writer.writeNewLine( output );
             writer.writeNewLine( output );
             writer.writeComment( COMMENT, output );
-            writer.writeNewLine( output );
             
             writer.increaseIndentLevel();
+            writer.writeNewLine( output );
+        }
+    }
+    
+    /** Represents a subcategory comment. */
+    private static class Subcategory extends Format {
+        /** The subcategory comment. */
+        private final List<String> COMMENT;
+        
+        /** Create a new subcategory action that will insert the subcategory comment. */
+        private Subcategory( String subcategoryName, List<String> comment ) {
+            comment.add( 0, "Subcategory: " + subcategoryName );
+            COMMENT = comment;
+        }
+        
+        /** Called when the config is saved. */
+        @Override
+        public void write( ToastTomlWriter writer, CharacterOutput output ) {
+            writer.decreaseIndentLevel();
+            
+            writer.writeNewLine( output );
+            writer.writeComment( COMMENT, output );
+            
+            writer.increaseIndentLevel();
+            writer.writeNewLine( output );
         }
     }
     
@@ -315,10 +337,10 @@ public class ToastConfigSpec {
         private final AbstractConfigField FIELD;
         
         /** Create a new field action that will load/create and save the field value. */
-        private Field( ToastConfigSpec parent, AbstractConfigField field ) {
+        private Field( ToastConfigSpec parent, AbstractConfigField field, @Nullable RestartNote restartNote ) {
             PARENT = parent;
             FIELD = field;
-            FIELD.finalizeComment();
+            FIELD.finalizeComment( restartNote );
         }
         
         /** Called when the config is loaded. */
@@ -348,29 +370,62 @@ public class ToastConfigSpec {
         }
     }
     
+    
+    // Spec building methods below
+    
     /**
+     * Adds a field. The added field will automatically update its value when the config file is loaded.
+     * It is good practice to avoid storing the field's value whenever possible.
+     * <p>
+     * When not possible (e.g. the field is used to initialize something that you can't modify afterward),
+     * consider providing a restart note to inform users of the limitation.
+     *
      * @param field The field to define in this config spec.
      * @return The same field for convenience in constructing.
      */
-    public <T extends AbstractConfigField> T define( T field ) {
+    public <T extends AbstractConfigField> T define( T field ) { return define( field, null ); }
+    
+    /**
+     * Adds a field. The added field will automatically update its value when the config file is loaded.
+     * It is good practice to avoid storing the field's value whenever possible.
+     * <p>
+     * When not possible (e.g. the field is used to initialize something that you can't modify afterward),
+     * consider providing a restart note to inform users of the limitation.
+     *
+     * @param field       The field to define in this config spec.
+     * @param restartNote Note to provide for the field's restart requirements.
+     * @return The same field for convenience in constructing.
+     */
+    public <T extends AbstractConfigField> T define( T field, @Nullable RestartNote restartNote ) {
         // Double check just to make sure we don't screw up the spec
         for( Action action : ACTIONS ) {
             if( action instanceof Field && field.getKey().equalsIgnoreCase( ((Field) action).FIELD.getKey() ) ) {
                 throw new IllegalStateException( "Attempted to register duplicate field key '" + field.getKey() + "' in config " + NAME );
             }
         }
-        ACTIONS.add( new Field( this, field ) );
+        ACTIONS.add( new Field( this, field, restartNote ) );
         return field;
     }
     
-    /** @param callback The callback to run on read. */
+    
+    /**
+     * Registers a runnable (or void no-argument method reference) to be called when the config is loaded.
+     * It is called at exactly the point defined, so fields defined above will be loaded with new values, while fields
+     * below will still contain their previous values (null/zero on the first load).
+     * <p>
+     * This is effectively an "on config loading" event.
+     *
+     * @param callback The callback to run on read.
+     */
     public void callback( Runnable callback ) { ACTIONS.add( new ReadCallback( callback ) ); }
+    
     
     /** Inserts a single new line. */
     public void newLine() { newLine( 1 ); }
     
     /** @param count The number of new lines to insert. */
     public void newLine( int count ) { ACTIONS.add( new NewLines( count ) ); }
+    
     
     /** Increases the indent by one level. */
     public void increaseIndent() { indent( +1 ); }
@@ -381,37 +436,90 @@ public class ToastConfigSpec {
     /** @param count The amount to change the indent by. */
     public void indent( int count ) { ACTIONS.add( new Indent( count ) ); }
     
-    /** @param comment The comment to insert. */
-    public void comment( String... comment ) { comment( TomlHelper.newComment( comment ) ); }
-    
-    /** @param comment The comment to insert. */
-    public void comment( List<String> comment ) { ACTIONS.add( new Comment( comment ) ); }
-    
-    /** @param comment The file comment to insert. */
-    public void header( List<String> comment ) { ACTIONS.add( new Header( this, comment ) ); }
-    
-    /** @param comment The appendix comment to insert. */
-    public void appendixHeader( String... comment ) { ACTIONS.add( new AppendixHeader( TomlHelper.newComment( comment ) ) ); }
-    
-    /** Inserts a detailed description of how to use the registry entry list field. */
-    public void describeRegistryEntryList() { ACTIONS.add( new Comment( RegistryEntryListField.verboseDescription() ) ); }
-    
-    /** Inserts a detailed description of how to use the entity list field. */
-    public void describeEntityList() { ACTIONS.add( new Comment( EntityListField.verboseDescription() ) ); }
-    
-    /** Inserts a detailed description of how to use the attribute list field. */
-    public void describeAttributeList() { ACTIONS.add( new Comment( AttributeListField.verboseDescription() ) ); }
-    
-    /** Inserts a detailed description of how to use the block list field. */
-    public void describeBlockList() { ACTIONS.add( new Comment( BlockListField.verboseDescription() ) ); }
-    
-    /** Inserts the first part of a detailed description of how to use the environment list field. Should go with the other field descriptions. */
-    public void describeEnvironmentListPart1of2() { ACTIONS.add( new Comment( EnvironmentListField.verboseDescription() ) ); }
-    
-    /** Inserts the second and last part of a detailed description of how to use the environment list field. Should go at the bottom of the file. */
-    public void describeEnvironmentListPart2of2() { ACTIONS.add( new Comment( EnvironmentListField.environmentDescriptions() ) ); }
     
     /**
+     * Adds a comment. Each argument is printed on a separate line, in the order given.
+     *
+     * @param comment The comment to insert.
+     */
+    public void comment( String... comment ) { comment( TomlHelper.newComment( comment ) ); }
+    
+    /**
+     * Adds a comment. Each string in the list is printed on a separate line, in the order returned by iteration.
+     *
+     * @param comment The comment to insert.
+     */
+    public void comment( List<String> comment ) { ACTIONS.add( new Comment( comment ) ); }
+    
+    
+    /**
+     * Adds a subcategory header, optionally including a comment to describe/summarize the contents of the file.
+     * <p>
+     * The header and its comment are printed at the current indent level - 1. Therefore, it is good practice to always
+     * increase the indent before the first subcategory and then decrease the indent after the final subcategory.
+     *
+     * @param name    The subcategory name.
+     * @param comment The subcategory comment to insert.
+     */
+    public void subcategory( String name, String... comment ) { ACTIONS.add( new Subcategory( name, TomlHelper.newComment( comment ) ) ); }
+    
+    /**
+     * Adds a header to signal the start of the appendix section, optionally including a comment to describe/summarize the section.
+     *
+     * @param comment The appendix comment to insert.
+     */
+    public void appendixHeader( String... comment ) { ACTIONS.add( new AppendixHeader( TomlHelper.newComment( comment ) ) ); }
+    
+    
+    /**
+     * Inserts a detailed description of how to use the registry entry list field.
+     * Recommended to include either in a README or at the start of each config that contains any registry entry list fields.
+     */
+    public void describeRegistryEntryList() { ACTIONS.add( new Comment( RegistryEntryListField.verboseDescription() ) ); }
+    
+    /**
+     * Inserts a detailed description of how to use the entity list field.
+     * Recommended to include either in a README or at the start of each config that contains any entity list fields.
+     */
+    public void describeEntityList() { ACTIONS.add( new Comment( EntityListField.verboseDescription() ) ); }
+    
+    /**
+     * Inserts a detailed description of how to use the attribute list field.
+     * Recommended to include either in a README or at the start of each config that contains any attribute list fields.
+     */
+    public void describeAttributeList() { ACTIONS.add( new Comment( AttributeListField.verboseDescription() ) ); }
+    
+    /**
+     * Inserts a detailed description of how to use the block list field.
+     * Recommended to include either in a README or at the start of each config that contains any block list fields.
+     */
+    public void describeBlockList() { ACTIONS.add( new Comment( BlockListField.verboseDescription() ) ); }
+    
+    /**
+     * Inserts the first part of a detailed description of how to use the environment list field.
+     * Should go with the other field descriptions.
+     */
+    public void describeEnvironmentListPart1of2() { ACTIONS.add( new Comment( EnvironmentListField.verboseDescription() ) ); }
+    
+    /**
+     * Inserts the second and last part of a detailed description of how to use the environment list field.
+     * Should go at the bottom of the file, preferably after the appendix header (if used).
+     */
+    public void describeEnvironmentListPart2of2() { ACTIONS.add( new Comment( EnvironmentListField.environmentDescriptions() ) ); }
+    
+    
+    /**
+     * NOTE: You should never need to call this method. It is called automatically in the config constructor.
+     * Adds a config header with a comment to describe/summarize the contents of the file.
+     *
+     * @param comment The file comment to insert.
+     */
+    public void header( List<String> comment ) { ACTIONS.add( new Header( this, comment ) ); }
+    
+    /**
+     * NOTE: You should never need to call this method. It is called automatically in the category constructor.
+     * Adds a category header with a comment to describe/summarize the contents of the category section.
+     *
      * @param name    The category name.
      * @param comment The category comment to insert.
      */

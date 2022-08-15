@@ -24,7 +24,7 @@ public class BlindingSilverfishEntity extends _SpecialSilverfishEntity {
     public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
         bestiaryInfo.color( 0x000000 ).theme( BestiaryInfo.Theme.FOREST )
                 .uniqueTextureBaseOnly()
-                .addExperience( 1 ).effectImmune( Effects.BLINDNESS );
+                .addExperience( 1 );
     }
     
     @SpecialMob.LanguageProvider

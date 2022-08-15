@@ -17,7 +17,6 @@ import java.util.Set;
  * <p>
  * See also: {@link net.minecraftforge.registries.ForgeRegistries}
  */
-@SuppressWarnings( "unused" )
 public class LazyRegistryEntryList<T extends IForgeRegistryEntry<T>> extends RegistryEntryList<T> {
     /** The field containing this list. We save a reference to help improve error/warning reports. */
     private final AbstractConfigField FIELD;

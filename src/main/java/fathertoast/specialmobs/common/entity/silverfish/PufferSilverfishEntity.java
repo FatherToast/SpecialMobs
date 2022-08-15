@@ -4,16 +4,19 @@ import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.entity.MobHelper;
+import fathertoast.specialmobs.common.entity.ai.AIHelper;
+import fathertoast.specialmobs.common.entity.ai.goal.AmphibiousGoToWaterGoal;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.ai.goal.SwimGoal;
 import net.minecraft.item.Items;
 import net.minecraft.potion.Effects;
 import net.minecraft.world.World;
 
 @SpecialMob
-public class PufferSilverfishEntity extends _SpecialSilverfishEntity {
+public class PufferSilverfishEntity extends AmphibiousSilverfishEntity {
     
     //--------------- Static Special Mob Hooks ----------------
     
@@ -22,8 +25,8 @@ public class PufferSilverfishEntity extends _SpecialSilverfishEntity {
     
     @SpecialMob.BestiaryInfoSupplier
     public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
-        bestiaryInfo.color( 0xE6E861 ).theme( BestiaryInfo.Theme.WATER )
-                .uniqueTextureBaseOnly()//TODO Change texture or renderer to fix offset
+        bestiaryInfo.color( 0xE6E861 ).weight( BestiaryInfo.DefaultWeight.LOW ).theme( BestiaryInfo.Theme.WATER )
+                .uniqueTextureBaseOnly()
                 .addExperience( 1 ).drownImmune().effectImmune( Effects.POISON );
     }
     
@@ -52,7 +55,12 @@ public class PufferSilverfishEntity extends _SpecialSilverfishEntity {
     
     public PufferSilverfishEntity( EntityType<? extends _SpecialSilverfishEntity> entityType, World world ) { super( entityType, world ); }
     
-    //TODO swim behavior
+    /** Override to change this entity's AI goals. */
+    @Override
+    protected void registerVariantGoals() {
+        AIHelper.removeGoals( goalSelector, SwimGoal.class );
+        AIHelper.insertGoal( goalSelector, 5, new AmphibiousGoToWaterGoal( this, 1.0 ).alwaysEnabled() );
+    }
     
     /** Override to change the color of this entity's spit attack. */
     @Override
@@ -63,4 +71,8 @@ public class PufferSilverfishEntity extends _SpecialSilverfishEntity {
     protected void onVariantAttack( LivingEntity target ) {
         MobHelper.applyEffect( target, Effects.POISON );
     }
+    
+    /** @return Water drag coefficient. */
+    @Override
+    protected float getWaterSlowDown() { return 0.95F; }
 }

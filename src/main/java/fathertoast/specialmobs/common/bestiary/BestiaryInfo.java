@@ -12,6 +12,7 @@ import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.potion.Effect;
 import net.minecraft.potion.Effects;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.biome.Biomes;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import javax.annotation.Nullable;
@@ -55,7 +56,7 @@ public class BestiaryInfo {
         ) ),
         DESERT( new EnvironmentList(
                 EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).inUltraWarmDimension().build(),
-                EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).inDryBiome().build(),
+                EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).inNaturalDimension().inDryBiome().build(),
                 EnvironmentEntry.builder( DefaultWeight.LOWEST.value ).inWaterBiome().build(),
                 EnvironmentEntry.builder( DefaultWeight.LOWEST.value ).inHumidBiome().build(),
                 EnvironmentEntry.builder( DefaultWeight.LOWEST.value ).isRaining().canSeeSky().build(),
@@ -63,7 +64,7 @@ public class BestiaryInfo {
         ) ),
         WATER( new EnvironmentList(
                 EnvironmentEntry.builder( DefaultWeight.LOWEST.value ).inUltraWarmDimension().build(),
-                EnvironmentEntry.builder( DefaultWeight.LOWEST.value ).inDryBiome().build(),
+                EnvironmentEntry.builder( DefaultWeight.LOWEST.value ).inNaturalDimension().inDryBiome().build(),
                 EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).inWaterBiome().build(),
                 EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).inHumidBiome().build(),
                 EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).isRaining().canSeeSky().build(),
@@ -74,6 +75,7 @@ public class BestiaryInfo {
                 EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).inBiomeCategory( BiomeCategory.JUNGLE ).build(),
                 EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).inBiomeCategory( BiomeCategory.FOREST ).build(),
                 EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).inBiomeCategory( BiomeCategory.SWAMP ).build(),
+                EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).inBiome( Biomes.CRIMSON_FOREST ).build(),
                 EnvironmentEntry.builder( DefaultWeight.HIGH.value ).atMaxMoonLight().build()
         ) ),
         MOUNTAIN( new EnvironmentList(
@@ -150,7 +152,7 @@ public class BestiaryInfo {
     private BestiaryInfo( int eggColor, float scale, DefaultWeight weight, Theme spawnTheme, List<AttributeEntry> attributes,
                           ResourceLocation tex, ResourceLocation eyeTex, ResourceLocation ovrTex,
                           int xp, int regen, double fallDmg, boolean fireImm, boolean burnImm, boolean drownImm, boolean pushImm,
-                          boolean waterDmg, boolean leash, boolean plateImm, Block[] blockImm, Effect[] effectImm,
+                          boolean waterDmg, boolean leash, boolean plateImm, Object[] blockImm, Object[] effectImm,
                           double raDmg, double raVar, double raSpd, int raCD, int raMCD, double raRng ) {
         eggSpotsColor = eggColor;
         baseScale = scale;
@@ -173,8 +175,8 @@ public class BestiaryInfo {
         isDamagedByWater = waterDmg;
         allowLeashing = leash;
         ignorePressurePlates = plateImm;
-        immuneToStickyBlocks = new RegistryEntryList<>( ForgeRegistries.BLOCKS, blockImm );
-        immuneToPotions = new RegistryEntryList<>( ForgeRegistries.POTIONS, effectImm );
+        immuneToStickyBlocks = new LazyRegistryEntryList<>( ForgeRegistries.BLOCKS, blockImm );
+        immuneToPotions = new LazyRegistryEntryList<>( ForgeRegistries.POTIONS, effectImm );
         rangedAttackDamage = raDmg;
         rangedAttackSpread = raVar;
         rangedWalkSpeed = raSpd;
@@ -213,8 +215,8 @@ public class BestiaryInfo {
         private boolean isDamagedByWater;
         private boolean allowLeashing;
         private boolean ignorePressurePlates;
-        private final ArrayList<Block> immuneToStickyBlocks = new ArrayList<>();
-        private final ArrayList<Effect> immuneToPotions = new ArrayList<>();
+        private final ArrayList<Object> immuneToStickyBlocks = new ArrayList<>();
+        private final ArrayList<Object> immuneToPotions = new ArrayList<>();
         private double rangedAttackDamage = -1.0;
         private double rangedAttackSpread = -1.0;
         private double rangedWalkSpeed = -1.0;
@@ -270,7 +272,7 @@ public class BestiaryInfo {
             
             return new BestiaryInfo( eggSpotsColor, baseScale, defaultWeight, spawnTheme, attributes, texture, eyesTexture, overlayTexture,
                     experience, healTime, fallDamageMultiplier, isImmuneToFire, isImmuneToBurning, canBreatheInWater, ignoreWaterPush, isDamagedByWater,
-                    allowLeashing, ignorePressurePlates, immuneToStickyBlocks.toArray( new Block[0] ), immuneToPotions.toArray( new Effect[0] ),
+                    allowLeashing, ignorePressurePlates, immuneToStickyBlocks.toArray(), immuneToPotions.toArray(),
                     rangedAttackDamage, rangedAttackSpread, rangedWalkSpeed, rangedAttackCooldown, rangedAttackMaxCooldown, rangedAttackMaxRange );
         }
         
@@ -431,7 +433,7 @@ public class BestiaryInfo {
         //--------------- Creature Type Templates ----------------
         
         /** Sets the standard species stats implied by being undead. */
-        public Builder undead() { return effectImmune( Effects.REGENERATION, Effects.POISON ); }
+        public Builder undead() { return drownImmune().effectImmune( Effects.REGENERATION, Effects.POISON ); }
         
         /** Sets the standard species stats implied by being a spider. */
         public Builder spider() { return webImmune().effectImmune( Effects.POISON ); }
@@ -521,14 +523,20 @@ public class BestiaryInfo {
         /** Sets the species as cobweb immune. */
         public Builder webImmune() { return stickyBlockImmune( Blocks.COBWEB ); }
         
-        /** Sets the species as immune to a specific list of sticky blocks. */
-        public Builder stickyBlockImmune( Block... blocks ) {
+        /**
+         * Sets the species as immune to a specific list of sticky blocks.
+         * Acceptable argument types are {@code Block}, {@code RegistryObject<Block>}, {@code ResourceLocation}, or {@code String}.
+         */
+        public Builder stickyBlockImmune( Object... blocks ) {
             immuneToStickyBlocks.addAll( Arrays.asList( blocks ) );
             return this;
         }
         
-        /** Sets the species as immune to a specific list of effects. */
-        public Builder effectImmune( Effect... effects ) {
+        /**
+         * Sets the species as immune to a specific list of effects.
+         * Acceptable argument types are {@code Effect}, {@code RegistryObject<Effect>}, {@code ResourceLocation}, or {@code String}.
+         */
+        public Builder effectImmune( Object... effects ) {
             immuneToPotions.addAll( Arrays.asList( effects ) );
             return this;
         }
@@ -565,6 +573,9 @@ public class BestiaryInfo {
         
         /** Converts the entity to a fishing rod user by disabling unused ranged attack stats (for a bow user). */
         public Builder convertBowToFishing() { return rangedDamage( -1.0 ).rangedWalkSpeed( -1.0 ); }
+        
+        /** Converts the entity to a fishing rod user by disabling unused ranged attack stats (for a throwing item user). */
+        public Builder convertThrowToFishing() { return rangedWalkSpeed( -1.0 ); }
         
         /** Converts the entity to a fishing rod user by disabling unused ranged attack stats (for a spit shooter). */
         public Builder convertSpitToFishing() { return rangedDamage( -1.0 ).rangedMaxCooldown( -1 ); }

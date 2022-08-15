@@ -134,15 +134,19 @@ public final class SpecialMobReplacer {
         replacement.load( tag );
         MobHelper.finalizeSpawn( replacement, (IServerWorld) world, world.getCurrentDifficultyAt( entityPos ), null, null );
         
+        world.addFreshEntity( replacement );
+        
         for( Entity rider : entityToReplace.getPassengers() ) {
+            rider.stopRiding();
             rider.startRiding( replacement, true );
         }
         if( entityToReplace.getVehicle() != null ) {
-            replacement.startRiding( entityToReplace.getVehicle(), true );
+            final Entity vehicle = entityToReplace.getVehicle();
+            entityToReplace.stopRiding();
+            replacement.startRiding( vehicle, true );
         }
         
         entityToReplace.remove();
-        world.addFreshEntity( replacement );
     }
     
     /** All data needed for a single mob we want to replace. */

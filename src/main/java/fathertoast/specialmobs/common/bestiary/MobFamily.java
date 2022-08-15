@@ -2,6 +2,7 @@ package fathertoast.specialmobs.common.bestiary;
 
 import fathertoast.specialmobs.common.config.family.*;
 import fathertoast.specialmobs.common.config.species.SpeciesConfig;
+import fathertoast.specialmobs.common.config.util.ConfigUtil;
 import fathertoast.specialmobs.common.core.register.SMEntities;
 import fathertoast.specialmobs.common.core.register.SMItems;
 import fathertoast.specialmobs.common.util.AnnotationHelper;
@@ -47,11 +48,10 @@ public class MobFamily<T extends LivingEntity, V extends FamilyConfig> {
             "Zombie", "zombies", 0x00AFAF, new EntityType[] { EntityType.ZOMBIE, EntityType.HUSK },
             "Brute", "Fire", "Fishing", "Frozen", "Giant", "Hungry", "Husk", "MadScientist", "Plague"
     );
-    // TODO Drowned family and zombie transform mechanic
-    //    public static final MobFamily<DrownedEntity, FamilyConfig> DROWNED = new MobFamily<>( FamilyConfig::new,
-    //            "Drowned", "drowned", 0x8FF1D7, new EntityType[] { EntityType.DROWNED }, //VR egg: 0x799C65
-    //            "Brute", "Fishing", "Giant", "Hungry", "Knight", "Plague"
-    //    );// ice/fire themes? (cold/warm ocean)
+    public static final MobFamily<DrownedEntity, FamilyConfig> DROWNED = new MobFamily<>( FamilyConfig::new,
+            "Drowned", "drowned", 0x8FF1D7, new EntityType[] { EntityType.DROWNED },
+            "Abyssal", "Brute", "Fishing", /*"Frozen",*/ "Giant", "Hungry", "Knight", "Plague"//, "Tropical"
+    ); //TODO Textures! - brute, hungry, plague, frozen, tropical
     public static final MobFamily<ZombifiedPiglinEntity, FamilyConfig> ZOMBIFIED_PIGLIN = new MobFamily<>( FamilyConfig::new,
             "ZombifiedPiglin", "zombified piglins", 0xEA9393, new EntityType[] { EntityType.ZOMBIFIED_PIGLIN },
             "Brute", "Fishing", "Giant", "Hungry", "Knight", "Plague", "Vampire"//TODO figure out crossbows
@@ -87,7 +87,7 @@ public class MobFamily<T extends LivingEntity, V extends FamilyConfig> {
     public static final MobFamily<SilverfishEntity, SilverfishFamilyConfig> SILVERFISH = new MobFamily<>( SilverfishFamilyConfig::new,
             "Silverfish", "silverfish", 0x6E6E6E, new EntityType[] { EntityType.SILVERFISH },
             "Albino", "Blinding", "Desiccated", "Fire", "Fishing", "Flying", "Poison", "Puffer", "Tough"
-    );//TODO puffer
+    );
     
     public static final MobFamily<EndermanEntity, FamilyConfig> ENDERMAN = new MobFamily<>( FamilyConfig::new,
             "Enderman", "endermen", 0x161616, new EntityType[] { EntityType.ENDERMAN },
@@ -197,9 +197,14 @@ public class MobFamily<T extends LivingEntity, V extends FamilyConfig> {
     
     /** Pick a new species from this family, based on the location. */
     public Species<? extends T> nextVariant( World world, @Nullable BlockPos pos ) {
-        final Species<?> species = config.GENERAL.specialVariantList.next( world.random, world, pos );
+        return nextVariant( world, pos, null, vanillaReplacement );
+    }
+    
+    /** Pick a new species from this family, based on the location. */
+    public Species<? extends T> nextVariant( World world, @Nullable BlockPos pos, @Nullable Function<Species<?>, Boolean> selector, Species<? extends T> fallback ) {
+        final Species<?> species = config.GENERAL.specialVariantList.next( world.random, world, pos, selector );
         //noinspection unchecked
-        return species == null ? vanillaReplacement : (Species<? extends T>) species;
+        return species == null ? fallback : (Species<? extends T>) species;
     }
     
     
@@ -218,6 +223,13 @@ public class MobFamily<T extends LivingEntity, V extends FamilyConfig> {
      * @see MobFamily
      */
     public static class Species<T extends LivingEntity> {
+        /** Maps each species's entity type back to the species. */
+        private static final Map<EntityType<?>, Species<?>> TYPE_TO_SPECIES_MAP = new HashMap<>();
+        
+        /** @return The entity type's species, or null if the entity type does not represent any mob species. */
+        @Nullable
+        public static Species<?> of( EntityType<?> entityType ) { return TYPE_TO_SPECIES_MAP.get( entityType ); }
+        
         /** The special mob family this species belongs to. */
         public final MobFamily<? super T, ?> family;
         /** The name of this special variant; or null for vanilla replacement species. */
@@ -237,6 +249,9 @@ public class MobFamily<T extends LivingEntity, V extends FamilyConfig> {
         
         /** This species's config. */
         public final SpeciesConfig config;
+        
+        /** The scale of this species's height in relation to the base vanilla entity's height. */
+        private float heightScale = -1.0F;
         
         /** Constructs a new mob species. For vanilla replacements, the variant name is null. */
         private Species( MobFamily<? super T, ?> parentFamily, String packageRoot, @Nullable String variantName ) {
@@ -296,6 +311,32 @@ public class MobFamily<T extends LivingEntity, V extends FamilyConfig> {
                     //          - this is okay for us because we only replace vanilla mobs
                     .clientTrackingRange( original.clientTrackingRange() ).updateInterval( original.updateInterval() )
                     .setShouldReceiveVelocityUpdates( original.trackDeltas() );
+        }
+        
+        /** Registers this species's spawn placement and links the (now loaded) entity type to this species. */
+        public void registerSpawnPlacement() {
+            TYPE_TO_SPECIES_MAP.put( entityType.get(), this );
+            AnnotationHelper.registerSpawnPlacement( this );
+        }
+        
+        /** @return The plural name used to refer to this species in unlocalized situations; e.g. config comments. */
+        public String getConfigName() {
+            return (specialVariantName == null ? "vanilla replacement " :
+                    ConfigUtil.camelCaseToLowerSpace( specialVariantName ) + " ") + family.configName;
+        }
+        
+        /** @return The singular name used to refer to this species in unlocalized situations; e.g. config comments. */
+        public String getConfigNameSingular() {
+            return (specialVariantName == null ? "vanilla replacement " :
+                    ConfigUtil.camelCaseToLowerSpace( specialVariantName ) + " ") + ConfigUtil.camelCaseToLowerSpace( family.name );
+        }
+        
+        /** @return The height scale. Used to calculate eye height for families that are not auto-scaled. */
+        public float getHeightScale() {
+            if( heightScale < 0.0F ) {
+                heightScale = entityType.get().getHeight() / family.replaceableTypes[0].getHeight();
+            }
+            return heightScale;
         }
     }
 }

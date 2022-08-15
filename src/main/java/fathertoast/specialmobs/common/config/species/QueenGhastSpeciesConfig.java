@@ -14,7 +14,7 @@ public class QueenGhastSpeciesConfig extends SpeciesConfig {
     public QueenGhastSpeciesConfig( MobFamily.Species<?> species, int minBabies, int maxBabies, int minSummons, int maxSummons ) {
         super( species );
         
-        QUEEN = new Queen( SPEC, species, speciesName, minBabies, maxBabies, minSummons, maxSummons );
+        QUEEN = new Queen( SPEC, species, species.getConfigName(), minBabies, maxBabies, minSummons, maxSummons );
     }
     
     public static class Queen extends Config.AbstractCategory {

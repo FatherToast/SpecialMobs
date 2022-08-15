@@ -2,13 +2,18 @@ package fathertoast.specialmobs.common.util;
 
 import fathertoast.specialmobs.common.core.SpecialMobs;
 import net.minecraft.block.BlockState;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
 import net.minecraft.nbt.StringNBT;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 
+import javax.annotation.Nullable;
 import java.util.UUID;
 
 public final class References {
@@ -93,7 +98,7 @@ public final class References {
     
     /** Bit flags that can be provided to {@link net.minecraft.world.World#setBlock(BlockPos, BlockState, int)}. */
     @SuppressWarnings( "unused" )
-    public static class SetBlockFlags {
+    public static final class SetBlockFlags {
         /** Triggers a block update. */
         public static final int BLOCK_UPDATE = 0b0000_0001;
         /** On servers, sends the change to clients. On clients, triggers a render update. */
@@ -115,13 +120,77 @@ public final class References {
         public static final int DEFAULTS = BLOCK_UPDATE | UPDATE_CLIENT;
     }
     
-    // Entity events; used in World#broadcastEntityEvent(Entity, byte) then executed by Entity#handleEntityEvent(byte)
-    public static final byte EVENT_TELEPORT_TRAIL_PARTICLES = 46;
+    /**
+     * Entity events. Sent from the server, executed on the client via {@link Entity#handleEntityEvent(byte)}.
+     * This only contains event codes for Entity and LivingEntity.
+     */
+    public enum EntityEvent {
+        // Note: if we want to go deeper, it may be wise to make this generic to only allow an appropriate Entity subclass.
+        // There's no need to go to MobEntity as its sole event is already nicely abstracted.
+        
+        HURT_SOUND( 2 ), HURT_SOUND_THORNS( 33 ), HURT_SOUND_DROWN( 36 ),
+        HURT_SOUND_BURNING( 37 ), HURT_SOUND_SWEET_BERRY_BUSH( 44 ),
+        DEATH_SOUND( 3 ),
+        SHIELD_BLOCK_SOUND( 29 ), SHIELD_BREAK_SOUND( 30 ),
+        TELEPORT_TRAIL_PARTICLES( 46 ),
+        ITEM_BREAK_FX_MAIN_HAND( 47 ), ITEM_BREAK_FX_OFF_HAND( 48 ),
+        ITEM_BREAK_FX_HEAD( 49 ), ITEM_BREAK_FX_CHEST( 50 ), ITEM_BREAK_FX_LEGS( 51 ), ITEM_BREAK_FX_FEET( 52 ),
+        HONEY_SLIDE_PARTICLES( 53 ) /* This is the only event from Entity. */, HONEY_JUMP_PARTICLES( 54 ),
+        SWAP_HAND_ITEMS( 55 );
+        
+        private final byte ID;
+        
+        EntityEvent( int id ) { ID = (byte) id; }
+        
+        /** Sends this event from the given server entity to its client-sided counterpart. */
+        public void broadcast( LivingEntity entity ) { entity.level.broadcastEntityEvent( entity, ID ); }
+    }
     
-    // Level events; used in World#levelEvent(PlayerEntity, int, BlockPos, int) then executed by WorldRenderer#levelEvent(PlayerEntity, int, BlockPos, int)
-    public static final int EVENT_GHAST_WARN = 1015;
-    public static final int EVENT_GHAST_SHOOT = 1016;
-    public static final int EVENT_BLAZE_SHOOT = 1018;
+    /**
+     * Simple level events (ones that do not use extra metadata). Sent from the server, then executed on the client
+     * via {@link net.minecraft.client.renderer.WorldRenderer#levelEvent(PlayerEntity, int, BlockPos, int)}.
+     */
+    public enum LevelEvent {
+        // Note: if metadata events are needed, they will need to be implemented in a separate class
+        
+        DISPENSER_DISPENSE( 1000 ), DISPENSER_FAIL( 1001 ), DISPENSER_LAUNCH( 1002 ),
+        ENDER_EYE_LAUNCH( 1003 ), ENDER_EYE( 2003 ), END_PORTAL_FRAME_FILL( 1503 ),
+        FIREWORK_ROCKET_SHOOT( 1004 ),
+        IRON_DOOR_OPEN( 1005 ), WOODEN_DOOR_OPEN( 1006 ), WOODEN_TRAPDOOR_OPEN( 1007 ), FENCE_GATE_OPEN( 1008 ),
+        IRON_DOOR_CLOSE( 1011 ), WOODEN_DOOR_CLOSE( 1012 ), WOODEN_TRAPDOOR_CLOSE( 1013 ), FENCE_GATE_CLOSE( 1014 ),
+        IRON_TRAPDOOR_CLOSE( 1036 ), IRON_TRAPDOOR_OPEN( 1037 ),
+        FIRE_EXTINGUISH( 1009 ), LAVA_EXTINGUISH( 1501 ), REDSTONE_TORCH_BURNOUT( 1502 ),
+        GHAST_WARN( 1015 ), GHAST_SHOOT( 1016 ),
+        ENDER_DRAGON_SHOOT( 1017 ), ENDER_DRAGON_GROWL( 3001 ),
+        BLAZE_SHOOT( 1018 ),
+        ZOMBIE_ATTACK_WOODEN_DOOR( 1019 ), ZOMBIE_ATTACK_IRON_DOOR( 1020 ), ZOMBIE_BREAK_WOODEN_DOOR( 1021 ),
+        ZOMBIE_INFECT( 1026 ), ZOMBIE_VILLAGER_CONVERTED( 1027 ),
+        ZOMBIE_CONVERTED_TO_DROWNED( 1040 ), HUSK_CONVERTED_TO_ZOMBIE( 1041 ),
+        WITHER_BREAK_BLOCK( 1022 ), WITHER_SHOOT( 1024 ),
+        BAT_TAKEOFF( 1025 ),
+        ANVIL_DESTROY( 1029 ), ANVIL_USE( 1030 ), ANVIL_LAND( 1031 ),
+        BREWING_STAND_BREW( 1035 ), GRINDSTONE_USE( 1042 ), BOOK_PAGE_TURN( 1043 ), SMITHING_TABLE_USE( 1044 ),
+        PORTAL_TRAVEL( 1032 ),
+        CHORUS_FLOWER_GROW( 1033 ), CHORUS_FLOWER_DEATH( 1034 ),
+        PHANTOM_BITE( 1039 ),
+        SMOKE_AND_FLAME( 2004 ),
+        EXPLOSION_PARTICLE( 2008 ), CLOUD_PARTICLES( 2009 ), EXPLOSION_EMITTER( 3000 );
+        
+        private final int ID;
+        
+        LevelEvent( int id ) { ID = id; }
+        
+        /** Plays this event at the entity's position, if the entity is not silenced. */
+        public void play( Entity entity ) {
+            if( !entity.isSilent() ) play( entity.level, entity.blockPosition() );
+        }
+        
+        /** Plays this event at a particular position. */
+        public void play( World world, BlockPos pos ) { play( world, null, pos ); }
+        
+        /** Plays this event at a particular position, excluding a particular player. */
+        public void play( World world, @Nullable PlayerEntity player, BlockPos pos ) { world.levelEvent( player, ID, pos, 0 ); }
+    }
     
     
     //--------------- NBT STUFF ----------------

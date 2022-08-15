@@ -10,6 +10,8 @@ import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.entity.SpecialMobData;
 import fathertoast.specialmobs.common.entity.ai.AIHelper;
 import fathertoast.specialmobs.common.entity.ai.goal.SpecialHurtByTargetGoal;
+import fathertoast.specialmobs.common.entity.drowned._SpecialDrownedEntity;
+import fathertoast.specialmobs.common.event.NaturalSpawnManager;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import net.minecraft.block.BlockState;
@@ -61,7 +63,7 @@ public class _SpecialZombieEntity extends ZombieEntity implements IRangedAttackM
     }
     
     protected static final double DEFAULT_BOW_CHANCE = 0.05;
-    protected static final double DEFAULT_SHIELD_CHANCE = 0.05;
+    protected static final double DEFAULT_SHIELD_CHANCE = 0.02;
     
     @SpecialMob.ConfigSupplier
     public static SpeciesConfig createConfig( MobFamily.Species<?> species ) {
@@ -73,6 +75,11 @@ public class _SpecialZombieEntity extends ZombieEntity implements IRangedAttackM
     
     @SpecialMob.AttributeSupplier
     public static AttributeModifierMap.MutableAttribute createAttributes() { return ZombieEntity.createAttributes(); }
+    
+    @SpecialMob.SpawnPlacementRegistrar
+    public static void registerSpawnPlacement( MobFamily.Species<? extends _SpecialZombieEntity> species ) {
+        NaturalSpawnManager.registerSpawnPlacement( species );
+    }
     
     @SpecialMob.LanguageProvider
     public static String[] getTranslations( String langKey ) {
@@ -111,6 +118,16 @@ public class _SpecialZombieEntity extends ZombieEntity implements IRangedAttackM
     /** Override to change starting equipment or stats. */
     public void finalizeVariantSpawn( IServerWorld world, DifficultyInstance difficulty, @Nullable SpawnReason spawnReason,
                                       @Nullable ILivingEntityData groupData ) { }
+    
+    /** Performs this zombie's drowning conversion. */
+    @Override
+    protected void doUnderWaterConversion() {
+        convertToZombieType( getVariantConversionType() );
+        References.LevelEvent.ZOMBIE_CONVERTED_TO_DROWNED.play( this );
+    }
+    
+    /** Override to change the entity this converts to when drowned. */
+    protected EntityType<? extends ZombieEntity> getVariantConversionType() { return _SpecialDrownedEntity.SPECIES.entityType.get(); }
     
     /** Called to attack the target with a ranged attack. */
     @Override
@@ -208,6 +225,10 @@ public class _SpecialZombieEntity extends ZombieEntity implements IRangedAttackM
         }
     }
     
+    /** @return True if this zombie can convert in water. */
+    @Override
+    protected boolean convertsInWater() { return !isSensitiveToWater(); }
+    
     
     //--------------- ISpecialMob Implementation ----------------
     
@@ -229,6 +250,18 @@ public class _SpecialZombieEntity extends ZombieEntity implements IRangedAttackM
     /** Sets the experience that should be dropped by this entity. */
     @Override
     public final void setExperience( int xp ) { xpReward = xp; }
+    
+    /** Converts this entity to one of another type. */
+    @Nullable
+    @Override
+    public <T extends MobEntity> T convertTo( EntityType<T> entityType, boolean keepEquipment ) {
+        final T replacement = super.convertTo( entityType, keepEquipment );
+        if( replacement instanceof ISpecialMob && level instanceof IServerWorld ) {
+            MobHelper.finalizeSpawn( replacement, (IServerWorld) level, level.getCurrentDifficultyAt( blockPosition() ),
+                    SpawnReason.CONVERSION, null );
+        }
+        return replacement;
+    }
     
     /** Called on spawn to initialize properties based on the world, difficulty, and the group it spawns with. */
     @Nullable
@@ -276,7 +309,7 @@ public class _SpecialZombieEntity extends ZombieEntity implements IRangedAttackM
     /** @return The eye height of this entity when standing. */
     @Override
     protected float getStandingEyeHeight( Pose pose, EntitySize size ) {
-        return super.getStandingEyeHeight( pose, size ) * getSpecialData().getBaseScale();// * (isBaby() ? 0.53448F : 1.0F); - Handled in super
+        return super.getStandingEyeHeight( pose, size ) * getSpecialData().getHeightScale(); // Age handled in super
     }
     
     /** @return Whether this entity is immune to fire damage. */

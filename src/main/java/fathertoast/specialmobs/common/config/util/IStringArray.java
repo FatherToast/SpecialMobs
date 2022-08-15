@@ -1,4 +1,4 @@
-package fathertoast.specialmobs.common.config.field;
+package fathertoast.specialmobs.common.config.util;
 
 import java.util.List;
 
