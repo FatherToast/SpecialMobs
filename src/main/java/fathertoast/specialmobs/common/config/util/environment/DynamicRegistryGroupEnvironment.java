@@ -76,7 +76,7 @@ public abstract class DynamicRegistryGroupEnvironment<T> extends AbstractEnviron
             }
             if( registryEntries.isEmpty() ) {
                 SpecialMobs.LOG.info( "Namespace entry for {} \"{}\" did not match anything in registry \"{}\"! Questionable entry: {}",
-                        FIELD == null ? "DEFAULT" : FIELD.getClass(), FIELD == null ? "DEFAULT" : FIELD.getKey(), getRegistry().getRegistryName(), NAMESPACE );
+                        FIELD == null ? "DEFAULT" : FIELD.getClass(), FIELD == null ? "DEFAULT" : FIELD.getKey(), getRegistry().location(), NAMESPACE );
             }
             registryEntries = Collections.unmodifiableList( registryEntries );
         }

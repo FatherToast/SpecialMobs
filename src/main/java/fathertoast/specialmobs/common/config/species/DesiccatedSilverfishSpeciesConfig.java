@@ -14,7 +14,7 @@ public class DesiccatedSilverfishSpeciesConfig extends SilverfishSpeciesConfig {
     public DesiccatedSilverfishSpeciesConfig( MobFamily.Species<?> species, double spitChance, int minAbsorb, int maxAbsorb ) {
         super( species, spitChance );
         
-        DESICCATED = new Desiccated( SPEC, species, speciesName, minAbsorb, maxAbsorb );
+        DESICCATED = new Desiccated( SPEC, species, species.getConfigName(), minAbsorb, maxAbsorb );
     }
     
     public static class Desiccated extends Config.AbstractCategory {

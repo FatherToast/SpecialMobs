@@ -20,7 +20,7 @@ public class PotionSlimeSpeciesConfig extends SpeciesConfig {
     public PotionSlimeSpeciesConfig( MobFamily.Species<?> species ) {
         super( species );
         
-        POTION = new Potion( SPEC, species, speciesName );
+        POTION = new Potion( SPEC, species, species.getConfigName() );
     }
     
     public static class Potion extends Config.AbstractCategory {

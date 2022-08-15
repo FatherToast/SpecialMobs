@@ -17,7 +17,7 @@ public class BlazeSpeciesConfig extends SpeciesConfig {
     public BlazeSpeciesConfig( MobFamily.Species<?> species, int fireballBurstCount, int fireballBurstDelay ) {
         super( species );
         
-        BLAZES = new Blazes( SPEC, species, speciesName, fireballBurstCount, fireballBurstDelay );
+        BLAZES = new Blazes( SPEC, species, species.getConfigName(), fireballBurstCount, fireballBurstDelay );
     }
     
     public static class Blazes extends Config.AbstractCategory {

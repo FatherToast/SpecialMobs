@@ -12,6 +12,7 @@ import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.potion.Effect;
 import net.minecraft.potion.Effects;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.biome.Biomes;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import javax.annotation.Nullable;
@@ -55,7 +56,7 @@ public class BestiaryInfo {
         ) ),
         DESERT( new EnvironmentList(
                 EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).inUltraWarmDimension().build(),
-                EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).inDryBiome().build(),
+                EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).inNaturalDimension().inDryBiome().build(),
                 EnvironmentEntry.builder( DefaultWeight.LOWEST.value ).inWaterBiome().build(),
                 EnvironmentEntry.builder( DefaultWeight.LOWEST.value ).inHumidBiome().build(),
                 EnvironmentEntry.builder( DefaultWeight.LOWEST.value ).isRaining().canSeeSky().build(),
@@ -63,7 +64,7 @@ public class BestiaryInfo {
         ) ),
         WATER( new EnvironmentList(
                 EnvironmentEntry.builder( DefaultWeight.LOWEST.value ).inUltraWarmDimension().build(),
-                EnvironmentEntry.builder( DefaultWeight.LOWEST.value ).inDryBiome().build(),
+                EnvironmentEntry.builder( DefaultWeight.LOWEST.value ).inNaturalDimension().inDryBiome().build(),
                 EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).inWaterBiome().build(),
                 EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).inHumidBiome().build(),
                 EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).isRaining().canSeeSky().build(),
@@ -74,6 +75,7 @@ public class BestiaryInfo {
                 EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).inBiomeCategory( BiomeCategory.JUNGLE ).build(),
                 EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).inBiomeCategory( BiomeCategory.FOREST ).build(),
                 EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).inBiomeCategory( BiomeCategory.SWAMP ).build(),
+                EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).inBiome( Biomes.CRIMSON_FOREST ).build(),
                 EnvironmentEntry.builder( DefaultWeight.HIGH.value ).atMaxMoonLight().build()
         ) ),
         MOUNTAIN( new EnvironmentList(

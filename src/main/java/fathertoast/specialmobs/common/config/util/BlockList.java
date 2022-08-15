@@ -1,7 +1,6 @@
 package fathertoast.specialmobs.common.config.util;
 
 import fathertoast.specialmobs.common.config.field.AbstractConfigField;
-import fathertoast.specialmobs.common.config.field.IStringArray;
 import fathertoast.specialmobs.common.config.file.TomlHelper;
 import fathertoast.specialmobs.common.core.SpecialMobs;
 import net.minecraft.block.Block;

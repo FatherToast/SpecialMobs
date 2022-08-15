@@ -24,7 +24,7 @@ public class GiantZombifiedPiglinEntity extends _SpecialZombifiedPiglinEntity {
     
     @SpecialMob.BestiaryInfoSupplier
     public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
-        bestiaryInfo.color( 0x4C7129 ).theme( BestiaryInfo.Theme.MOUNTAIN )
+        bestiaryInfo.color( 0x4C7129 )
                 .size( 1.5F, 0.9F, 2.95F )
                 .addExperience( 1 )
                 .addToAttribute( Attributes.MAX_HEALTH, 20.0 )

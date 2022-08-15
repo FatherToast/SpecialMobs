@@ -2,6 +2,7 @@ package fathertoast.specialmobs.common.bestiary;
 
 import fathertoast.specialmobs.common.config.family.*;
 import fathertoast.specialmobs.common.config.species.SpeciesConfig;
+import fathertoast.specialmobs.common.config.util.ConfigUtil;
 import fathertoast.specialmobs.common.core.register.SMEntities;
 import fathertoast.specialmobs.common.core.register.SMItems;
 import fathertoast.specialmobs.common.util.AnnotationHelper;
@@ -316,6 +317,18 @@ public class MobFamily<T extends LivingEntity, V extends FamilyConfig> {
         public void registerSpawnPlacement() {
             TYPE_TO_SPECIES_MAP.put( entityType.get(), this );
             AnnotationHelper.registerSpawnPlacement( this );
+        }
+        
+        /** @return The plural name used to refer to this species in unlocalized situations; e.g. config comments. */
+        public String getConfigName() {
+            return (specialVariantName == null ? "vanilla replacement " :
+                    ConfigUtil.camelCaseToLowerSpace( specialVariantName ) + " ") + family.configName;
+        }
+        
+        /** @return The singular name used to refer to this species in unlocalized situations; e.g. config comments. */
+        public String getConfigNameSingular() {
+            return (specialVariantName == null ? "vanilla replacement " :
+                    ConfigUtil.camelCaseToLowerSpace( specialVariantName ) + " ") + ConfigUtil.camelCaseToLowerSpace( family.name );
         }
         
         /** @return The height scale. Used to calculate eye height for families that are not auto-scaled. */

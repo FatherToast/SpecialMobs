@@ -17,7 +17,7 @@ public class ZombieSpeciesConfig extends SpeciesConfig {
     public ZombieSpeciesConfig( MobFamily.Species<?> species, double bowChance, double shieldChance ) {
         super( species );
         
-        ZOMBIES = new Zombies( SPEC, species, speciesName, bowChance, shieldChance );
+        ZOMBIES = new Zombies( SPEC, species, species.getConfigName(), bowChance, shieldChance );
     }
     
     public static class Zombies extends Config.AbstractCategory {

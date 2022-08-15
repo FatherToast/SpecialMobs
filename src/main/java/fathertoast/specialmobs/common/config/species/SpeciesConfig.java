@@ -16,20 +16,15 @@ import net.minecraft.potion.Effect;
  * options that are used by all species should be defined in this class.
  */
 public class SpeciesConfig extends Config.AbstractConfig {
-    
     public static final String SPECIAL_DATA_SUBCAT = "special_data.";
+    
+    /** Set this field right before creating a new species config; this will then be set as a default value for that config. */
+    public static EnvironmentList NEXT_NATURAL_SPAWN_CHANCE_EXCEPTIONS;
     
     protected static String fileName( MobFamily.Species<?> species ) {
         return (species.specialVariantName == null ? "_normal" : ConfigUtil.camelCaseToLowerUnderscore( species.specialVariantName ))
                 + "_" + ConfigUtil.noSpaces( species.family.configName );
     }
-    
-    protected static String variantName( MobFamily.Species<?> species ) {
-        return species.specialVariantName == null ? "vanilla replacement" : ConfigUtil.camelCaseToLowerSpace( species.specialVariantName );
-    }
-    
-    /** The full readable name for the species in lower space case; e.g., "baby cave spiders". */
-    protected final String speciesName;
     
     /** Category containing all options applicable to mob species as a whole; i.e. not specific to any particular species. */
     public final General GENERAL;
@@ -37,12 +32,9 @@ public class SpeciesConfig extends Config.AbstractConfig {
     /** Builds the config spec that should be used for this config. */
     public SpeciesConfig( MobFamily.Species<?> species ) {
         super( FamilyConfig.dir( species.family ), fileName( species ),
-                String.format( "This config contains options that apply only to the %s %s species.",
-                        variantName( species ), ConfigUtil.camelCaseToLowerSpace( species.family.name ) ) );
+                "This config contains options that apply only to the " + species.getConfigNameSingular() + " species." );
         
-        speciesName = variantName( species ) + " " + species.family.configName;
-        
-        GENERAL = new General( SPEC, species, speciesName );
+        GENERAL = new General( SPEC, species, species.getConfigName() );
     }
     
     public static class General extends Config.AbstractCategory {
@@ -83,8 +75,7 @@ public class SpeciesConfig extends Config.AbstractConfig {
                     SPEC.define( new DoubleField( "natural_spawn_chance.base", 1.0, DoubleField.Range.PERCENT,
                             "The chance for " + speciesName + " to succeed at natural spawn attempts. Does not affect mob replacement.",
                             "Note: Most species do NOT naturally spawn - they must be added by a mod or data pack for this option to do anything." ) ),
-                    SPEC.define( new EnvironmentListField( "natural_spawn_chance.exceptions", new EnvironmentList()
-                            .setRange( DoubleField.Range.PERCENT ),
+                    SPEC.define( new EnvironmentListField( "natural_spawn_chance.exceptions", getDefaultSpawnExceptions().setRange( DoubleField.Range.PERCENT ),
                             "The chance for " + speciesName + " to succeed at natural spawn attempts when specific environmental conditions are met." ) )
             );
             
@@ -150,6 +141,16 @@ public class SpeciesConfig extends Config.AbstractConfig {
                     SPEC.define( new DoubleField( SPECIAL_DATA_SUBCAT + "ranged_attack.max_range", info.rangedAttackMaxRange, DoubleField.Range.NON_NEGATIVE,
                             "The maximum distance (in blocks) at which " + speciesName + " can use their ranged attacks.",
                             "0 disables ranged attacks." ) );
+        }
+        
+        /** @return The next default natural spawn chance exceptions to use. */
+        private static EnvironmentList getDefaultSpawnExceptions() {
+            if( NEXT_NATURAL_SPAWN_CHANCE_EXCEPTIONS == null ) return new EnvironmentList();
+            
+            // A hacky way to have an extra optional constructor parameter without overloading EVERY SINGLE constructor
+            final EnvironmentList presetValue = NEXT_NATURAL_SPAWN_CHANCE_EXCEPTIONS;
+            NEXT_NATURAL_SPAWN_CHANCE_EXCEPTIONS = null;
+            return presetValue;
         }
     }
 }

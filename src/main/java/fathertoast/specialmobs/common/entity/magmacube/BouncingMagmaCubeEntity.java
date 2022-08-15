@@ -29,7 +29,7 @@ public class BouncingMagmaCubeEntity extends _SpecialMagmaCubeEntity {
     
     @SpecialMob.BestiaryInfoSupplier
     public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
-        bestiaryInfo.color( 0xB333B3 ).theme( BestiaryInfo.Theme.MOUNTAIN )
+        bestiaryInfo.color( 0xB333B3 )
                 .uniqueTextureBaseOnly()
                 .addExperience( 1 ).fallImmune()
                 .addToAttribute( Attributes.MAX_HEALTH, 4.0 )

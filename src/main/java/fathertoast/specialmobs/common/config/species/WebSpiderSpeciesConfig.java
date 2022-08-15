@@ -14,7 +14,7 @@ public class WebSpiderSpeciesConfig extends SpiderSpeciesConfig {
     public WebSpiderSpeciesConfig( MobFamily.Species<?> species, double spitChance, int minWebs, int maxWebs ) {
         super( species, spitChance );
         
-        WEB = new Web( SPEC, species, speciesName, minWebs, maxWebs );
+        WEB = new Web( SPEC, species, species.getConfigName(), minWebs, maxWebs );
     }
     
     public static class Web extends Config.AbstractCategory {

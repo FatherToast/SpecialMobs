@@ -16,7 +16,7 @@ public class SplittingCreeperSpeciesConfig extends CreeperSpeciesConfig {
                                           int minExtraBabies, int maxExtraBabies ) {
         super( species, cannotExplodeWhileWet, explodeWhileBurning, explodeWhenShot );
         
-        SPLITTING = new Splitting( SPEC, species, speciesName, minExtraBabies, maxExtraBabies );
+        SPLITTING = new Splitting( SPEC, species, species.getConfigName(), minExtraBabies, maxExtraBabies );
     }
     
     public static class Splitting extends Config.AbstractCategory {

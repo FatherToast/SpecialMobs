@@ -19,7 +19,7 @@ public class CreeperSpeciesConfig extends SpeciesConfig {
                                  boolean cannotExplodeWhileWet, boolean explodeWhileBurning, boolean explodeWhenShot ) {
         super( species );
         
-        CREEPERS = new Creepers( SPEC, species, speciesName, cannotExplodeWhileWet, explodeWhileBurning, explodeWhenShot );
+        CREEPERS = new Creepers( SPEC, species, species.getConfigName(), cannotExplodeWhileWet, explodeWhileBurning, explodeWhenShot );
     }
     
     public static class Creepers extends Config.AbstractCategory {

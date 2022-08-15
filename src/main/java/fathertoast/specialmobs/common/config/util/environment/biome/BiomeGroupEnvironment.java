@@ -15,7 +15,7 @@ import java.util.List;
 
 public class BiomeGroupEnvironment extends DynamicRegistryGroupEnvironment<Biome> {
     
-    public BiomeGroupEnvironment( RegistryKey<Biome> biome, boolean invert ) { this( biome.getRegistryName(), invert ); }
+    public BiomeGroupEnvironment( RegistryKey<Biome> biome, boolean invert ) { this( biome.location(), invert ); }
     
     public BiomeGroupEnvironment( ResourceLocation regKey, boolean invert ) { super( regKey, invert ); }
     

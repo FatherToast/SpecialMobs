@@ -17,7 +17,7 @@ public class DrownedSpeciesConfig extends SpeciesConfig {
     public DrownedSpeciesConfig( MobFamily.Species<?> species, double tridentChance, double shieldChance ) {
         super( species );
         
-        DROWNED = new Drowned( SPEC, species, speciesName, tridentChance, shieldChance );
+        DROWNED = new Drowned( SPEC, species, species.getConfigName(), tridentChance, shieldChance );
     }
     
     public static class Drowned extends Config.AbstractCategory {

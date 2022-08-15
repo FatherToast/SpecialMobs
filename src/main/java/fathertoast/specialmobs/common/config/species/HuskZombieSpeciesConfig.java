@@ -17,7 +17,7 @@ public class HuskZombieSpeciesConfig extends ZombieSpeciesConfig {
     public HuskZombieSpeciesConfig( MobFamily.Species<?> species, double bowChance, double shieldChance ) {
         super( species, bowChance, shieldChance );
         
-        HUSK = new Husk( SPEC, species, speciesName );
+        HUSK = new Husk( SPEC, species, species.getConfigName() );
     }
     
     public static class Husk extends Config.AbstractCategory {

@@ -39,10 +39,18 @@ public class SpecialMobs {
      *  - general
      *      - entity replacer
      *      - environment-sensitive configs
-     *      + natural spawning
-     *          o nether spawns
-     *          o end spawns
-     *          ? ocean/water spawns
+     *  - natural spawning
+     *      - copied spawns
+     *          - spiders -> cave spiders
+     *          - endermen -> ender creepers
+     *      - ocean/river spawns
+     *          - drowning creepers
+     *          - blueberry slimes
+     *      - nether spawns
+     *          - wither skeletons (outside of fortresses)
+     *          - blazes (outside of fortresses)
+     *          - fire creepers/zombies/spiders
+     *          ? warped/crimson mobs
      *  - potions
      *      - vulnerability (opposite of resistance)
      *      ? gravity (opposite of levitation)
@@ -82,7 +90,6 @@ public class SpecialMobs {
      *          - ranged attack AI (spitter)
      *      - cave spiders
      *          - ranged attack AI (spitter)
-     *          + natural spawning
      *      - silverfish
      *          - ranged attack AI (spitter)
      *      - endermen

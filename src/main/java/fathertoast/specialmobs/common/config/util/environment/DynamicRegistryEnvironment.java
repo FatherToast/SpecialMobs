@@ -68,7 +68,7 @@ public abstract class DynamicRegistryEnvironment<T> extends AbstractEnvironment 
             registryEntry = registry.get( REGISTRY_KEY );
             if( registryEntry == null ) {
                 SpecialMobs.LOG.info( "Missing entry for {} \"{}\"! Not present in registry \"{}\". Missing entry: {}",
-                        FIELD.getClass(), FIELD.getKey(), getRegistry().getRegistryName(), REGISTRY_KEY );
+                        FIELD.getClass(), FIELD.getKey(), getRegistry().location(), REGISTRY_KEY );
             }
         }
         return registryEntry;

@@ -3,6 +3,10 @@ package fathertoast.specialmobs.common.entity.creeper;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
+import fathertoast.specialmobs.common.config.species.SpeciesConfig;
+import fathertoast.specialmobs.common.config.util.EnvironmentEntry;
+import fathertoast.specialmobs.common.config.util.EnvironmentList;
+import fathertoast.specialmobs.common.config.util.environment.biome.BiomeCategory;
 import fathertoast.specialmobs.common.entity.ai.AIHelper;
 import fathertoast.specialmobs.common.entity.ai.AmphibiousMovementController;
 import fathertoast.specialmobs.common.entity.ai.IAmphibiousMob;
@@ -16,10 +20,7 @@ import fathertoast.specialmobs.datagen.loot.LootPoolBuilder;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.entity.EntitySpawnPlacementRegistry;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.MoverType;
+import net.minecraft.entity.*;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.ai.goal.SwimGoal;
 import net.minecraft.entity.passive.fish.PufferfishEntity;
@@ -36,6 +37,9 @@ import net.minecraft.world.Explosion;
 import net.minecraft.world.IServerWorld;
 import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
+import net.minecraft.world.biome.Biome;
+
+import java.util.Random;
 
 @SpecialMob
 public class DrowningCreeperEntity extends _SpecialCreeperEntity implements IAmphibiousMob {
@@ -53,9 +57,28 @@ public class DrowningCreeperEntity extends _SpecialCreeperEntity implements IAmp
                 .addToAttribute( Attributes.MAX_HEALTH, 10.0 );
     }
     
+    @SpecialMob.ConfigSupplier
+    public static SpeciesConfig createConfig( MobFamily.Species<?> species ) {
+        SpeciesConfig.NEXT_NATURAL_SPAWN_CHANCE_EXCEPTIONS = new EnvironmentList(
+                EnvironmentEntry.builder( 0.06F ).inBiomeCategory( BiomeCategory.RIVER ).build(),
+                EnvironmentEntry.builder( 0.02F ).inBiomeCategory( BiomeCategory.OCEAN ).belowSeaDepths().build(),
+                EnvironmentEntry.builder( 0.0F ).inBiomeCategory( BiomeCategory.OCEAN ).build() );
+        return _SpecialCreeperEntity.createConfig( species );
+    }
+    
     @SpecialMob.SpawnPlacementRegistrar
     public static void registerSpeciesSpawnPlacement( MobFamily.Species<? extends DrowningCreeperEntity> species ) {
-        NaturalSpawnManager.registerSpawnPlacement( species, EntitySpawnPlacementRegistry.PlacementType.IN_WATER );
+        NaturalSpawnManager.registerSpawnPlacement( species, EntitySpawnPlacementRegistry.PlacementType.IN_WATER,
+                DrowningCreeperEntity::checkSpeciesSpawnRules );
+    }
+    
+    public static boolean checkSpeciesSpawnRules( EntityType<? extends DrowningCreeperEntity> type, IServerWorld world,
+                                                  SpawnReason reason, BlockPos pos, Random random ) {
+        final Biome.Category biomeCategory = world.getBiome( pos ).getBiomeCategory();
+        if( biomeCategory == Biome.Category.OCEAN || biomeCategory == Biome.Category.RIVER ) {
+            return NaturalSpawnManager.checkSpawnRulesWater( type, world, reason, pos, random );
+        }
+        return NaturalSpawnManager.checkSpawnRulesDefault( type, world, reason, pos, random );
     }
     
     /** @return True if this entity's position is currently obstructed. */

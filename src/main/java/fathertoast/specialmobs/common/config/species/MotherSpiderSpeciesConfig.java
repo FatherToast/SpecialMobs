@@ -15,7 +15,7 @@ public class MotherSpiderSpeciesConfig extends SpiderSpeciesConfig {
                                       int minBabies, int maxBabies, int minExtraBabies, int maxExtraBabies ) {
         super( species, spitChance );
         
-        MOTHER = new Mother( SPEC, species, speciesName, minBabies, maxBabies, minExtraBabies, maxExtraBabies );
+        MOTHER = new Mother( SPEC, species, species.getConfigName(), minBabies, maxBabies, minExtraBabies, maxExtraBabies );
     }
     
     public static class Mother extends Config.AbstractCategory {

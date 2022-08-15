@@ -3,6 +3,7 @@ package fathertoast.specialmobs.common.config.field;
 import com.electronwill.nightconfig.core.io.CharacterOutput;
 import fathertoast.specialmobs.common.config.file.ToastTomlWriter;
 import fathertoast.specialmobs.common.config.file.TomlHelper;
+import fathertoast.specialmobs.common.config.util.IStringArray;
 import fathertoast.specialmobs.common.config.util.RestartNote;
 
 import javax.annotation.Nullable;

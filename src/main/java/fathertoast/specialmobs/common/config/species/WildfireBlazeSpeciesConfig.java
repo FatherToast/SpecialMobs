@@ -15,7 +15,7 @@ public class WildfireBlazeSpeciesConfig extends BlazeSpeciesConfig {
                                        int minBabies, int maxBabies, int minSummons, int maxSummons ) {
         super( species, fireballBurstCount, fireballBurstDelay );
         
-        WILDFIRE = new Wildfire( SPEC, species, speciesName, minBabies, maxBabies, minSummons, maxSummons );
+        WILDFIRE = new Wildfire( SPEC, species, species.getConfigName(), minBabies, maxBabies, minSummons, maxSummons );
     }
     
     public static class Wildfire extends Config.AbstractCategory {
