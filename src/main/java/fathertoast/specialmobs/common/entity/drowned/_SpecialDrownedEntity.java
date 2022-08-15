@@ -19,6 +19,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.entity.*;
 import net.minecraft.entity.ai.attributes.AttributeModifierMap;
 import net.minecraft.entity.monster.DrownedEntity;
+import net.minecraft.entity.monster.ZombieEntity;
 import net.minecraft.entity.monster.ZombifiedPiglinEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.SnowballEntity;
@@ -113,7 +114,8 @@ public class _SpecialDrownedEntity extends DrownedEntity implements ISpecialMob<
         AIHelper.removeGoals( goalSelector, 2 ); // DrownedEntity.TridentAttackGoal & DrownedEntity.AttackGoal
         goalSelector.addGoal( 2, new SpecialDrownedAttackGoal( this, 1.0, false ) );
         
-        AIHelper.replaceHurtByTarget( this, new SpecialHurtByTargetGoal( this, DrownedEntity.class )
+        // Bug fix - tweaked from vanilla behavior to cause drowned to alert zombies (vanilla zombies alert drowned)
+        AIHelper.replaceHurtByTarget( this, new SpecialHurtByTargetGoal( this, ZombieEntity.class, DrownedEntity.class )
                 .setAlertOthers( ZombifiedPiglinEntity.class ) );
         
         registerVariantGoals();
@@ -147,8 +149,6 @@ public class _SpecialDrownedEntity extends DrownedEntity implements ISpecialMob<
     
     /** The parameter for special mob render scale. */
     private static final DataParameter<Float> SCALE = EntityDataManager.defineId( _SpecialDrownedEntity.class, DataSerializers.FLOAT );
-    
-    private boolean needsToBeDeeper;
     
     public _SpecialDrownedEntity( EntityType<? extends _SpecialDrownedEntity> entityType, World world ) {
         super( entityType, world );
@@ -191,6 +191,9 @@ public class _SpecialDrownedEntity extends DrownedEntity implements ISpecialMob<
         level.addFreshEntity( trident );
     }
     
+    /** For bug fix. Vanilla drowned movement logic breaks in 1-block-deep water. */
+    private boolean needsToBeDeeper;
+    
     /** Called each tick to update this entity's swimming state. */
     @Override
     public void updateSwimming() {
@@ -205,20 +208,19 @@ public class _SpecialDrownedEntity extends DrownedEntity implements ISpecialMob<
         super.travel( input );
     }
     
-    /** @return Water drag coefficient. */
-    @Override
-    protected float getWaterSlowDown() { return 0.9F; } // Improve mobility in shallow water
-    
     /** @return True if this entity is in water. */
     @Override
     public boolean isInWater() {
-        // Hacky way to fix vanilla drowned AI breaking in shallow water
         if( needsToBeDeeper ) {
             needsToBeDeeper = false;
             return isUnderWater();
         }
         return super.isInWater();
     }
+    
+    /** @return Water drag coefficient. */
+    @Override
+    protected float getWaterSlowDown() { return 0.9F; } // Improves mobility in shallow water; helpful with above fix
     
     
     //--------------- ISpecialMob Implementation ----------------
@@ -241,12 +243,12 @@ public class _SpecialDrownedEntity extends DrownedEntity implements ISpecialMob<
     /** Sets the experience that should be dropped by this entity. */
     @Override
     public final void setExperience( int xp ) { xpReward = xp; }
-
+    
     @Override
-    public void setSpecialPathfindingMalus(PathNodeType nodeType, float malus) {
-        this.setPathfindingMalus(nodeType, malus);
+    public void setSpecialPathfindingMalus( PathNodeType nodeType, float malus ) {
+        this.setPathfindingMalus( nodeType, malus );
     }
-
+    
     /** Converts this entity to one of another type. */
     @Nullable
     @Override
