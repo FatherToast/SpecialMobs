@@ -4,6 +4,7 @@ import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.entity.ai.AIHelper;
+import fathertoast.specialmobs.common.entity.projectile.BoneShrapnelEntity;
 import fathertoast.specialmobs.common.util.ExplosionHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
@@ -12,10 +13,7 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.ai.goal.FleeSunGoal;
 import net.minecraft.entity.ai.goal.RestrictSunGoal;
-import net.minecraft.entity.projectile.AbstractArrowEntity;
-import net.minecraft.entity.projectile.ProjectileHelper;
 import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.item.BowItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.MathHelper;
@@ -81,27 +79,46 @@ public class SkeletonCreeperEntity extends _SpecialCreeperEntity {
         
         if( level.isClientSide() ) return;
         
-        final ItemStack arrowItem = getProjectile( getItemInHand( ProjectileHelper.getWeaponHoldingHand(
-                this, item -> item instanceof BowItem ) ) );
         final float shootPower = explosionPower * 2.0F + 4.0F;
         final int count = (int) Math.ceil( shootPower * shootPower * 3.5F );
         for( int i = 0; i < count; i++ ) {
-            AbstractArrowEntity arrow = ProjectileHelper.getMobArrow( this, arrowItem, shootPower );
-            if( getMainHandItem().getItem() instanceof BowItem )
-                arrow = ((BowItem) getMainHandItem().getItem()).customArrow( arrow );
+            final BoneShrapnelEntity shrapnel = makeShrapnel( shootPower );
             
-            final float speed = (shootPower * 0.7F + random.nextFloat() * shootPower) / 20.0F;
+            final float speed = (0.7F + random.nextFloat()) * shootPower / 20.0F;
             final float pitch = random.nextFloat() * (float) Math.PI;
             final float yaw = random.nextFloat() * 2.0F * (float) Math.PI;
             final Vector3d velocity = new Vector3d(
                     MathHelper.cos( yaw ) * speed,
                     MathHelper.sin( pitch ) * (shootPower + random.nextFloat() * shootPower) / 18.0F,
                     MathHelper.sin( yaw ) * speed );
-            arrow.shoot( velocity.x, velocity.y, velocity.z, (float) velocity.length(), 0.0F );
-            level.addFreshEntity( arrow );
+            shrapnel.shoot( velocity.x, velocity.y, velocity.z, (float) velocity.length(), 0.0F );
+            
+            shrapnel.life += pitch * 6.0F;
+            level.addFreshEntity( shrapnel );
         }
         spawnAnim();
         playSound( SoundEvents.SKELETON_DEATH, 1.0F, 1.0F / (random.nextFloat() * 0.4F + 0.8F) );
+    }
+    
+    /** @return A new shrapnel entity to shoot. */
+    private BoneShrapnelEntity makeShrapnel( float damage ) {
+        final BoneShrapnelEntity shrapnel = new BoneShrapnelEntity( this );
+        
+        shrapnel.setEnchantmentEffectsFromEntity( this, damage );
+        if( isOnFire() ) shrapnel.setSecondsOnFire( 100 );
+        
+        byte pierce = 1;
+        if( isPowered() ) {
+            shrapnel.setCritArrow( true );
+            pierce++;
+        }
+        if( isSupercharged() ) {
+            shrapnel.setKnockback( shrapnel.knockback + 2 );
+            pierce++;
+        }
+        shrapnel.setPierceLevel( pierce );
+        
+        return shrapnel;
     }
     
     /** @return This entity's creature type. */

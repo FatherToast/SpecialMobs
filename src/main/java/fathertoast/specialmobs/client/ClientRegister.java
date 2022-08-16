@@ -1,6 +1,7 @@
 package fathertoast.specialmobs.client;
 
 import fathertoast.specialmobs.client.renderer.entity.family.*;
+import fathertoast.specialmobs.client.renderer.entity.projectile.BoneShrapnelRenderer;
 import fathertoast.specialmobs.client.renderer.entity.projectile.BugSpitRenderer;
 import fathertoast.specialmobs.client.renderer.entity.projectile.SpecialFishingBobberRenderer;
 import fathertoast.specialmobs.client.renderer.entity.species.*;
@@ -83,6 +84,7 @@ public class ClientRegister {
         registerSpeciesRenderer( CorporealShiftGhastEntity.SPECIES, CorporealShiftGhastRenderer::new );
         
         // Other
+        registerRenderer( SMEntities.BONE_SHRAPNEL, BoneShrapnelRenderer::new );
         registerRenderer( SMEntities.BUG_SPIT, BugSpitRenderer::new );
         registerSpriteRenderer( SMEntities.CORPOREAL_FIREBALL, game, 3.0F, true );
         registerRenderer( SMEntities.FISHING_BOBBER, SpecialFishingBobberRenderer::new );

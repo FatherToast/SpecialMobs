@@ -62,6 +62,8 @@ public class SMLanguageProvider extends LanguageProvider {
         }
         
         // Other entities
+        translationList.add( References.translations( SMEntities.BONE_SHRAPNEL.get().getDescriptionId(), "Bone Shrapnel",
+                "", "", "", "", "", "" ) ); //TODO
         translationList.add( References.translations( SMEntities.BUG_SPIT.get().getDescriptionId(), "Bug Spit",
                 "", "", "", "", "", "" ) ); //TODO
         translationList.add( References.translations( SMEntities.CORPOREAL_FIREBALL.get().getDescriptionId(), "Bug Spit",

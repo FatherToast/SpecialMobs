@@ -21,6 +21,10 @@ public class SMEntities {
     public static final DeferredRegister<EntityType<?>> REGISTRY = DeferredRegister.create( ForgeRegistries.ENTITIES, SpecialMobs.MOD_ID );
     
     // Misc entities
+    public static final RegistryObject<EntityType<BoneShrapnelEntity>> BONE_SHRAPNEL = register( "bone_shrapnel",
+            EntityType.Builder.<BoneShrapnelEntity>of( BoneShrapnelEntity::new, EntityClassification.MISC )
+                    .sized( 0.5F, 0.5F ).clientTrackingRange( 4 ).updateInterval( 20 ) );
+    
     public static final RegistryObject<EntityType<BugSpitEntity>> BUG_SPIT = register( "bug_spit",
             EntityType.Builder.<BugSpitEntity>of( BugSpitEntity::new, EntityClassification.MISC )
                     .sized( 0.25F, 0.25F ).clientTrackingRange( 4 ).updateInterval( 10 ) );
@@ -31,10 +35,6 @@ public class SMEntities {
     
     public static final RegistryObject<EntityType<SpecialFishingBobberEntity>> FISHING_BOBBER = register( "fishing_bobber",
             EntityType.Builder.<SpecialFishingBobberEntity>of( SpecialFishingBobberEntity::new, EntityClassification.MISC ).noSave().noSummon()
-                    .sized( 0.25F, 0.25F ).clientTrackingRange( 4 ).updateInterval( 5 ) );
-    
-    public static final RegistryObject<EntityType<BoneShrapnelEntity>> BONE_SHRAPNEL = register( "bone_shrapnel",
-            EntityType.Builder.<BoneShrapnelEntity>of( BoneShrapnelEntity::new, EntityClassification.MISC ).noSave().noSummon()
                     .sized( 0.25F, 0.25F ).clientTrackingRange( 4 ).updateInterval( 5 ) );
     
     
