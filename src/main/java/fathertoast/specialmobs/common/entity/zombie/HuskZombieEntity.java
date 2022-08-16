@@ -26,7 +26,7 @@ import net.minecraft.world.IServerWorld;
 import net.minecraft.world.World;
 
 import java.util.Random;
-import java.util.function.Function;
+import java.util.function.Predicate;
 
 @SpecialMob
 public class HuskZombieEntity extends _SpecialZombieEntity {
@@ -109,7 +109,7 @@ public class HuskZombieEntity extends _SpecialZombieEntity {
     }
     
     /** Returns true if the species is not a husk and not damaged by water. */
-    private static final Function<MobFamily.Species<?>, Boolean> HUSK_CONVERSION_SELECTOR =
+    private static final Predicate<MobFamily.Species<?>> HUSK_CONVERSION_SELECTOR =
             ( species ) -> species != SPECIES && !species.config.GENERAL.isDamagedByWater.get();
     
     /** Performs this zombie's drowning conversion. */

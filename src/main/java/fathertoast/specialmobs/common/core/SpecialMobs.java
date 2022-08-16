@@ -37,45 +37,55 @@ public class SpecialMobs {
      * (KEY: - = complete in current version, o = incomplete feature from previous version,
      *       + = incomplete new feature, ? = feature to consider adding)
      *  - general
-     *      - entity replacer
+     *      - mob replacer
      *      - environment-sensitive configs
      *  - natural spawning
      *      - copied spawns
-     *          - spiders -> cave spiders
-     *          - endermen -> ender creepers
+     *          - vanilla spiders -> vanilla cave spiders
+     *          - vanilla endermen -> ender creepers
      *      - ocean/river spawns
      *          - drowning creepers
      *          - blueberry slimes
      *      - nether spawns
-     *          - wither skeletons (outside of fortresses)
-     *          - blazes (outside of fortresses)
+     *          - vanilla wither skeletons (outside of fortresses)
+     *          - vanilla blazes (outside of fortresses)
      *          - fire creepers/zombies/spiders
      *          ? warped/crimson mobs
      *  - potions
      *      - vulnerability (opposite of resistance)
      *      - weight (opposite of levitation)
+     *  + blocks
+     *      + infested coral (spawns puffer silverfish)
+     *      + melting ice
+     *          - has variant that turns to air when melted
+     *          - melts if not below melting ice or if above air (regardless of light/temp)
+     *          - melts faster in brighter light
+     *          - melts faster when next to non-solid blocks
      *  - entities
-     *      - nbt-driven capabilities (special mob data)
-     *      - fish hook
-     *      - bug spit
      *      + bestiary
-     *      - configurable stats
+     *      - configurable, nbt-driven stats (bestiary info + special mob data)
+     *      - configurable weapon type chance
+     *      - bone shrapnel
+     *      - bug spit
+     *      - fish hook
      *  - monster families (see doc for specifics)
      *      - creepers
      *          - chance to spawn charged during thunderstorms
+     *          - chance to become supercharged when charged
+     *          - explosion stats (while wet, while burning, when shot)
      *          + scope - perhaps delay this until 1.18 where spyglasses will be in the game
      *      - zombies
      *          - transformations (husk -> any other non-water-sensitive zombie -> analogous drowned)
      *          - ranged attack AI (using bow)
      *          - use shields
      *      - drowned
-     *          - AI functions in shallow water
      *          - use shields
+     *          - bug fixes (can move in shallow water, alert regular zombies)
      *      - zombified piglins
      *          - ranged attack AI (using bow)
      *          + ranged attack AI (using crossbow)
      *          - use shields
-     *          ? warped/crimson mobs
+     *          ? warped/crimson
      *      - skeletons
      *          - use shields
      *          - melee chance
@@ -84,7 +94,7 @@ public class SpecialMobs {
      *          - use shields
      *          - bow chance
      *          - babies
-     *          ? warped/crimson mobs
+     *          ? warped/crimson
      *      - slimes
      *          - smallest size can deal damage
      *      - magma cubes
@@ -94,14 +104,17 @@ public class SpecialMobs {
      *          - ranged attack AI (spitter)
      *      - silverfish
      *          - ranged attack AI (spitter)
+     *          - chance to spawn already calling for reinforcements
      *      - endermen
      *      - witches
      *          - ability to equip held items (wonky)
-     *          - uses splash speed instead of regular
+     *          - use splash speed instead of regular
      *      - ghasts
      *          - melee attack AI
+     *          - remove vertical targeting restriction
      *      - blazes
      *          - melee attack AI
+     *          - configurable fireball attack
      *      ? hoglins
      *      ? zoglins
      *      + guardians

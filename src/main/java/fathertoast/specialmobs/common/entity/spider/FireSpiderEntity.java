@@ -3,6 +3,7 @@ package fathertoast.specialmobs.common.entity.spider;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
+import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import net.minecraft.block.Blocks;
@@ -63,7 +64,7 @@ public class FireSpiderEntity extends _SpecialSpiderEntity {
         if( !level.isClientSide() ) {
             final BlockPos pos = target.blockPosition();
             if( level.getBlockState( pos ).getMaterial().isReplaceable() ) {
-                level.setBlock( pos, Blocks.FIRE.defaultBlockState(), References.SetBlockFlags.DEFAULTS );
+                MobHelper.placeBlock( this, pos, Blocks.FIRE.defaultBlockState() );
             }
         }
         target.setSecondsOnFire( 5 );

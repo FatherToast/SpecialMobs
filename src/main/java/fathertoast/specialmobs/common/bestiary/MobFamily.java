@@ -13,6 +13,7 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.monster.*;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeSpawnEggItem;
 import net.minecraftforge.fml.RegistryObject;
@@ -20,6 +21,7 @@ import net.minecraftforge.fml.RegistryObject;
 import javax.annotation.Nullable;
 import java.util.*;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 /**
  * Special mobs are broken up into distinct 'families', each of which correspond to a type of vanilla mob that can be
@@ -50,7 +52,7 @@ public class MobFamily<T extends LivingEntity, V extends FamilyConfig> {
     );
     public static final MobFamily<DrownedEntity, FamilyConfig> DROWNED = new MobFamily<>( FamilyConfig::new,
             "Drowned", "drowned", 0x8FF1D7, new EntityType[] { EntityType.DROWNED },
-            "Abyssal", "Brute", "Fishing", /*"Frozen",*/ "Giant", "Hungry", "Knight", "Plague"//, "Tropical"
+            "Abyssal", "Brute", "Fishing", "Frozen", "Giant", "Hungry", "Knight", "Plague", "Tropical"
     ); //TODO Textures! - brute, hungry, plague, frozen, tropical
     public static final MobFamily<ZombifiedPiglinEntity, FamilyConfig> ZOMBIFIED_PIGLIN = new MobFamily<>( FamilyConfig::new,
             "ZombifiedPiglin", "zombified piglins", 0xEA9393, new EntityType[] { EntityType.ZOMBIFIED_PIGLIN },
@@ -169,6 +171,9 @@ public class MobFamily<T extends LivingEntity, V extends FamilyConfig> {
     /** This family's config. */
     public final V config;
     
+    /** True if this family has any giant species. */
+    private Boolean hasAnyGiants;
+    
     private MobFamily( Function<MobFamily<?, ?>, V> configSupplier,
                        String familyName, String readableName, int eggColor, EntityType<?>[] replaceable,
                        String... variantNames ) {
@@ -196,15 +201,32 @@ public class MobFamily<T extends LivingEntity, V extends FamilyConfig> {
     }
     
     /** Pick a new species from this family, based on the location. */
-    public Species<? extends T> nextVariant( World world, @Nullable BlockPos pos ) {
-        return nextVariant( world, pos, null, vanillaReplacement );
+    public Species<? extends T> nextVariant( World world, @Nullable BlockPos pos, @Nullable Predicate<Species<?>> selector ) {
+        return nextVariant( world, pos, selector, vanillaReplacement );
     }
     
     /** Pick a new species from this family, based on the location. */
-    public Species<? extends T> nextVariant( World world, @Nullable BlockPos pos, @Nullable Function<Species<?>, Boolean> selector, Species<? extends T> fallback ) {
+    public Species<? extends T> nextVariant( World world, @Nullable BlockPos pos, @Nullable Predicate<Species<?>> selector, Species<? extends T> fallback ) {
         final Species<?> species = config.GENERAL.specialVariantList.next( world.random, world, pos, selector );
         //noinspection unchecked
         return species == null ? fallback : (Species<? extends T>) species;
+    }
+    
+    /**
+     * @return True if this species is NOT taller (in block height) than the base vanilla entity.
+     * Used to reduce likelihood of suffocation due to Mob Replacement.
+     */
+    public boolean hasAnyGiants() {
+        if( hasAnyGiants == null ) {
+            hasAnyGiants = false;
+            for( Species<?> species : variants ) {
+                if( !species.isNotGiant() ) {
+                    hasAnyGiants = true;
+                    break;
+                }
+            }
+        }
+        return hasAnyGiants;
     }
     
     
@@ -250,6 +272,8 @@ public class MobFamily<T extends LivingEntity, V extends FamilyConfig> {
         /** This species's config. */
         public final SpeciesConfig config;
         
+        /** True if this mob is NOT taller (in block height) than the base vanilla entity. */
+        private Boolean isNotGiant;
         /** The scale of this species's height in relation to the base vanilla entity's height. */
         private float heightScale = -1.0F;
         
@@ -329,6 +353,17 @@ public class MobFamily<T extends LivingEntity, V extends FamilyConfig> {
         public String getConfigNameSingular() {
             return (specialVariantName == null ? "vanilla replacement " :
                     ConfigUtil.camelCaseToLowerSpace( specialVariantName ) + " ") + ConfigUtil.camelCaseToLowerSpace( family.name );
+        }
+        
+        /**
+         * @return True if this species is NOT taller (in block height) than the base vanilla entity.
+         * Used to reduce likelihood of suffocation due to Mob Replacement.
+         */
+        public boolean isNotGiant() {
+            if( isNotGiant == null ) {
+                isNotGiant = MathHelper.ceil( entityType.get().getHeight() ) <= MathHelper.ceil( family.replaceableTypes[0].getHeight() );
+            }
+            return isNotGiant;
         }
         
         /** @return The height scale. Used to calculate eye height for families that are not auto-scaled. */

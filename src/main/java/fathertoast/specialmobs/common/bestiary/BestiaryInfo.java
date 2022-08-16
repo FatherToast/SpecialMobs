@@ -43,16 +43,31 @@ public class BestiaryInfo {
         NONE( new EnvironmentList() ),
         FIRE( new EnvironmentList(
                 EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).inUltraWarmDimension().build(),
-                EnvironmentEntry.builder( DefaultWeight.LOWEST.value ).isRaining().canSeeSky().notInDryBiome().build(),
                 EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).isHot().build(),
                 EnvironmentEntry.builder( DefaultWeight.HIGH.value ).isWarm().build(),
-                EnvironmentEntry.builder( DefaultWeight.LOWEST.value ).isFreezing().build()
+                EnvironmentEntry.builder( DefaultWeight.LOWEST.value ).isFreezing().build(),
+                // Regular frozen ocean is actually freezing, so already covered
+                EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).inBiome( Biomes.WARM_OCEAN ).build(),
+                EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).inBiome( Biomes.DEEP_WARM_OCEAN ).build(),
+                EnvironmentEntry.builder( DefaultWeight.HIGH.value ).inBiome( Biomes.LUKEWARM_OCEAN ).build(),
+                EnvironmentEntry.builder( DefaultWeight.HIGH.value ).inBiome( Biomes.DEEP_LUKEWARM_OCEAN ).build(),
+                EnvironmentEntry.builder( DefaultWeight.LOW.value ).inBiome( Biomes.COLD_OCEAN ).build(),
+                EnvironmentEntry.builder( DefaultWeight.LOW.value ).inBiome( Biomes.DEEP_COLD_OCEAN ).build(),
+                EnvironmentEntry.builder( DefaultWeight.LOWEST.value ).inBiome( Biomes.DEEP_FROZEN_OCEAN ).build()
         ) ),
         ICE( new EnvironmentList(
                 EnvironmentEntry.builder( DefaultWeight.LOWEST.value ).inUltraWarmDimension().build(),
                 EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).isFreezing().build(),
                 EnvironmentEntry.builder( DefaultWeight.LOW.value ).isWarm().build(),
-                EnvironmentEntry.builder( DefaultWeight.LOWEST.value ).isHot().build()
+                EnvironmentEntry.builder( DefaultWeight.LOWEST.value ).isHot().build(),
+                // Regular frozen ocean is actually freezing, so already covered
+                EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).inBiome( Biomes.DEEP_FROZEN_OCEAN ).build(),
+                EnvironmentEntry.builder( DefaultWeight.HIGH.value ).inBiome( Biomes.COLD_OCEAN ).build(),
+                EnvironmentEntry.builder( DefaultWeight.HIGH.value ).inBiome( Biomes.DEEP_COLD_OCEAN ).build(),
+                EnvironmentEntry.builder( DefaultWeight.LOW.value ).inBiome( Biomes.LUKEWARM_OCEAN ).build(),
+                EnvironmentEntry.builder( DefaultWeight.LOW.value ).inBiome( Biomes.DEEP_LUKEWARM_OCEAN ).build(),
+                EnvironmentEntry.builder( DefaultWeight.LOWEST.value ).inBiome( Biomes.WARM_OCEAN ).build(),
+                EnvironmentEntry.builder( DefaultWeight.LOWEST.value ).inBiome( Biomes.DEEP_WARM_OCEAN ).build()
         ) ),
         DESERT( new EnvironmentList(
                 EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).inUltraWarmDimension().build(),
@@ -88,6 +103,13 @@ public class BestiaryInfo {
                 EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).isThundering().build(),
                 EnvironmentEntry.builder( DefaultWeight.HIGH.value ).isRaining().build(),
                 EnvironmentEntry.builder( DefaultWeight.LOW.value ).cannotSeeSky().build()
+        ) ),
+        TROPICAL( new EnvironmentList(
+                // All ocean biomes (except regular frozen ocean) have the same temp of 0.5, so we must call out specific biomes
+                EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).inBiome( Biomes.WARM_OCEAN ).build(),
+                EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).inBiome( Biomes.DEEP_WARM_OCEAN ).build(),
+                EnvironmentEntry.builder( DefaultWeight.DISABLED.value ).isFreezing().build(),
+                EnvironmentEntry.builder( DefaultWeight.DISABLED.value ).inBiome( Biomes.DEEP_FROZEN_OCEAN ).build()
         ) ),
         FISHING( new EnvironmentList(
                 EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).inWaterBiome().build(),

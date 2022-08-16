@@ -7,6 +7,7 @@ import fathertoast.specialmobs.common.config.species.SpeciesConfig;
 import fathertoast.specialmobs.common.config.util.EnvironmentEntry;
 import fathertoast.specialmobs.common.config.util.EnvironmentList;
 import fathertoast.specialmobs.common.config.util.environment.biome.BiomeCategory;
+import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.entity.ai.AIHelper;
 import fathertoast.specialmobs.common.entity.ai.AmphibiousMovementController;
 import fathertoast.specialmobs.common.entity.ai.IAmphibiousMob;
@@ -172,20 +173,20 @@ public class DrowningCreeperEntity extends _SpecialCreeperEntity implements IAmp
                         if( stateAtPos.getMaterial().isReplaceable() || stateAtPos.is( BlockTags.LEAVES ) ) {
                             if( distSq > rMinusOneSq ) {
                                 // "Coral" casing
-                                level.setBlock( pos, random.nextFloat() < 0.25F ? brainCoral : hornCoral, References.SetBlockFlags.DEFAULTS );
+                                MobHelper.placeBlock( this, pos, random.nextFloat() < 0.25F ? brainCoral : hornCoral );
                             }
                             else {
                                 final float fillChoice = random.nextFloat();
                                 
                                 if( fillChoice < 0.1F && seaPickle.canSurvive( level, pos ) ) {
-                                    level.setBlock( pos, seaPickle, References.SetBlockFlags.DEFAULTS );
+                                    MobHelper.placeBlock( this, pos, seaPickle );
                                 }
                                 else if( fillChoice < 0.3F && seaGrass.canSurvive( level, pos ) ) {
-                                    level.setBlock( pos, seaGrass, References.SetBlockFlags.DEFAULTS );
+                                    MobHelper.placeBlock( this, pos, seaGrass );
                                 }
                                 else {
                                     // Water fill
-                                    level.setBlock( pos, water, References.SetBlockFlags.DEFAULTS );
+                                    MobHelper.placeBlock( this, pos, water );
                                     
                                     if( random.nextFloat() < 0.0075F && pufferCount < 5 ) {
                                         spawnPufferfish( pos );

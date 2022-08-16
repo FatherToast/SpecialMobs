@@ -23,7 +23,7 @@ public class BruteDrownedEntity extends _SpecialDrownedEntity {
     @SpecialMob.BestiaryInfoSupplier
     public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
         bestiaryInfo.color( 0xFFF87E )
-                .uniqueTextureBaseOnly()
+                .uniqueTextureWithOverlay()
                 .size( 1.2F, 0.7F, 2.35F )
                 .addExperience( 2 )
                 .addToAttribute( Attributes.MAX_HEALTH, 10.0 ).addToAttribute( Attributes.ARMOR, 10.0 );

@@ -139,7 +139,7 @@ public class SnowCreeperEntity extends _SpecialCreeperEntity {
                             if( block.is( Blocks.FROSTED_ICE ) || block.getFluidState().is( FluidTags.WATER ) ) {
                                 final BlockState blockAbove = level.getBlockState( pos.above() );
                                 if( !blockAbove.getMaterial().blocksMotion() && !blockAbove.getFluidState().is( FluidTags.WATER ) )
-                                    level.setBlock( pos, ice, References.SetBlockFlags.DEFAULTS );
+                                    MobHelper.placeBlock( this, pos, ice );
                             }
                             
                             // Attempt to place pillars along circumference only
@@ -170,7 +170,7 @@ public class SnowCreeperEntity extends _SpecialCreeperEntity {
         if( pos.getY() > currentPos.getY() ) height -= (pos.getY() - currentPos.getY()) / 2;
         
         while( currentPos.getY() < maxY && shouldReplace( currentPos ) ) {
-            level.setBlock( currentPos, ice, References.SetBlockFlags.DEFAULTS );
+            MobHelper.placeBlock( this, currentPos, ice );
             currentPos.move( 0, 1, 0 );
             
             if( ++height >= 0 && random.nextBoolean() ) break;
