@@ -5,6 +5,7 @@ import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.entity.ai.AIHelper;
+import fathertoast.specialmobs.common.entity.drowned.FrozenDrownedEntity;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import net.minecraft.block.Blocks;
@@ -16,6 +17,7 @@ import net.minecraft.entity.ai.attributes.ModifiableAttributeInstance;
 import net.minecraft.entity.ai.goal.LookAtGoal;
 import net.minecraft.entity.ai.goal.LookRandomlyGoal;
 import net.minecraft.entity.ai.goal.WaterAvoidingRandomWalkingGoal;
+import net.minecraft.entity.monster.ZombieEntity;
 import net.minecraft.entity.projectile.AbstractArrowEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -91,6 +93,10 @@ public class FrozenZombieEntity extends _SpecialZombieEntity {
     protected AbstractArrowEntity getVariantArrow( AbstractArrowEntity arrow, ItemStack arrowItem, float damageMulti ) {
         return MobHelper.tipArrow( arrow, Effects.MOVEMENT_SLOWDOWN );
     }
+    
+    /** Override to change the entity this converts to when drowned. */
+    @Override
+    protected EntityType<? extends ZombieEntity> getVariantConversionType() { return FrozenDrownedEntity.SPECIES.entityType.get(); }
     
     /** Called each tick to update this entity's movement. */
     @Override
