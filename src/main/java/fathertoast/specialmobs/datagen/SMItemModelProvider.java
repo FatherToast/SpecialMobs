@@ -22,15 +22,16 @@ public class SMItemModelProvider extends ItemModelProvider {
     protected void registerModels() {
         // Bestiary-generated spawn egg models
         final ResourceLocation spawnEggParent = modLoc( ITEM_FOLDER + "/template_sm_spawn_egg" );
-        for( MobFamily.Species<?> species : MobFamily.getAllSpecies() )
+        for( MobFamily.Species<?> species : MobFamily.getAllSpecies() ) {
             withExistingParent( species.spawnEgg.getId().getPath(), spawnEggParent );
-
+        }
+        
         // Simple items
-        for(RegistryObject<? extends Item> regObject : SMItems.SIMPLE_ITEMS) {
-            String name = Objects.requireNonNull(regObject.getId()).getPath();
-
-            withExistingParent(name, mcLoc("item/generated"))
-                    .texture("layer0", modLoc(ITEM_FOLDER + "/" + name));
+        for( RegistryObject<? extends Item> regObject : SMItems.SIMPLE_ITEMS ) {
+            final String name = Objects.requireNonNull( regObject.getId() ).getPath();
+            
+            withExistingParent( name, mcLoc( ITEM_FOLDER + "/generated" ) )
+                    .texture( "layer0", modLoc( ITEM_FOLDER + "/" + name ) );
         }
     }
 }

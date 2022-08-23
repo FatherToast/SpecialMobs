@@ -3,6 +3,7 @@ package fathertoast.specialmobs.common.entity.drowned;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
+import fathertoast.specialmobs.common.block.MeltingIceBlock;
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.util.ExplosionHelper;
 import fathertoast.specialmobs.common.util.References;
@@ -134,9 +135,8 @@ public class FrozenDrownedEntity extends _SpecialDrownedEntity {
                     SoundEvents.GLASS_BREAK, getSoundSource(), 0.4F, 1.0F / (random.nextFloat() * 0.4F + 0.8F) );
         }
         
-        final BlockState block = Blocks.FROSTED_ICE.defaultBlockState();
         if( radius <= 0 ) {
-            placeSealBlock( center, block );
+            placeSealBlock( center );
             return;
         }
         
@@ -146,21 +146,18 @@ public class FrozenDrownedEntity extends _SpecialDrownedEntity {
                 
                 // Fill circle
                 if( distSq <= radius * radius ) {
-                    placeSealBlock( center.offset( x, 0, z ), block );
+                    placeSealBlock( center.offset( x, 0, z ) );
                 }
             }
         }
     }
     
     /** Attempts to place a single seal block. */
-    private void placeSealBlock( BlockPos pos, BlockState block ) {
-        final BlockState currentBlock = level.getBlockState( pos );
-        if( currentBlock.getBlock() == Blocks.WATER && currentBlock.getValue( FlowingFluidBlock.LEVEL ) == 0 &&
-                block.canSurvive( level, pos ) && level.isUnobstructed( block, pos, ISelectionContext.empty() ) ) {
-            if( MobHelper.placeBlock( this, pos, block ) ) {
-                level.getBlockTicks().scheduleTick( pos, Blocks.FROSTED_ICE,
-                        MathHelper.nextInt( random, 60, 120 ) );
-            }
+    private void placeSealBlock( BlockPos pos ) {
+        final BlockState block = MeltingIceBlock.getState( level, pos );
+        if( level.getBlockState( pos ).getMaterial().isReplaceable() && level.isUnobstructed( block, pos, ISelectionContext.empty() ) &&
+                MobHelper.placeBlock( this, pos, block ) ) {
+            MeltingIceBlock.scheduleFirstTick( level, pos, random );
         }
     }
 }

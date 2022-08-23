@@ -2,6 +2,7 @@ package fathertoast.specialmobs.common.core;
 
 import fathertoast.specialmobs.common.compat.top.SMTheOneProbe;
 import fathertoast.specialmobs.common.config.Config;
+import fathertoast.specialmobs.common.core.register.SMBlocks;
 import fathertoast.specialmobs.common.core.register.SMEffects;
 import fathertoast.specialmobs.common.core.register.SMEntities;
 import fathertoast.specialmobs.common.core.register.SMItems;
@@ -56,11 +57,7 @@ public class SpecialMobs {
      *      - weight (opposite of levitation)
      *  + blocks
      *      + infested coral (spawns puffer silverfish)
-     *      + melting ice
-     *          - has variant that turns to air when melted
-     *          - melts if not below melting ice or if above air (regardless of light/temp)
-     *          - melts faster in brighter light
-     *          - melts faster when next to non-solid blocks
+     *      + melting ice (similar to frosted ice)
      *  - entities
      *      + bestiary
      *      - configurable, nbt-driven stats (bestiary info + special mob data)
@@ -143,9 +140,10 @@ public class SpecialMobs {
         
         final IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
         
-        SMEffects.REGISTRY.register( modEventBus );
-        SMEntities.REGISTRY.register( modEventBus );
+        SMBlocks.REGISTRY.register( modEventBus );
         SMItems.REGISTRY.register( modEventBus );
+        SMEntities.REGISTRY.register( modEventBus );
+        SMEffects.REGISTRY.register( modEventBus );
         
         modEventBus.addListener( SMEntities::createAttributes );
         modEventBus.addListener( this::setup );

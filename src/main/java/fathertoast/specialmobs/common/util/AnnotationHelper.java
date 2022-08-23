@@ -5,10 +5,12 @@ import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.config.species.SpeciesConfig;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
+import net.minecraft.block.Block;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.AttributeModifierMap;
 import net.minecraft.item.Item;
+import net.minecraftforge.registries.ForgeRegistryEntry;
 
 import javax.annotation.Nullable;
 import java.lang.annotation.Annotation;
@@ -103,14 +105,20 @@ public final class AnnotationHelper {
         }
     }
     
-    /** Gets the translations from a mod item. Throws an exception if anything goes wrong. */
-    public static String[] getTranslations( Item item ) {
+    /** Gets the translations from a block. Throws an exception if anything goes wrong. */
+    public static String[] getTranslations( Block block ) { return getTranslations( block, block.getDescriptionId() ); }
+    
+    /** Gets the translations from an item. Throws an exception if anything goes wrong. */
+    public static String[] getTranslations( Item item ) { return getTranslations( item, item.getDescriptionId() ); }
+    
+    /** Gets the translations from a registry entry. Throws an exception if anything goes wrong. */
+    public static String[] getTranslations( ForgeRegistryEntry<?> entry, String key ) {
         try {
-            return (String[]) getMethod( item.getClass(), SpecialMob.LanguageProvider.class )
-                    .invoke( null, item.getDescriptionId() );
+            return (String[]) getMethod( entry.getClass(), SpecialMob.LanguageProvider.class )
+                    .invoke( null, key );
         }
         catch( NoSuchMethodException | InvocationTargetException | IllegalAccessException ex ) {
-            throw new RuntimeException( "Item class for " + item.getRegistryName() + " has invalid language provider method", ex );
+            throw new RuntimeException( "Class for " + entry.getRegistryName() + " has invalid language provider method", ex );
         }
     }
     

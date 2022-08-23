@@ -3,6 +3,9 @@ package fathertoast.specialmobs.common.entity.creeper;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
+import fathertoast.specialmobs.common.block.MeltingIceBlock;
+import fathertoast.specialmobs.common.config.species.SnowCreeperSpeciesConfig;
+import fathertoast.specialmobs.common.config.species.SpeciesConfig;
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.entity.ai.AIHelper;
 import fathertoast.specialmobs.common.entity.ai.FluidPathNavigator;
@@ -12,6 +15,7 @@ import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.block.FlowingFluidBlock;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.ai.attributes.Attributes;
@@ -44,6 +48,16 @@ public class SnowCreeperEntity extends _SpecialCreeperEntity {
                 .addExperience( 2 ).effectImmune( Effects.MOVEMENT_SLOWDOWN )
                 .addToAttribute( Attributes.MAX_HEALTH, 10.0 );
     }
+    
+    @SpecialMob.ConfigSupplier
+    public static SpeciesConfig createConfig( MobFamily.Species<?> species ) {
+        return new SnowCreeperSpeciesConfig( species, false, false, false,
+                0.33 );
+    }
+    
+    /** @return This entity's species config. */
+    @Override
+    public SnowCreeperSpeciesConfig getConfig() { return (SnowCreeperSpeciesConfig) getSpecies().config; }
     
     @SpecialMob.LanguageProvider
     public static String[] getTranslations( String langKey ) {
@@ -123,7 +137,9 @@ public class SnowCreeperEntity extends _SpecialCreeperEntity {
         final BlockPos center = new BlockPos( explosion.getPos() );
         
         if( explosionMode != Explosion.Mode.NONE ) {
-            final BlockState ice = Blocks.ICE.defaultBlockState();
+            final boolean snowGlobe = isUnderWater() || random.nextDouble() < getConfig().SNOW.snowGlobeChance.get();
+            
+            final int radiusSq = radius * radius;
             final int rMinusOneSq = (radius - 1) * (radius - 1);
             
             for( int y = -radius; y <= radius; y++ ) {
@@ -131,19 +147,32 @@ public class SnowCreeperEntity extends _SpecialCreeperEntity {
                     for( int z = -radius; z <= radius; z++ ) {
                         final int distSq = x * x + y * y + z * z;
                         
-                        if( distSq <= radius * radius ) {
+                        if( distSq <= radiusSq ) {
                             final BlockPos pos = center.offset( x, y, z );
                             
-                            // Freeze top layer of water and temporary ice within affected volume
+                            // Freeze top layer of water sources and frosted ice within affected volume
                             final BlockState block = level.getBlockState( pos );
-                            if( block.is( Blocks.FROSTED_ICE ) || block.getFluidState().is( FluidTags.WATER ) ) {
+                            if( block.is( Blocks.FROSTED_ICE ) || block.getBlock() == Blocks.WATER && block.getValue( FlowingFluidBlock.LEVEL ) == 0 ) {
                                 final BlockState blockAbove = level.getBlockState( pos.above() );
-                                if( !blockAbove.getMaterial().blocksMotion() && !blockAbove.getFluidState().is( FluidTags.WATER ) )
-                                    MobHelper.placeBlock( this, pos, ice );
+                                if( !blockAbove.getMaterial().blocksMotion() && !blockAbove.getFluidState().is( FluidTags.WATER ) &&
+                                        MobHelper.placeBlock( this, pos, MeltingIceBlock.getState( level, pos ) ) ) {
+                                    MeltingIceBlock.scheduleFirstTick( level, pos, random );
+                                }
                             }
                             
-                            // Attempt to place pillars along circumference only
-                            if( y == 0 && distSq > rMinusOneSq ) placePillar( pos, radius );
+                            if( distSq > rMinusOneSq ) {
+                                if( snowGlobe ) {
+                                    // Create spherical shell of ice
+                                    if( level.getBlockState( pos ).getMaterial().isReplaceable() &&
+                                            MobHelper.placeBlock( this, pos, MeltingIceBlock.getState( level, pos ) ) ) {
+                                        MeltingIceBlock.scheduleFirstTick( level, pos, random );
+                                    }
+                                }
+                                else if( y == 0 ) {
+                                    // Create ice wall
+                                    placePillar( pos, radius );
+                                }
+                            }
                         }
                     }
                 }
@@ -164,13 +193,14 @@ public class SnowCreeperEntity extends _SpecialCreeperEntity {
         if( shouldReplace( currentPos ) ) findGroundBelow( currentPos, radius );
         else if( findGroundAbove( currentPos, radius ) ) return;
         
-        final BlockState ice = Blocks.PACKED_ICE.defaultBlockState();
         final int maxY = Math.min( currentPos.getY() + 4, level.getMaxBuildHeight() - 2 );
         int height = -2; // This is minimum pillar height
         if( pos.getY() > currentPos.getY() ) height -= (pos.getY() - currentPos.getY()) / 2;
         
         while( currentPos.getY() < maxY && shouldReplace( currentPos ) ) {
-            MobHelper.placeBlock( this, currentPos, ice );
+            if( MobHelper.placeBlock( this, currentPos, MeltingIceBlock.getState( level, currentPos ) ) ) {
+                MeltingIceBlock.scheduleFirstTick( level, currentPos, random );
+            }
             currentPos.move( 0, 1, 0 );
             
             if( ++height >= 0 && random.nextBoolean() ) break;
