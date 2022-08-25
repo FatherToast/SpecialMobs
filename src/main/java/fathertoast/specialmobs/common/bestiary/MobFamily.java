@@ -44,7 +44,7 @@ public class MobFamily<T extends LivingEntity, V extends FamilyConfig> {
             "Creeper", "creepers", 0x0DA70B, new EntityType[] { EntityType.CREEPER },
             "Dark", "Death", "Dirt", "Doom", "Drowning", "Ender", "Fire", "Gravel", "Jumping", "Lightning",
             "Mini", "Sand", /*"Scope",*/ "Snow", "Skeleton", "Splitting"
-    );//TODO scope
+    );//TODO scope - maybe in 1.18 when spyglasses exist
     
     public static final MobFamily<ZombieEntity, FamilyConfig> ZOMBIE = new MobFamily<>( FamilyConfig::newLessSpecial,
             "Zombie", "zombies", 0x00AFAF, new EntityType[] { EntityType.ZOMBIE, EntityType.HUSK },
@@ -52,12 +52,12 @@ public class MobFamily<T extends LivingEntity, V extends FamilyConfig> {
     );
     public static final MobFamily<DrownedEntity, FamilyConfig> DROWNED = new MobFamily<>( FamilyConfig::new,
             "Drowned", "drowned", 0x8FF1D7, new EntityType[] { EntityType.DROWNED },
-            "Abyssal", "Brute", "Fishing", "Frozen", "Giant", "Hungry", "Knight", "Plague", "Tropical"
-    ); //TODO Textures! - tropical
+            "Abyssal", "Brute", "Fishing", "Frozen", "Giant", "Hungry", "Knight", "Plague"//, "Tropical"
+    );
     public static final MobFamily<ZombifiedPiglinEntity, FamilyConfig> ZOMBIFIED_PIGLIN = new MobFamily<>( FamilyConfig::new,
             "ZombifiedPiglin", "zombified piglins", 0xEA9393, new EntityType[] { EntityType.ZOMBIFIED_PIGLIN },
             "Brute", "Fishing", "Giant", "Hungry", "Knight", "Plague", "Vampire"//TODO figure out crossbows
-    );
+    );//TODO crimson/warped
     
     public static final MobFamily<AbstractSkeletonEntity, SkeletonFamilyConfig> SKELETON = new MobFamily<>( SkeletonFamilyConfig::new,
             "Skeleton", "skeletons", 0xC1C1C1, new EntityType[] { EntityType.SKELETON, EntityType.STRAY },
@@ -66,7 +66,7 @@ public class MobFamily<T extends LivingEntity, V extends FamilyConfig> {
     public static final MobFamily<AbstractSkeletonEntity, SkeletonFamilyConfig> WITHER_SKELETON = new MobFamily<>( SkeletonFamilyConfig::new,
             "WitherSkeleton", "wither skeletons", 0x141414, new EntityType[] { EntityType.WITHER_SKELETON },
             "Brute", "Gatling", "Giant", "Knight", "Ninja", "Sniper", "Spitfire"
-    );
+    );//TODO crimson/warped
     
     public static final MobFamily<SlimeEntity, SlimeFamilyConfig> SLIME = new MobFamily<>( SlimeFamilyConfig::new,
             "Slime", "slimes", 0x51A03E, new EntityType[] { EntityType.SLIME },
@@ -98,8 +98,8 @@ public class MobFamily<T extends LivingEntity, V extends FamilyConfig> {
     
     public static final MobFamily<WitchEntity, WitchFamilyConfig> WITCH = new MobFamily<>( WitchFamilyConfig::new,
             "Witch", "witches", 0x340000, new EntityType[] { EntityType.WITCH },
-            "Domination", "Shadows", "Undead", "Wilds", "Wind"
-    );
+            "Domination", /*"Ice",*/ "Shadows", "Undead", "Wilds", "Wind"
+    );//TODO ice (slowness 2, ice wall), fire-theme (fireball instead of poison), desert-theme (plague potion), water-theme? (water "potion")
     
     public static final MobFamily<GhastEntity, GhastFamilyConfig> GHAST = new MobFamily<>( GhastFamilyConfig::new,
             "Ghast", "ghasts", 0xF9F9F9, new EntityType[] { EntityType.GHAST },

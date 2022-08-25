@@ -27,14 +27,7 @@ import javax.annotation.Nullable;
 
 @Mod( SpecialMobs.MOD_ID )
 public class SpecialMobs {
-    
-    /* TODO List:
-     *  Reimplement all old features (see list below)
-     *  Utility features:
-     *      - Bestiary
-     */
-    
-    /* Feature List: //TODO; list may not be complete
+    /* Feature List:
      * (KEY: - = complete in current version, o = incomplete feature from previous version,
      *       + = incomplete new feature, ? = feature to consider adding)
      *  - general
@@ -52,14 +45,15 @@ public class SpecialMobs {
      *          - vanilla blazes (outside of fortresses)
      *          - fire creepers/zombies/spiders
      *          ? warped/crimson mobs
+     *      + phantom spawns
      *  - potions
      *      - vulnerability (opposite of resistance)
      *      - weight (opposite of levitation)
-     *  + blocks
-     *      + infested coral (spawns puffer silverfish)
-     *      + melting ice (similar to frosted ice)
+     *  - blocks
+     *      - infested coral (spawns puffer silverfish)
+     *      - melting ice (similar to frosted ice)
      *  - entities
-     *      + bestiary
+     *      + TODO bestiary
      *      - configurable, nbt-driven stats (bestiary info + special mob data)
      *      - configurable weapon type chance
      *      - bone shrapnel
@@ -70,7 +64,6 @@ public class SpecialMobs {
      *          - chance to spawn charged during thunderstorms
      *          - chance to become supercharged when charged
      *          - explosion stats (while wet, while burning, when shot)
-     *          + scope - perhaps delay this until 1.18 where spyglasses will be in the game
      *      - zombies
      *          - transformations (husk -> any other non-water-sensitive zombie -> analogous drowned)
      *          - ranged attack AI (using bow)
@@ -82,7 +75,6 @@ public class SpecialMobs {
      *          - ranged attack AI (using bow)
      *          + ranged attack AI (using crossbow)
      *          - use shields
-     *          ? warped/crimson
      *      - skeletons
      *          - use shields
      *          - melee chance
@@ -91,7 +83,6 @@ public class SpecialMobs {
      *          - use shields
      *          - bow chance
      *          - babies
-     *          ? warped/crimson
      *      - slimes
      *          - smallest size can deal damage
      *      - magma cubes
@@ -112,14 +103,13 @@ public class SpecialMobs {
      *      - blazes
      *          - melee attack AI
      *          - configurable fireball attack
-     *      ? hoglins
-     *      ? zoglins
      *      + guardians
      *          + vortex
-     *      ? shulkers
      *      + phantoms
-     *          + natural spawning
      *      + the goat
+     *      ? hoglins
+     *      ? zoglins
+     *      ? shulkers
      */
     
     /** Our mod ID. */
