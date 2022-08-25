@@ -29,7 +29,7 @@ import net.minecraftforge.fml.network.NetworkHooks;
 import javax.annotation.Nullable;
 
 public class IncorporealFireballEntity extends AbstractFireballEntity {
-
+    
     public int explosionPower = 1;
     private boolean shouldExplode = false;
     
@@ -37,17 +37,17 @@ public class IncorporealFireballEntity extends AbstractFireballEntity {
     private LivingEntity target;
     
     
-    public IncorporealFireballEntity(EntityType<? extends AbstractFireballEntity> entityType, World world ) {
+    public IncorporealFireballEntity( EntityType<? extends AbstractFireballEntity> entityType, World world ) {
         super( entityType, world );
     }
     
-    public IncorporealFireballEntity(World world, CorporealShiftGhastEntity ghast, double x, double y, double z ) {
-        super( SMEntities.CORPOREAL_FIREBALL.get(), ghast, x, y, z, world );
+    public IncorporealFireballEntity( World world, CorporealShiftGhastEntity ghast, double x, double y, double z ) {
+        super( SMEntities.INCORPOREAL_FIREBALL.get(), ghast, x, y, z, world );
         target = ghast.getTarget();
     }
     
-    public IncorporealFireballEntity(World world, @Nullable PlayerEntity owner, LivingEntity target, double x, double y, double z ) {
-        super( SMEntities.CORPOREAL_FIREBALL.get(), owner, x, y, z, world );
+    public IncorporealFireballEntity( World world, @Nullable PlayerEntity owner, LivingEntity target, double x, double y, double z ) {
+        super( SMEntities.INCORPOREAL_FIREBALL.get(), owner, x, y, z, world );
         this.target = target;
     }
     
@@ -103,21 +103,21 @@ public class IncorporealFireballEntity extends AbstractFireballEntity {
         
         if( !this.level.isClientSide ) {
             Entity target = traceResult.getEntity();
-
+            
             boolean fizzle;
-
-            if ( target instanceof PlayerEntity ) {
+            
+            if( target instanceof PlayerEntity ) {
                 // TODO - Implement player-specific checks
                 fizzle = true;
             }
             else {
-                if (target.getX() != target.xo || target.getY() != target.yo || target.getZ() != target.zo) {
+                if( target.getX() != target.xo || target.getY() != target.yo || target.getZ() != target.zo ) {
                     explode();
                     return;
                 }
                 fizzle = true;
             }
-            if (fizzle) {
+            if( fizzle ) {
                 playSound( SoundEvents.FIRE_EXTINGUISH, 1.0F, 1.0F );
                 remove();
             }
@@ -132,10 +132,10 @@ public class IncorporealFireballEntity extends AbstractFireballEntity {
         shouldExplode = true;
         return true;
     }
-
-    @OnlyIn(Dist.CLIENT)
+    
+    @OnlyIn( Dist.CLIENT )
     public ItemStack getItem() {
-        return new ItemStack(SMItems.INCORPOREAL_FIREBALL.get());
+        return new ItemStack( SMItems.INCORPOREAL_FIREBALL.get() );
     }
     
     @Override

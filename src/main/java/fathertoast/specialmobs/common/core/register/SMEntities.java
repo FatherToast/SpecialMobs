@@ -29,7 +29,7 @@ public class SMEntities {
             EntityType.Builder.<BugSpitEntity>of( BugSpitEntity::new, EntityClassification.MISC )
                     .sized( 0.25F, 0.25F ).clientTrackingRange( 4 ).updateInterval( 10 ) );
     
-    public static final RegistryObject<EntityType<IncorporealFireballEntity>> CORPOREAL_FIREBALL = register( "incorporeal_fireball",
+    public static final RegistryObject<EntityType<IncorporealFireballEntity>> INCORPOREAL_FIREBALL = register( "incorporeal_fireball",
             EntityType.Builder.<IncorporealFireballEntity>of( IncorporealFireballEntity::new, EntityClassification.MISC )
                     .sized( 1.0F, 1.0F ).clientTrackingRange( 4 ).updateInterval( 3 ) );
     
