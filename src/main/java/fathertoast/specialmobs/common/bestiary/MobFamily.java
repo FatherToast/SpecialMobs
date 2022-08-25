@@ -98,8 +98,8 @@ public class MobFamily<T extends LivingEntity, V extends FamilyConfig> {
     
     public static final MobFamily<WitchEntity, WitchFamilyConfig> WITCH = new MobFamily<>( WitchFamilyConfig::new,
             "Witch", "witches", 0x340000, new EntityType[] { EntityType.WITCH },
-            "Domination", /*"Ice",*/ "Shadows", "Undead", "Wilds", "Wind"
-    );//TODO ice (slowness 2, ice wall), fire-theme (fireball instead of poison), desert-theme (plague potion), water-theme? (water "potion")
+            /*"Burned",*/ "Domination", /*"Drowned", "Ice", "Sands",*/ "Shadows", "Undead", "Wilds", "Wind"
+    );//TODO burned, drowned, ice, sands
     
     public static final MobFamily<GhastEntity, GhastFamilyConfig> GHAST = new MobFamily<>( GhastFamilyConfig::new,
             "Ghast", "ghasts", 0xF9F9F9, new EntityType[] { EntityType.GHAST },
