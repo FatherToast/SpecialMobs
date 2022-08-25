@@ -6,12 +6,12 @@ import fathertoast.specialmobs.common.config.field.IntField;
 import fathertoast.specialmobs.common.config.file.ToastConfigSpec;
 import fathertoast.specialmobs.common.config.util.ConfigUtil;
 
-public class CorporealGhastSpeciesConfig extends SpeciesConfig {
+public class CorporealShiftGhastSpeciesConfig extends SpeciesConfig {
     
     public final CorporealShift CORPOREAL_SHIFT;
     
     /** Builds the config spec that should be used for this config. */
-    public CorporealGhastSpeciesConfig( MobFamily.Species<?> species, int corporealTime, int incorporealTime ) {
+    public CorporealShiftGhastSpeciesConfig( MobFamily.Species<?> species, int corporealTime, int incorporealTime ) {
         super( species );
         
         CORPOREAL_SHIFT = new CorporealShift( SPEC, species, species.getConfigName(), corporealTime, incorporealTime );

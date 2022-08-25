@@ -3,7 +3,7 @@ package fathertoast.specialmobs.common.entity.ghast;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
-import fathertoast.specialmobs.common.config.species.CorporealGhastSpeciesConfig;
+import fathertoast.specialmobs.common.config.species.CorporealShiftGhastSpeciesConfig;
 import fathertoast.specialmobs.common.config.species.SpeciesConfig;
 import fathertoast.specialmobs.common.core.register.SMItems;
 import fathertoast.specialmobs.common.entity.projectile.IncorporealFireballEntity;
@@ -43,11 +43,11 @@ public class CorporealShiftGhastEntity extends _SpecialGhastEntity {
     
     @SpecialMob.ConfigSupplier
     public static SpeciesConfig createConfig( MobFamily.Species<?> species ) {
-        return new CorporealGhastSpeciesConfig( species, 300, 200 );
+        return new CorporealShiftGhastSpeciesConfig( species, 300, 200 );
     }
     
     /** @return This entity's species config. */
-    public CorporealGhastSpeciesConfig getConfig() { return (CorporealGhastSpeciesConfig) getSpecies().config; }
+    public CorporealShiftGhastSpeciesConfig getConfig() { return (CorporealShiftGhastSpeciesConfig) getSpecies().config; }
     
     @SpecialMob.LanguageProvider
     public static String[] getTranslations( String langKey ) {
