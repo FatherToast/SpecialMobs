@@ -151,6 +151,7 @@ public class SpecialMobs {
         NaturalSpawnManager.registerSpawnPlacements();
     }
     
+    @SuppressWarnings( "SpellCheckingInspection" )
     public void sendIMCMessages( InterModEnqueueEvent event ) {
         if( ModList.get().isLoaded( "theoneprobe" ) ) {
             InterModComms.sendTo( "theoneprobe", "getTheOneProbe", SMTheOneProbe::new );
