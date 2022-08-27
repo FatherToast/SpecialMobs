@@ -148,7 +148,12 @@ public class SpecialMobs {
     //    }
     
     public void setup( FMLCommonSetupEvent event ) {
-        NaturalSpawnManager.registerSpawnPlacements();
+        event.enqueueWork(() -> {
+            NaturalSpawnManager.registerSpawnPlacements();
+            /*
+            SMDispenserBehavior.registerBehaviors();
+             */
+        });
     }
     
     @SuppressWarnings( "SpellCheckingInspection" )

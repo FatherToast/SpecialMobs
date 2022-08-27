@@ -15,6 +15,7 @@ import net.minecraft.world.World;
 
 public class SMDispenserBehavior {
 
+    // TODO - Make it so incorporeal fireball entities can be spawned without an owner
     public static void registerBehaviors() {
         DispenserBlock.registerBehavior(SMItems.INCORPOREAL_FIREBALL.get(), new ProjectileDispenseBehavior() {
             protected ProjectileEntity getProjectile(World world, IPosition pos, ItemStack itemStack) {
@@ -24,12 +25,7 @@ public class SMDispenserBehavior {
                 LivingEntity nearestEntity = world.getNearestEntity(LivingEntity.class, EntityPredicate.DEFAULT, null, x, y, z,
                         new AxisAlignedBB(new BlockPos(x + 0.5D, y + 0.5D, z + 0.5D)).inflate(50.0F));
 
-                if (nearestEntity != null) {
-                    IncorporealFireballEntity fireballEntity = new IncorporealFireballEntity(world, null, nearestEntity, x, y, z);
-                    return fireballEntity;
-                }
-                // TODO
-                return null;
+                return new IncorporealFireballEntity(world, null, nearestEntity, x, y, z);
             }
         });
     }
