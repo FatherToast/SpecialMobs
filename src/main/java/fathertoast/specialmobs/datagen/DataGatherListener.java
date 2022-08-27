@@ -16,6 +16,7 @@ public class DataGatherListener {
         DataGenerator generator = event.getGenerator();
         
         if( event.includeClient() ) {
+            generator.addProvider( new SMBlockStateAndModelProvider( generator, event.getExistingFileHelper() ) );
             generator.addProvider( new SMItemModelProvider( generator, event.getExistingFileHelper() ) );
             for( Map.Entry<String, SMLanguageProvider.TranslationKey> entry : SMLanguageProvider.LANG_CODE_MAP.entrySet() ) {
                 generator.addProvider( new SMLanguageProvider( generator, entry.getKey(), entry.getValue() ) );

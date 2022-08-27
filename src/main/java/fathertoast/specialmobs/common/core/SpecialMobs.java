@@ -2,6 +2,7 @@ package fathertoast.specialmobs.common.core;
 
 import fathertoast.specialmobs.common.compat.top.SMTheOneProbe;
 import fathertoast.specialmobs.common.config.Config;
+import fathertoast.specialmobs.common.core.register.SMBlocks;
 import fathertoast.specialmobs.common.core.register.SMEffects;
 import fathertoast.specialmobs.common.core.register.SMEntities;
 import fathertoast.specialmobs.common.core.register.SMItems;
@@ -26,56 +27,54 @@ import javax.annotation.Nullable;
 
 @Mod( SpecialMobs.MOD_ID )
 public class SpecialMobs {
-    
-    /* TODO List:
-     *  Reimplement all old features (see list below)
-     *  Utility features:
-     *      - Bestiary
-     */
-    
-    /* Feature List: //TODO; list may not be complete
+    /* Feature List:
      * (KEY: - = complete in current version, o = incomplete feature from previous version,
      *       + = incomplete new feature, ? = feature to consider adding)
      *  - general
-     *      - entity replacer
+     *      - mob replacer
      *      - environment-sensitive configs
      *  - natural spawning
      *      - copied spawns
-     *          - spiders -> cave spiders
-     *          - endermen -> ender creepers
+     *          - vanilla spiders -> vanilla cave spiders
+     *          - vanilla endermen -> ender creepers
      *      - ocean/river spawns
      *          - drowning creepers
      *          - blueberry slimes
      *      - nether spawns
-     *          - wither skeletons (outside of fortresses)
-     *          - blazes (outside of fortresses)
+     *          - vanilla wither skeletons (outside of fortresses)
+     *          - vanilla blazes (outside of fortresses)
      *          - fire creepers/zombies/spiders
      *          ? warped/crimson mobs
+     *      + phantom spawns
      *  - potions
      *      - vulnerability (opposite of resistance)
      *      - weight (opposite of levitation)
+     *  - blocks
+     *      - infested coral (spawns puffer silverfish)
+     *      - melting ice (similar to frosted ice)
      *  - entities
-     *      - nbt-driven capabilities (special mob data)
-     *      - fish hook
+     *      + TODO bestiary
+     *      - configurable, nbt-driven stats (bestiary info + special mob data)
+     *      - configurable weapon type chance
+     *      - bone shrapnel
      *      - bug spit
-     *      + bestiary
-     *      - configurable stats
+     *      - fish hook
      *  - monster families (see doc for specifics)
      *      - creepers
      *          - chance to spawn charged during thunderstorms
-     *          + scope - perhaps delay this until 1.18 where spyglasses will be in the game
+     *          - chance to become supercharged when charged
+     *          - explosion stats (while wet, while burning, when shot)
      *      - zombies
      *          - transformations (husk -> any other non-water-sensitive zombie -> analogous drowned)
      *          - ranged attack AI (using bow)
      *          - use shields
      *      - drowned
-     *          - AI functions in shallow water
      *          - use shields
+     *          - bug fixes (can move in shallow water, alert regular zombies)
      *      - zombified piglins
      *          - ranged attack AI (using bow)
      *          + ranged attack AI (using crossbow)
      *          - use shields
-     *          ? warped/crimson mobs
      *      - skeletons
      *          - use shields
      *          - melee chance
@@ -84,7 +83,6 @@ public class SpecialMobs {
      *          - use shields
      *          - bow chance
      *          - babies
-     *          ? warped/crimson mobs
      *      - slimes
      *          - smallest size can deal damage
      *      - magma cubes
@@ -94,22 +92,24 @@ public class SpecialMobs {
      *          - ranged attack AI (spitter)
      *      - silverfish
      *          - ranged attack AI (spitter)
+     *          - chance to spawn already calling for reinforcements
      *      - endermen
      *      - witches
      *          - ability to equip held items (wonky)
-     *          - uses splash speed instead of regular
+     *          - use splash speed instead of regular
      *      - ghasts
      *          - melee attack AI
+     *          - remove vertical targeting restriction
      *      - blazes
      *          - melee attack AI
-     *      ? hoglins
-     *      ? zoglins
+     *          - configurable fireball attack
      *      + guardians
      *          + vortex
-     *      ? shulkers
      *      + phantoms
-     *          + natural spawning
      *      + the goat
+     *      ? hoglins
+     *      ? zoglins
+     *      ? shulkers
      */
     
     /** Our mod ID. */
@@ -130,9 +130,10 @@ public class SpecialMobs {
         
         final IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
         
-        SMEffects.REGISTRY.register( modEventBus );
-        SMEntities.REGISTRY.register( modEventBus );
+        SMBlocks.REGISTRY.register( modEventBus );
         SMItems.REGISTRY.register( modEventBus );
+        SMEntities.REGISTRY.register( modEventBus );
+        SMEffects.REGISTRY.register( modEventBus );
         
         modEventBus.addListener( SMEntities::createAttributes );
         modEventBus.addListener( this::setup );
@@ -150,6 +151,7 @@ public class SpecialMobs {
         NaturalSpawnManager.registerSpawnPlacements();
     }
     
+    @SuppressWarnings( "SpellCheckingInspection" )
     public void sendIMCMessages( InterModEnqueueEvent event ) {
         if( ModList.get().isLoaded( "theoneprobe" ) ) {
             InterModComms.sendTo( "theoneprobe", "getTheOneProbe", SMTheOneProbe::new );

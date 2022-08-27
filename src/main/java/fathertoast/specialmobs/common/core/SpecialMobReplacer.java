@@ -7,7 +7,10 @@ import fathertoast.specialmobs.common.util.References;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.world.IServerWorld;
 import net.minecraft.world.World;
 import net.minecraftforge.event.TickEvent;
@@ -19,11 +22,19 @@ import net.minecraftforge.fml.common.Mod;
 import javax.annotation.Nullable;
 import java.util.ArrayDeque;
 import java.util.Deque;
+import java.util.function.Predicate;
 
 @Mod.EventBusSubscriber( modid = SpecialMobs.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE )
 public final class SpecialMobReplacer {
     /** List of data for mobs needing replacement. */
     private static final Deque<MobReplacementEntry> TO_REPLACE = new ArrayDeque<>();
+    
+    /** Returns true if the species is not damaged by water. */
+    private static final Predicate<MobFamily.Species<?>> WATER_INSENSITIVE_SELECTOR =
+            ( species ) -> !species.config.GENERAL.isDamagedByWater.get();
+    /** Returns true if the species's block height is less than or equal to the base vanilla entity's. */
+    private static final Predicate<MobFamily.Species<?>> NO_GIANTS_SELECTOR = MobFamily.Species::isNotGiant;
+    
     
     /**
      * Called when any entity is spawned into the world by any means (such as natural/spawner spawns or chunk loading).
@@ -123,7 +134,9 @@ public final class SpecialMobReplacer {
         // Don't copy UUID
         tag.remove( "UUID" );
         
-        final MobFamily.Species<?> species = isSpecial ? mobFamily.nextVariant( world, entityPos ) : mobFamily.vanillaReplacement;
+        final MobFamily.Species<?> species = isSpecial ?
+                mobFamily.nextVariant( world, entityPos, getVariantFilter( mobFamily, entityToReplace, world, entityPos ) ) :
+                mobFamily.vanillaReplacement;
         
         final LivingEntity replacement = species.entityType.get().create( world );
         if( replacement == null ) {
@@ -147,6 +160,32 @@ public final class SpecialMobReplacer {
         }
         
         entityToReplace.remove();
+    }
+    
+    /** @return A selector that filters out variants that are likely to die a stupid death if chosen. */
+    @Nullable
+    private static Predicate<MobFamily.Species<?>> getVariantFilter( MobFamily<?, ?> mobFamily, Entity entityToReplace,
+                                                                     World world, BlockPos entityPos ) {
+        Predicate<MobFamily.Species<?>> selector = null;
+        
+        // Note that we do not check for any fluids (water/lava) since that is handled by spawn logic
+        if( !mobFamily.vanillaReplacement.bestiaryInfo.isDamagedByWater && // Skip this check if the base vanilla mob dies in water
+                world.isRainingAt( entityPos ) ) {
+            selector = WATER_INSENSITIVE_SELECTOR;
+        }
+        
+        // Does not consider overly wide mobs or extra-tall (>1 block taller) mobs
+        if( mobFamily.hasAnyGiants() ) {
+            final AxisAlignedBB bb = entityToReplace.getBoundingBox();
+            final int y = MathHelper.ceil( bb.maxY );
+            // Only check the FULL block above current collision - not a perfect representation, but keeps things simple
+            if( !world.isUnobstructed( entityToReplace, VoxelShapes.create(
+                    new AxisAlignedBB( bb.minX, y, bb.minZ, bb.maxX, y + 1, bb.maxZ ) ) ) ) {
+                selector = selector == null ? NO_GIANTS_SELECTOR : selector.and( NO_GIANTS_SELECTOR );
+            }
+        }
+        
+        return selector;
     }
     
     /** All data needed for a single mob we want to replace. */

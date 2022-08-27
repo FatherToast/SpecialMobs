@@ -256,7 +256,7 @@ public final class References {
     // Spawner mobs
     public static final String TAG_BABIES = "Babies"; // Mother (Cave) Spider, Wilds Witch, Queen Ghast, Wildfire Blaze
     public static final String TAG_EXTRA_BABIES = "ExtraBabies"; // Splitting Creeper, Mother (Cave) Spider, Wilds Witch
-    public static final String TAG_SUMMONS = "Summons"; // Undead Witch, Wilds Witch, Queen Ghast, Wildfire Blaze
+    public static final String TAG_SUMMONS = "Summons"; // Drowning Creeper, Undead Witch, Wilds Witch, Queen Ghast, Wildfire Blaze
     
     // Growing mobs
     public static final String TAG_GROWTH_LEVEL = "GrowthLevel"; // Hungry Spider, Conflagration Blaze

@@ -3,6 +3,7 @@ package fathertoast.specialmobs.common.entity.enderman;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
+import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.util.ExplosionHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
@@ -120,8 +121,9 @@ public class FlameEndermanEntity extends _SpecialEndermanEntity {
         while( currentPos.getY() < maxY ) {
             currentPos.move( 0, 1, 0 );
             
-            if( shouldSetFire( currentPos ) )
-                level.setBlock( currentPos, AbstractFireBlock.getState( level, currentPos ), References.SetBlockFlags.DEFAULTS );
+            if( shouldSetFire( currentPos ) ) {
+                MobHelper.placeBlock( this, currentPos, AbstractFireBlock.getState( level, currentPos ) );
+            }
         }
     }
     

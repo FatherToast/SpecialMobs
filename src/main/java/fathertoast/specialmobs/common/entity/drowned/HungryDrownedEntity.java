@@ -34,7 +34,7 @@ public class HungryDrownedEntity extends _SpecialDrownedEntity {
     @SpecialMob.BestiaryInfoSupplier
     public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
         bestiaryInfo.color( 0xAB1518 )
-                .uniqueTextureBaseOnly()
+                .uniqueTextureWithOverlay()
                 .addExperience( 2 ).regen( 30 ).disableRangedAttack()
                 .addToAttribute( Attributes.MAX_HEALTH, 10.0 )
                 .multiplyAttribute( Attributes.MOVEMENT_SPEED, 1.3 );

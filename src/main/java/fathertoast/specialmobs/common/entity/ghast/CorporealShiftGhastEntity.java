@@ -3,6 +3,8 @@ package fathertoast.specialmobs.common.entity.ghast;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
+import fathertoast.specialmobs.common.config.species.CorporealShiftGhastSpeciesConfig;
+import fathertoast.specialmobs.common.config.species.SpeciesConfig;
 import fathertoast.specialmobs.common.core.register.SMItems;
 import fathertoast.specialmobs.common.entity.projectile.IncorporealFireballEntity;
 import fathertoast.specialmobs.common.util.References;
@@ -39,6 +41,14 @@ public class CorporealShiftGhastEntity extends _SpecialGhastEntity {
                 .multiplyAttribute( Attributes.MOVEMENT_SPEED, 0.8 );
     }
     
+    @SpecialMob.ConfigSupplier
+    public static SpeciesConfig createConfig( MobFamily.Species<?> species ) {
+        return new CorporealShiftGhastSpeciesConfig( species, 300, 200 );
+    }
+    
+    /** @return This entity's species config. */
+    public CorporealShiftGhastSpeciesConfig getConfig() { return (CorporealShiftGhastSpeciesConfig) getSpecies().config; }
+    
     @SpecialMob.LanguageProvider
     public static String[] getTranslations( String langKey ) {
         return References.translations( langKey, "Corporeal Shift Ghast",
@@ -64,8 +74,7 @@ public class CorporealShiftGhastEntity extends _SpecialGhastEntity {
     
     public static final DataParameter<Boolean> CORPOREAL = EntityDataManager.defineId( CorporealShiftGhastEntity.class, DataSerializers.BOOLEAN );
     
-    private final int maxShiftTime = 150;
-    private int shiftTime = maxShiftTime;
+    private int shiftTime;
     
     public CorporealShiftGhastEntity( EntityType<? extends _SpecialGhastEntity> entityType, World world ) { super( entityType, world ); }
     
@@ -73,7 +82,7 @@ public class CorporealShiftGhastEntity extends _SpecialGhastEntity {
     protected void defineSynchedData() {
         super.defineSynchedData();
         entityData.define( CORPOREAL, false );
-        if( !level.isClientSide() && random.nextBoolean() ) setCorporeal( true );
+        if( !level.isClientSide() ) setCorporeal( random.nextBoolean() );
     }
     
     @Override
@@ -81,8 +90,7 @@ public class CorporealShiftGhastEntity extends _SpecialGhastEntity {
         super.tick();
         
         if( --shiftTime <= 0 ) {
-            if( !level.isClientSide ) {
-                shiftTime = maxShiftTime + random.nextInt( maxShiftTime );
+            if( !level.isClientSide() ) {
                 setCorporeal( !isCorporeal() );
                 spawnShiftSmoke( (ServerWorld) level );
             }
@@ -106,7 +114,10 @@ public class CorporealShiftGhastEntity extends _SpecialGhastEntity {
     
     public boolean isCorporeal() { return entityData.get( CORPOREAL ); }
     
-    private void setCorporeal( boolean value ) { entityData.set( CORPOREAL, value ); }
+    private void setCorporeal( boolean value ) {
+        entityData.set( CORPOREAL, value );
+        shiftTime = value ? getConfig().CORPOREAL_SHIFT.corporealTicks.get() : getConfig().CORPOREAL_SHIFT.incorporealTicks.get();
+    }
     
     /** Called to attack the target with a ranged attack. */
     @Override

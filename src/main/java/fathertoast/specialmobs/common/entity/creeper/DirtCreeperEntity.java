@@ -3,6 +3,7 @@ package fathertoast.specialmobs.common.entity.creeper;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
+import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.util.ExplosionHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
@@ -78,7 +79,7 @@ public class DirtCreeperEntity extends _SpecialCreeperEntity {
                     if( x * x + y * y + z * z <= radius * radius ) {
                         final BlockPos pos = center.offset( x, y, z );
                         if( level.getBlockState( pos ).getMaterial().isReplaceable() ) {
-                            level.setBlock( pos, dirt, References.SetBlockFlags.DEFAULTS );
+                            MobHelper.placeBlock( this, pos, dirt );
                         }
                     }
                 }

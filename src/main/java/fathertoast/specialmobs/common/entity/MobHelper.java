@@ -26,10 +26,7 @@ import net.minecraft.potion.Effects;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.tags.ITag;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.Hand;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.SoundEvents;
+import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.shapes.ISelectionContext;
@@ -38,6 +35,8 @@ import net.minecraft.world.Difficulty;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.IServerWorld;
 import net.minecraftforge.common.ForgeHooks;
+import net.minecraftforge.common.util.BlockSnapshot;
+import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.entity.living.LivingKnockBackEvent;
 
 import javax.annotation.Nullable;
@@ -551,5 +550,42 @@ public final class MobHelper {
                 entity.setDeltaMovement( entity.getDeltaMovement().scale( 0.5 ).add( 0.0, 0.4, 0.0 ) );
             }
         }
+    }
+    
+    /** @return Attempts to place a block, firing the appropriate Forge event. Returns true if successful. */
+    public static boolean placeBlock( Entity entity, BlockPos pos, BlockState block ) {
+        return placeBlock( entity, pos, block, References.SetBlockFlags.DEFAULTS );
+    }
+    
+    /** @return Attempts to place a block, firing the appropriate Forge event. Returns true if successful. */
+    public static boolean placeBlock( Entity entity, BlockPos pos, Direction direction, BlockState block ) {
+        return placeBlock( entity, pos, direction, block, References.SetBlockFlags.DEFAULTS );
+    }
+    
+    /** @return Attempts to place a block, firing the appropriate Forge event. Returns true if successful. */
+    public static boolean placeBlock( Entity entity, BlockPos pos, BlockState block, int updateFlags ) {
+        return placeBlock( entity, pos, Direction.UP, block, updateFlags );
+    }
+    
+    /** @return Attempts to place a block, firing the appropriate Forge event. Returns true if successful. */
+    public static boolean placeBlock( Entity entity, BlockPos pos, Direction direction, BlockState block, int updateFlags ) {
+        if( canPlaceBlock( entity, pos, direction ) ) {
+            entity.level.setBlock( pos, block, updateFlags );
+            return true;
+        }
+        return false;
+    }
+    
+    // Note to future self - I should probably also make 'destroy block' methods for whatever Forge event those should have,
+    // generally I do fire mob griefing events already for everything, though
+    
+    /** @return Fires the Forge event to check if a block can be placed and returns the result. */
+    public static boolean canPlaceBlock( Entity entity, BlockPos pos ) {
+        return canPlaceBlock( entity, pos, Direction.UP );
+    }
+    
+    /** @return Fires the Forge event to check if a block can be placed and returns the result. */
+    public static boolean canPlaceBlock( Entity entity, BlockPos pos, Direction direction ) {
+        return !ForgeEventFactory.onBlockPlace( entity, BlockSnapshot.create( entity.level.dimension(), entity.level, pos ), direction );
     }
 }

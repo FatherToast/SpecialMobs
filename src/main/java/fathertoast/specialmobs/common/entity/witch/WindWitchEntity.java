@@ -43,7 +43,6 @@ public class WindWitchEntity extends _SpecialWitchEntity {
         bestiaryInfo.color( 0x6388B2 ).theme( BestiaryInfo.Theme.MOUNTAIN )
                 .uniqueTextureWithEyes()
                 .addExperience( 2 ).fallImmune()
-                .addToAttribute( Attributes.ATTACK_DAMAGE, 2.0 )
                 .multiplyAttribute( Attributes.MOVEMENT_SPEED, 1.2 );
     }
     

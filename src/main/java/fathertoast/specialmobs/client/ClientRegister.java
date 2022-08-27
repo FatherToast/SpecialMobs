@@ -8,6 +8,7 @@ import fathertoast.specialmobs.client.renderer.entity.species.*;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.config.Config;
 import fathertoast.specialmobs.common.core.SpecialMobs;
+import fathertoast.specialmobs.common.core.register.SMBlocks;
 import fathertoast.specialmobs.common.core.register.SMEntities;
 import fathertoast.specialmobs.common.entity.creeper.EnderCreeperEntity;
 import fathertoast.specialmobs.common.entity.enderman.RunicEndermanEntity;
@@ -20,6 +21,8 @@ import fathertoast.specialmobs.common.entity.zombie.MadScientistZombieEntity;
 import fathertoast.specialmobs.common.entity.zombifiedpiglin.VampireZombifiedPiglinEntity;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ItemRenderer;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.RenderTypeLookup;
 import net.minecraft.client.renderer.entity.SpriteRenderer;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -43,6 +46,8 @@ public class ClientRegister {
     
     @SubscribeEvent
     public static void onClientSetup( FMLClientSetupEvent event ) {
+        RenderTypeLookup.setRenderLayer( SMBlocks.MELTING_ICE.get(), RenderType.translucent() );
+        
         if( Config.MAIN.GENERAL.fancyFishingMobs.get() ) {
             ItemModelsProperties.register( Items.FISHING_ROD, new ResourceLocation( "cast" ), new FishingRodItemPropertyGetter() );
         }

@@ -23,8 +23,8 @@ public class PlagueDrownedEntity extends _SpecialDrownedEntity {
     
     @SpecialMob.BestiaryInfoSupplier
     public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
-        bestiaryInfo.color( 0x8AA838 ).theme( BestiaryInfo.Theme.FOREST )
-                .uniqueTextureBaseOnly()
+        bestiaryInfo.color( 0x8AA838 )
+                .uniqueTextureWithOverlay()
                 .addExperience( 1 )
                 .multiplyAttribute( Attributes.MOVEMENT_SPEED, 1.1 );
     }

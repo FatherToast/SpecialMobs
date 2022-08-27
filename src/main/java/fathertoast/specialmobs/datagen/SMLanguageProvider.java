@@ -2,12 +2,15 @@ package fathertoast.specialmobs.datagen;
 
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.core.SpecialMobs;
+import fathertoast.specialmobs.common.core.register.SMBlocks;
 import fathertoast.specialmobs.common.core.register.SMEffects;
 import fathertoast.specialmobs.common.core.register.SMEntities;
 import fathertoast.specialmobs.common.core.register.SMItems;
 import fathertoast.specialmobs.common.util.AnnotationHelper;
 import fathertoast.specialmobs.common.util.References;
+import net.minecraft.block.Block;
 import net.minecraft.data.DataGenerator;
+import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraftforge.common.ForgeSpawnEggItem;
 import net.minecraftforge.common.data.LanguageProvider;
@@ -71,13 +74,18 @@ public class SMLanguageProvider extends LanguageProvider {
         translationList.add( References.translations( SMEntities.FISHING_BOBBER.get().getDescriptionId(), "Fishing Bobber",
                 "", "", "", "", "", "" ) ); //TODO
         
+        // Blocks
+        for( RegistryObject<Block> regObject : SMBlocks.REGISTRY.getEntries() ) {
+            translationList.add( AnnotationHelper.getTranslations( regObject.get() ) );
+        }
+        
         // Items
         for( RegistryObject<Item> regObject : SMItems.REGISTRY.getEntries() ) {
             // Lazy method of avoiding duplicate entries for now
             if( regObject.get() instanceof ForgeSpawnEggItem ) continue;
+            if( regObject.get() instanceof BlockItem ) continue;
             
-            final String[] itemTranslations = AnnotationHelper.getTranslations( regObject.get() );
-            translationList.add( itemTranslations );
+            translationList.add( AnnotationHelper.getTranslations( regObject.get() ) );
         }
         
         // Misc

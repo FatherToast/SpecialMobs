@@ -3,10 +3,13 @@ package fathertoast.specialmobs.common.entity.creeper;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
+import fathertoast.specialmobs.common.block.UnderwaterSilverfishBlock;
+import fathertoast.specialmobs.common.config.species.DrowningCreeperSpeciesConfig;
 import fathertoast.specialmobs.common.config.species.SpeciesConfig;
 import fathertoast.specialmobs.common.config.util.EnvironmentEntry;
 import fathertoast.specialmobs.common.config.util.EnvironmentList;
 import fathertoast.specialmobs.common.config.util.environment.biome.BiomeCategory;
+import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.entity.ai.AIHelper;
 import fathertoast.specialmobs.common.entity.ai.AmphibiousMovementController;
 import fathertoast.specialmobs.common.entity.ai.IAmphibiousMob;
@@ -38,6 +41,7 @@ import net.minecraft.world.IServerWorld;
 import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
+import net.minecraft.world.biome.Biomes;
 
 import java.util.Random;
 
@@ -60,11 +64,18 @@ public class DrowningCreeperEntity extends _SpecialCreeperEntity implements IAmp
     @SpecialMob.ConfigSupplier
     public static SpeciesConfig createConfig( MobFamily.Species<?> species ) {
         SpeciesConfig.NEXT_NATURAL_SPAWN_CHANCE_EXCEPTIONS = new EnvironmentList(
+                EnvironmentEntry.builder( 0.06F ).inBiome( Biomes.WARM_OCEAN ).build(),
+                EnvironmentEntry.builder( 0.06F ).inBiome( Biomes.DEEP_WARM_OCEAN ).build(),
                 EnvironmentEntry.builder( 0.06F ).inBiomeCategory( BiomeCategory.RIVER ).build(),
                 EnvironmentEntry.builder( 0.02F ).inBiomeCategory( BiomeCategory.OCEAN ).belowSeaDepths().build(),
                 EnvironmentEntry.builder( 0.0F ).inBiomeCategory( BiomeCategory.OCEAN ).build() );
-        return _SpecialCreeperEntity.createConfig( species );
+        return new DrowningCreeperSpeciesConfig( species, false, false, false,
+                0.25, 2, 4 );
     }
+    
+    /** @return This entity's species config. */
+    @Override
+    public DrowningCreeperSpeciesConfig getConfig() { return (DrowningCreeperSpeciesConfig) getSpecies().config; }
     
     @SpecialMob.SpawnPlacementRegistrar
     public static void registerSpeciesSpawnPlacement( MobFamily.Species<? extends DrowningCreeperEntity> species ) {
@@ -114,6 +125,9 @@ public class DrowningCreeperEntity extends _SpecialCreeperEntity implements IAmp
     
     //--------------- Variant-Specific Implementations ----------------
     
+    /** The maximum number of pufferfish spawned on explosion. */
+    private int pufferfish;
+    
     public DrowningCreeperEntity( EntityType<? extends _SpecialCreeperEntity> entityType, World world ) {
         super( entityType, world );
         moveControl = new AmphibiousMovementController<>( this );
@@ -121,6 +135,8 @@ public class DrowningCreeperEntity extends _SpecialCreeperEntity implements IAmp
         groundNavigation = new GroundPathNavigator( this, world );
         maxUpStep = 1.0F;
         setPathfindingMalus( PathNodeType.WATER, PathNodeType.WALKABLE.getMalus() );
+        
+        pufferfish = getConfig().DROWNING.puffPuffs.next( random );
     }
     
     /** Override to change this entity's AI goals. */
@@ -147,17 +163,23 @@ public class DrowningCreeperEntity extends _SpecialCreeperEntity implements IAmp
         
         if( explosionMode == Explosion.Mode.NONE ) return;
         
-        final BlockState brainCoral = Blocks.BRAIN_CORAL_BLOCK.defaultBlockState();
-        final BlockState hornCoral = Blocks.HORN_CORAL_BLOCK.defaultBlockState();
+        final UnderwaterSilverfishBlock.Type mainType = UnderwaterSilverfishBlock.Type.next( random );
+        final UnderwaterSilverfishBlock.Type rareType = UnderwaterSilverfishBlock.Type.next( random );
+        final BlockState mainCoral = mainType.hostBlock().defaultBlockState();
+        final BlockState rareCoral = rareType.hostBlock().defaultBlockState();
+        final BlockState mainInfestedCoral = mainType.block().defaultBlockState();
+        final BlockState rareInfestedCoral = rareType.block().defaultBlockState();
+        
         final BlockState water = Blocks.WATER.defaultBlockState();
         final BlockState seaPickle = Blocks.SEA_PICKLE.defaultBlockState().setValue( BlockStateProperties.WATERLOGGED, true );
         final BlockState seaGrass = Blocks.SEAGRASS.defaultBlockState();
         final int radius = (int) Math.floor( explosionPower );
+        final int radiusSq = radius * radius;
         final int rMinusOneSq = (radius - 1) * (radius - 1);
         final BlockPos center = new BlockPos( explosion.getPos() );
         
         // Track how many pufferfish have been spawned so we don't spawn a bunch of them
-        spawnPufferfish( center.above( 1 ) );
+        if( pufferfish > 0 ) spawnPufferfish( center.above( 1 ) );
         int pufferCount = 1;
         
         for( int y = -radius; y <= radius; y++ ) {
@@ -165,33 +187,37 @@ public class DrowningCreeperEntity extends _SpecialCreeperEntity implements IAmp
                 for( int z = -radius; z <= radius; z++ ) {
                     final int distSq = x * x + y * y + z * z;
                     
-                    if( distSq <= radius * radius ) {
+                    if( distSq <= radiusSq ) {
                         final BlockPos pos = center.offset( x, y, z );
                         final BlockState stateAtPos = level.getBlockState( pos );
                         
                         if( stateAtPos.getMaterial().isReplaceable() || stateAtPos.is( BlockTags.LEAVES ) ) {
-                            if( distSq > rMinusOneSq ) {
-                                // "Coral" casing
-                                level.setBlock( pos, random.nextFloat() < 0.25F ? brainCoral : hornCoral, References.SetBlockFlags.DEFAULTS );
-                            }
-                            else {
+                            if( distSq <= rMinusOneSq ) {
+                                // Water fill
                                 final float fillChoice = random.nextFloat();
                                 
                                 if( fillChoice < 0.1F && seaPickle.canSurvive( level, pos ) ) {
-                                    level.setBlock( pos, seaPickle, References.SetBlockFlags.DEFAULTS );
+                                    MobHelper.placeBlock( this, pos, seaPickle );
                                 }
                                 else if( fillChoice < 0.3F && seaGrass.canSurvive( level, pos ) ) {
-                                    level.setBlock( pos, seaGrass, References.SetBlockFlags.DEFAULTS );
+                                    MobHelper.placeBlock( this, pos, seaGrass );
                                 }
                                 else {
                                     // Water fill
-                                    level.setBlock( pos, water, References.SetBlockFlags.DEFAULTS );
+                                    MobHelper.placeBlock( this, pos, water );
                                     
-                                    if( random.nextFloat() < 0.0075F && pufferCount < 5 ) {
+                                    if( random.nextFloat() < 0.0075F && pufferCount < pufferfish ) {
                                         spawnPufferfish( pos );
                                         pufferCount++;
                                     }
                                 }
+                            }
+                            else if( isCoralSafe( rMinusOneSq, x, y, z ) ) {
+                                // Coral casing
+                                final boolean infested = getConfig().DROWNING.infestedBlockChance.rollChance( random );
+                                MobHelper.placeBlock( this, pos, random.nextFloat() < 0.8F ?
+                                        infested ? mainInfestedCoral : mainCoral :
+                                        infested ? rareInfestedCoral : rareCoral );
                             }
                         }
                     }
@@ -210,6 +236,28 @@ public class DrowningCreeperEntity extends _SpecialCreeperEntity implements IAmp
         }
     }
     
+    /** @return Checks the inner three-ish block distances and returns true if at least one is inside the main radius. */
+    @SuppressWarnings( "RedundantIfStatement" ) // The symmetry makes it look better
+    private boolean isCoralSafe( int rMinusOneSq, int x, int y, int z ) {
+        int distSq;
+        if( y != 0 ) {
+            final int innerY = y < 0 ? y + 1 : y - 1;
+            distSq = x * x + innerY * innerY + z * z;
+            if( distSq <= rMinusOneSq ) return true;
+        }
+        if( x != 0 ) {
+            final int innerX = x < 0 ? x + 1 : x - 1;
+            distSq = innerX * innerX + y * y + z * z;
+            if( distSq <= rMinusOneSq ) return true;
+        }
+        if( z != 0 ) {
+            final int innerZ = z < 0 ? z + 1 : z - 1;
+            distSq = x * x + y * y + innerZ * innerZ;
+            if( distSq <= rMinusOneSq ) return true;
+        }
+        return false;
+    }
+    
     // The below two methods are here to effectively override the private Entity#isInRain to always return true (always wet)
     @Override
     public boolean isInWaterOrRain() { return true; }
@@ -217,9 +265,18 @@ public class DrowningCreeperEntity extends _SpecialCreeperEntity implements IAmp
     @Override
     public boolean isInWaterRainOrBubble() { return true; }
     
+    /** Override to save data to this entity's NBT data. */
+    @Override
+    public void addVariantSaveData( CompoundNBT saveTag ) {
+        saveTag.putByte( References.TAG_SUMMONS, (byte) pufferfish );
+    }
+    
     /** Override to load data from this entity's NBT data. */
     @Override
     public void readVariantSaveData( CompoundNBT saveTag ) {
+        if( saveTag.contains( References.TAG_SUMMONS, References.NBT_TYPE_NUMERICAL ) )
+            pufferfish = saveTag.getByte( References.TAG_SUMMONS );
+        
         setPathfindingMalus( PathNodeType.WATER, PathNodeType.WALKABLE.getMalus() );
     }
     

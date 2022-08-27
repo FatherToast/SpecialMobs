@@ -5,6 +5,7 @@ import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.config.species.SpeciesConfig;
 import fathertoast.specialmobs.common.config.species.WebSpiderSpeciesConfig;
+import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import net.minecraft.block.Blocks;
@@ -99,8 +100,8 @@ public class WebCaveSpiderEntity extends _SpecialCaveSpiderEntity {
     
     /** @return Attempts to place a cobweb at the given position and returns true if successful. */
     private boolean tryPlaceWeb( BlockPos pos ) {
-        if( level.getBlockState( pos ).getMaterial().isReplaceable() ) {
-            level.setBlock( pos, Blocks.COBWEB.defaultBlockState(), References.SetBlockFlags.DEFAULTS );
+        if( level.getBlockState( pos ).getMaterial().isReplaceable() &&
+                MobHelper.placeBlock( this, pos, Blocks.COBWEB.defaultBlockState() ) ) {
             webCount--;
             return true;
         }
