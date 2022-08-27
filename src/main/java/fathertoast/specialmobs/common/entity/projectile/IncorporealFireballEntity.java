@@ -1,10 +1,8 @@
 package fathertoast.specialmobs.common.entity.projectile;
 
-import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.core.register.SMEntities;
 import fathertoast.specialmobs.common.core.register.SMItems;
 import fathertoast.specialmobs.common.entity.ghast.CorporealShiftGhastEntity;
-import fathertoast.specialmobs.common.util.References;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -42,21 +40,15 @@ public class IncorporealFireballEntity extends AbstractFireballEntity {
     }
     
     public IncorporealFireballEntity(World world, CorporealShiftGhastEntity ghast, double x, double y, double z ) {
-        super( SMEntities.CORPOREAL_FIREBALL.get(), ghast, x, y, z, world );
+        super( SMEntities.INCORPOREAL_FIREBALL.get(), ghast, x, y, z, world );
         target = ghast.getTarget();
     }
     
     public IncorporealFireballEntity(World world, @Nullable PlayerEntity owner, LivingEntity target, double x, double y, double z ) {
-        super( SMEntities.CORPOREAL_FIREBALL.get(), owner, x, y, z, world );
+        super( SMEntities.INCORPOREAL_FIREBALL.get(), owner, x, y, z, world );
         this.target = target;
     }
-    
-    @SpecialMob.LanguageProvider
-    public static String[] getTranslations( String langKey ) {
-        return References.translations( langKey, "Incorporeal Fireball",
-                "", "", "", "", "", "" );//TODO
-    }
-    
+
     @Override
     public void tick() {
         super.tick();

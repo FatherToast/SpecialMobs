@@ -10,6 +10,7 @@ import fathertoast.specialmobs.common.config.Config;
 import fathertoast.specialmobs.common.core.SpecialMobs;
 import fathertoast.specialmobs.common.core.register.SMEntities;
 import fathertoast.specialmobs.common.entity.creeper.EnderCreeperEntity;
+import fathertoast.specialmobs.common.entity.enderman.RunicEndermanEntity;
 import fathertoast.specialmobs.common.entity.ghast.CorporealShiftGhastEntity;
 import fathertoast.specialmobs.common.entity.silverfish.PufferSilverfishEntity;
 import fathertoast.specialmobs.common.entity.skeleton.NinjaSkeletonEntity;
@@ -82,11 +83,13 @@ public class ClientRegister {
         registerSpeciesRenderer( PufferSilverfishEntity.SPECIES, ShortSilverfishRenderer::new );
         
         registerSpeciesRenderer( CorporealShiftGhastEntity.SPECIES, CorporealShiftGhastRenderer::new );
+
+        registerSpeciesRenderer( RunicEndermanEntity.SPECIES, RunicEndermanRenderer::new );
         
         // Other
         registerRenderer( SMEntities.BONE_SHRAPNEL, BoneShrapnelRenderer::new );
         registerRenderer( SMEntities.BUG_SPIT, BugSpitRenderer::new );
-        registerSpriteRenderer( SMEntities.CORPOREAL_FIREBALL, game, 3.0F, true );
+        registerSpriteRenderer( SMEntities.INCORPOREAL_FIREBALL, game, 3.0F, true );
         registerRenderer( SMEntities.FISHING_BOBBER, SpecialFishingBobberRenderer::new );
     }
     

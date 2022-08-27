@@ -66,7 +66,7 @@ public class SMLanguageProvider extends LanguageProvider {
                 "", "", "", "", "", "" ) ); //TODO
         translationList.add( References.translations( SMEntities.BUG_SPIT.get().getDescriptionId(), "Bug Spit",
                 "", "", "", "", "", "" ) ); //TODO
-        translationList.add( References.translations( SMEntities.CORPOREAL_FIREBALL.get().getDescriptionId(), "Bug Spit",
+        translationList.add( References.translations( SMEntities.INCORPOREAL_FIREBALL.get().getDescriptionId(), "Incorporeal Fireball",
                 "", "", "", "", "", "" ) ); //TODO
         translationList.add( References.translations( SMEntities.FISHING_BOBBER.get().getDescriptionId(), "Fishing Bobber",
                 "", "", "", "", "", "" ) ); //TODO

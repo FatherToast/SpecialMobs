@@ -4,6 +4,7 @@ import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.entity.MobHelper;
+import fathertoast.specialmobs.common.entity.ai.goal.RunicEndermanBeamAttackGoal;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import net.minecraft.block.Blocks;
@@ -11,8 +12,13 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.item.Items;
+import net.minecraft.network.datasync.DataParameter;
+import net.minecraft.network.datasync.DataSerializers;
+import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.potion.Effects;
 import net.minecraft.world.World;
+
+import java.util.OptionalInt;
 
 @SpecialMob
 public class RunicEndermanEntity extends _SpecialEndermanEntity {
@@ -56,9 +62,31 @@ public class RunicEndermanEntity extends _SpecialEndermanEntity {
     
     
     //--------------- Variant-Specific Implementations ----------------
-    
+
+    public static final DataParameter<Boolean> BEAMING = EntityDataManager.defineId(RunicEndermanEntity.class, DataSerializers.BOOLEAN);
+    public static final DataParameter<OptionalInt> TARGET_ID = EntityDataManager.defineId(RunicEndermanEntity.class, DataSerializers.OPTIONAL_UNSIGNED_INT);
+
     public RunicEndermanEntity( EntityType<? extends _SpecialEndermanEntity> entityType, World world ) { super( entityType, world ); }
-    
+
+    @Override
+    protected void defineSynchedData() {
+        super.defineSynchedData();
+        entityData.define( BEAMING, false );
+        entityData.define( TARGET_ID, OptionalInt.empty() );
+    }
+
+    public OptionalInt getBeamTargetId() {
+        return entityData.get( TARGET_ID );
+    }
+
+    public void setBeamTargetId(int targetId) {
+        entityData.set( TARGET_ID, OptionalInt.of(targetId) );
+    }
+
+    public void clearBeamTargetId() {
+        entityData.set( TARGET_ID, OptionalInt.empty() );
+    }
+
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override
     protected void onVariantAttack( LivingEntity target ) {
@@ -70,7 +98,6 @@ public class RunicEndermanEntity extends _SpecialEndermanEntity {
     @Override
     protected void registerVariantGoals() {
         super.registerVariantGoals();
+        goalSelector.addGoal( 2, new RunicEndermanBeamAttackGoal(this, 50, 2.0D));
     }
-    
-    // NOTE would be fun to try and make this mob shoot an 'end crystal laser' to deal ranged damage and/or knockback
 }
