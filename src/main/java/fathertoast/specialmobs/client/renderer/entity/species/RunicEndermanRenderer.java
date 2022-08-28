@@ -91,20 +91,22 @@ public class RunicEndermanRenderer extends SpecialEndermanRenderer {
         final Matrix4f pose = matrixEntry.pose();
         final Matrix3f normal = matrixEntry.normal();
         
-        final int eRB;
-        final int alpha;
-        final float eScale;
+        final int c1, c2;
+        final float endScale;
         final float v1;
         if( beamState == RunicEndermanEntity.BeamState.DAMAGING ) {
-            eRB = 255;
-            alpha = 255;
-            eScale = 1.0F;
+            // Same properties as end crystal beam; black at beam start point transitioning to magenta at end point,
+            //  beam is wider at end point (conical), and animation scrolls the texture towards the end point
+            c1 = 0;
+            c2 = 255;
+            endScale = 1.0F;
             v1 = (tickCount + partialTicks) * -0.01F;
         }
         else {
-            eRB = 100;
-            alpha = 170;
-            eScale = 0.2F;
+            // Make the whole beam gray, uniform width, and animation reversed
+            c1 = 100;
+            c2 = 100;
+            endScale = 0.2F;
             v1 = (tickCount + partialTicks) * 0.006F;
         }
         final float v2 = length / 32.0F + v1;
@@ -121,19 +123,19 @@ public class RunicEndermanRenderer extends SpecialEndermanRenderer {
             final float y2 = MathHelper.cos( angle ) * 0.75F;
             
             vertexBuilder.vertex( pose, x1 * 0.2F, y1 * 0.2F, 0.0F )
-                    .color( 0, 0, 0, alpha )
+                    .color( c1, c1, c1, 255 )
                     .uv( u1, v1 ).overlayCoords( OverlayTexture.NO_OVERLAY ).uv2( packedLight )
                     .normal( normal, 0.0F, -1.0F, 0.0F ).endVertex();
-            vertexBuilder.vertex( pose, x1 * eScale, y1 * eScale, length )
-                    .color( eRB, 100, eRB, alpha )
+            vertexBuilder.vertex( pose, x1 * endScale, y1 * endScale, length )
+                    .color( c2, 100, c2, 255 )
                     .uv( u1, v2 ).overlayCoords( OverlayTexture.NO_OVERLAY ).uv2( packedLight )
                     .normal( normal, 0.0F, -1.0F, 0.0F ).endVertex();
-            vertexBuilder.vertex( pose, x2 * eScale, y2 * eScale, length )
-                    .color( eRB, 100, eRB, alpha )
+            vertexBuilder.vertex( pose, x2 * endScale, y2 * endScale, length )
+                    .color( c2, 100, c2, 255 )
                     .uv( u2, v2 ).overlayCoords( OverlayTexture.NO_OVERLAY ).uv2( packedLight )
                     .normal( normal, 0.0F, -1.0F, 0.0F ).endVertex();
             vertexBuilder.vertex( pose, x2 * 0.2F, y2 * 0.2F, 0.0F )
-                    .color( 0, 0, 0, alpha )
+                    .color( c1, c1, c1, 255 )
                     .uv( u2, v1 ).overlayCoords( OverlayTexture.NO_OVERLAY ).uv2( packedLight )
                     .normal( normal, 0.0F, -1.0F, 0.0F ).endVertex();
             

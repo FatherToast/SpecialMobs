@@ -4,9 +4,13 @@ import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.entity.enderman.RunicEndermanEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.ai.goal.Goal;
+import net.minecraft.entity.boss.dragon.EnderDragonEntity;
+import net.minecraft.entity.monster.EndermanEntity;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EntityDamageSource;
+import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceContext;
@@ -23,6 +27,7 @@ public class RunicEndermanBeamAttackGoal extends Goal {
     private final RunicEndermanEntity mob;
     private final DamageSource beamDamageSource;
     
+    private LivingEntity targetEntity;
     private Vector3d targetPos;
     private int attackTime;
     
@@ -41,9 +46,17 @@ public class RunicEndermanBeamAttackGoal extends Goal {
         if( target != null && target.isAlive() && mob.getSensing().canSee( target ) &&
                 mob.tickCount % 8 == 0 && mob.getRandom().nextInt( 10 ) == 0 && target.distanceToSqr( mob ) <=
                 mob.getSpecialData().getRangedAttackMaxRange() * mob.getSpecialData().getRangedAttackMaxRange() ) {
-            setTargetPos( target );
+            
+            targetEntity = target;
+            updateTargetPos();
             attackTime = 0;
+            
             mob.setBeamState( RunicEndermanEntity.BeamState.CHARGING );
+            if( !mob.isSilent() ) {
+                mob.level.playSound( null, mob.getX(), mob.getEyeY(), mob.getZ(),
+                        SoundEvents.ENDERMAN_SCREAM, mob.getSoundSource(),
+                        1.0F, 1.0F / (mob.getRandom().nextFloat() * 0.2F + 1.8F) );
+            }
             return true;
         }
         return false;
@@ -52,14 +65,14 @@ public class RunicEndermanBeamAttackGoal extends Goal {
     /** @return Called each update while active and returns true if this AI can remain active. */
     @Override
     public boolean canContinueToUse() {
-        final LivingEntity target = mob.getTarget();
-        return (mob.getBeamState() == RunicEndermanEntity.BeamState.DAMAGING || target != null && target.isAlive()) &&
+        return (mob.getBeamState() == RunicEndermanEntity.BeamState.DAMAGING || targetEntity != null && targetEntity.isAlive()) &&
                 attackTime < mob.getSpecialData().getRangedAttackMaxCooldown();
     }
     
     /** Called when this AI is deactivated. */
     @Override
     public void stop() {
+        targetEntity = null;
         targetPos = null;
         mob.setBeamState( RunicEndermanEntity.BeamState.OFF );
     }
@@ -90,10 +103,15 @@ public class RunicEndermanBeamAttackGoal extends Goal {
     
     /** Called each tick while this AI is active and in the damaging phase. */
     private void damagingTick() {
-        final LivingEntity target = mob.getTarget();
-        if( target != null ) setTargetPos( target );
+        if( targetEntity != null ) updateTargetPos();
         
-        lookTowardTarget( 1.666F * mob.getSpecialData().getRangedWalkSpeed() ); // Use move speed as a turn rate modifier
+        if( !mob.isSilent() && attackTime % 10 == 0 ) {
+            mob.level.playSound( null, mob.getX(), mob.getEyeY(), mob.getZ(),
+                    SoundEvents.ENDERMAN_SCREAM, mob.getSoundSource(),
+                    1.0F, 1.0F / (mob.getRandom().nextFloat() * 0.4F + 1.0F) );
+        }
+        
+        lookTowardTarget( 1.7F * mob.getSpecialData().getRangedWalkSpeed() ); // Use move speed as a turn rate modifier
         final Vector3d viewVec = mob.getViewVector( 1.0F ).scale( RunicEndermanEntity.BEAM_MAX_RANGE );
         
         final Vector3d beamStartPos = mob.getEyePosition( 1.0F );
@@ -109,7 +127,10 @@ public class RunicEndermanBeamAttackGoal extends Goal {
         final List<Entity> hitEntities = rayTraceEntities( beamStartPos, beamEndPos,
                 mob.getBoundingBox().expandTowards( viewVec ).inflate( 1.0 ) );
         for( Entity entity : hitEntities ) {
-            if( entity.hurt( beamDamageSource, mob.getSpecialData().getRangedAttackDamage() ) &&
+            if( entity instanceof EndermanEntity || entity instanceof EnderDragonEntity ) {
+                if( mob.tickCount % 10 == 0 ) ((MobEntity) entity).heal( 1.0F );
+            }
+            else if( entity.hurt( beamDamageSource, mob.getSpecialData().getRangedAttackDamage() ) &&
                     entity instanceof LivingEntity ) {
                 MobHelper.knockback( (LivingEntity) entity, 1.0F, 1.0F,
                         -viewVec.x, -viewVec.z, 1.0 );
@@ -118,8 +139,8 @@ public class RunicEndermanBeamAttackGoal extends Goal {
     }
     
     /** Updates the target position based on an entity we want to hit. */
-    private void setTargetPos( LivingEntity target ) {
-        targetPos = new Vector3d( target.getX(), target.getY( 0.5 ), target.getZ() );
+    private void updateTargetPos() {
+        targetPos = new Vector3d( targetEntity.getX(), targetEntity.getY( 0.5 ), targetEntity.getZ() );
     }
     
     /** Sets the target look position. Modifies the target position to limit vertical look speed. */
