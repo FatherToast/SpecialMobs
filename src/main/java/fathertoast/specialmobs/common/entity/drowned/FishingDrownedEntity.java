@@ -42,7 +42,7 @@ public class FishingDrownedEntity extends _SpecialDrownedEntity implements IAngl
     public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
         bestiaryInfo.color( 0x2D41F4 ).weight( BestiaryInfo.DefaultWeight.LOW )
                 .addExperience( 2 ).drownImmune().fluidPushImmune()
-                .convertThrowToFishing().fishingAttack( 1.0, 40, 15.0 )
+                .convertRangedAttackToFishing( 1.0, 40, 15.0 )
                 .multiplyAttribute( Attributes.MOVEMENT_SPEED, 0.8 );
     }
     

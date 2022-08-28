@@ -276,12 +276,8 @@ public class BestiaryInfo {
                 immuneToStickyBlocks.addAll( parent.immuneToStickyBlocks.getEntries() );
                 immuneToPotions.addAll( parent.immuneToPotions.getEntries() );
                 
-                rangedAttackDamage = parent.rangedAttackDamage;
-                rangedAttackSpread = parent.rangedAttackSpread;
-                rangedWalkSpeed = parent.rangedWalkSpeed;
-                rangedAttackCooldown = parent.rangedAttackCooldown;
-                rangedAttackMaxCooldown = parent.rangedAttackMaxCooldown;
-                rangedAttackMaxRange = parent.rangedAttackMaxRange;
+                setAllRangedStats( parent.rangedAttackDamage, parent.rangedAttackSpread, parent.rangedWalkSpeed,
+                        parent.rangedAttackCooldown, parent.rangedAttackMaxCooldown, parent.rangedAttackMaxRange );
             }
         }
         
@@ -593,18 +589,14 @@ public class BestiaryInfo {
                     .multiplyRangedCooldown( cooldown ).multiplyRangedMaxCooldown( cooldown ).multiplyRangedMaxRange( range );
         }
         
-        /** Converts the entity to a fishing rod user by disabling unused ranged attack stats (for a bow user). */
-        public Builder convertBowToFishing() { return rangedDamage( -1.0 ).rangedWalkSpeed( -1.0 ); }
+        /** Converts the entity's ranged attack stats to those of a fishing rod user. */
+        public Builder convertRangedAttackToFishing( double spread, int cooldown, double range ) {
+            return setAllRangedStats( -1.0, spread, -1.0, cooldown, -1, range );
+        }
         
-        /** Converts the entity to a fishing rod user by disabling unused ranged attack stats (for a throwing item user). */
-        public Builder convertThrowToFishing() { return rangedWalkSpeed( -1.0 ); }
-        
-        /** Converts the entity to a fishing rod user by disabling unused ranged attack stats (for a spit shooter). */
-        public Builder convertSpitToFishing() { return rangedDamage( -1.0 ).rangedMaxCooldown( -1 ); }
-        
-        /** Sets the species fishing rod user stats. */
-        public Builder fishingAttack( double spread, int cooldown, double range ) {
-            return rangedSpread( spread ).rangedCooldown( cooldown ).rangedMaxRange( range );
+        /** Converts the entity's ranged attack stats to those of a beam attack user. */
+        public Builder convertRangedAttackToBeam( double damage, double turnSpeed, int charge, int duration, double range ) {
+            return setAllRangedStats( damage, -1.0, turnSpeed, charge, charge + duration, range );
         }
         
         /** Sets the species as unable to use ranged attacks (for any ranged user). */
@@ -676,6 +668,17 @@ public class BestiaryInfo {
             if( owningSpecies.specialVariantName != null && rangedAttackMaxRange < 0.0 )
                 throw new IllegalStateException( "Attempted to add inapplicable ranged attack stat!" );
             rangedAttackMaxRange = value;
+            return this;
+        }
+        
+        /** Converts ALL the entity's ranged attack stats. This method allows enabling/disabling stats on variants. */
+        private Builder setAllRangedStats( double damage, double spread, double walkSpeed, int cooldown, int maxCooldown, double range ) {
+            rangedAttackDamage = damage;
+            rangedAttackSpread = spread;
+            rangedWalkSpeed = walkSpeed;
+            rangedAttackCooldown = cooldown;
+            rangedAttackMaxCooldown = maxCooldown;
+            rangedAttackMaxRange = range;
             return this;
         }
         

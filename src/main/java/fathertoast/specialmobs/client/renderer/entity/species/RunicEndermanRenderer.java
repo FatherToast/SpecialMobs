@@ -2,107 +2,146 @@ package fathertoast.specialmobs.client.renderer.entity.species;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
-import fathertoast.specialmobs.client.renderer.entity.layers.SpecialMobEyesLayer;
-import fathertoast.specialmobs.client.renderer.entity.layers.SpecialMobOverlayLayer;
-import fathertoast.specialmobs.common.entity.ISpecialMob;
+import fathertoast.specialmobs.client.renderer.entity.family.SpecialEndermanRenderer;
 import fathertoast.specialmobs.common.entity.enderman.RunicEndermanEntity;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EnderDragonRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
-import net.minecraft.client.renderer.entity.MobRenderer;
+import net.minecraft.client.renderer.entity.model.EndermanModel;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.entity.Entity;
+import net.minecraft.entity.monster.EndermanEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.RayTraceContext;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.vector.Matrix3f;
 import net.minecraft.util.math.vector.Matrix4f;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.math.vector.Vector3f;
 
-public class RunicEndermanRenderer extends MobRenderer<RunicEndermanEntity, RunicEndermanModel<RunicEndermanEntity>> {
-
-    public static final ResourceLocation CRYSTAL_BEAM_LOCATION = new ResourceLocation("textures/entity/end_crystal/end_crystal_beam.png");
-    private static final RenderType BEAM = RenderType.entitySmoothCutout(CRYSTAL_BEAM_LOCATION);
-
-    private final float baseShadowRadius;
-
-
-    public RunicEndermanRenderer(EntityRendererManager rendererManager) {
-        super(rendererManager, new RunicEndermanModel<>(0.0F), 0.5F);
-
-        baseShadowRadius = shadowRadius;
-        addLayer( new SpecialMobEyesLayer<>( this ) );
-        addLayer( new SpecialMobOverlayLayer<>( this, new RunicEndermanModel<>( 0.25F ) ) );
-    }
-
+public class RunicEndermanRenderer extends SpecialEndermanRenderer {
+    public static final ResourceLocation BEAM_TEXTURE_LOCATION = new ResourceLocation( "textures/entity/end_crystal/end_crystal_beam.png" );
+    private static final RenderType BEAM = RenderType.entitySmoothCutout( BEAM_TEXTURE_LOCATION );
+    
+    public RunicEndermanRenderer( EntityRendererManager rendererManager ) { super( rendererManager ); }
+    
     @Override
-    public void render(RunicEndermanEntity enderman, float rotation, float partialTicks, MatrixStack matrixStack, IRenderTypeBuffer buffer, int packedLight) {
-        if (enderman.getBeamTargetId().isPresent()) {
-            Entity entity = enderman.level.getEntity(enderman.getBeamTargetId().getAsInt());
-
-            if (entity != null) {
-                matrixStack.pushPose();
-                float x = (float)(entity.getX() - MathHelper.lerp(partialTicks, enderman.xo, enderman.getX()));
-                float y = (float)(entity.getY() - MathHelper.lerp(partialTicks, enderman.yo, enderman.getY()));
-                float z = (float)(entity.getZ() - MathHelper.lerp(partialTicks, enderman.zo, enderman.getZ()));
-                renderBeamAttack(x, y, z, partialTicks, enderman.tickCount, matrixStack, buffer, packedLight);
-                matrixStack.popPose();
+    public void render( EndermanEntity entity, float rotation, float partialTicks,
+                        MatrixStack matrixStack, IRenderTypeBuffer buffer, int packedLight ) {
+        // Beam attack
+        final RunicEndermanEntity.BeamState beamState = ((RunicEndermanEntity) entity).getBeamState();
+        if( beamState != RunicEndermanEntity.BeamState.OFF ) {
+            matrixStack.pushPose();
+            
+            Vector3d beamVec = entity.getViewVector( partialTicks ).scale( RunicEndermanEntity.BEAM_MAX_RANGE );
+            
+            final Vector3d beamStartPos = entity.getEyePosition( partialTicks );
+            final Vector3d beamEndPos = beamStartPos.add( beamVec );
+            
+            final RayTraceResult blockRayTrace = entity.level.clip(
+                    new RayTraceContext( beamStartPos, beamEndPos,
+                            RayTraceContext.BlockMode.COLLIDER, RayTraceContext.FluidMode.NONE, entity ) );
+            if( blockRayTrace.getType() != RayTraceResult.Type.MISS ) {
+                beamVec = blockRayTrace.getLocation().subtract( beamStartPos );
             }
+            
+            renderBeamAttack( beamState, entity.getEyeHeight(), (float) beamVec.x, (float) beamVec.y, (float) beamVec.z,
+                    partialTicks, entity.tickCount, matrixStack, buffer, packedLight );
+            
+            matrixStack.popPose();
         }
-
-        super.render(enderman, rotation, partialTicks, matrixStack, buffer, packedLight);
+        
+        super.render( entity, rotation, partialTicks, matrixStack, buffer, packedLight );
     }
-
+    
     @Override
-    public ResourceLocation getTextureLocation(RunicEndermanEntity enderman) {
-        return ((ISpecialMob<?>) enderman).getSpecialData().getTexture();
+    protected boolean isBodyVisible( EndermanEntity entity ) {
+        // This is called right after EntityModel#setupAnim, so we add on our own animation here as a hacky way to avoid a lot of extra stuff
+        final RunicEndermanEntity.BeamState beamState = ((RunicEndermanEntity) entity).getBeamState();
+        if( beamState != RunicEndermanEntity.BeamState.OFF ) {
+            final float zRot = beamState == RunicEndermanEntity.BeamState.DAMAGING ? 0.25F : 0.6F;
+            final EndermanModel<EndermanEntity> model = getModel();
+            model.leftArm.xRot = -0.6F;
+            model.rightArm.xRot = -0.6F;
+            model.leftArm.zRot = -zRot;
+            model.rightArm.zRot = zRot;
+        }
+        
+        return super.isBodyVisible( entity );
     }
-
-    @Override
-    protected void scale(RunicEndermanEntity entity, MatrixStack matrixStack, float partialTick ) {
-        super.scale( entity, matrixStack, partialTick );
-
-        final float scale = ((ISpecialMob<?>) entity).getSpecialData().getRenderScale();
-        shadowRadius = baseShadowRadius * scale;
-        matrixStack.scale( scale, scale, scale );
-    }
-
-    /** Copy-paste Ender Crystal render code. {@link EnderDragonRenderer#renderCrystalBeams(float, float, float, float, int, MatrixStack, IRenderTypeBuffer, int)} */
-    private void renderBeamAttack(float x, float y, float z, float partialTicks, int tickCount, MatrixStack matrixStack, IRenderTypeBuffer buffer, int packedLight) {
-        float f = MathHelper.sqrt(x * x + z * z);
-        float xyzMul = x * x + y * y + z * z;
-        float f1 = MathHelper.sqrt(xyzMul);
-
+    
+    /**
+     * Copy-paste Ender Crystal render code.
+     * {@link EnderDragonRenderer#renderCrystalBeams(float, float, float, float, int, MatrixStack, IRenderTypeBuffer, int)}
+     */
+    private void renderBeamAttack( RunicEndermanEntity.BeamState beamState, float offsetY, float dX, float dY, float dZ,
+                                   float partialTicks, int tickCount, MatrixStack matrixStack, IRenderTypeBuffer buffer, int packedLight ) {
         matrixStack.pushPose();
-        matrixStack.translate(0.0D, 2.0D, 0.0D);
-        matrixStack.mulPose(Vector3f.YP.rotation((float)(-Math.atan2(z, x)) - ((float)Math.PI / 2F)));
-        matrixStack.mulPose(Vector3f.XP.rotation((float)(-Math.atan2(f, y)) - ((float)Math.PI / 2F)));
-
-        IVertexBuilder ivertexbuilder = buffer.getBuffer(BEAM);
-
-        float f2 = 0.0F - ((float)tickCount + partialTicks) * 0.01F;
-        float f3 = MathHelper.sqrt(xyzMul) / 32.0F - ((float)tickCount + partialTicks) * 0.01F;
-        float f4 = 0.0F;
-        float f5 = 0.75F;
-        float f6 = 0.0F;
-
-        MatrixStack.Entry entry = matrixStack.last();
-        Matrix4f matrix4f = entry.pose();
-        Matrix3f matrix3f = entry.normal();
-
-        for(int j = 1; j <= 8; ++j) {
-            float f7 = MathHelper.sin((float)j * ((float)Math.PI * 2F) / 8.0F) * 0.75F;
-            float f8 = MathHelper.cos((float)j * ((float)Math.PI * 2F) / 8.0F) * 0.75F;
-            float f9 = (float)j / 8.0F;
-
-            ivertexbuilder.vertex(matrix4f, f4 * 0.2F, f5 * 0.2F, 0.0F).color(0, 0, 0, 255).uv(f6, f2).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(packedLight).normal(matrix3f, 0.0F, -1.0F, 0.0F).endVertex();
-            ivertexbuilder.vertex(matrix4f, f4, f5, f1).color(255, 100, 255, 255).uv(f6, f3).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(packedLight).normal(matrix3f, 0.0F, -1.0F, 0.0F).endVertex();
-            ivertexbuilder.vertex(matrix4f, f7, f8, f1).color(255, 100, 255, 255).uv(f9, f3).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(packedLight).normal(matrix3f, 0.0F, -1.0F, 0.0F).endVertex();
-            ivertexbuilder.vertex(matrix4f, f7 * 0.2F, f8 * 0.2F, 0.0F).color(0, 0, 0, 255).uv(f9, f2).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(packedLight).normal(matrix3f, 0.0F, -1.0F, 0.0F).endVertex();
-            f4 = f7;
-            f5 = f8;
-            f6 = f9;
+        
+        final float dH = MathHelper.sqrt( dX * dX + dZ * dZ );
+        final float length = MathHelper.sqrt( dX * dX + dY * dY + dZ * dZ );
+        
+        matrixStack.translate( 0.0, offsetY, 0.0 );
+        matrixStack.mulPose( Vector3f.YP.rotation( (float) -Math.atan2( dZ, dX ) - (float) Math.PI / 2.0F ) );
+        matrixStack.mulPose( Vector3f.XP.rotation( (float) -Math.atan2( dH, dY ) - (float) Math.PI / 2.0F ) );
+        
+        final IVertexBuilder vertexBuilder = buffer.getBuffer( BEAM );
+        final MatrixStack.Entry matrixEntry = matrixStack.last();
+        final Matrix4f pose = matrixEntry.pose();
+        final Matrix3f normal = matrixEntry.normal();
+        
+        final int eRB;
+        final int alpha;
+        final float eScale;
+        final float v1;
+        if( beamState == RunicEndermanEntity.BeamState.DAMAGING ) {
+            eRB = 255;
+            alpha = 255;
+            eScale = 1.0F;
+            v1 = (tickCount + partialTicks) * -0.01F;
         }
+        else {
+            eRB = 100;
+            alpha = 170;
+            eScale = 0.2F;
+            v1 = (tickCount + partialTicks) * 0.006F;
+        }
+        final float v2 = length / 32.0F + v1;
+        
+        float u1 = 0.0F;
+        float x1 = 0.0F;
+        float y1 = 0.75F;
+        
+        final int resolution = 8;
+        for( int n = 1; n <= resolution; n++ ) {
+            final float u2 = (float) n / resolution;
+            final float angle = u2 * (float) Math.PI * 2.0F;
+            final float x2 = MathHelper.sin( angle ) * 0.75F;
+            final float y2 = MathHelper.cos( angle ) * 0.75F;
+            
+            vertexBuilder.vertex( pose, x1 * 0.2F, y1 * 0.2F, 0.0F )
+                    .color( 0, 0, 0, alpha )
+                    .uv( u1, v1 ).overlayCoords( OverlayTexture.NO_OVERLAY ).uv2( packedLight )
+                    .normal( normal, 0.0F, -1.0F, 0.0F ).endVertex();
+            vertexBuilder.vertex( pose, x1 * eScale, y1 * eScale, length )
+                    .color( eRB, 100, eRB, alpha )
+                    .uv( u1, v2 ).overlayCoords( OverlayTexture.NO_OVERLAY ).uv2( packedLight )
+                    .normal( normal, 0.0F, -1.0F, 0.0F ).endVertex();
+            vertexBuilder.vertex( pose, x2 * eScale, y2 * eScale, length )
+                    .color( eRB, 100, eRB, alpha )
+                    .uv( u2, v2 ).overlayCoords( OverlayTexture.NO_OVERLAY ).uv2( packedLight )
+                    .normal( normal, 0.0F, -1.0F, 0.0F ).endVertex();
+            vertexBuilder.vertex( pose, x2 * 0.2F, y2 * 0.2F, 0.0F )
+                    .color( 0, 0, 0, alpha )
+                    .uv( u2, v1 ).overlayCoords( OverlayTexture.NO_OVERLAY ).uv2( packedLight )
+                    .normal( normal, 0.0F, -1.0F, 0.0F ).endVertex();
+            
+            x1 = x2;
+            y1 = y2;
+            u1 = u2;
+        }
+        
         matrixStack.popPose();
     }
 }

@@ -35,7 +35,7 @@ public class FishingSilverfishEntity extends AmphibiousSilverfishEntity implemen
                 .uniqueTextureBaseOnly()
                 .size( 1.2F, 0.5F, 0.4F )
                 .addExperience( 2 ).drownImmune().fluidPushImmune()
-                .convertSpitToFishing().fishingAttack( 1.0, 40, 10.0 )
+                .convertRangedAttackToFishing( 1.0, 40, 10.0 )
                 .addToAttribute( Attributes.MAX_HEALTH, 4.0 )
                 .multiplyAttribute( Attributes.MOVEMENT_SPEED, 0.8 );
     }

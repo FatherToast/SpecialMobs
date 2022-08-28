@@ -4,6 +4,7 @@ import fathertoast.specialmobs.client.renderer.entity.family.SpecialCreeperRende
 import fathertoast.specialmobs.common.entity.creeper.EnderCreeperEntity;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.entity.monster.CreeperEntity;
+import net.minecraft.entity.monster.EndermanEntity;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -18,6 +19,7 @@ public class EnderCreeperRenderer extends SpecialCreeperRenderer {
     
     public EnderCreeperRenderer( EntityRendererManager rendererManager ) { super( rendererManager ); }
     
+    /** {@link net.minecraft.client.renderer.entity.EndermanRenderer#getRenderOffset(EndermanEntity, float)} */
     @Override
     public Vector3d getRenderOffset( CreeperEntity entity, float partialTicks ) {
         if( ((EnderCreeperEntity) entity).isCreepy() ) {
@@ -26,5 +28,4 @@ public class EnderCreeperRenderer extends SpecialCreeperRenderer {
         }
         return super.getRenderOffset( entity, partialTicks );
     }
-    
 }

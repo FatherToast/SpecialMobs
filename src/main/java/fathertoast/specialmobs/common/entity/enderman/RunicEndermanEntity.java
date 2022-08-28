@@ -4,6 +4,7 @@ import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.entity.MobHelper;
+import fathertoast.specialmobs.common.entity.ai.AIHelper;
 import fathertoast.specialmobs.common.entity.ai.goal.RunicEndermanBeamAttackGoal;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
@@ -16,9 +17,10 @@ import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.potion.Effects;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.world.World;
-
-import java.util.OptionalInt;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 @SpecialMob
 public class RunicEndermanEntity extends _SpecialEndermanEntity {
@@ -33,10 +35,11 @@ public class RunicEndermanEntity extends _SpecialEndermanEntity {
         bestiaryInfo.color( 0xE42281 ).weight( BestiaryInfo.DefaultWeight.LOW ).theme( BestiaryInfo.Theme.MOUNTAIN )
                 .uniqueTextureWithEyes()
                 .addExperience( 2 ).fallImmune().burnImmune()
+                .convertRangedAttackToBeam( 2.0, 1.0, 60, 100, 16.0 )
                 .addToAttribute( Attributes.ARMOR, 10.0 )
                 .addToAttribute( Attributes.ATTACK_DAMAGE, 1.0 )
                 .multiplyAttribute( Attributes.MOVEMENT_SPEED, 0.8 );
-
+        
     }
     
     @SpecialMob.LanguageProvider
@@ -62,42 +65,53 @@ public class RunicEndermanEntity extends _SpecialEndermanEntity {
     
     
     //--------------- Variant-Specific Implementations ----------------
-
-    public static final DataParameter<Boolean> BEAMING = EntityDataManager.defineId(RunicEndermanEntity.class, DataSerializers.BOOLEAN);
-    public static final DataParameter<OptionalInt> TARGET_ID = EntityDataManager.defineId(RunicEndermanEntity.class, DataSerializers.OPTIONAL_UNSIGNED_INT);
-
+    
+    /** The actual range of the beam when fired. Roughly based on end crystal max range. */
+    public static final double BEAM_MAX_RANGE = 32.0;
+    /** The parameter for beam attack state. */
+    private static final DataParameter<Byte> BEAM_STATE = EntityDataManager.defineId( RunicEndermanEntity.class, DataSerializers.BYTE );
+    
     public RunicEndermanEntity( EntityType<? extends _SpecialEndermanEntity> entityType, World world ) { super( entityType, world ); }
-
+    
+    /** Called from the Entity.class constructor to define data watcher variables. */
     @Override
     protected void defineSynchedData() {
         super.defineSynchedData();
-        entityData.define( BEAMING, false );
-        entityData.define( TARGET_ID, OptionalInt.empty() );
+        entityData.define( BEAM_STATE, BeamState.OFF.id() );
     }
-
-    public OptionalInt getBeamTargetId() {
-        return entityData.get( TARGET_ID );
+    
+    /** Override to change this entity's AI goals. */
+    @Override
+    protected void registerVariantGoals() {
+        AIHelper.insertGoal( goalSelector, 2, new RunicEndermanBeamAttackGoal( this ) );
     }
-
-    public void setBeamTargetId(int targetId) {
-        entityData.set( TARGET_ID, OptionalInt.of(targetId) );
-    }
-
-    public void clearBeamTargetId() {
-        entityData.set( TARGET_ID, OptionalInt.empty() );
-    }
-
+    
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override
     protected void onVariantAttack( LivingEntity target ) {
         MobHelper.applyEffect( target, Effects.LEVITATION );
         MobHelper.knockback( this, target, 2.0F, 0.0F );
     }
-
-    /** Override to change this entity's AI goals. */
+    
+    /** @return True if this enderman is using its beam attack. */
+    public BeamState getBeamState() { return BeamState.of( entityData.get( BEAM_STATE ) ); }
+    
+    /** Sets whether this enderman is using its beam attack. */
+    public void setBeamState( BeamState value ) { entityData.set( BEAM_STATE, value.id() ); }
+    
+    /** @return The bounding box to use for frustum culling. */
+    @OnlyIn( Dist.CLIENT )
     @Override
-    protected void registerVariantGoals() {
-        super.registerVariantGoals();
-        goalSelector.addGoal( 2, new RunicEndermanBeamAttackGoal(this, 50, 2.0D));
+    public AxisAlignedBB getBoundingBoxForCulling() {
+        return getBeamState() == BeamState.OFF ? super.getBoundingBoxForCulling() :
+                super.getBoundingBoxForCulling().expandTowards( getViewVector( 1.0F ).scale( BEAM_MAX_RANGE ) );
+    }
+    
+    public enum BeamState {
+        OFF, CHARGING, DAMAGING;
+        
+        public byte id() { return (byte) ordinal(); }
+        
+        public static BeamState of( byte id ) { return values()[id]; }
     }
 }

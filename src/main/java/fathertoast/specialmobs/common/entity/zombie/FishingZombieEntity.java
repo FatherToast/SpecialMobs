@@ -46,7 +46,7 @@ public class FishingZombieEntity extends _SpecialZombieEntity implements IAngler
     public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
         bestiaryInfo.color( 0x2D41F4 ).weight( BestiaryInfo.DefaultWeight.LOW ).theme( BestiaryInfo.Theme.FISHING )
                 .addExperience( 2 ).drownImmune().fluidPushImmune()
-                .convertBowToFishing().fishingAttack( 1.0, 40, 15.0 )
+                .convertRangedAttackToFishing( 1.0, 40, 15.0 )
                 .multiplyAttribute( Attributes.MOVEMENT_SPEED, 0.8 );
     }
     
