@@ -70,8 +70,9 @@ public class _SpecialBlazeEntity extends BlazeEntity implements IRangedAttackMob
     
     @SpecialMob.LanguageProvider
     public static String[] getTranslations( String langKey ) {
+        //noinspection SpellCheckingInspection
         return References.translations( langKey, "Blaze",
-                "", "", "", "", "", "" );//TODO
+                "Blaze", "Blaze", "Blaze", "Blaze", "Lohe", "Blisterin' Blaze" );
     }
     
     @SpecialMob.LootTableProvider
@@ -214,10 +215,10 @@ public class _SpecialBlazeEntity extends BlazeEntity implements IRangedAttackMob
                                       @Nullable ILivingEntityData groupData ) {
         finalizeVariantSpawn( world, difficulty, spawnReason, groupData );
     }
-
+    
     @Override
-    public void setSpecialPathfindingMalus(PathNodeType nodeType, float malus) {
-        this.setPathfindingMalus(nodeType, malus);
+    public void setSpecialPathfindingMalus( PathNodeType nodeType, float malus ) {
+        this.setPathfindingMalus( nodeType, malus );
     }
     
     

@@ -84,8 +84,10 @@ public class _SpecialSilverfishEntity extends SilverfishEntity implements IRange
     
     @SpecialMob.LanguageProvider
     public static String[] getTranslations( String langKey ) {
+        //noinspection SpellCheckingInspection
         return References.translations( langKey, "Silverfish",
-                "", "", "", "", "", "" );//TODO
+                "Lepisma", "Lepisma", "Poisson d'argent",
+                "Pesciolino d'argento", "Silberfischchen", "Bilge Rat" );
     }
     
     @SpecialMob.LootTableProvider
@@ -209,10 +211,10 @@ public class _SpecialSilverfishEntity extends SilverfishEntity implements IRange
         return MobHelper.finalizeSpawn( this, world, difficulty, spawnReason,
                 super.finalizeSpawn( world, difficulty, spawnReason, groupData, eggTag ) );
     }
-
+    
     @Override
-    public void setSpecialPathfindingMalus(PathNodeType nodeType, float malus) {
-        this.setPathfindingMalus(nodeType, malus);
+    public void setSpecialPathfindingMalus( PathNodeType nodeType, float malus ) {
+        this.setPathfindingMalus( nodeType, malus );
     }
     
     /** Called on spawn to set starting equipment. */

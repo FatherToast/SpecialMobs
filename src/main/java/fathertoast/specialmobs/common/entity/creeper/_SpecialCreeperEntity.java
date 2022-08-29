@@ -67,11 +67,11 @@ public class _SpecialCreeperEntity extends CreeperEntity implements IExplodingMo
     public static void registerSpawnPlacement( MobFamily.Species<? extends _SpecialCreeperEntity> species ) {
         NaturalSpawnManager.registerSpawnPlacement( species );
     }
-
+    
     @SpecialMob.LanguageProvider
     public static String[] getTranslations( String langKey ) {
         return References.translations( langKey, "Creeper",
-                "", "", "", "", "", "" );//TODO
+                "Creeper", "Creeper", "Creeper", "Creeper", "Creeper", "Creeper" );
     }
     
     @SpecialMob.LootTableProvider
@@ -321,13 +321,13 @@ public class _SpecialCreeperEntity extends CreeperEntity implements IExplodingMo
     /** Sets the experience that should be dropped by this entity. */
     @Override
     public final void setExperience( int xp ) { xpReward = xp; }
-
+    
     @Override
-    public void setSpecialPathfindingMalus(PathNodeType nodeType, float malus) {
-        this.setPathfindingMalus(nodeType, malus);
+    public void setSpecialPathfindingMalus( PathNodeType nodeType, float malus ) {
+        this.setPathfindingMalus( nodeType, malus );
     }
-
-
+    
+    
     /** Converts this entity to one of another type. */
     @Nullable
     @Override
@@ -339,7 +339,7 @@ public class _SpecialCreeperEntity extends CreeperEntity implements IExplodingMo
         }
         return replacement;
     }
-
+    
     /** Called on spawn to initialize properties based on the world, difficulty, and the group it spawns with. */
     @Nullable
     @Override

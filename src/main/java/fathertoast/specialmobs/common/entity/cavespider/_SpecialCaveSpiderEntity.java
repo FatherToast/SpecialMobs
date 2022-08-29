@@ -71,8 +71,10 @@ public class _SpecialCaveSpiderEntity extends CaveSpiderEntity implements IRange
     
     @SpecialMob.LanguageProvider
     public static String[] getTranslations( String langKey ) {
+        //noinspection SpellCheckingInspection
         return References.translations( langKey, "Cave Spider",
-                "", "", "", "", "", "" );//TODO
+                "Araña de cueva", "Aranha venenosa", "Araignée venimeuse",
+                "Ragno delle caverne", "Höhlenspinne", "Cave Horror" );
     }
     
     @SpecialMob.LootTableProvider
@@ -193,10 +195,10 @@ public class _SpecialCaveSpiderEntity extends CaveSpiderEntity implements IRange
         return MobHelper.finalizeSpawn( this, world, difficulty, spawnReason,
                 super.finalizeSpawn( world, difficulty, spawnReason, groupData, eggTag ) );
     }
-
+    
     @Override
-    public void setSpecialPathfindingMalus(PathNodeType nodeType, float malus) {
-        this.setPathfindingMalus(nodeType, malus);
+    public void setSpecialPathfindingMalus( PathNodeType nodeType, float malus ) {
+        this.setPathfindingMalus( nodeType, malus );
     }
     
     /** Called on spawn to set starting equipment. */

@@ -90,8 +90,9 @@ public class _SpecialDrownedEntity extends DrownedEntity implements ISpecialMob<
     
     @SpecialMob.LanguageProvider
     public static String[] getTranslations( String langKey ) {
+        //noinspection SpellCheckingInspection
         return References.translations( langKey, "Drowned",
-                "", "", "", "", "", "" );//TODO
+                "Ahogado", "Afogado", "Noyé", "Annegato", "Ertrunkener", "Sunken Sailor" );
     }
     
     @SpecialMob.LootTableProvider

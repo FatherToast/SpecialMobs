@@ -90,8 +90,10 @@ public class _SpecialZombifiedPiglinEntity extends ZombifiedPiglinEntity impleme
     
     @SpecialMob.LanguageProvider
     public static String[] getTranslations( String langKey ) {
+        //noinspection SpellCheckingInspection
         return References.translations( langKey, "Zombified Piglin",
-                "", "", "", "", "", "" );//TODO
+                "Piglin zombificado", "Piglin-zombie", "Piglin zombifié",
+                "Piglin zombificato", "Zombifizierter Piglin", "Corpse o' Devil's Swine" );
     }
     
     @SpecialMob.LootTableProvider
@@ -263,10 +265,10 @@ public class _SpecialZombifiedPiglinEntity extends ZombifiedPiglinEntity impleme
         return MobHelper.finalizeSpawn( this, world, difficulty, spawnReason,
                 super.finalizeSpawn( world, difficulty, spawnReason, groupData, eggTag ) );
     }
-
+    
     @Override
-    public void setSpecialPathfindingMalus(PathNodeType nodeType, float malus) {
-        this.setPathfindingMalus(nodeType, malus);
+    public void setSpecialPathfindingMalus( PathNodeType nodeType, float malus ) {
+        this.setPathfindingMalus( nodeType, malus );
     }
     
     /** Called on spawn to set starting equipment. */

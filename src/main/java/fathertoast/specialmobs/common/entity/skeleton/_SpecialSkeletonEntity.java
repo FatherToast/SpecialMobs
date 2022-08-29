@@ -84,8 +84,9 @@ public class _SpecialSkeletonEntity extends AbstractSkeletonEntity implements IS
     
     @SpecialMob.LanguageProvider
     public static String[] getTranslations( String langKey ) {
+        //noinspection SpellCheckingInspection
         return References.translations( langKey, "Skeleton",
-                "", "", "", "", "", "" );//TODO
+                "Esqueleto", "Esqueleto", "Squelette", "Scheletro", "Skelett", "Bag o' Bones" );
     }
     
     @SpecialMob.LootTableProvider
@@ -329,10 +330,10 @@ public class _SpecialSkeletonEntity extends AbstractSkeletonEntity implements IS
         return MobHelper.finalizeSpawn( this, world, difficulty, spawnReason,
                 super.finalizeSpawn( world, difficulty, spawnReason, groupData, eggTag ) );
     }
-
+    
     @Override
-    public void setSpecialPathfindingMalus(PathNodeType nodeType, float malus) {
-        this.setPathfindingMalus(nodeType, malus);
+    public void setSpecialPathfindingMalus( PathNodeType nodeType, float malus ) {
+        this.setPathfindingMalus( nodeType, malus );
     }
     
     /** Called on spawn to set starting equipment. */
