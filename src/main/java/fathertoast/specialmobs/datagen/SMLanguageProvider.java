@@ -49,9 +49,11 @@ public class SMLanguageProvider extends LanguageProvider {
         final ArrayList<String[]> translationList = new ArrayList<>();
         
         final String[] spawnEggTranslationPattern = References.translations( "%s", "%s Spawn Egg",
-                "%s", "%s", "%s", "%s", "%s", "%s" ); //TODO
+                "Generar %s", "Ovo de invocação de %s", "Oeuf d'apparition de %s",
+                "Uovo generatore di %s", "%s-Spawn-Ei", "%s Cackle Fruit" ); //TODO not great
         final String[] vanillaReplacementSpawnEggTranslationPattern = References.translations( "%s", "Normal %s Spawn Egg",
-                "%s", "%s", "%s", "%s", "%s", "%s" ); //TODO
+                "Generar %s normal", "Ovo de invocação de %s normal", "Oeuf d'apparition de %s normale",
+                "Uovo generatore di %s normale", "Normale-%s-Spawn-Ei", "Simple %s Cackle Fruit" ); //TODO also bad
         
         // Bestiary-generated translations
         for( MobFamily.Species<?> species : MobFamily.getAllSpecies() ) {
@@ -66,13 +68,16 @@ public class SMLanguageProvider extends LanguageProvider {
         
         // Other entities
         translationList.add( References.translations( SMEntities.BONE_SHRAPNEL.get().getDescriptionId(), "Bone Shrapnel",
-                "", "", "", "", "", "" ) ); //TODO
+                "Metralla de hueso", "Estilhaços de osso", "Tesson d'os",
+                "Schegge di osso", "Knochensplitter", "" ) ); //TODO
         translationList.add( References.translations( SMEntities.BUG_SPIT.get().getDescriptionId(), "Bug Spit",
-                "", "", "", "", "", "" ) ); //TODO
+                "Escupir bicho", "Cuspe de inseto", "Cracher des insectes",
+                "Sputo di insetti", "Käferspucken", "" ) ); //TODO
         translationList.add( References.translations( SMEntities.INCORPOREAL_FIREBALL.get().getDescriptionId(), "Incorporeal Fireball",
-                "", "", "", "", "", "" ) ); //TODO
+                "Bola de fuego incorpórea", "Bola de fogo incorpórea", "Boule de feu incorporelle",
+                "Palla di fuoco incorporea", "Unkörperlicher Feuerkugel", "Haunted Cannonball" ) );
         translationList.add( References.translations( SMEntities.FISHING_BOBBER.get().getDescriptionId(), "Fishing Bobber",
-                "", "", "", "", "", "" ) ); //TODO
+                "Anzuelo", "Boia de pesca", "Flotteur", "Galleggiante da pesca", "Schwimmer", "Fishin' Bobber" ) );
         
         // Blocks
         for( RegistryObject<Block> regObject : SMBlocks.REGISTRY.getEntries() ) {
@@ -90,9 +95,10 @@ public class SMLanguageProvider extends LanguageProvider {
         
         // Misc
         translationList.add( References.translations( SMEffects.VULNERABILITY.get().getDescriptionId(), "Vulnerability",
-                "", "", "", "", "", "" ) ); //TODO
+                "Vulnerabilidad", "Vulnerabilidade", "Vulnérabilité",
+                "Vulnerabilità", "Verletzlichkeit", "More Hurtin'" ) );
         translationList.add( References.translations( SMEffects.WEIGHT.get().getDescriptionId(), "Weight",
-                "", "", "", "", "", "" ) ); //TODO
+                "Pesando", "Peso", "Lester", "Peso", "Gewicht", "Anchor" ) );
         
         TRANSLATIONS = translationList.toArray( new String[0][0] );
         

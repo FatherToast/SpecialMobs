@@ -48,7 +48,7 @@ public class WindWitchEntity extends _SpecialWitchEntity {
     
     @SpecialMob.LanguageProvider
     public static String[] getTranslations( String langKey ) {
-        return References.translations( langKey, "Witch of the Wind",
+        return References.translations( langKey, "Wind Witch",
                 "", "", "", "", "", "" );//TODO
     }
     
