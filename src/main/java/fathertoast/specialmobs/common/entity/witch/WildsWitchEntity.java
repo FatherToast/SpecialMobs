@@ -36,7 +36,7 @@ public class WildsWitchEntity extends _SpecialWitchEntity {
     @SpecialMob.BestiaryInfoSupplier
     public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
         bestiaryInfo.color( 0xA80E0E ).theme( BestiaryInfo.Theme.FOREST )
-                .uniqueTextureBaseOnly()
+                .uniqueTextureWithEyes()
                 .addExperience( 1 ).spider()
                 .multiplyAttribute( Attributes.MOVEMENT_SPEED, 0.7 );
     }

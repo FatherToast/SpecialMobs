@@ -41,7 +41,7 @@ public class WindWitchEntity extends _SpecialWitchEntity {
     @SpecialMob.BestiaryInfoSupplier
     public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
         bestiaryInfo.color( 0x6388B2 ).theme( BestiaryInfo.Theme.MOUNTAIN )
-                .uniqueTextureWithEyes()
+                .uniqueTextureBaseOnly()
                 .addExperience( 2 ).fallImmune()
                 .multiplyAttribute( Attributes.MOVEMENT_SPEED, 1.2 );
     }

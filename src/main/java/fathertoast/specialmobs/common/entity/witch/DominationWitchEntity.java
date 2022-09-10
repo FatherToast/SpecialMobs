@@ -31,7 +31,7 @@ public class DominationWitchEntity extends _SpecialWitchEntity {
     @SpecialMob.BestiaryInfoSupplier
     public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
         bestiaryInfo.color( 0xFFF87E ).weight( BestiaryInfo.DefaultWeight.LOW )
-                .uniqueTextureWithEyes()
+                .uniqueTextureBaseOnly()
                 .addExperience( 2 )
                 .multiplyAttribute( Attributes.MOVEMENT_SPEED, 0.8 );
     }
