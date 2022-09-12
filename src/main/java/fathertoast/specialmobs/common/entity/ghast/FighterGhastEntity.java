@@ -24,7 +24,7 @@ public class FighterGhastEntity extends _SpecialGhastEntity {
     public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
         bestiaryInfo.color( 0x7A1300 )
                 .uniqueTextureWithAnimation()
-                .size( 0.5F, .0F, 2.0F )
+                .size( 0.5F, 2.0F, 2.0F )
                 .addExperience( 1 ).disableRangedAttack()
                 .addToAttribute( Attributes.MAX_HEALTH, 20.0 ).addToAttribute( Attributes.ARMOR, 10.0 )
                 .addToAttribute( Attributes.ATTACK_DAMAGE, 2.0 )
