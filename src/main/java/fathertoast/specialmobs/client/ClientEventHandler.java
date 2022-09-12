@@ -14,15 +14,16 @@ import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 
 @Mod.EventBusSubscriber( value = Dist.CLIENT, modid = SpecialMobs.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE )
-public class ClientEventHandler {
+public final class ClientEventHandler {
     
     static void registerConfigGUIFactory() {
         ModLoadingContext.get().registerExtensionPoint( ExtensionPoint.CONFIGGUIFACTORY,
                 () -> ClientEventHandler.OpenConfigFolderScreen::new );
     }
     
+    @SuppressWarnings( "ProtectedMemberInFinalClass" )
     @SubscribeEvent
-    public static void onGuiOpen( GuiOpenEvent event ) {
+    protected static void onGuiOpen( GuiOpenEvent event ) {
         if( event.getGui() instanceof OpenConfigFolderScreen ) {
             event.setCanceled( true );
             Util.getPlatform().openFile( Config.CONFIG_DIR );
