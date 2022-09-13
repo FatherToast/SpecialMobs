@@ -9,6 +9,7 @@ import fathertoast.specialmobs.common.core.register.SMItems;
 import fathertoast.specialmobs.common.event.GameEvents;
 import fathertoast.specialmobs.common.event.NaturalSpawnManager;
 import fathertoast.specialmobs.common.network.PacketHandler;
+import fathertoast.specialmobs.common.util.SMDispenserBehavior;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.EventPriority;
@@ -150,9 +151,7 @@ public class SpecialMobs {
     public void setup( FMLCommonSetupEvent event ) {
         event.enqueueWork(() -> {
             NaturalSpawnManager.registerSpawnPlacements();
-            /*
             SMDispenserBehavior.registerBehaviors();
-             */
         });
     }
     

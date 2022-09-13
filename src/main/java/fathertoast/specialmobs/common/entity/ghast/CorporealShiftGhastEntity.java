@@ -58,7 +58,7 @@ public class CorporealShiftGhastEntity extends _SpecialGhastEntity {
     @SpecialMob.LootTableProvider
     public static void buildLootTable( LootTableBuilder loot ) {
         addBaseLoot( loot );
-        loot.addSemicommonDrop( "semicommon", SMItems.INCORPOREAL_FIREBALL.get() );
+        loot.addClusterDrop( "cluster", SMItems.INCORPOREAL_FIREBALL.get() );
     }
     
     @SpecialMob.Factory

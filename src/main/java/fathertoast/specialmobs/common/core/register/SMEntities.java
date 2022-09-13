@@ -31,7 +31,7 @@ public class SMEntities {
     
     public static final RegistryObject<EntityType<IncorporealFireballEntity>> INCORPOREAL_FIREBALL = register( "incorporeal_fireball",
             EntityType.Builder.<IncorporealFireballEntity>of( IncorporealFireballEntity::new, EntityClassification.MISC )
-                    .sized( 1.0F, 1.0F ).clientTrackingRange( 4 ).updateInterval( 3 ) );
+                    .sized( 1.0F, 1.0F ).clientTrackingRange( 4 ).updateInterval( 2 ) );
     
     public static final RegistryObject<EntityType<SpecialFishingBobberEntity>> FISHING_BOBBER = register( "fishing_bobber",
             EntityType.Builder.<SpecialFishingBobberEntity>of( SpecialFishingBobberEntity::new, EntityClassification.MISC ).noSave().noSummon()
