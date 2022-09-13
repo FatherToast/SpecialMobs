@@ -5,6 +5,7 @@ import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.config.species.SkeletonSpeciesConfig;
 import fathertoast.specialmobs.common.config.species.SpeciesConfig;
+import fathertoast.specialmobs.common.event.PlayerVelocityWatcher;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import net.minecraft.entity.EntityType;
@@ -17,6 +18,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 
 @SpecialMob
@@ -71,14 +73,20 @@ public class SniperSkeletonEntity extends _SpecialSkeletonEntity {
     /** Called to attack the target with a ranged attack. */
     @Override
     public void performRangedAttack( LivingEntity target, float damageMulti ) {
-        // Would be nice if we could lead the target, maybe someday when we can more easily read player velocity
-        final double dX = target.getX() - getX();
-        final double dY = target.getY( 0.5 ) - getEyeY() + 0.1;
-        final double dZ = target.getZ() - getZ();
-        final double dH = MathHelper.sqrt( dX * dX + dZ * dZ );
-        
         final double g = 0.05; // Gravitational acceleration for AbstractArrowEntity
         final float v = 1.6F;
+        
+        // Try to lead the target
+        final double dist = distanceTo( target );
+        final double arcFactor = dist * 0.012;
+        final float ticksToTarget = (float) (dist / v * (1.0 + arcFactor * arcFactor * arcFactor));
+        final Vector3d targetV = PlayerVelocityWatcher.getVelocity( target );
+        
+        final double dX = target.getX() + targetV.x * ticksToTarget - getX();
+        final double dY = target.getY( 0.5 ) - getEyeY() + 0.1;
+        final double dZ = target.getZ() + targetV.z * ticksToTarget - getZ();
+        final double dH = MathHelper.sqrt( dX * dX + dZ * dZ );
+        
         final double radical = v * v * v * v - g * (g * dH * dH + 2 * dY * v * v);
         if( radical < 0.0 ) {
             // No firing solution, just fall back to the default
