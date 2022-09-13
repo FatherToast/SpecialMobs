@@ -1,6 +1,7 @@
 package fathertoast.specialmobs.common.event;
 
 import fathertoast.specialmobs.common.core.SpecialMobs;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.management.PlayerList;
 import net.minecraft.util.math.vector.Vector3d;
@@ -35,6 +36,11 @@ public class PlayerVelocityWatcher {
             TRACKER.put( player.getUUID(), trackerEntry );
         }
         return trackerEntry;
+    }
+    
+    /** @return The entity's velocity. Uses the player tracker to work for players, too. */
+    public static Vector3d getVelocity( Entity entity ) {
+        return entity instanceof PlayerEntity ? get( (PlayerEntity) entity ).velocity() : entity.getDeltaMovement();
     }
     
     /** Called for every player tick event. */
