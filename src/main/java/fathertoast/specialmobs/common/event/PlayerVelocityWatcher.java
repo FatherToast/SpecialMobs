@@ -64,7 +64,7 @@ public class PlayerVelocityWatcher {
         }
     }
     
-    /** Called when the server is starts shutting down. */
+    /** Called when the server starts shutting down. */
     @SubscribeEvent
     protected static void onServerStopping( FMLServerStoppingEvent event ) {
         cleanupCounter = 0;
