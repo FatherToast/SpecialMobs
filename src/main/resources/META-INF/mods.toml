@@ -1,0 +1,51 @@
+modLoader = "javafml"
+loaderVersion = "[36,)"
+license = "GNU General Public License v3.0"
+issueTrackerURL = "https://github.com/FatherToast/SpecialMobs/issues/"
+
+[[mods]]
+logoFile = "banner.png"
+authors = "Father Toast"
+credits = "Sarinsa.instance().getCredits().toString(), Tutta (glorious textures), Mother Toast & Baby Toast"
+version = "${file.jarVersion}"
+displayName = "Special Mobs"
+modId = "specialmobs"
+description = '''
+Special Mobs adds variety to vanilla monsters to make enemies more interesting, without breaking the 'Minecraft' feel.
+
+This mod is highly configurable and each feature has at least one config option associated with it.
+Browsing the configs will provide information on all the mod's features. If more in-depth information is needed, ask in the Discord server.
+
+
+Download: https://www.curseforge.com/members/fathertoast/projects/
+
+Source: https://github.com/FatherToast/
+
+Discussion: https://discord.gg/GFTzTdX
+'''
+
+[[dependencies.specialmobs]]
+modId = "forge"
+mandatory = true
+versionRange = "[36.2.17,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.specialmobs]]
+modId = "minecraft"
+mandatory = true
+versionRange = "[1.16.5,1.17)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.specialmobs]]
+modId = "theoneprobe"
+mandatory = false
+versionRange = "[1.16,)"
+ordering = "BEFORE"
+side = "BOTH"
+
+# A URL to query for updates for this mod. See the JSON update specification https://mcforge.readthedocs.io/en/latest/gettingstarted/autoupdate/
+#updateJSONURL="https://change.me.example.invalid/updates.json" #optional
+# A URL for the "homepage" for this mod, displayed in the mod UI
+#displayURL="" #optional
