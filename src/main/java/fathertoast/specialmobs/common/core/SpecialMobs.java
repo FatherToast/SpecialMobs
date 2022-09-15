@@ -6,6 +6,7 @@ import fathertoast.specialmobs.common.core.register.SMBlocks;
 import fathertoast.specialmobs.common.core.register.SMEffects;
 import fathertoast.specialmobs.common.core.register.SMEntities;
 import fathertoast.specialmobs.common.core.register.SMItems;
+import fathertoast.specialmobs.common.event.AdvancementFixer;
 import fathertoast.specialmobs.common.event.GameEvents;
 import fathertoast.specialmobs.common.event.NaturalSpawnManager;
 import fathertoast.specialmobs.common.network.PacketHandler;
@@ -142,6 +143,7 @@ public class SpecialMobs {
         
         MinecraftForge.EVENT_BUS.addListener( EventPriority.LOW, NaturalSpawnManager::onBiomeLoad );
         MinecraftForge.EVENT_BUS.register( new GameEvents() );
+        MinecraftForge.EVENT_BUS.register( new AdvancementFixer() );
     }
     
     //    public void onParallelDispatch( FMLConstructModEvent event ) {
