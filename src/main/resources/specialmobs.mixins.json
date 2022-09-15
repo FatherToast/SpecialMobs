@@ -4,7 +4,9 @@
   "compatibilityLevel": "JAVA_8",
   "minVersion": "0.8",
   "refmap": "specialmobs.mixins.refmap.json",
-  "mixins": [],
+  "mixins": [
+    "BlazeEntityMixin"
+  ],
   "client": [],
   "server": [],
   "injectors": {
