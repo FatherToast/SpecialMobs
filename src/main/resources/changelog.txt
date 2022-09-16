@@ -1,3 +1,6 @@
+1.16.5-1.0.1
+    - Fixed certain vanilla advancements broken by mob replacement.
+    - Cinders now spawn less smoke.
 1.16.5-1.0.0
     - Rewritten and rebased version number for MC 1.6.5.
 1.0.4
