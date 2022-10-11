@@ -140,8 +140,8 @@ public class _SpecialSkeletonEntity extends AbstractSkeletonEntity implements IS
     /** @return The arrow for this skeleton to shoot. */
     @Override
     protected AbstractArrowEntity getArrow( ItemStack arrowItem, float damageMulti ) {
-        return getVariantArrow( super.getArrow( arrowItem, damageMulti * getSpecialData().getRangedAttackDamage() ),
-                arrowItem, damageMulti );
+        return getVariantArrow( super.getArrow( arrowItem,
+                damageMulti * getSpecialData().getRangedAttackDamage() / 2.0F ), arrowItem, damageMulti );
     }
     
     /** Override to modify this entity's ranged attack projectile. */
