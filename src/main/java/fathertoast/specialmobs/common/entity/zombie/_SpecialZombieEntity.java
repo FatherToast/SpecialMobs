@@ -153,7 +153,7 @@ public class _SpecialZombieEntity extends ZombieEntity implements IRangedAttackM
     /** @return The arrow for this zombie to shoot. */
     protected AbstractArrowEntity getArrow( ItemStack arrowItem, float damageMulti ) {
         return getVariantArrow( ProjectileHelper.getMobArrow( this, arrowItem,
-                damageMulti * getSpecialData().getRangedAttackDamage() ), arrowItem, damageMulti );
+                damageMulti * getSpecialData().getRangedAttackDamage() / 2.0F ), arrowItem, damageMulti );
     }
     
     /** Override to modify this entity's ranged attack projectile. */
