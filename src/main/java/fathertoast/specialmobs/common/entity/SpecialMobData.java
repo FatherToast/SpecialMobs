@@ -287,6 +287,7 @@ public class SpecialMobData<T extends LivingEntity & ISpecialMob<T>> {
      * @return The height scale, including baby modifier if applicable. Used to calculate eye height for families that are not auto-scaled.
      * Note: Baby scale is derived from {@link net.minecraft.entity.monster.ZombieEntity#getStandingEyeHeight(Pose, EntitySize)}.
      */
+    @SuppressWarnings("JavadocReference")
     public float getHeightScaleByAge() { return getHeightScale() * (theEntity.isBaby() ? 0.53448F : 1.0F); }
     
     /** @return The base render scale for the entity, which is a property of the mob species. */
@@ -377,7 +378,9 @@ public class SpecialMobData<T extends LivingEntity & ISpecialMob<T>> {
      * @param block The block state to test.
      * @return True if the block is allowed to apply its stuck speed multiplier.
      */
-    public boolean canBeStuckIn( BlockState block ) { return !immuneToStickyBlocks.contains( block.getBlock() ); }
+    public boolean canBeStuckIn( @Nullable BlockState block ) {
+        return block != null && !immuneToStickyBlocks.contains( block.getBlock() );
+    }
     
     /** @param blocks The sticky block(s) to grant immunity from. */
     private void addStickyBlockImmunity( Collection<Block> blocks ) { immuneToStickyBlocks.addAll( blocks ); }
