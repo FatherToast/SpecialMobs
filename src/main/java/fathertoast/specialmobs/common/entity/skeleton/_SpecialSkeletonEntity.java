@@ -36,6 +36,8 @@ import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.pathfinding.PathNodeType;
 import net.minecraft.potion.EffectInstance;
+import net.minecraft.tags.EntityTypeTags;
+import net.minecraft.tags.ITag;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.SoundEvents;
@@ -46,6 +48,8 @@ import net.minecraft.world.IServerWorld;
 import net.minecraft.world.World;
 
 import javax.annotation.Nullable;
+import java.util.Collections;
+import java.util.List;
 
 @SpecialMob
 public class _SpecialSkeletonEntity extends AbstractSkeletonEntity implements ISpecialMob<_SpecialSkeletonEntity> {
@@ -92,6 +96,11 @@ public class _SpecialSkeletonEntity extends AbstractSkeletonEntity implements IS
     @SpecialMob.LootTableProvider
     public static void addBaseLoot( LootTableBuilder loot ) {
         loot.addLootTable( "main", EntityType.SKELETON.getDefaultLootTable() );
+    }
+
+    @SpecialMob.EntityTagProvider
+    public static List<ITag.INamedTag<EntityType<?>>> getEntityTags() {
+        return Collections.singletonList(EntityTypeTags.SKELETONS);
     }
     
     @SpecialMob.Factory

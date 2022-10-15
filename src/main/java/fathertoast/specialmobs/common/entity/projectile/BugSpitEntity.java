@@ -68,7 +68,7 @@ public class BugSpitEntity extends ProjectileEntity {
         final double dH = MathHelper.sqrt( dX * dX + dZ * dZ );
         shoot( dX, dY + dH * 0.2, dZ, 1.2F, spread );
     }
-    
+
     /** Called from the Entity.class constructor to define data watcher variables. */
     @Override
     protected void defineSynchedData() { entityData.define( COLOR, 0xFFFFFF ); }

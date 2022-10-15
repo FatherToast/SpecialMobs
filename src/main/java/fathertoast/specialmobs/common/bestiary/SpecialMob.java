@@ -135,6 +135,18 @@ public @interface SpecialMob {
     @Retention( RetentionPolicy.RUNTIME )
     @Target( ElementType.METHOD )
     @interface LootTableProvider { }
+
+    /**
+     * OPTIONAL-OVERRIDABLE. This is called during data generation to add the mob's entity type to any
+     * desired entity type tags.
+     * <p>
+     * The annotated method must have a signature that follows the pattern:
+     * <p>
+     * {@code public static List<ITag.INamedTag<EntityType<?>> METHOD_NAME( )}
+     */
+    @Retention( RetentionPolicy.RUNTIME )
+    @Target( ElementType.METHOD )
+    @interface EntityTagProvider { }
     
     /**
      * REQUIRED. This is called during registration to build the mob 'factory'. This will essentially just return the

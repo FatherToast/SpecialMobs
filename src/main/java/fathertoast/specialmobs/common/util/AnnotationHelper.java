@@ -10,6 +10,7 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.AttributeModifierMap;
 import net.minecraft.item.Item;
+import net.minecraft.tags.ITag;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 
 import javax.annotation.Nullable;
@@ -18,6 +19,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.List;
 
 /**
  * Provides helper methods to handle annotation processing through reflection.
@@ -131,6 +133,26 @@ public final class AnnotationHelper {
         }
         catch( NoSuchMethodException | InvocationTargetException | IllegalAccessException ex ) {
             throw new RuntimeException( "Entity class for " + species.name + " has invalid loot table builder method", ex );
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    @Nullable
+    public static List<ITag.INamedTag<EntityType<?>>> getEntityTags( Class<? extends LivingEntity> entityClass ) {
+        try {
+            Method method = getMethodOrSuperOptional( entityClass, SpecialMob.EntityTagProvider.class );
+
+            if (method != null) {
+                Object ret = method.invoke( null );
+
+                if (ret != null)
+                    return (List<ITag.INamedTag<EntityType<?>>>) ret;
+            }
+            return null;
+        }
+        catch (InvocationTargetException | IllegalAccessException e) {
+            e.printStackTrace();
+            return null;
         }
     }
     
