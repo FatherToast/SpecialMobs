@@ -1,24 +1,25 @@
 package fathertoast.specialmobs.common.entity.ai.goal;
 
-import net.minecraft.entity.IRangedAttackMob;
-import net.minecraft.entity.MobEntity;
-import net.minecraft.entity.ai.goal.RangedAttackGoal;
-import net.minecraft.entity.monster.DrownedEntity;
-import net.minecraft.item.Items;
-import net.minecraft.util.Hand;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.ai.goal.RangedAttackGoal;
+import net.minecraft.world.entity.monster.Drowned;
+import net.minecraft.world.entity.monster.RangedAttackMob;
+import net.minecraft.world.item.Items;
 
 /**
  * Copy of the drowned trident attack goal made accessible.
  * <p>
- * {@link DrownedEntity.TridentAttackGoal}
+ * {@link net.minecraft.world.entity.monster.Drowned.DrownedTridentAttackGoal}
  */
+@SuppressWarnings("JavadocReference")
 public class SpecialTridentAttackGoal extends RangedAttackGoal {
     
-    private final MobEntity mob;
+    private final Mob mob;
     
-    public SpecialTridentAttackGoal( IRangedAttackMob entity, double p_i48907_2_, int p_i48907_4_, float p_i48907_5_ ) {
-        super( entity, p_i48907_2_, p_i48907_4_, p_i48907_5_ );
-        mob = (DrownedEntity) entity;
+    public SpecialTridentAttackGoal( RangedAttackMob entity, double speedMod, int attackInterval, float attackRange ) {
+        super( entity, speedMod, attackInterval, attackRange );
+        mob = (Drowned) entity;
     }
     
     /** @return Returns true if this AI can be activated. */
@@ -30,7 +31,7 @@ public class SpecialTridentAttackGoal extends RangedAttackGoal {
     public void start() {
         super.start();
         mob.setAggressive( true );
-        mob.startUsingItem( Hand.MAIN_HAND );
+        mob.startUsingItem( InteractionHand.MAIN_HAND );
     }
     
     /** Called when this AI is deactivated. */

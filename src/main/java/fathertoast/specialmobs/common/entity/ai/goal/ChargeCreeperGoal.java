@@ -2,34 +2,34 @@ package fathertoast.specialmobs.common.entity.ai.goal;
 
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.entity.ai.IAmmoUser;
-import net.minecraft.entity.MobEntity;
-import net.minecraft.entity.ai.goal.Goal;
-import net.minecraft.entity.monster.CreeperEntity;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.SoundEvents;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.World;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.ai.goal.Goal;
+import net.minecraft.world.entity.monster.Creeper;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 
 import java.util.EnumSet;
 import java.util.List;
 import java.util.function.BiPredicate;
 
-public class ChargeCreeperGoal<T extends MobEntity & IAmmoUser> extends Goal {
+public class ChargeCreeperGoal<T extends Mob & IAmmoUser> extends Goal {
     
-    private final BiPredicate<T, ? super CreeperEntity> targetPredicate;
+    private final BiPredicate<T, ? super Creeper> targetPredicate;
     
     private final T madman;
     private final double movementSpeed;
     private final double targetRange;
     
     /** The creeper to target for power-up injection */
-    private CreeperEntity creeper;
+    private Creeper creeper;
     
     private int pathUpdateCooldown;
-    private Vector3d pathTarget = Vector3d.ZERO;
+    private Vec3 pathTarget = Vec3.ZERO;
     private boolean canUseWhileMounted = false;
     
-    public ChargeCreeperGoal( T madman, double movementSpeed, double targetRange, BiPredicate<T, ? super CreeperEntity> targetPredicate ) {
+    public ChargeCreeperGoal( T madman, double movementSpeed, double targetRange, BiPredicate<T, ? super Creeper> targetPredicate ) {
         this.madman = madman;
         this.movementSpeed = movementSpeed;
         this.targetRange = targetRange;
@@ -59,11 +59,11 @@ public class ChargeCreeperGoal<T extends MobEntity & IAmmoUser> extends Goal {
     }
     
     private void findCreeper() {
-        World world = madman.level;
-        List<CreeperEntity> nearbyCreepers = world.getLoadedEntitiesOfClass( CreeperEntity.class, madman.getBoundingBox().inflate( targetRange ), null );
+        Level level = madman.level;
+        List<Creeper> nearbyCreepers = level.getEntitiesOfClass( Creeper.class, madman.getBoundingBox().inflate( targetRange ), null );
         
         if( !nearbyCreepers.isEmpty() ) {
-            for( CreeperEntity creeper : nearbyCreepers ) {
+            for( Creeper creeper : nearbyCreepers ) {
                 if( targetPredicate.test( madman, creeper ) ) {
                     this.creeper = creeper;
                     break;
@@ -101,7 +101,7 @@ public class ChargeCreeperGoal<T extends MobEntity & IAmmoUser> extends Goal {
                 madman.consumeAmmo();
                 MobHelper.charge( creeper );
                 madman.level.playSound( null, creeper.getX(), creeper.getY(), creeper.getZ(),
-                        SoundEvents.BEE_STING, SoundCategory.HOSTILE, 0.9F, 1.0F );
+                        SoundEvents.BEE_STING, SoundSource.HOSTILE, 0.9F, 1.0F );
             }
             
             creeper = null;

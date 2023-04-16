@@ -2,9 +2,9 @@ package fathertoast.specialmobs.common.entity.ai.goal;
 
 import fathertoast.specialmobs.common.entity.ai.SimpleFlyingMovementController;
 import fathertoast.specialmobs.common.entity.ghast._SpecialGhastEntity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.controller.MovementController;
-import net.minecraft.entity.ai.goal.Goal;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.control.MoveControl;
+import net.minecraft.world.entity.ai.goal.Goal;
 
 import java.util.EnumSet;
 
@@ -50,7 +50,7 @@ public class SpecialGhastMeleeAttackGoal extends Goal {
         if( target == null ) return;
         
         // Move towards the target
-        final MovementController moveControl = ghast.getMoveControl();
+        final MoveControl moveControl = ghast.getMoveControl();
         if( pathUpdateCooldown-- <= 0 || !moveControl.hasWanted() ) {
             pathUpdateCooldown = ghast.getRandom().nextInt( 5 ) + 3;
             

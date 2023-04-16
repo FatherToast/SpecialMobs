@@ -1,18 +1,18 @@
 package fathertoast.specialmobs.common.util;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.effect.LightningBoltEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.fluid.FluidState;
-import net.minecraft.network.play.server.SExplosionPacket;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.EntityExplosionContext;
-import net.minecraft.world.Explosion;
-import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.protocol.game.ClientboundExplodePacket;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LightningBolt;
+import net.minecraft.world.level.Explosion;
+import net.minecraft.world.level.ExplosionDamageCalculator;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.ForgeEventFactory;
 
 import java.util.List;
@@ -26,8 +26,8 @@ import java.util.Optional;
 public class ExplosionHelper {
     
     /** Gets the explosion mode to use as a result of appropriate Forge events. */
-    public static Explosion.Mode getMode( Entity entity ) {
-        return ForgeEventFactory.getMobGriefingEvent( entity.level, entity ) ? Explosion.Mode.DESTROY : Explosion.Mode.NONE;
+    public static Explosion.BlockInteraction getMode(Entity entity ) {
+        return ForgeEventFactory.getMobGriefingEvent( entity.level, entity ) ? Explosion.BlockInteraction.DESTROY : Explosion.BlockInteraction.NONE;
     }
     
     /** Creates and fully executes an explosion for a source entity at that source's current position. */
@@ -37,24 +37,24 @@ public class ExplosionHelper {
     
     /** Creates and fully executes an explosion for a source entity at a specified position. */
     public static Explosion explode( Entity entity, double x, double y, double z, float power, boolean damageBlocks, boolean fiery ) {
-        return entity.level.explode( entity, x, y, z, power, fiery, damageBlocks ? getMode( entity ) : Explosion.Mode.NONE );
+        return entity.level.explode( entity, x, y, z, power, fiery, damageBlocks ? getMode( entity ) : Explosion.BlockInteraction.NONE );
     }
     
     /** Helper method to simplify spawning lightning. */
-    public static void spawnLightning( World world, double x, double y, double z ) {
-        final LightningBoltEntity lightning = EntityType.LIGHTNING_BOLT.create( world );
+    public static void spawnLightning( Level level, double x, double y, double z ) {
+        final LightningBolt lightning = EntityType.LIGHTNING_BOLT.create( level );
         if( lightning != null ) {
             lightning.moveTo( x, y, z );
-            world.addFreshEntity( lightning );
+            level.addFreshEntity( lightning );
         }
     }
     
     public final Entity source;
-    public final World level;
+    public final Level level;
     public final float radius;
     
-    public final Explosion.Mode mode;
-    public final EntityExplosionContext damageCalculator;
+    public final Explosion.BlockInteraction mode;
+    public final ExplosionDamageCalculator damageCalculator;
     public final Explosion explosion;
     
     /**
@@ -79,7 +79,7 @@ public class ExplosionHelper {
      * @see #initializeExplosion()
      * @see #finalizeExplosion()
      */
-    public ExplosionHelper( Entity entity, float power, Explosion.Mode explosionMode, boolean fiery ) {
+    public ExplosionHelper( Entity entity, float power, Explosion.BlockInteraction explosionMode, boolean fiery ) {
         this( entity, entity.getX(), entity.getY(), entity.getZ(), power, explosionMode, fiery );
     }
     
@@ -93,7 +93,7 @@ public class ExplosionHelper {
      * @see #finalizeExplosion()
      */
     public ExplosionHelper( Entity entity, double x, double y, double z, float power, boolean damageBlocks, boolean fiery ) {
-        this( entity, x, y, z, power, damageBlocks ? getMode( entity ) : Explosion.Mode.NONE, fiery );
+        this( entity, x, y, z, power, damageBlocks ? getMode( entity ) : Explosion.BlockInteraction.NONE, fiery );
     }
     
     /**
@@ -105,18 +105,18 @@ public class ExplosionHelper {
      * @see #initializeExplosion()
      * @see #finalizeExplosion()
      */
-    public ExplosionHelper( Entity entity, double x, double y, double z, float power, Explosion.Mode explosionMode, boolean fiery ) {
+    public ExplosionHelper( Entity entity, double x, double y, double z, float power, Explosion.BlockInteraction explosionMode, boolean fiery ) {
         source = entity;
         level = entity.level;
         radius = power;
         
         mode = explosionMode;
-        damageCalculator = new EntityExplosionContext( entity );
+        damageCalculator = new ExplosionDamageCalculator( );
         explosion = new Explosion( level, entity, null, damageCalculator, x, y, z, power, fiery, explosionMode );
     }
     
     /** @return This explosion's position vector. */
-    public Vector3d getPos() { return explosion.getPosition(); }
+    public Vec3 getPos() { return explosion.getPosition(); }
     
     /**
      * @return A list of all block positions hit by this explosion. This is populated after calling initializeExplosion()
@@ -128,7 +128,7 @@ public class ExplosionHelper {
      * Does a quick check if the block can explode, firing all relevant Forge events.
      * The power value used here ignores distance and shielding.
      */
-    public boolean tryExplodeBlock( BlockPos pos, BlockState block, float power ) {
+    public boolean tryExplodeBlock(BlockPos pos, BlockState block, float power ) {
         return tryExplodeBlock( pos, block, level.getFluidState( pos ), power );
     }
     
@@ -136,7 +136,7 @@ public class ExplosionHelper {
      * Does a quick check if the block can explode, firing all relevant Forge events.
      * The power value used here ignores distance and shielding.
      */
-    public boolean tryExplodeBlock( BlockPos pos, BlockState block, FluidState fluid, float power ) {
+    public boolean tryExplodeBlock(BlockPos pos, BlockState block, FluidState fluid, float power ) {
         float blockDamage = power * (0.7F + level.random.nextFloat() * 0.6F);
         
         final Optional<Float> optional = getBlockExplosionResistance( pos, block, fluid );
@@ -178,18 +178,16 @@ public class ExplosionHelper {
      * (if these capabilities are enabled) and notifies players that the explosion happened.
      */
     public void finalizeExplosion() {
-        if( level instanceof ServerWorld ) {
-            final ServerWorld serverLevel = (ServerWorld) level;
-            
+        if( level instanceof ServerLevel serverLevel ) {
             // Handle server-side explosion logic
             explosion.finalizeExplosion( false );
-            if( mode == Explosion.Mode.NONE ) {
+            if( mode == Explosion.BlockInteraction.NONE ) {
                 explosion.clearToBlow();
             }
-            final Vector3d pos = getPos();
-            for( ServerPlayerEntity player : serverLevel.players() ) {
+            final Vec3 pos = getPos();
+            for( ServerPlayer player : serverLevel.players() ) {
                 if( player.distanceToSqr( pos.x, pos.y, pos.z ) < 4096.0 ) {
-                    player.connection.send( new SExplosionPacket( pos.x, pos.y, pos.z, radius,
+                    player.connection.send( new ClientboundExplodePacket( pos.x, pos.y, pos.z, radius,
                             explosion.getToBlow(), explosion.getHitPlayers().get( player ) ) );
                 }
             }

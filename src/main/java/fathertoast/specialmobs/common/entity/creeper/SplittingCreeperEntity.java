@@ -8,15 +8,15 @@ import fathertoast.specialmobs.common.config.species.SplittingCreeperSpeciesConf
 import fathertoast.specialmobs.common.util.ExplosionHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.ILivingEntityData;
-import net.minecraft.entity.SpawnReason;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.item.Items;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.SoundEvents;
-import net.minecraft.world.IServerWorld;
-import net.minecraft.world.World;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.SpawnGroupData;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.ServerLevelAccessor;
 
 import javax.annotation.Nullable;
 
@@ -59,7 +59,7 @@ public class SplittingCreeperEntity extends _SpecialCreeperEntity {
     }
     
     @SpecialMob.Factory
-    public static EntityType.IFactory<SplittingCreeperEntity> getVariantFactory() { return SplittingCreeperEntity::new; }
+    public static EntityType.EntityFactory<SplittingCreeperEntity> getVariantFactory() { return SplittingCreeperEntity::new; }
     
     /** @return This entity's mob species. */
     @SpecialMob.SpeciesSupplier
@@ -72,8 +72,8 @@ public class SplittingCreeperEntity extends _SpecialCreeperEntity {
     /** The number of extra mini creepers spawned on explosion (in addition to the amount based on explosion power). */
     private int extraBabies;
     
-    public SplittingCreeperEntity( EntityType<? extends _SpecialCreeperEntity> entityType, World world ) {
-        super( entityType, world );
+    public SplittingCreeperEntity( EntityType<? extends _SpecialCreeperEntity> entityType, Level level ) {
+        super( entityType, level );
         extraBabies = getConfig().SPLITTING.extraBabies.next( random );
     }
     
@@ -82,10 +82,10 @@ public class SplittingCreeperEntity extends _SpecialCreeperEntity {
     protected void makeVariantExplosion( float explosionPower ) {
         ExplosionHelper.explode( this, explosionPower, false, false );
         
-        if( !(level instanceof IServerWorld) ) return;
+        if( !(level instanceof ServerLevelAccessor) ) return;
         
         final int babiesToSpawn = extraBabies + (int) (explosionPower * explosionPower) / 2;
-        ILivingEntityData groupData = null;
+        SpawnGroupData groupData = null;
         for( int i = 0; i < babiesToSpawn; i++ ) {
             groupData = spawnBaby( explosionPower / 3.0F, groupData );
         }
@@ -95,15 +95,15 @@ public class SplittingCreeperEntity extends _SpecialCreeperEntity {
     
     /** Helper method to simplify spawning babies. */
     @Nullable
-    private ILivingEntityData spawnBaby( float speed, @Nullable ILivingEntityData groupData ) {
+    private SpawnGroupData spawnBaby( float speed, @Nullable SpawnGroupData groupData ) {
         final MiniCreeperEntity baby = MiniCreeperEntity.SPECIES.entityType.get().create( level );
         if( baby == null ) return groupData;
         
         baby.copyPosition( this );
-        baby.yHeadRot = yRot;
-        baby.yBodyRot = yRot;
-        groupData = baby.finalizeSpawn( (IServerWorld) level, level.getCurrentDifficultyAt( blockPosition() ),
-                SpawnReason.MOB_SUMMONED, groupData, null );
+        baby.yHeadRot = getYRot();
+        baby.yBodyRot = getYRot();
+        groupData = baby.finalizeSpawn( (ServerLevelAccessor) level, level.getCurrentDifficultyAt( blockPosition() ),
+                MobSpawnType.MOB_SUMMONED, groupData, null );
         baby.copyChargedState( this );
         baby.setTarget( getTarget() );
         
@@ -119,13 +119,13 @@ public class SplittingCreeperEntity extends _SpecialCreeperEntity {
     
     /** Override to save data to this entity's NBT data. */
     @Override
-    public void addVariantSaveData( CompoundNBT saveTag ) {
+    public void addVariantSaveData( CompoundTag saveTag ) {
         saveTag.putByte( References.TAG_EXTRA_BABIES, (byte) extraBabies );
     }
     
     /** Override to load data from this entity's NBT data. */
     @Override
-    public void readVariantSaveData( CompoundNBT saveTag ) {
+    public void readVariantSaveData( CompoundTag saveTag ) {
         if( saveTag.contains( References.TAG_EXTRA_BABIES, References.NBT_TYPE_NUMERICAL ) )
             extraBabies = saveTag.getByte( References.TAG_EXTRA_BABIES );
     }

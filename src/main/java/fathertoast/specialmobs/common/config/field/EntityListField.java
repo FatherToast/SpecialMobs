@@ -4,9 +4,9 @@ import fathertoast.specialmobs.common.config.file.TomlHelper;
 import fathertoast.specialmobs.common.config.util.EntityEntry;
 import fathertoast.specialmobs.common.config.util.EntityList;
 import fathertoast.specialmobs.common.core.SpecialMobs;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;

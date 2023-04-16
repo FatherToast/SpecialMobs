@@ -6,10 +6,10 @@ import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.util.ExplosionHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
-import net.minecraft.entity.EntityType;
-import net.minecraft.item.Items;
-import net.minecraft.world.World;
-import net.minecraft.world.storage.IServerWorldInfo;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.storage.ServerLevelData;
 
 @SpecialMob
 public class LightningCreeperEntity extends _SpecialCreeperEntity {
@@ -39,7 +39,7 @@ public class LightningCreeperEntity extends _SpecialCreeperEntity {
     }
     
     @SpecialMob.Factory
-    public static EntityType.IFactory<LightningCreeperEntity> getVariantFactory() { return LightningCreeperEntity::new; }
+    public static EntityType.EntityFactory<LightningCreeperEntity> getVariantFactory() { return LightningCreeperEntity::new; }
     
     /** @return This entity's mob species. */
     @SpecialMob.SpeciesSupplier
@@ -49,7 +49,7 @@ public class LightningCreeperEntity extends _SpecialCreeperEntity {
     
     //--------------- Variant-Specific Implementations ----------------
     
-    public LightningCreeperEntity( EntityType<? extends _SpecialCreeperEntity> entityType, World world ) { super( entityType, world ); }
+    public LightningCreeperEntity( EntityType<? extends _SpecialCreeperEntity> entityType, Level level ) { super( entityType, level ); }
     
     /** Override to change this creeper's explosion power multiplier. */
     @Override
@@ -78,18 +78,16 @@ public class LightningCreeperEntity extends _SpecialCreeperEntity {
         }
         
         // Start a thunderstorm
-        if( isPowered() && level.getLevelData() instanceof IServerWorldInfo ) {
-            final IServerWorldInfo serverInfo = (IServerWorldInfo) level.getLevelData();
-            
+        if( isPowered() && level.getLevelData() instanceof ServerLevelData serverData ) {
             int duration = random.nextInt( 12000 ) + 3600;
-            if( !serverInfo.isThundering() || serverInfo.getThunderTime() < duration ) {
-                serverInfo.setThunderTime( duration );
-                serverInfo.setThundering( true );
+            if( !serverData.isThundering() || serverData.getThunderTime() < duration ) {
+                serverData.setThunderTime( duration );
+                serverData.setThundering( true );
             }
             duration += 1200;
-            if( !serverInfo.isRaining() || serverInfo.getRainTime() < duration ) {
-                serverInfo.setRainTime( duration );
-                serverInfo.setRaining( true );
+            if( !serverData.isRaining() || serverData.getRainTime() < duration ) {
+                serverData.setRainTime( duration );
+                serverData.setRaining( true );
             }
         }
     }

@@ -5,49 +5,48 @@ import fathertoast.specialmobs.common.core.register.SMEntities;
 import fathertoast.specialmobs.common.entity.ISpecialMob;
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.util.References;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.MoverType;
-import net.minecraft.entity.projectile.ProjectileEntity;
-import net.minecraft.entity.projectile.ProjectileHelper;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.IPacket;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.SoundEvents;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.EntityRayTraceResult;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.World;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.MoverType;
+import net.minecraft.world.entity.projectile.Projectile;
+import net.minecraft.world.entity.projectile.ProjectileUtil;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.EntityHitResult;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.entity.IEntityAdditionalSpawnData;
 import net.minecraftforge.event.ForgeEventFactory;
-import net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData;
-import net.minecraftforge.fml.network.NetworkHooks;
+import net.minecraftforge.network.NetworkHooks;
 
 import javax.annotation.Nullable;
 
-public class SpecialFishingBobberEntity extends ProjectileEntity implements IEntityAdditionalSpawnData {
+public class SpecialFishingBobberEntity extends Projectile implements IEntityAdditionalSpawnData {
     private static final float DRAG_FACTOR = 0.92F;
     private static final float GRAVITY_ACCEL = 0.03F;
     
     private float maxRangeSq = 1024.0F;
     
-    public SpecialFishingBobberEntity( EntityType<? extends SpecialFishingBobberEntity> entityType, World world ) { super( entityType, world ); }
+    public SpecialFishingBobberEntity( EntityType<? extends SpecialFishingBobberEntity> entityType, Level level ) { super( entityType, level ); }
     
     public SpecialFishingBobberEntity( LivingEntity angler, LivingEntity target ) {
         super( SMEntities.FISHING_BOBBER.get(), angler.level );
         setOwner( angler );
         
-        final Vector3d lookVec = angler.getViewVector( 1.0F ).scale( angler.getBbWidth() );
+        final Vec3 lookVec = angler.getViewVector( 1.0F ).scale( angler.getBbWidth() );
         setPos( angler.getX() + lookVec.x, angler.getEyeY() - 0.1, angler.getZ() + lookVec.z );
         
         float spread = 18 - 4 * level.getDifficulty().getId();
-        if( angler instanceof ISpecialMob ) {
-            final ISpecialMob<?> specialShooter = (ISpecialMob<?>) angler;
-            
+        if(angler instanceof final ISpecialMob<?> specialShooter) {
+
             if( specialShooter.getSpecialData().getRangedAttackMaxRange() >= 0.0F ) {
                 maxRangeSq = 2.0F * specialShooter.getSpecialData().getRangedAttackMaxRange();
                 maxRangeSq *= maxRangeSq;
@@ -67,7 +66,7 @@ public class SpecialFishingBobberEntity extends ProjectileEntity implements IEnt
         final double dX = target.getX() - getX();
         final double dY = target.getY( 0.3333 ) - getY();
         final double dZ = target.getZ() - getZ();
-        final double dH = MathHelper.sqrt( dX * dX + dZ * dZ );
+        final double dH = Mth.sqrt( (float) (dX * dX + dZ * dZ) );
         shoot( dX, dY + dH * 0.2, dZ, 1.3F, spread );
     }
     
@@ -76,7 +75,7 @@ public class SpecialFishingBobberEntity extends ProjectileEntity implements IEnt
     protected void defineSynchedData() { }
     
     @Override
-    public IPacket<?> getAddEntityPacket() { return NetworkHooks.getEntitySpawningPacket( this ); }
+    public Packet<?> getAddEntityPacket() { return NetworkHooks.getEntitySpawningPacket( this ); }
     
     /**
      * Called by the server when constructing the spawn packet.
@@ -85,7 +84,7 @@ public class SpecialFishingBobberEntity extends ProjectileEntity implements IEnt
      * @param buffer The packet data stream
      */
     @Override
-    public void writeSpawnData( PacketBuffer buffer ) {
+    public void writeSpawnData( FriendlyByteBuf buffer ) {
         final Entity owner = getOwner();
         buffer.writeInt( owner == null ? 0 : owner.getId() );
     }
@@ -97,7 +96,7 @@ public class SpecialFishingBobberEntity extends ProjectileEntity implements IEnt
      * @param additionalData The packet data stream
      */
     @Override
-    public void readSpawnData( PacketBuffer additionalData ) {
+    public void readSpawnData( FriendlyByteBuf additionalData ) {
         final int ownerId = additionalData.readInt();
         setOwner( level.getEntity( ownerId ) );
     }
@@ -105,9 +104,9 @@ public class SpecialFishingBobberEntity extends ProjectileEntity implements IEnt
     /** @return The bounding box to use for frustum culling. */
     @OnlyIn( Dist.CLIENT )
     @Override
-    public AxisAlignedBB getBoundingBoxForCulling() {
+    public AABB getBoundingBoxForCulling() {
         // Include the whole fishing line as part of the render area
-        final AxisAlignedBB boundingBox = super.getBoundingBoxForCulling();
+        final AABB boundingBox = super.getBoundingBoxForCulling();
         final Entity owner = getOwner();
         return owner == null ? boundingBox : boundingBox.minmax( owner.getBoundingBoxForCulling() );
     }
@@ -126,13 +125,13 @@ public class SpecialFishingBobberEntity extends ProjectileEntity implements IEnt
         
         final LivingEntity angler = getLivingOwner();
         if( !level.isClientSide() && (angler == null || distanceToSqr( angler ) > maxRangeSq) ) {
-            remove();
+            discard();
             return;
         }
         
-        final RayTraceResult rayTrace = ProjectileHelper.getHitResult( this, this::canHitEntity );
-        if( rayTrace.getType() != RayTraceResult.Type.MISS && !ForgeEventFactory.onProjectileImpact( this, rayTrace ) ) {
-            onHit( rayTrace );
+        final HitResult hitResult = ProjectileUtil.getHitResult( this, this::canHitEntity );
+        if( hitResult.getType() != HitResult.Type.MISS && !ForgeEventFactory.onProjectileImpact( this, hitResult ) ) {
+            onHit( hitResult );
         }
         
         if( !isNoGravity() ) {
@@ -149,15 +148,15 @@ public class SpecialFishingBobberEntity extends ProjectileEntity implements IEnt
     
     /** Called when this projectile hits anything. */
     @Override
-    protected void onHit( RayTraceResult hit ) {
+    protected void onHit( HitResult hit ) {
         super.onHit( hit );
         
-        if( !level.isClientSide() ) remove();
+        if( !level.isClientSide() ) discard();
     }
     
     /** Called when this projectile hits an entity. */
     @Override
-    protected void onHitEntity( EntityRayTraceResult hit ) {
+    protected void onHitEntity( EntityHitResult hit ) {
         super.onHitEntity( hit );
         
         playSound( SoundEvents.FISHING_BOBBER_RETRIEVE, 1.0F, 0.4F / (random.nextFloat() * 0.4F + 0.8F) );
@@ -172,7 +171,7 @@ public class SpecialFishingBobberEntity extends ProjectileEntity implements IEnt
     
     /** Saves data to this entity's base NBT compound that is specific to its subclass. */
     @Override
-    public void addAdditionalSaveData( CompoundNBT tag ) {
+    public void addAdditionalSaveData( CompoundTag tag ) {
         super.addAdditionalSaveData( tag );
         
         tag.putFloat( References.TAG_MAX_RANGE, maxRangeSq );
@@ -180,7 +179,7 @@ public class SpecialFishingBobberEntity extends ProjectileEntity implements IEnt
     
     /** Loads data from this entity's base NBT compound that is specific to its subclass. */
     @Override
-    public void readAdditionalSaveData( CompoundNBT tag ) {
+    public void readAdditionalSaveData( CompoundTag tag ) {
         super.readAdditionalSaveData( tag );
         
         if( tag.contains( References.TAG_MAX_RANGE, References.NBT_TYPE_NUMERICAL ) )

@@ -1,19 +1,20 @@
 package fathertoast.specialmobs.common.entity.ai.goal;
 
 import fathertoast.specialmobs.common.entity.ai.IAmphibiousMob;
-import net.minecraft.entity.CreatureEntity;
-import net.minecraft.entity.ai.RandomPositionGenerator;
-import net.minecraft.entity.ai.goal.Goal;
-import net.minecraft.pathfinding.Path;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.PathfinderMob;
+import net.minecraft.world.entity.ai.goal.Goal;
+import net.minecraft.world.entity.ai.util.DefaultRandomPos;
+import net.minecraft.world.level.pathfinder.Path;
+import net.minecraft.world.phys.Vec3;
 
 /**
  * The drowned "swim up" goal repurposed for use on other mobs.
  * <p>
- * {@link net.minecraft.entity.monster.DrownedEntity.SwimUpGoal}
+ * {@link net.minecraft.world.entity.monster.Drowned.DrownedSwimUpGoal}
  */
-public class AmphibiousSwimUpGoal<T extends CreatureEntity & IAmphibiousMob> extends Goal {
+@SuppressWarnings("JavadocReference")
+public class AmphibiousSwimUpGoal<T extends PathfinderMob & IAmphibiousMob> extends Goal {
     
     private final T mob;
     private final double speedModifier;
@@ -58,8 +59,8 @@ public class AmphibiousSwimUpGoal<T extends CreatureEntity & IAmphibiousMob> ext
     @Override
     public void tick() {
         if( mob.getY() < seaLevel && (mob.getNavigation().isDone() || closeToNextPos()) ) {
-            final Vector3d pos = RandomPositionGenerator.getPosTowards( mob, 4, 8,
-                    new Vector3d( mob.getX(), seaLevel, mob.getZ() ) );
+            final Vec3 pos = DefaultRandomPos.getPosTowards( mob, 4, 8,
+                    new Vec3( mob.getX(), seaLevel, mob.getZ() ), (float) Math.PI / 2F);
             if( pos == null ) {
                 stuck = true;
                 return;

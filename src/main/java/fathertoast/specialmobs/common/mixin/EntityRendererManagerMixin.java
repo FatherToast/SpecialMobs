@@ -1,23 +1,27 @@
 package fathertoast.specialmobs.common.mixin;
-
-import com.mojang.blaze3d.matrix.MatrixStack;
-import net.minecraft.client.GameSettings;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.renderer.IRenderTypeBuffer;
-import net.minecraft.client.renderer.entity.EntityRendererManager;
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.Options;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.model.geom.EntityModelSet;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.block.BlockRenderDispatcher;
+import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.renderer.texture.TextureManager;
-import net.minecraft.entity.Entity;
-import net.minecraft.resources.IReloadableResourceManager;
-import net.minecraft.world.IWorldReader;
+import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.LevelReader;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
 /**
+ * Note: this is a bad mixin tutorial by yours truly, Sarinsa
+ *
  * This is our EntityRendererManager mixin!
  *
- * All mixin classes must be annotated with @Mixin(TargetClass)
+ * All mixin classes must be annotated with @Mixin(TargetClass.class)
  *
  * Also note that all mixin classes must exist in their own dedicated mixin package. Having a non-mixin class
  * inside the package you have specified to be your mixin package will not go well.
@@ -31,20 +35,20 @@ import org.spongepowered.asm.mixin.injection.Redirect;
  *       the mixin config can be found inside the mod's resources folder: "specialmobs.mixins.json".
  *       When you remove this mixin from the config, it will no longer be active.
  */
-@Mixin(EntityRendererManager.class)
-public abstract class EntityRendererManagerMixin {
+@Mixin(EntityRenderDispatcher.class)
+public abstract class EntityRendererManagerMixin implements ResourceManagerReloadListener {
 
     /**
      *  Constructor matching target class constructor. Not required in this case, but generally nice to have
      */
-    public EntityRendererManagerMixin(TextureManager textureManager, ItemRenderer p_i226034_2_, IReloadableResourceManager resourceManager, FontRenderer fontRenderer, GameSettings gameSettings) {
+    public EntityRendererManagerMixin(Minecraft game, TextureManager textureManager, ItemRenderer itemRenderer, BlockRenderDispatcher brd, Font font, Options options, EntityModelSet modelSet) {
 
     }
 
     /**
      * Simple redirect injection.
      *
-     * Here we use the @Redirect annotation on a target method in our mixin target class.
+     * Here we use the @Redirect annotation to make a redirect injection on the target method.
      * This annotation lets us swap out invocations in the target method with our own.
      *
      * The first parameter of annotation is the target method name; the method we will be messing around with
@@ -62,8 +66,8 @@ public abstract class EntityRendererManagerMixin {
      *       the "name" of our injection method does not matter. It can be anything, but its not a bad idea to
      *       name it something intuitive.
      */
-    @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/entity/EntityRendererManager;renderShadow(Lcom/mojang/blaze3d/matrix/MatrixStack;Lnet/minecraft/client/renderer/IRenderTypeBuffer;Lnet/minecraft/entity/Entity;FFLnet/minecraft/world/IWorldReader;F)V"))
-    public void onRender(MatrixStack matrixStack, IRenderTypeBuffer buffer, Entity entity, float p_229096_3_, float p_229096_4_, IWorldReader worldReader, float p_229096_6_) {
+    @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/entity/EntityRenderDispatcher;renderShadow(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;Lnet/minecraft/world/entity/Entity;FFLnet/minecraft/world/level/LevelReader;F)V"))
+    public void onRender(PoseStack poseStack, MultiBufferSource bufferSource, Entity entity, float p_229096_3_, float p_229096_4_, LevelReader levelReader, float p_229096_6_) {
 
     }
 }

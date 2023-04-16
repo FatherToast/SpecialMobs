@@ -8,7 +8,6 @@ import fathertoast.specialmobs.common.config.species.DrowningCreeperSpeciesConfi
 import fathertoast.specialmobs.common.config.species.SpeciesConfig;
 import fathertoast.specialmobs.common.config.util.EnvironmentEntry;
 import fathertoast.specialmobs.common.config.util.EnvironmentList;
-import fathertoast.specialmobs.common.config.util.environment.biome.BiomeCategory;
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.entity.ai.AIHelper;
 import fathertoast.specialmobs.common.entity.ai.AmphibiousMovementController;
@@ -21,29 +20,33 @@ import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootEntryItemBuilder;
 import fathertoast.specialmobs.datagen.loot.LootPoolBuilder;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.entity.*;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.entity.ai.goal.SwimGoal;
-import net.minecraft.entity.passive.fish.PufferfishEntity;
-import net.minecraft.item.Items;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.pathfinding.GroundPathNavigator;
-import net.minecraft.pathfinding.PathNodeType;
-import net.minecraft.pathfinding.SwimmerPathNavigator;
-import net.minecraft.state.properties.BlockStateProperties;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.tags.BiomeTags;
 import net.minecraft.tags.BlockTags;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.Explosion;
-import net.minecraft.world.IServerWorld;
-import net.minecraft.world.IWorldReader;
-import net.minecraft.world.World;
-import net.minecraft.world.biome.Biome;
-import net.minecraft.world.biome.Biomes;
-
-import java.util.Random;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.MoverType;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.ai.goal.FloatGoal;
+import net.minecraft.world.entity.ai.navigation.GroundPathNavigation;
+import net.minecraft.world.entity.ai.navigation.WaterBoundPathNavigation;
+import net.minecraft.world.entity.animal.Pufferfish;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Explosion;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.ServerLevelAccessor;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.biome.Biomes;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.pathfinder.BlockPathTypes;
+import net.minecraft.world.phys.Vec3;
 
 @SpecialMob
 public class DrowningCreeperEntity extends _SpecialCreeperEntity implements IAmphibiousMob {
@@ -65,10 +68,9 @@ public class DrowningCreeperEntity extends _SpecialCreeperEntity implements IAmp
     public static SpeciesConfig createConfig( MobFamily.Species<?> species ) {
         SpeciesConfig.NEXT_NATURAL_SPAWN_CHANCE_EXCEPTIONS = new EnvironmentList(
                 EnvironmentEntry.builder( 0.06F ).inBiome( Biomes.WARM_OCEAN ).build(),
-                EnvironmentEntry.builder( 0.06F ).inBiome( Biomes.DEEP_WARM_OCEAN ).build(),
-                EnvironmentEntry.builder( 0.06F ).inBiomeCategory( BiomeCategory.RIVER ).build(),
-                EnvironmentEntry.builder( 0.02F ).inBiomeCategory( BiomeCategory.OCEAN ).belowSeaDepths().build(),
-                EnvironmentEntry.builder( 0.0F ).inBiomeCategory( BiomeCategory.OCEAN ).build() );
+                EnvironmentEntry.builder( 0.06F ).inBiomeTag( BiomeTags.IS_RIVER ).build(),
+                EnvironmentEntry.builder( 0.02F ).inBiomeTag( BiomeTags.IS_OCEAN ).belowSeaDepths().build(),
+                EnvironmentEntry.builder( 0.0F ).inBiomeTag( BiomeTags.IS_OCEAN ).build() );
         return new DrowningCreeperSpeciesConfig( species, false, false, false,
                 0.25, 2, 4 );
     }
@@ -83,18 +85,18 @@ public class DrowningCreeperEntity extends _SpecialCreeperEntity implements IAmp
                 DrowningCreeperEntity::checkSpeciesSpawnRules );
     }
     
-    public static boolean checkSpeciesSpawnRules( EntityType<? extends DrowningCreeperEntity> type, IServerWorld world,
-                                                  SpawnReason reason, BlockPos pos, Random random ) {
-        final Biome.Category biomeCategory = world.getBiome( pos ).getBiomeCategory();
-        if( biomeCategory == Biome.Category.OCEAN || biomeCategory == Biome.Category.RIVER ) {
-            return NaturalSpawnManager.checkSpawnRulesWater( type, world, reason, pos, random );
+    public static boolean checkSpeciesSpawnRules(EntityType<? extends DrowningCreeperEntity> type, ServerLevelAccessor level,
+                                                 MobSpawnType spawnType, BlockPos pos, RandomSource random ) {
+        final Holder<Biome> biome = level.getBiome( pos );
+        if( biome.is(BiomeTags.IS_OCEAN) || biome.is(BiomeTags.IS_RIVER) ) {
+            return NaturalSpawnManager.checkSpawnRulesWater( type, level, spawnType, pos, random );
         }
-        return NaturalSpawnManager.checkSpawnRulesDefault( type, world, reason, pos, random );
+        return NaturalSpawnManager.checkSpawnRulesDefault( type, level, spawnType, pos, random );
     }
     
     /** @return True if this entity's position is currently obstructed. */
     @Override
-    public boolean checkSpawnObstruction( IWorldReader world ) { return world.isUnobstructed( this ); }
+    public boolean checkSpawnObstruction( LevelReader level ) { return level.isUnobstructed( this ); }
     
     @SpecialMob.LanguageProvider
     public static String[] getTranslations( String langKey ) {
@@ -115,7 +117,7 @@ public class DrowningCreeperEntity extends _SpecialCreeperEntity implements IAmp
     }
     
     @SpecialMob.Factory
-    public static EntityType.IFactory<DrowningCreeperEntity> getVariantFactory() { return DrowningCreeperEntity::new; }
+    public static EntityType.EntityFactory<DrowningCreeperEntity> getVariantFactory() { return DrowningCreeperEntity::new; }
     
     /** @return This entity's mob species. */
     @SpecialMob.SpeciesSupplier
@@ -128,13 +130,13 @@ public class DrowningCreeperEntity extends _SpecialCreeperEntity implements IAmp
     /** The maximum number of pufferfish spawned on explosion. */
     private int pufferfish;
     
-    public DrowningCreeperEntity( EntityType<? extends _SpecialCreeperEntity> entityType, World world ) {
-        super( entityType, world );
+    public DrowningCreeperEntity( EntityType<? extends _SpecialCreeperEntity> entityType, Level level ) {
+        super( entityType, level );
         moveControl = new AmphibiousMovementController<>( this );
-        waterNavigation = new SwimmerPathNavigator( this, world );
-        groundNavigation = new GroundPathNavigator( this, world );
+        waterNavigation = new WaterBoundPathNavigation( this, level );
+        groundNavigation = new GroundPathNavigation( this, level );
         maxUpStep = 1.0F;
-        setPathfindingMalus( PathNodeType.WATER, PathNodeType.WALKABLE.getMalus() );
+        setPathfindingMalus( BlockPathTypes.WATER, BlockPathTypes.WALKABLE.getMalus() );
         
         pufferfish = getConfig().DROWNING.puffPuffs.next( random );
     }
@@ -142,7 +144,7 @@ public class DrowningCreeperEntity extends _SpecialCreeperEntity implements IAmp
     /** Override to change this entity's AI goals. */
     @Override
     protected void registerVariantGoals() {
-        AIHelper.removeGoals( goalSelector, SwimGoal.class );
+        AIHelper.removeGoals( goalSelector, FloatGoal.class );
         AIHelper.insertGoal( goalSelector, 5, new AmphibiousGoToWaterGoal( this, 1.0 ).alwaysEnabled() );
         AIHelper.insertGoal( goalSelector, 6, new AmphibiousSwimUpGoal<>( this, 1.0 ) );
         AIHelper.replaceWaterAvoidingRandomWalking( this, 0.8 );
@@ -155,13 +157,13 @@ public class DrowningCreeperEntity extends _SpecialCreeperEntity implements IAmp
     /** Override to change this creeper's explosion. */
     @Override
     protected void makeVariantExplosion( float explosionPower ) {
-        final Explosion.Mode explosionMode = ExplosionHelper.getMode( this );
+        final Explosion.BlockInteraction explosionMode = ExplosionHelper.getMode( this );
         final ExplosionHelper explosion = new ExplosionHelper( this,
-                explosionMode == Explosion.Mode.NONE ? explosionPower : 1.0F, explosionMode, false );
+                explosionMode == Explosion.BlockInteraction.NONE ? explosionPower : 1.0F, explosionMode, false );
         if( !explosion.initializeExplosion() ) return;
         explosion.finalizeExplosion();
         
-        if( explosionMode == Explosion.Mode.NONE ) return;
+        if( explosionMode == Explosion.BlockInteraction.NONE ) return;
         
         final UnderwaterSilverfishBlock.Type mainType = UnderwaterSilverfishBlock.Type.next( random );
         final UnderwaterSilverfishBlock.Type rareType = UnderwaterSilverfishBlock.Type.next( random );
@@ -228,8 +230,8 @@ public class DrowningCreeperEntity extends _SpecialCreeperEntity implements IAmp
     
     /** Helper method to simplify spawning pufferfish. */
     private void spawnPufferfish( BlockPos pos ) {
-        if( !(level instanceof IServerWorld) ) return;
-        final PufferfishEntity lePuffPuff = EntityType.PUFFERFISH.create( level );
+        if( !(level instanceof ServerLevelAccessor) ) return;
+        final Pufferfish lePuffPuff = EntityType.PUFFERFISH.create( level );
         if( lePuffPuff != null ) {
             lePuffPuff.setPos( pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5 );
             level.addFreshEntity( lePuffPuff );
@@ -267,24 +269,24 @@ public class DrowningCreeperEntity extends _SpecialCreeperEntity implements IAmp
     
     /** Override to save data to this entity's NBT data. */
     @Override
-    public void addVariantSaveData( CompoundNBT saveTag ) {
+    public void addVariantSaveData( CompoundTag saveTag ) {
         saveTag.putByte( References.TAG_SUMMONS, (byte) pufferfish );
     }
     
     /** Override to load data from this entity's NBT data. */
     @Override
-    public void readVariantSaveData( CompoundNBT saveTag ) {
+    public void readVariantSaveData( CompoundTag saveTag ) {
         if( saveTag.contains( References.TAG_SUMMONS, References.NBT_TYPE_NUMERICAL ) )
             pufferfish = saveTag.getByte( References.TAG_SUMMONS );
         
-        setPathfindingMalus( PathNodeType.WATER, PathNodeType.WALKABLE.getMalus() );
+        setPathfindingMalus( BlockPathTypes.WATER, BlockPathTypes.WALKABLE.getMalus() );
     }
     
     
     //--------------- IAmphibiousMob Implementation ----------------
     
-    private final SwimmerPathNavigator waterNavigation;
-    private final GroundPathNavigator groundNavigation;
+    private final WaterBoundPathNavigation waterNavigation;
+    private final GroundPathNavigation groundNavigation;
     
     private boolean swimmingUp;
     
@@ -305,7 +307,7 @@ public class DrowningCreeperEntity extends _SpecialCreeperEntity implements IAmp
     
     /** Moves this entity in the desired direction. Input magnitude of < 1 scales down movement speed. */
     @Override
-    public void travel( Vector3d input ) {
+    public void travel( Vec3 input ) {
         if( isEffectiveAi() && isUnderWater() && shouldSwim() ) {
             moveRelative( 0.01F, input );
             move( MoverType.SELF, getDeltaMovement() );

@@ -9,20 +9,11 @@ import fathertoast.specialmobs.common.core.register.SMItems;
 import fathertoast.specialmobs.common.entity.projectile.IncorporealFireballEntity;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.datasync.DataParameter;
-import net.minecraft.network.datasync.DataSerializers;
-import net.minecraft.network.datasync.EntityDataManager;
-import net.minecraft.particles.ParticleTypes;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 
 @SpecialMob
 public class CorporealShiftGhastEntity extends _SpecialGhastEntity {
@@ -62,17 +53,16 @@ public class CorporealShiftGhastEntity extends _SpecialGhastEntity {
     }
     
     @SpecialMob.Factory
-    public static EntityType.IFactory<CorporealShiftGhastEntity> getVariantFactory() { return CorporealShiftGhastEntity::new; }
+    public static EntityType.EntityFactory<CorporealShiftGhastEntity> getVariantFactory() { return CorporealShiftGhastEntity::new; }
     
     /** @return This entity's mob species. */
     @SpecialMob.SpeciesSupplier
     @Override
     public MobFamily.Species<? extends CorporealShiftGhastEntity> getSpecies() { return SPECIES; }
     
-    
     //--------------- Variant-Specific Implementations ----------------
     
-    public static final DataParameter<Boolean> CORPOREAL = EntityDataManager.defineId( CorporealShiftGhastEntity.class, DataSerializers.BOOLEAN );
+    public static final EntityDataAccessor<Boolean> CORPOREAL = SynchedEntityData.defineId( CorporealShiftGhastEntity.class, EntityDataSerializers.BOOLEAN );
     
     private int shiftTime;
     

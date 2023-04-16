@@ -1,7 +1,6 @@
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
 package fathertoast.specialmobs.common.entity.ai.goal;
-
-import mcp.MethodsReturnNonnullByDefault;
+import net.minecraft.MethodsReturnNonnullByDefault;
 
 import javax.annotation.ParametersAreNonnullByDefault;

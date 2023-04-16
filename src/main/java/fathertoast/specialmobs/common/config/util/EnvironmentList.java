@@ -2,8 +2,8 @@ package fathertoast.specialmobs.common.config.util;
 
 import fathertoast.specialmobs.common.config.field.DoubleField;
 import fathertoast.specialmobs.common.config.file.TomlHelper;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -62,21 +62,21 @@ public class EnvironmentList implements IStringArray {
     }
     
     /** @return The value matching the given environment, or the default value if no matching environment is defined. */
-    public double getOrElse( World world, @Nullable BlockPos pos, DoubleField defaultValue ) {
-        return getOrElse( world, pos, defaultValue.get() );
+    public double getOrElse(Level level, @Nullable BlockPos pos, DoubleField defaultValue ) {
+        return getOrElse( level, pos, defaultValue.get() );
     }
     
     /** @return The value matching the given environment, or the default value if no matching environment is defined. */
-    public double getOrElse( World world, @Nullable BlockPos pos, double defaultValue ) {
-        final Double value = get( world, pos );
+    public double getOrElse( Level level, @Nullable BlockPos pos, double defaultValue ) {
+        final Double value = get( level, pos );
         return value == null ? defaultValue : value;
     }
     
     /** @return The value matching the given environment, or null if no matching environment is defined. */
     @Nullable
-    public Double get( World world, @Nullable BlockPos pos ) {
+    public Double get( Level level, @Nullable BlockPos pos ) {
         for( EnvironmentEntry entry : ENTRIES ) {
-            if( entry.matches( world, pos ) ) return entry.VALUE;
+            if( entry.matches( level, pos ) ) return entry.VALUE;
         }
         return null;
     }

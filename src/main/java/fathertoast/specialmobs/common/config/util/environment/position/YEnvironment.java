@@ -4,8 +4,8 @@ import fathertoast.specialmobs.common.config.field.AbstractConfigField;
 import fathertoast.specialmobs.common.config.field.EnvironmentListField;
 import fathertoast.specialmobs.common.config.util.environment.CompareIntEnvironment;
 import fathertoast.specialmobs.common.config.util.environment.ComparisonOperator;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 
 import javax.annotation.Nullable;
 
@@ -21,5 +21,5 @@ public class YEnvironment extends CompareIntEnvironment {
     
     /** @return Returns the actual value to compare, or null if there isn't enough information. */
     @Override
-    public Integer getActual( World world, @Nullable BlockPos pos ) { return pos == null ? null : pos.getY(); }
+    public Integer getActual( Level level, @Nullable BlockPos pos ) { return pos == null ? null : pos.getY(); }
 }

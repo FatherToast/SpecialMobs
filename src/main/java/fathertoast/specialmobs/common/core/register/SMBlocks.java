@@ -3,13 +3,13 @@ package fathertoast.specialmobs.common.core.register;
 import fathertoast.specialmobs.common.block.MeltingIceBlock;
 import fathertoast.specialmobs.common.block.UnderwaterSilverfishBlock;
 import fathertoast.specialmobs.common.core.SpecialMobs;
-import net.minecraft.block.Block;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemGroup;
-import net.minecraftforge.fml.RegistryObject;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.block.Block;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.RegistryObject;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -27,16 +27,16 @@ public class SMBlocks {
     static {
         final ArrayList<RegistryObject<Block>> infestedCoral = new ArrayList<>();
         for( UnderwaterSilverfishBlock.Type type : UnderwaterSilverfishBlock.Type.values() ) {
-            infestedCoral.add( registerBlock( type.blockId(), type::blockSupplier, ItemGroup.TAB_DECORATIONS ) );
+            infestedCoral.add( registerBlock( type.blockId(), type::blockSupplier, CreativeModeTab.TAB_DECORATIONS ) );
         }
         infestedCoral.trimToSize();
         INFESTED_CORAL = Collections.unmodifiableList( infestedCoral );
     }
     
     /** Registers a block and a simple BlockItem for it. */
-    private static <T extends Block> RegistryObject<T> registerBlock( String name, Supplier<T> blockSupplier, ItemGroup itemGroup ) {
+    private static <T extends Block> RegistryObject<T> registerBlock( String name, Supplier<T> blockSupplier, CreativeModeTab creativeTab ) {
         final RegistryObject<T> blockRegObject = REGISTRY.register( name, blockSupplier );
-        SMItems.REGISTRY.register( name, () -> new BlockItem( blockRegObject.get(), new Item.Properties().tab( itemGroup ) ) );
+        SMItems.REGISTRY.register( name, () -> new BlockItem( blockRegObject.get(), new Item.Properties().tab( creativeTab ) ) );
         return blockRegObject;
     }
     

@@ -3,7 +3,8 @@ package fathertoast.specialmobs.common.config.field;
 import fathertoast.specialmobs.common.config.file.TomlHelper;
 import fathertoast.specialmobs.common.config.util.EnvironmentEntry;
 import fathertoast.specialmobs.common.config.util.EnvironmentList;
-import fathertoast.specialmobs.common.config.util.environment.*;
+import fathertoast.specialmobs.common.config.util.environment.AbstractEnvironment;
+import fathertoast.specialmobs.common.config.util.environment.ComparisonOperator;
 import fathertoast.specialmobs.common.config.util.environment.biome.*;
 import fathertoast.specialmobs.common.config.util.environment.dimension.DimensionPropertyEnvironment;
 import fathertoast.specialmobs.common.config.util.environment.dimension.DimensionTypeEnvironment;
@@ -11,8 +12,9 @@ import fathertoast.specialmobs.common.config.util.environment.dimension.Dimensio
 import fathertoast.specialmobs.common.config.util.environment.position.*;
 import fathertoast.specialmobs.common.config.util.environment.time.*;
 import fathertoast.specialmobs.common.core.SpecialMobs;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.tags.BiomeTags;
+import net.minecraft.world.level.Level;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -40,7 +42,7 @@ public class EnvironmentListField extends GenericField<EnvironmentList> {
     public static final String ENV_RAINFALL = "rainfall";
     public static final String ENV_BIOME_TEMPERATURE = "biome_temp";
     public static final String ENV_TEMPERATURE = "temp";
-    public static final String ENV_BIOME_CATEGORY = "biome_category";
+    public static final String ENV_BIOME_TAG = "biome_tag";
     public static final String ENV_BIOME = "biome";
     // Position-based
     public static final String ENV_STRUCTURE = "structure";
@@ -97,8 +99,8 @@ public class EnvironmentListField extends GenericField<EnvironmentList> {
         comment.add( "    Biome's temperature parameter. For reference, freezing is < 0.15 and hot is generally considered > 0.95." );
         comment.add( "  \"" + ENV_TEMPERATURE + " op value\" or \"" + ENV_TEMPERATURE + " (!)" + TemperatureEnvironment.FREEZING + "\":" );
         comment.add( "    Height-adjusted temperature. For reference, freezing is < 0.15 and hot is generally considered > 0.95." );
-        comment.add( "  \"" + ENV_BIOME_CATEGORY + " (!)category\":" );
-        comment.add( "    Valid category values: " + TomlHelper.literalList( (Object[]) BiomeCategory.values() ) );
+        comment.add( "  \"" + ENV_BIOME_TAG + " (!)namespace:tag_name\":" );
+        comment.add( "    Some existing biome tags: " + TomlHelper.literalList( BiomeTags.HAS_IGLOO, BiomeTags.IS_JUNGLE, BiomeTags.HAS_DESERT_PYRAMID, BiomeTags.HAS_END_CITY ) );
         comment.add( "  \"" + ENV_BIOME + " (!)namespace:biome_name\":" );
         comment.add( "    The biome. See the wiki for vanilla biome names (resource locations) [https://minecraft.fandom.com/wiki/Biome#Biome_IDs]." );
         // Position-based
@@ -245,8 +247,8 @@ public class EnvironmentListField extends GenericField<EnvironmentList> {
                 return new BiomeTemperatureEnvironment( this, value );
             case ENV_TEMPERATURE:
                 return new TemperatureEnvironment( this, value );
-            case ENV_BIOME_CATEGORY:
-                return new BiomeCategoryEnvironment( this, value );
+            case ENV_BIOME_TAG:
+                return new BiomeTagKeyEnvironment( this, value );
             case ENV_BIOME:
                 return value.endsWith( "*" ) ? new BiomeGroupEnvironment( this, value ) : new BiomeEnvironment( this, value );
             // Position-based
@@ -284,7 +286,7 @@ public class EnvironmentListField extends GenericField<EnvironmentList> {
                 // Dimension-based
                 ENV_DIMENSION_PROPERTY, ENV_DIMENSION_TYPE,
                 // Biome-based
-                ENV_TERRAIN_DEPTH, ENV_TERRAIN_SCALE, ENV_RAINFALL, ENV_BIOME_TEMPERATURE, ENV_TEMPERATURE, ENV_BIOME_CATEGORY, ENV_BIOME,
+                ENV_TERRAIN_DEPTH, ENV_TERRAIN_SCALE, ENV_RAINFALL, ENV_BIOME_TEMPERATURE, ENV_TEMPERATURE, ENV_BIOME_TAG, ENV_BIOME,
                 // Position-based
                 ENV_STRUCTURE, ENV_Y, ENV_Y_FROM_SEA, ENV_POSITION,
                 // Time-based
@@ -301,12 +303,12 @@ public class EnvironmentListField extends GenericField<EnvironmentList> {
     // Convenience methods
     
     /** @return The value matching the given environment, or the default value if no matching environment is defined. */
-    public double getOrElse( World world, @Nullable BlockPos pos, DoubleField defaultValue ) { return get().getOrElse( world, pos, defaultValue ); }
+    public double getOrElse( Level level, @Nullable BlockPos pos, DoubleField defaultValue ) { return get().getOrElse( level, pos, defaultValue ); }
     
     /** @return The value matching the given environment, or the default value if no matching environment is defined. */
-    public double getOrElse( World world, @Nullable BlockPos pos, double defaultValue ) { return get().getOrElse( world, pos, defaultValue ); }
+    public double getOrElse( Level level, @Nullable BlockPos pos, double defaultValue ) { return get().getOrElse( level, pos, defaultValue ); }
     
     /** @return The value matching the given environment, or null if no matching environment is defined. */
     @Nullable
-    public Double get( World world, @Nullable BlockPos pos ) { return get().get( world, pos ); }
+    public Double get( Level level, @Nullable BlockPos pos ) { return get().get( level, pos ); }
 }

@@ -3,28 +3,34 @@ package fathertoast.specialmobs.common.block;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.core.register.SMBlocks;
 import fathertoast.specialmobs.common.util.References;
-import net.minecraft.block.*;
-import net.minecraft.block.material.Material;
-import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.enchantment.Enchantments;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.state.BooleanProperty;
-import net.minecraft.state.IntegerProperty;
-import net.minecraft.state.StateContainer;
-import net.minecraft.state.properties.BlockStateProperties;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.stats.Stats;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.LightType;
-import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.enchantment.Enchantments;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LightLayer;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.IceBlock;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
+import net.minecraft.world.level.material.FlowingFluid;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.phys.HitResult;
 
 import javax.annotation.Nullable;
-import java.util.Random;
 
 public class MeltingIceBlock extends IceBlock {
     
@@ -35,26 +41,26 @@ public class MeltingIceBlock extends IceBlock {
     }
     
     /** @return The state that should be placed. */
-    public static BlockState getState( World world, BlockPos pos ) {
-        final BlockState currentBlock = world.getBlockState( pos );
+    public static BlockState getState(Level level, BlockPos pos ) {
+        final BlockState currentBlock = level.getBlockState( pos );
         return SMBlocks.MELTING_ICE.get().defaultBlockState().setValue( HAS_WATER,
                 currentBlock.is( Blocks.FROSTED_ICE ) ||
-                        currentBlock.getBlock() == Blocks.WATER && currentBlock.getValue( FlowingFluidBlock.LEVEL ) == 0 );
+                        currentBlock.getBlock() == Blocks.WATER && currentBlock.getValue( FlowingFluid.LEVEL ) == 0 );
     }
     
     /** Call this after placing a melting ice block to trigger its melting logic. */
-    public static void scheduleFirstTick( World world, BlockPos pos, Random random ) {
-        world.getBlockTicks().scheduleTick( pos, SMBlocks.MELTING_ICE.get(), MathHelper.nextInt( random, 60, 120 ) );
+    public static void scheduleFirstTick( Level level, BlockPos pos, RandomSource random ) {
+        level.scheduleTick( pos, SMBlocks.MELTING_ICE.get(), Mth.nextInt( random, 60, 120 ) );
     }
     
     /** Called after each melt logic tick to schedule the next tick. */
-    private void scheduleTick( World world, BlockPos pos, Random random ) {
-        final int darkness = 15 - getLight( world, pos );
+    private void scheduleTick( Level level, BlockPos pos, RandomSource random ) {
+        final int darkness = 15 - getLight( level, pos );
         
         int solidNeighbors = 0;
-        final BlockPos.Mutable neighborPos = new BlockPos.Mutable();
+        final BlockPos.MutableBlockPos neighborPos = new BlockPos.MutableBlockPos();
         for( Direction direction : Direction.Plane.HORIZONTAL ) {
-            if( world.getBlockState( neighborPos.setWithOffset( pos, direction ) ).getMaterial().isSolid() ) {
+            if( level.getBlockState( neighborPos.setWithOffset( pos, direction ) ).getMaterial().isSolid() ) {
                 solidNeighbors++;
             }
         }
@@ -62,15 +68,15 @@ public class MeltingIceBlock extends IceBlock {
         // The 'neutral' state is 0 block light and 0 solid neighbors - this gives the same tick rate as frosted ice (1-2s)
         // Max delay is same as the default 'first tick' delay (3-6s)
         final int delay = 5 + darkness + 10 * solidNeighbors;
-        world.getBlockTicks().scheduleTick( pos, this, MathHelper.nextInt( random, delay, delay << 1 ) );
+        level.scheduleTick( pos, this, Mth.nextInt( random, delay, delay << 1 ) );
     }
     
     /** @return The light level touching this block (0-15). We use this method because the block is solid. */
-    private static int getLight( World world, BlockPos pos ) {
+    private static int getLight( Level level, BlockPos pos ) {
         int highestLight = 0;
-        final BlockPos.Mutable neighborPos = new BlockPos.Mutable();
+        final BlockPos.MutableBlockPos neighborPos = new BlockPos.MutableBlockPos();
         for( Direction direction : Direction.values() ) {
-            final int neighborLight = world.getBrightness( LightType.BLOCK, neighborPos.setWithOffset( pos, direction ) );
+            final int neighborLight = level.getBrightness( LightLayer.BLOCK, neighborPos.setWithOffset( pos, direction ) );
             if( neighborLight > 14 ) return 15;
             if( neighborLight > highestLight ) highestLight = neighborLight;
         }
@@ -81,98 +87,98 @@ public class MeltingIceBlock extends IceBlock {
     public static final BooleanProperty HAS_WATER = BooleanProperty.create( "has_water" );
     
     public MeltingIceBlock() {
-        super( AbstractBlock.Properties.of( Material.ICE ).sound( SoundType.GLASS ).noOcclusion()
+        super( BlockBehaviour.Properties.of( Material.ICE ).sound( SoundType.GLASS ).noOcclusion()
                 .randomTicks().friction( 0.98F ).strength( 0.5F ) );
         registerDefaultState( stateDefinition.any().setValue( AGE, 0 ).setValue( HAS_WATER, true ) );
     }
     
     @Override
-    protected void createBlockStateDefinition( StateContainer.Builder<Block, BlockState> builder ) {
+    protected void createBlockStateDefinition( StateDefinition.Builder<Block, BlockState> builder ) {
         builder.add( AGE ).add( HAS_WATER );
     }
-    
-    @SuppressWarnings( "deprecation" )
+
     @Override
-    public ItemStack getCloneItemStack( IBlockReader world, BlockPos pos, BlockState state ) { return ItemStack.EMPTY; }
-    
+    public ItemStack getCloneItemStack(BlockState state, HitResult target, BlockGetter level, BlockPos pos, Player player) {
+        return ItemStack.EMPTY;
+    }
+
     @Override
-    public void playerDestroy( World world, PlayerEntity player, BlockPos pos, BlockState state,
-                               @Nullable TileEntity tileEntity, ItemStack tool ) {
+    public void playerDestroy( Level level, Player player, BlockPos pos, BlockState state,
+                              @Nullable BlockEntity blockEntity, ItemStack tool ) {
         player.awardStat( Stats.BLOCK_MINED.get( this ) );
         player.causeFoodExhaustion( 0.005F );
-        dropResources( state, world, pos, tileEntity, player, tool );
+        dropResources( state, level, pos, blockEntity, player, tool );
         
-        if( EnchantmentHelper.getItemEnchantmentLevel( Enchantments.SILK_TOUCH, tool ) == 0 ) {
-            melt( state, world, pos );
+        if( tool.getEnchantmentLevel( Enchantments.SILK_TOUCH ) == 0 ) {
+            melt( state, level, pos );
         }
     }
     
     @Override
-    public void randomTick( BlockState state, ServerWorld world, BlockPos pos, Random random ) { tick( state, world, pos, random ); }
+    public void randomTick( BlockState state, ServerLevel world, BlockPos pos, RandomSource random ) { tick( state, world, pos, random ); }
     
     @SuppressWarnings( "deprecation" )
     @Override
-    public void tick( BlockState state, ServerWorld world, BlockPos pos, Random random ) {
-        if( canMelt( world, pos ) ) {
-            if( slightlyMelt( state, world, pos, random ) ) {
-                final BlockPos.Mutable neighborPos = new BlockPos.Mutable();
-                trySlightlyMelt( world, neighborPos.setWithOffset( pos, Direction.DOWN ), random );
+    public void tick( BlockState state, ServerLevel level, BlockPos pos, RandomSource random ) {
+        if( canMelt( level, pos ) ) {
+            if( slightlyMelt( state, level, pos, random ) ) {
+                final BlockPos.MutableBlockPos neighborPos = new BlockPos.MutableBlockPos();
+                trySlightlyMelt( level, neighborPos.setWithOffset( pos, Direction.DOWN ), random );
                 for( Direction direction : Direction.Plane.HORIZONTAL ) {
-                    trySlightlyMelt( world, neighborPos.setWithOffset( pos, direction ), random );
+                    trySlightlyMelt( level, neighborPos.setWithOffset( pos, direction ), random );
                 }
             }
         }
-        else scheduleTick( world, pos, random );
+        else scheduleTick( level, pos, random );
     }
     
     /** @return True if the conditions allow melting. */
-    private boolean canMelt( World world, BlockPos pos ) {
+    private boolean canMelt( Level level, BlockPos pos ) {
         // If a bright-ish (torch or higher) light source is nearby, always allow melting
-        if( getLight( world, pos ) > 13 ) return true;
+        if( getLight( level, pos ) > 13 ) return true;
         
         // Otherwise, we want to prevent melting in two specific cases to get our desired melting pattern:
         //  * surrounded by other melting ice blocks horizontally (outside-in for ice floors/ceilings)
         //  * block below is non-air and block above is another melting ice block (top-down for ice walls)
-        final BlockPos.Mutable neighborPos = new BlockPos.Mutable();
+        final BlockPos.MutableBlockPos neighborPos = new BlockPos.MutableBlockPos();
         for( Direction direction : Direction.Plane.HORIZONTAL ) {
-            if( !world.getBlockState( neighborPos.setWithOffset( pos, direction ) ).is( this ) ) {
-                //noinspection deprecation
-                return !world.getBlockState( neighborPos.setWithOffset( pos, Direction.UP ) ).is( this ) ||
-                        world.getBlockState( neighborPos.setWithOffset( pos, Direction.DOWN ) ).isAir();
+            if( !level.getBlockState( neighborPos.setWithOffset( pos, direction ) ).is( this ) ) {
+                return !level.getBlockState( neighborPos.setWithOffset( pos, Direction.UP ) ).is( this ) ||
+                        level.getBlockState( neighborPos.setWithOffset( pos, Direction.DOWN ) ).isAir();
             }
         }
         return false;
     }
     
     /** Attempts to slightly melt a target block. */
-    private void trySlightlyMelt( World world, BlockPos pos, Random random ) {
-        final BlockState state = world.getBlockState( pos );
-        if( state.is( this ) && canMelt( world, pos ) ) slightlyMelt( state, world, pos, random );
+    private void trySlightlyMelt( Level level, BlockPos pos, RandomSource random ) {
+        final BlockState state = level.getBlockState( pos );
+        if( state.is( this ) && canMelt( level, pos ) ) slightlyMelt( state, level, pos, random );
     }
     
     /** @return Increments the block's melting and returns true if the block was completely melted. */
-    private boolean slightlyMelt( BlockState state, World world, BlockPos pos, Random random ) {
+    private boolean slightlyMelt( BlockState state, Level level, BlockPos pos, RandomSource random ) {
         int age = state.getValue( AGE );
         if( age < 3 ) {
-            world.setBlock( pos, state.setValue( AGE, age + 1 ), References.SetBlockFlags.UPDATE_CLIENT );
-            scheduleTick( world, pos, random );
+            level.setBlock( pos, state.setValue( AGE, age + 1 ), References.SetBlockFlags.UPDATE_CLIENT );
+            scheduleTick( level, pos, random );
             return false;
         }
         else {
-            melt( state, world, pos );
+            melt( state, level, pos );
             return true;
         }
     }
     
     /** Melts the ice block. */
     @Override
-    protected void melt( BlockState state, World world, BlockPos pos ) {
-        if( world.dimensionType().ultraWarm() || !state.getValue( HAS_WATER ) ) {
-            world.removeBlock( pos, false );
+    protected void melt( BlockState state, Level level, BlockPos pos ) {
+        if( level.dimensionType().ultraWarm() || !state.getValue( HAS_WATER ) ) {
+            level.removeBlock( pos, false );
         }
         else {
-            world.setBlockAndUpdate( pos, Blocks.WATER.defaultBlockState() );
-            world.neighborChanged( pos, Blocks.WATER, pos );
+            level.setBlockAndUpdate( pos, Blocks.WATER.defaultBlockState() );
+            level.neighborChanged( pos, Blocks.WATER, pos );
         }
     }
 }

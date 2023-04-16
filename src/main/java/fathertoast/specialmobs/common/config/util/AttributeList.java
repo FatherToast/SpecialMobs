@@ -1,8 +1,8 @@
 package fathertoast.specialmobs.common.config.util;
 
 import fathertoast.specialmobs.common.config.file.TomlHelper;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.AttributeModifierMap;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -51,7 +51,7 @@ public class AttributeList implements IStringArray {
     }
     
     /** Applies all attribute changes in this list to the entity attribute builder. */
-    public void apply( AttributeModifierMap.MutableAttribute builder ) {
+    public void apply( AttributeSupplier.Builder builder ) {
         for( AttributeEntry entry : ENTRIES ) entry.apply( builder );
     }
     

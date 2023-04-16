@@ -7,11 +7,11 @@ import fathertoast.specialmobs.common.config.species.CreeperSpeciesConfig;
 import fathertoast.specialmobs.common.config.species.SpeciesConfig;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
-import net.minecraft.block.Blocks;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.item.Items;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
 
 @SpecialMob
 public class DeathCreeperEntity extends _SpecialCreeperEntity {
@@ -49,7 +49,7 @@ public class DeathCreeperEntity extends _SpecialCreeperEntity {
     }
     
     @SpecialMob.Factory
-    public static EntityType.IFactory<DeathCreeperEntity> getVariantFactory() { return DeathCreeperEntity::new; }
+    public static EntityType.EntityFactory<DeathCreeperEntity> getVariantFactory() { return DeathCreeperEntity::new; }
     
     /** @return This entity's mob species. */
     @SpecialMob.SpeciesSupplier
@@ -59,7 +59,7 @@ public class DeathCreeperEntity extends _SpecialCreeperEntity {
     
     //--------------- Variant-Specific Implementations ----------------
     
-    public DeathCreeperEntity( EntityType<? extends _SpecialCreeperEntity> entityType, World world ) { super( entityType, world ); }
+    public DeathCreeperEntity( EntityType<? extends _SpecialCreeperEntity> entityType, Level level ) { super( entityType, level ); }
     
     /** Override to change this creeper's explosion power multiplier. */
     protected float getVariantExplosionPower( float radius ) { return super.getVariantExplosionPower( radius + 1.0F ); }

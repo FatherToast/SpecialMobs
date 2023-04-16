@@ -13,32 +13,32 @@ import fathertoast.specialmobs.common.event.NaturalSpawnManager;
 import fathertoast.specialmobs.common.util.ExplosionHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.*;
-import net.minecraft.entity.ai.attributes.AttributeModifierMap;
-import net.minecraft.entity.effect.LightningBoltEntity;
-import net.minecraft.entity.monster.CreeperEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.projectile.SnowballEntity;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.datasync.DataParameter;
-import net.minecraft.network.datasync.DataSerializers;
-import net.minecraft.network.datasync.EntityDataManager;
-import net.minecraft.pathfinding.PathNodeType;
-import net.minecraft.potion.EffectInstance;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.DifficultyInstance;
-import net.minecraft.world.IServerWorld;
-import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
+import net.minecraft.world.entity.monster.Creeper;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.Snowball;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.ServerLevelAccessor;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.pathfinder.BlockPathTypes;
+import net.minecraft.world.phys.Vec3;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
 @SpecialMob
-public class _SpecialCreeperEntity extends CreeperEntity implements IExplodingMob, ISpecialMob<_SpecialCreeperEntity> {
+public class _SpecialCreeperEntity extends Creeper implements IExplodingMob, ISpecialMob<_SpecialCreeperEntity> {
     
     //--------------- Static Special Mob Hooks ----------------
     
@@ -61,7 +61,7 @@ public class _SpecialCreeperEntity extends CreeperEntity implements IExplodingMo
     public CreeperSpeciesConfig getConfig() { return (CreeperSpeciesConfig) getSpecies().config; }
     
     @SpecialMob.AttributeSupplier
-    public static AttributeModifierMap.MutableAttribute createAttributes() { return CreeperEntity.createAttributes(); }
+    public static AttributeSupplier.Builder createAttributes() { return Creeper.createAttributes(); }
     
     @SpecialMob.SpawnPlacementRegistrar
     public static void registerSpawnPlacement( MobFamily.Species<? extends _SpecialCreeperEntity> species ) {
@@ -80,7 +80,7 @@ public class _SpecialCreeperEntity extends CreeperEntity implements IExplodingMo
     }
     
     @SpecialMob.Factory
-    public static EntityType.IFactory<_SpecialCreeperEntity> getFactory() { return _SpecialCreeperEntity::new; }
+    public static EntityType.EntityFactory<_SpecialCreeperEntity> getFactory() { return _SpecialCreeperEntity::new; }
     
     
     //--------------- Variant-Specific Breakouts ----------------
@@ -97,12 +97,12 @@ public class _SpecialCreeperEntity extends CreeperEntity implements IExplodingMo
     
     /** Override to change starting equipment or stats. */
     @SuppressWarnings( "unused" )
-    public void finalizeVariantSpawn( IServerWorld world, DifficultyInstance difficulty, @Nullable SpawnReason spawnReason,
-                                      @Nullable ILivingEntityData groupData ) { }
+    public void finalizeVariantSpawn(ServerLevelAccessor level, DifficultyInstance difficulty, @Nullable MobSpawnType spawnType,
+                                     @Nullable SpawnGroupData groupData ) { }
     
     /** Called when this entity successfully damages a target to apply on-hit effects. */
     @Override
-    public void doEnchantDamageEffects( LivingEntity attacker, Entity target ) {
+    public void doEnchantDamageEffects(LivingEntity attacker, Entity target ) {
         if( target instanceof LivingEntity ) onVariantAttack( (LivingEntity) target );
         super.doEnchantDamageEffects( attacker, target );
     }
@@ -117,7 +117,7 @@ public class _SpecialCreeperEntity extends CreeperEntity implements IExplodingMo
         if( !level.isClientSide ) {
             dead = true;
             makeVariantExplosion( getVariantExplosionPower( explosionRadius ) );
-            remove();
+            discard();
             spawnLingeringCloud();
         }
     }
@@ -133,18 +133,18 @@ public class _SpecialCreeperEntity extends CreeperEntity implements IExplodingMo
     /** Called to create a lingering effect cloud as part of this creeper's explosion 'attack'. */
     @Override
     protected void spawnLingeringCloud() {
-        final List<EffectInstance> effects = new ArrayList<>( getActiveEffects() );
+        final List<MobEffectInstance> effects = new ArrayList<>( getActiveEffects() );
         modifyVariantLingeringCloudEffects( effects );
         
         if( !effects.isEmpty() ) {
-            final AreaEffectCloudEntity potionCloud = new AreaEffectCloudEntity( level, getX(), getY(), getZ() );
+            final AreaEffectCloud potionCloud = new AreaEffectCloud( level, getX(), getY(), getZ() );
             potionCloud.setRadius( getVariantExplosionPower( explosionRadius - 0.5F ) );
             potionCloud.setRadiusOnUse( -0.5F );
             potionCloud.setWaitTime( 10 );
             potionCloud.setDuration( potionCloud.getDuration() / 2 );
             potionCloud.setRadiusPerTick( -potionCloud.getRadius() / (float) potionCloud.getDuration() );
-            for( EffectInstance effect : effects ) {
-                potionCloud.addEffect( new EffectInstance( effect ) );
+            for( MobEffectInstance effect : effects ) {
+                potionCloud.addEffect( new MobEffectInstance( effect ) );
             }
             modifyVariantLingeringCloud( potionCloud );
             level.addFreshEntity( potionCloud );
@@ -155,25 +155,25 @@ public class _SpecialCreeperEntity extends CreeperEntity implements IExplodingMo
      * Override to change effects applied by the lingering cloud left by this creeper's explosion.
      * If this list is empty, the lingering cloud is not created.
      */
-    protected void modifyVariantLingeringCloudEffects( List<EffectInstance> potions ) { }
+    protected void modifyVariantLingeringCloudEffects( List<MobEffectInstance> potions ) { }
     
     /** Override to change stats of the lingering cloud left by this creeper's explosion. */
-    protected void modifyVariantLingeringCloud( AreaEffectCloudEntity potionCloud ) { }
+    protected void modifyVariantLingeringCloud( AreaEffectCloud potionCloud ) { }
     
     /** Override to save data to this entity's NBT data. */
-    public void addVariantSaveData( CompoundNBT saveTag ) { }
+    public void addVariantSaveData( CompoundTag saveTag ) { }
     
     /** Override to load data from this entity's NBT data. */
-    public void readVariantSaveData( CompoundNBT saveTag ) { }
+    public void readVariantSaveData( CompoundTag saveTag ) { }
     
     
     //--------------- Family-Specific Implementations ----------------
     
     /** The parameter for special mob render scale. */
-    private static final DataParameter<Float> SCALE = EntityDataManager.defineId( _SpecialCreeperEntity.class, DataSerializers.FLOAT );
+    private static final EntityDataAccessor<Float> SCALE = SynchedEntityData.defineId( _SpecialCreeperEntity.class, EntityDataSerializers.FLOAT );
     
-    public _SpecialCreeperEntity( EntityType<? extends _SpecialCreeperEntity> entityType, World world ) {
-        super( entityType, world );
+    public _SpecialCreeperEntity( EntityType<? extends _SpecialCreeperEntity> entityType, Level level ) {
+        super( entityType, level );
         setCannotExplodeWhileWet( !getConfig().CREEPERS.canExplodeWhileWet.get() );
         setExplodesWhileBurning( getConfig().CREEPERS.explodesWhileBurning.get() );
         setExplodesWhenShot( getConfig().CREEPERS.explodesWhenShot.get() );
@@ -208,9 +208,9 @@ public class _SpecialCreeperEntity extends CreeperEntity implements IExplodingMo
     
     /** Called when this entity is struck by lightning. */
     @Override
-    public void thunderHit( ServerWorld world, LightningBoltEntity lightningBolt ) {
+    public void thunderHit( ServerLevel level, LightningBolt lightningBolt ) {
         charge();
-        super.thunderHit( world, lightningBolt );
+        super.thunderHit( level, lightningBolt );
         
         // Make it less likely for charged "explode while burning" creepers to immediately explode
         if( explodesWhileBurning() ) clearFire();
@@ -220,7 +220,7 @@ public class _SpecialCreeperEntity extends CreeperEntity implements IExplodingMo
     //--------------- Creeper Explosion Property Setters/Getters ----------------
     
     /** The parameter for creeper explosion properties. This is a combination of boolean flags. */
-    private static final DataParameter<Byte> EXPLODE_FLAGS = EntityDataManager.defineId( _SpecialCreeperEntity.class, DataSerializers.BYTE );
+    private static final EntityDataAccessor<Byte> EXPLODE_FLAGS = SynchedEntityData.defineId( _SpecialCreeperEntity.class, EntityDataSerializers.BYTE );
     
     /** The bit for "is supercharged". */
     private static final byte EXPLODE_FLAG_SUPERCHARGED = 0b0001;
@@ -264,7 +264,7 @@ public class _SpecialCreeperEntity extends CreeperEntity implements IExplodingMo
     /** Sets this creeper's capability to explode while wet. */
     private void setCannotExplodeWhileWet( boolean value ) {
         setExplodeFlag( EXPLODE_FLAG_DEFUSE_IN_WATER, value );
-        setPathfindingMalus( PathNodeType.WATER, value ? PathNodeType.LAVA.getMalus() : PathNodeType.WATER.getMalus() );
+        setPathfindingMalus( BlockPathTypes.WATER, value ? BlockPathTypes.LAVA.getMalus() : BlockPathTypes.WATER.getMalus() );
     }
     
     /** @return True if this creeper explodes while burning. */
@@ -274,12 +274,12 @@ public class _SpecialCreeperEntity extends CreeperEntity implements IExplodingMo
     private void setExplodesWhileBurning( boolean value ) {
         setExplodeFlag( EXPLODE_FLAG_ON_FIRE, value );
         if( value ) {
-            setPathfindingMalus( PathNodeType.DANGER_FIRE, PathNodeType.DAMAGE_FIRE.getMalus() );
-            setPathfindingMalus( PathNodeType.DAMAGE_FIRE, PathNodeType.BLOCKED.getMalus() );
+            setPathfindingMalus( BlockPathTypes.DANGER_FIRE, BlockPathTypes.DAMAGE_FIRE.getMalus() );
+            setPathfindingMalus( BlockPathTypes.DAMAGE_FIRE, BlockPathTypes.BLOCKED.getMalus() );
         }
         else {
-            setPathfindingMalus( PathNodeType.DANGER_FIRE, PathNodeType.DANGER_FIRE.getMalus() );
-            setPathfindingMalus( PathNodeType.DAMAGE_FIRE, PathNodeType.DAMAGE_FIRE.getMalus() );
+            setPathfindingMalus( BlockPathTypes.DANGER_FIRE, BlockPathTypes.DANGER_FIRE.getMalus() );
+            setPathfindingMalus( BlockPathTypes.DAMAGE_FIRE, BlockPathTypes.DAMAGE_FIRE.getMalus() );
         }
     }
     
@@ -323,19 +323,19 @@ public class _SpecialCreeperEntity extends CreeperEntity implements IExplodingMo
     public final void setExperience( int xp ) { xpReward = xp; }
     
     @Override
-    public void setSpecialPathfindingMalus( PathNodeType nodeType, float malus ) {
-        this.setPathfindingMalus( nodeType, malus );
+    public void setSpecialPathfindingMalus( BlockPathTypes type, float malus ) {
+        this.setPathfindingMalus( type, malus );
     }
     
     
     /** Converts this entity to one of another type. */
     @Nullable
     @Override
-    public <T extends MobEntity> T convertTo( EntityType<T> entityType, boolean keepEquipment ) {
+    public <T extends Mob> T convertTo( EntityType<T> entityType, boolean keepEquipment ) {
         final T replacement = super.convertTo( entityType, keepEquipment );
-        if( replacement instanceof ISpecialMob && level instanceof IServerWorld ) {
-            MobHelper.finalizeSpawn( replacement, (IServerWorld) level, level.getCurrentDifficultyAt( blockPosition() ),
-                    SpawnReason.CONVERSION, null );
+        if( replacement instanceof ISpecialMob && level instanceof ServerLevelAccessor serverLevel ) {
+            MobHelper.finalizeSpawn( replacement, serverLevel, level.getCurrentDifficultyAt( blockPosition() ),
+                    MobSpawnType.CONVERSION, null );
         }
         return replacement;
     }
@@ -343,21 +343,21 @@ public class _SpecialCreeperEntity extends CreeperEntity implements IExplodingMo
     /** Called on spawn to initialize properties based on the world, difficulty, and the group it spawns with. */
     @Nullable
     @Override
-    public final ILivingEntityData finalizeSpawn( IServerWorld world, DifficultyInstance difficulty, SpawnReason spawnReason,
-                                                  @Nullable ILivingEntityData groupData, @Nullable CompoundNBT eggTag ) {
-        return MobHelper.finalizeSpawn( this, world, difficulty, spawnReason,
-                super.finalizeSpawn( world, difficulty, spawnReason, groupData, eggTag ) );
+    public final SpawnGroupData finalizeSpawn( ServerLevelAccessor level, DifficultyInstance difficulty, MobSpawnType spawnType,
+                                                  @Nullable SpawnGroupData groupData, @Nullable CompoundTag eggTag ) {
+        return MobHelper.finalizeSpawn( this, level, difficulty, spawnType,
+                super.finalizeSpawn( level, difficulty, spawnType, groupData, eggTag ) );
     }
     
     /** Called on spawn to set starting equipment. */
     @Override // Seal method to force spawn equipment changes through ISpecialMob
-    protected final void populateDefaultEquipmentSlots( DifficultyInstance difficulty ) { super.populateDefaultEquipmentSlots( difficulty ); }
+    protected final void populateDefaultEquipmentSlots( RandomSource random, DifficultyInstance difficulty ) { super.populateDefaultEquipmentSlots( random, difficulty ); }
     
     /** Called on spawn to initialize properties based on the world, difficulty, and the group it spawns with. */
     @Override
-    public void finalizeSpecialSpawn( IServerWorld world, DifficultyInstance difficulty, @Nullable SpawnReason spawnReason,
-                                      @Nullable ILivingEntityData groupData ) {
-        if( world.getLevelData().isThundering() ) {
+    public void finalizeSpecialSpawn( ServerLevelAccessor level, DifficultyInstance difficulty, @Nullable MobSpawnType spawnType,
+                                      @Nullable SpawnGroupData groupData ) {
+        if( level.getLevelData().isThundering() ) {
             final double chargedChance = getConfig().CREEPERS.stormChargeChance.get() < 0.0 ?
                     MobFamily.CREEPER.config.CREEPERS.familyStormChargeChance.get() :
                     getConfig().CREEPERS.stormChargeChance.get();
@@ -365,7 +365,7 @@ public class _SpecialCreeperEntity extends CreeperEntity implements IExplodingMo
             if( random.nextDouble() < chargedChance ) charge();
         }
         
-        finalizeVariantSpawn( world, difficulty, spawnReason, groupData );
+        finalizeVariantSpawn( level, difficulty, spawnType, groupData );
     }
     
     
@@ -396,18 +396,18 @@ public class _SpecialCreeperEntity extends CreeperEntity implements IExplodingMo
     
     /** @return True if this entity can be leashed. */
     @Override
-    public boolean canBeLeashed( PlayerEntity player ) { return !isLeashed() && getSpecialData().allowLeashing(); }
+    public boolean canBeLeashed( Player player ) { return !isLeashed() && getSpecialData().allowLeashing(); }
     
     /** Sets this entity 'stuck' inside a block, such as a cobweb or sweet berry bush. Mod blocks could use this as a speed boost. */
     @Override
-    public void makeStuckInBlock( BlockState block, Vector3d speedMulti ) {
+    public void makeStuckInBlock( BlockState block, Vec3 speedMulti ) {
         if( getSpecialData().canBeStuckIn( block ) ) super.makeStuckInBlock( block, speedMulti );
     }
     
     /** @return Called when this mob falls. Calculates and applies fall damage. Returns false if canceled. */
     @Override
-    public boolean causeFallDamage( float distance, float damageMultiplier ) {
-        return super.causeFallDamage( distance, damageMultiplier * getSpecialData().getFallDamageMultiplier() );
+    public boolean causeFallDamage( float distance, float damageMultiplier, DamageSource damageSource) {
+        return super.causeFallDamage( distance, damageMultiplier * getSpecialData().getFallDamageMultiplier(), damageSource );
     }
     
     /** @return True if this entity should NOT trigger pressure plates or tripwires. */
@@ -429,7 +429,7 @@ public class _SpecialCreeperEntity extends CreeperEntity implements IExplodingMo
     /** @return Attempts to damage this entity; returns true if the hit was successful. */
     @Override
     public boolean hurt( DamageSource source, float amount ) {
-        if( isSensitiveToWater() && source.getDirectEntity() instanceof SnowballEntity ) {
+        if( isSensitiveToWater() && source.getDirectEntity() instanceof Snowball ) {
             amount = Math.max( 3.0F, amount );
         }
         if( super.hurt( source, amount ) ) {
@@ -442,14 +442,14 @@ public class _SpecialCreeperEntity extends CreeperEntity implements IExplodingMo
     
     /** @return True if the effect can be applied to this entity. */
     @Override
-    public boolean canBeAffected( EffectInstance effect ) { return getSpecialData().isPotionApplicable( effect ); }
+    public boolean canBeAffected( MobEffectInstance effect ) { return getSpecialData().isPotionApplicable( effect ); }
     
     /** Saves data to this entity's base NBT compound that is specific to its subclass. */
     @Override
-    public void addAdditionalSaveData( CompoundNBT tag ) {
+    public void addAdditionalSaveData( CompoundTag tag ) {
         super.addAdditionalSaveData( tag );
         
-        final CompoundNBT saveTag = SpecialMobData.getSaveLocation( tag );
+        final CompoundTag saveTag = SpecialMobData.getSaveLocation( tag );
         
         saveTag.putBoolean( References.TAG_SUPERCHARGED, isSupercharged() );
         
@@ -463,10 +463,10 @@ public class _SpecialCreeperEntity extends CreeperEntity implements IExplodingMo
     
     /** Loads data from this entity's base NBT compound that is specific to its subclass. */
     @Override
-    public void readAdditionalSaveData( CompoundNBT tag ) {
+    public void readAdditionalSaveData( CompoundTag tag ) {
         super.readAdditionalSaveData( tag );
         
-        final CompoundNBT saveTag = SpecialMobData.getSaveLocation( tag );
+        final CompoundTag saveTag = SpecialMobData.getSaveLocation( tag );
         
         if( saveTag.contains( References.TAG_SUPERCHARGED, References.NBT_TYPE_NUMERICAL ) )
             setSupercharged( saveTag.getBoolean( References.TAG_SUPERCHARGED ) );

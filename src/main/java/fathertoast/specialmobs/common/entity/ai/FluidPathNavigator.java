@@ -1,42 +1,42 @@
 package fathertoast.specialmobs.common.entity.ai;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.entity.MobEntity;
-import net.minecraft.pathfinding.GroundPathNavigator;
-import net.minecraft.pathfinding.PathFinder;
-import net.minecraft.pathfinding.PathNodeType;
-import net.minecraft.pathfinding.WalkNodeProcessor;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.ai.navigation.GroundPathNavigation;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.pathfinder.BlockPathTypes;
+import net.minecraft.world.level.pathfinder.PathFinder;
+import net.minecraft.world.level.pathfinder.WalkNodeEvaluator;
 
 /**
  * A path navigator used for entities that can walk on fluids. Based on the strider's lava path navigator.
  */
-public class FluidPathNavigator extends GroundPathNavigator {
+public class FluidPathNavigator extends GroundPathNavigation {
     
     private final boolean waterWalkable;
     private final boolean lavaWalkable;
     
-    public FluidPathNavigator( MobEntity entity, World world, boolean water, boolean lava ) {
-        super( entity, world );
+    public FluidPathNavigator( Mob entity, Level level, boolean water, boolean lava ) {
+        super( entity, level );
         waterWalkable = water;
         lavaWalkable = lava;
     }
     
     /** @return A new pathfinder instance with a given max size (based on entity follow range). */
     @Override
-    protected PathFinder createPathFinder( int maxPathSize ) {
-        nodeEvaluator = new WalkNodeProcessor();
+    protected PathFinder createPathFinder(int maxPathSize ) {
+        nodeEvaluator = new WalkNodeEvaluator();
         return new PathFinder( nodeEvaluator, maxPathSize );
     }
     
     /** @return Whether the path node type is walkable. */
     @Override
-    protected boolean hasValidPathType( PathNodeType node ) {
-        return waterWalkable && (node == PathNodeType.WATER || node == PathNodeType.WATER_BORDER) ||
-                lavaWalkable && (node == PathNodeType.LAVA || node == PathNodeType.DAMAGE_FIRE || node == PathNodeType.DANGER_FIRE) ||
-                super.hasValidPathType( node );
+    protected boolean hasValidPathType( BlockPathTypes type ) {
+        return waterWalkable && (type == BlockPathTypes.WATER || type == BlockPathTypes.WATER_BORDER) ||
+                lavaWalkable && (type == BlockPathTypes.LAVA || type == BlockPathTypes.DAMAGE_FIRE || type == BlockPathTypes.DANGER_FIRE) ||
+                super.hasValidPathType( type );
     }
     
     /** @return True if the given position is a block that is suitable for standing on. */

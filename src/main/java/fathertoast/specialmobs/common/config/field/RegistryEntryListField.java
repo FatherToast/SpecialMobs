@@ -4,7 +4,6 @@ import fathertoast.specialmobs.common.config.file.TomlHelper;
 import fathertoast.specialmobs.common.config.util.RegistryEntryList;
 import fathertoast.specialmobs.common.core.SpecialMobs;
 import net.minecraftforge.registries.IForgeRegistry;
-import net.minecraftforge.registries.IForgeRegistryEntry;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -17,7 +16,7 @@ import java.util.Set;
  * See also: {@link net.minecraftforge.registries.ForgeRegistries}
  */
 @SuppressWarnings( "unused" )
-public class RegistryEntryListField<T extends IForgeRegistryEntry<T>> extends GenericField<RegistryEntryList<T>> {
+public class RegistryEntryListField<T> extends GenericField<RegistryEntryList<T>> {
     
     /** Provides a detailed description of how to use registry entry lists. Recommended putting at the top of any file using registry entry lists. */
     public static List<String> verboseDescription() {

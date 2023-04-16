@@ -3,8 +3,8 @@ package fathertoast.specialmobs.common.config.util.environment.time;
 import fathertoast.specialmobs.common.config.field.AbstractConfigField;
 import fathertoast.specialmobs.common.config.field.EnvironmentListField;
 import fathertoast.specialmobs.common.config.util.environment.EnumEnvironment;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 
 import javax.annotation.Nullable;
 
@@ -29,8 +29,8 @@ public class MoonPhaseEnvironment extends EnumEnvironment<MoonPhaseEnvironment.V
     
     /** @return Returns true if this environment matches the provided environment. */
     @Override
-    public boolean matches( World world, @Nullable BlockPos pos ) {
-        final int phase = world.dimensionType().moonPhase( world.dayTime() );
+    public boolean matches( Level level, @Nullable BlockPos pos ) {
+        final int phase = level.dimensionType().moonPhase( level.dayTime() );
         return (VALUE.INDEX == phase) != INVERT;
     }
 }

@@ -8,35 +8,33 @@ import fathertoast.specialmobs.common.entity.creeper.FireCreeperEntity;
 import fathertoast.specialmobs.common.entity.slime.BlueberrySlimeEntity;
 import fathertoast.specialmobs.common.entity.spider.FireSpiderEntity;
 import fathertoast.specialmobs.common.entity.zombie.FireZombieEntity;
-import net.minecraft.entity.*;
-import net.minecraft.entity.monster.CaveSpiderEntity;
-import net.minecraft.entity.monster.MonsterEntity;
+import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.FluidTags;
-import net.minecraft.util.RegistryKey;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.Difficulty;
-import net.minecraft.world.IServerWorld;
-import net.minecraft.world.World;
-import net.minecraft.world.biome.Biome;
-import net.minecraft.world.biome.Biomes;
-import net.minecraft.world.biome.MobSpawnInfo;
-import net.minecraft.world.gen.Heightmap;
-import net.minecraftforge.common.world.MobSpawnInfoBuilder;
-import net.minecraftforge.event.world.BiomeLoadingEvent;
+import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.monster.CaveSpider;
+import net.minecraft.world.entity.monster.Monster;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.ServerLevelAccessor;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.biome.Biomes;
+import net.minecraft.world.level.biome.MobSpawnSettings;
+import net.minecraft.world.level.levelgen.Heightmap;
+import net.minecraftforge.event.entity.SpawnPlacementRegisterEvent;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 public final class NaturalSpawnManager {
     
     //--------------- Spawn Placement Registration ----------------
     
     /** Sets the natural spawn placement rules for entity types. */
-    public static void registerSpawnPlacements() {
+    public static void registerSpawnPlacements( SpawnPlacementRegisterEvent event ) {
         if( !Config.MAIN.GENERAL.enableNaturalSpawning.get() ) return;
         
         // Bestiary-generated entities
@@ -47,8 +45,8 @@ public final class NaturalSpawnManager {
         // Additional entries
         if( Config.MAIN.NATURAL_SPAWNING.caveSpiderSpawnMultiplier.get() > 0.0 ) {
             try {
-                EntitySpawnPlacementRegistry.register( EntityType.CAVE_SPIDER, EntitySpawnPlacementRegistry.PlacementType.ON_GROUND,
-                        Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, NaturalSpawnManager::checkSpawnRulesCaveSpider );
+                event.register( EntityType.CAVE_SPIDER, SpawnPlacements.Type.ON_GROUND,
+                        Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, NaturalSpawnManager::checkSpawnRulesCaveSpider, SpawnPlacementRegisterEvent.Operation.AND );
             }
             catch( IllegalStateException ex ) {
                 // Overwriting the vanilla entry with our own throws this exception, but we can just ignore it :^)
@@ -56,70 +54,70 @@ public final class NaturalSpawnManager {
         }
     }
     
-    public static void registerSpawnPlacement( MobFamily.Species<? extends MonsterEntity> species ) {
-        registerSpawnPlacement( species, EntitySpawnPlacementRegistry.PlacementType.ON_GROUND );
+    public static void registerSpawnPlacement( MobFamily.Species<? extends Monster> species ) {
+        registerSpawnPlacement( species, SpawnPlacements.Type.ON_GROUND );
     }
     
-    public static void registerSpawnPlacement( MobFamily.Species<? extends MonsterEntity> species,
-                                               EntitySpawnPlacementRegistry.PlacementType type ) {
+    public static void registerSpawnPlacement( MobFamily.Species<? extends Monster> species,
+                                               SpawnPlacements.Type type ) {
         registerSpawnPlacement( species, type, NaturalSpawnManager::checkSpawnRulesDefault );
     }
     
-    public static <T extends MobEntity> void registerSpawnPlacement( MobFamily.Species<T> species,
-                                                                     EntitySpawnPlacementRegistry.IPlacementPredicate<T> predicate ) {
-        registerSpawnPlacement( species, EntitySpawnPlacementRegistry.PlacementType.ON_GROUND, predicate );
+    public static <T extends Mob> void registerSpawnPlacement(MobFamily.Species<T> species,
+                                                              SpawnPlacements.SpawnPredicate<T> predicate ) {
+        registerSpawnPlacement( species, SpawnPlacements.Type.ON_GROUND, predicate );
     }
     
-    public static <T extends MobEntity> void registerSpawnPlacement( MobFamily.Species<T> species,
-                                                                     EntitySpawnPlacementRegistry.PlacementType type,
-                                                                     EntitySpawnPlacementRegistry.IPlacementPredicate<T> predicate ) {
-        EntitySpawnPlacementRegistry.register( species.entityType.get(), type, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, predicate );
+    public static <T extends Mob> void registerSpawnPlacement( MobFamily.Species<T> species,
+                                                               SpawnPlacements.Type type,
+                                                               SpawnPlacements.SpawnPredicate<T> predicate ) {
+        EntitySpawnPlacementRegistry.register( species.entityType.get(), type, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, predicate );
     }
     
-    public static boolean checkSpawnRulesDefault( EntityType<? extends MonsterEntity> type, IServerWorld world,
-                                                  SpawnReason reason, BlockPos pos, Random random ) {
-        return MonsterEntity.checkMonsterSpawnRules( type, world, reason, pos, random ) &&
-                checkSpawnRulesConfigured( type, world, reason, pos, random );
+    public static boolean checkSpawnRulesDefault(EntityType<? extends Monster> type, ServerLevelAccessor level,
+                                                 MobSpawnType spawnType, BlockPos pos, RandomSource random ) {
+        return Monster.checkMonsterSpawnRules( type, level, spawnType, pos, random ) &&
+                checkSpawnRulesConfigured( type, level, spawnType, pos, random );
     }
     
-    public static boolean checkSpawnRulesIgnoreLight( EntityType<? extends MonsterEntity> type, IServerWorld world,
-                                                      SpawnReason reason, BlockPos pos, Random random ) {
-        return MonsterEntity.checkAnyLightMonsterSpawnRules( type, world, reason, pos, random ) &&
-                checkSpawnRulesConfigured( type, world, reason, pos, random );
+    public static boolean checkSpawnRulesIgnoreLight( EntityType<? extends Monster> type, ServerLevelAccessor level,
+                                                      MobSpawnType spawnType, BlockPos pos, RandomSource random ) {
+        return Monster.checkAnyLightMonsterSpawnRules( type, level, spawnType, pos, random ) &&
+                checkSpawnRulesConfigured( type, level, spawnType, pos, random );
     }
     
     @SuppressWarnings( "unused" )
-    public static boolean checkSpawnRulesBasic( EntityType<? extends MobEntity> type, IServerWorld world,
-                                                SpawnReason reason, BlockPos pos, Random random ) {
-        return world.getDifficulty() != Difficulty.PEACEFUL && MobEntity.checkMobSpawnRules( type, world, reason, pos, random ) &&
-                checkSpawnRulesConfigured( type, world, reason, pos, random );
+    public static boolean checkSpawnRulesBasic( EntityType<? extends Mob> type, ServerLevelAccessor level,
+                                                MobSpawnType spawnType, BlockPos pos, RandomSource random ) {
+        return level.getDifficulty() != Difficulty.PEACEFUL && Mob.checkMobSpawnRules( type, level, spawnType, pos, random ) &&
+                checkSpawnRulesConfigured( type, level, spawnType, pos, random );
     }
     
-    public static boolean checkSpawnRulesWater( EntityType<? extends MobEntity> type, IServerWorld world,
-                                                SpawnReason reason, BlockPos pos, Random random ) {
-        return world.getDifficulty() != Difficulty.PEACEFUL && MonsterEntity.isDarkEnoughToSpawn( world, pos, random ) &&
-                (reason == SpawnReason.SPAWNER || world.getFluidState( pos ).is( FluidTags.WATER )) &&
-                checkSpawnRulesConfigured( type, world, reason, pos, random );
+    public static boolean checkSpawnRulesWater( EntityType<? extends Mob> type, ServerLevelAccessor level,
+                                                MobSpawnType spawnType, BlockPos pos, RandomSource random ) {
+        return level.getDifficulty() != Difficulty.PEACEFUL && Monster.isDarkEnoughToSpawn( level, pos, random ) &&
+                (spawnType == MobSpawnType.SPAWNER || level.getFluidState( pos ).is( FluidTags.WATER )) &&
+                checkSpawnRulesConfigured( type, level, spawnType, pos, random );
     }
     
-    public static boolean checkSpawnRulesConfigured( EntityType<? extends LivingEntity> type, IServerWorld world,
-                                                     SpawnReason reason, BlockPos pos, Random random ) {
-        if( reason == SpawnReason.NATURAL ) {
+    public static boolean checkSpawnRulesConfigured(EntityType<? extends LivingEntity> type, ServerLevelAccessor levelAccessor,
+                                                    MobSpawnType spawnType, BlockPos pos, RandomSource random ) {
+        if( spawnType == MobSpawnType.NATURAL ) {
             final MobFamily.Species<?> species = MobFamily.Species.of( type );
-            if( species != null && world instanceof World ) {
-                return species.config.GENERAL.naturalSpawnChance.rollChance( random, (World) world, pos );
+            if( species != null && levelAccessor instanceof Level level ) {
+                return species.config.GENERAL.naturalSpawnChance.rollChance( random, level, pos );
             }
         }
         return true;
     }
     
-    public static boolean checkSpawnRulesCaveSpider( EntityType<CaveSpiderEntity> type, IServerWorld world,
-                                                     SpawnReason reason, BlockPos pos, Random random ) {
-        if( reason == SpawnReason.NATURAL && world instanceof World &&
-                !Config.MAIN.NATURAL_SPAWNING.caveSpiderSpawnChance.rollChance( random, (World) world, pos ) ) {
+    public static boolean checkSpawnRulesCaveSpider( EntityType<CaveSpider> type, ServerLevelAccessor levelAccessor,
+                                                     MobSpawnType spawnType, BlockPos pos, RandomSource random ) {
+        if( spawnType == MobSpawnType.NATURAL && levelAccessor instanceof Level level &&
+                !Config.MAIN.NATURAL_SPAWNING.caveSpiderSpawnChance.rollChance( random, level, pos ) ) {
             return false;
         }
-        return MonsterEntity.checkMonsterSpawnRules( type, world, reason, pos, random );
+        return Monster.checkMonsterSpawnRules( type, levelAccessor, spawnType, pos, random );
     }
     
     
@@ -230,7 +228,7 @@ public final class NaturalSpawnManager {
     }
     
     /** @return True if the name represents a particular biome. */
-    private static boolean isBiome( @Nullable ResourceLocation name, RegistryKey<Biome> biome ) {
+    private static boolean isBiome( @Nullable ResourceLocation name, ResourceKey<Biome> biome ) {
         return biome.location().equals( name );
     }
     
@@ -247,7 +245,7 @@ public final class NaturalSpawnManager {
     private static void addSpawn( MobSpawnInfoBuilder builder, EntityType<?> entity, int weight, int minCount, int maxCount,
                                   double charge, double budget ) {
         if( weight > 0 ) {
-            builder.addSpawn( entity.getCategory(), new MobSpawnInfo.Spawners( entity, weight, minCount, maxCount ) );
+            builder.addSpawn( entity.getCategory(), new MobSpawnSettings.SpawnerData( entity, weight, minCount, maxCount ) );
             builder.addMobCharge( entity, charge, budget );
         }
     }

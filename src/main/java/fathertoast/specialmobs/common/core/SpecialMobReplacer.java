@@ -4,17 +4,17 @@ import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.config.Config;
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.util.References;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.shapes.VoxelShapes;
-import net.minecraft.world.IServerWorld;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.ServerLevelAccessor;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.event.entity.EntityJoinWorldEvent;
+import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -45,21 +45,21 @@ public final class SpecialMobReplacer {
      * @param event The event data.
      */
     @SubscribeEvent( priority = EventPriority.LOWEST )
-    public static void onEntitySpawn( EntityJoinWorldEvent event ) {
-        if( event.getWorld().isClientSide() || !Config.MAIN.GENERAL.enableMobReplacement.get() || event.isCanceled() )
+    public static void onEntitySpawn( EntityJoinLevelEvent event ) {
+        if( event.getLevel().isClientSide() || !Config.MAIN.GENERAL.enableMobReplacement.get() || event.isCanceled() )
             return;
         
         final Entity entity = event.getEntity();
         final MobFamily<?, ?> mobFamily = getReplacingMobFamily( entity );
         if( mobFamily != null ) {
-            final World world = event.getWorld();
+            final Level level = event.getLevel();
             final BlockPos entityPos = new BlockPos( entity.position() );
             
             setInitFlag( entity ); // Do this regardless of replacement, should help prevent bizarre save glitches
             
-            final boolean isSpecial = shouldMakeNextSpecial( mobFamily, world, entityPos );
+            final boolean isSpecial = shouldMakeNextSpecial( mobFamily, level, entityPos );
             if( shouldReplace( mobFamily, isSpecial ) ) {
-                TO_REPLACE.addLast( new MobReplacementEntry( mobFamily, isSpecial, entity, world, entityPos ) );
+                TO_REPLACE.addLast( new MobReplacementEntry( mobFamily, isSpecial, entity, level, entityPos ) );
                 
                 // Sadly, it's somewhat of a pain to make sure no warnings get logged
                 // when dealing with mounts/riders... Maybe someday :(
@@ -90,7 +90,7 @@ public final class SpecialMobReplacer {
      * @return True if this mod's init flag has been set for the entity.
      */
     private static boolean getInitFlag( Entity entity ) {
-        final CompoundNBT forgeData = entity.getPersistentData();
+        final CompoundTag forgeData = entity.getPersistentData();
         if( forgeData.contains( References.TAG_INIT, References.NBT_TYPE_NUMERICAL ) ) {
             return forgeData.getBoolean( References.TAG_INIT );
         }
@@ -103,7 +103,7 @@ public final class SpecialMobReplacer {
      * @param entity The entity to set this mod's init flag for.
      */
     private static void setInitFlag( Entity entity ) {
-        final CompoundNBT forgeData = entity.getPersistentData();
+        final CompoundTag forgeData = entity.getPersistentData();
         forgeData.putBoolean( References.TAG_INIT, true );
     }
     
@@ -115,8 +115,8 @@ public final class SpecialMobReplacer {
     }
     
     /** @return True if the next mob should be made a special variant. */
-    private static boolean shouldMakeNextSpecial( MobFamily<?, ?> mobFamily, World world, BlockPos entityPos ) {
-        return world.random.nextDouble() < mobFamily.config.GENERAL.specialVariantChance.get( world, entityPos );
+    private static boolean shouldMakeNextSpecial( MobFamily<?, ?> mobFamily, Level level, BlockPos entityPos ) {
+        return level.random.nextDouble() < mobFamily.config.GENERAL.specialVariantChance.get( level, entityPos );
     }
     
     /** @return True if a mob should be replaced. */
@@ -125,29 +125,29 @@ public final class SpecialMobReplacer {
     }
     
     /** Replaces a mob, copying over all its data to the replacement. */
-    private static void replace( MobFamily<?, ?> mobFamily, boolean isSpecial, Entity entityToReplace, World world, BlockPos entityPos ) {
-        if( !(world instanceof IServerWorld) ) return;
+    private static void replace( MobFamily<?, ?> mobFamily, boolean isSpecial, Entity entityToReplace, Level level, BlockPos entityPos ) {
+        if( !(level instanceof ServerLevelAccessor) ) return;
         
-        final CompoundNBT tag = new CompoundNBT();
+        final CompoundTag tag = new CompoundTag();
         entityToReplace.saveWithoutId( tag );
         
         // Don't copy UUID
         tag.remove( "UUID" );
         
         final MobFamily.Species<?> species = isSpecial ?
-                mobFamily.nextVariant( world, entityPos, getVariantFilter( mobFamily, entityToReplace, world, entityPos ) ) :
+                mobFamily.nextVariant( level, entityPos, getVariantFilter( mobFamily, entityToReplace, level, entityPos ) ) :
                 mobFamily.vanillaReplacement;
         
-        final LivingEntity replacement = species.entityType.get().create( world );
+        final LivingEntity replacement = species.entityType.get().create( level );
         if( replacement == null ) {
             SpecialMobs.LOG.error( "Failed to create replacement entity '{}'", species.entityType.getId() );
             return;
         }
         
         replacement.load( tag );
-        MobHelper.finalizeSpawn( replacement, (IServerWorld) world, world.getCurrentDifficultyAt( entityPos ), null, null );
+        MobHelper.finalizeSpawn( replacement, (ServerLevelAccessor) level, level.getCurrentDifficultyAt( entityPos ), null, null );
         
-        world.addFreshEntity( replacement );
+        level.addFreshEntity( replacement );
         
         for( Entity rider : entityToReplace.getPassengers() ) {
             rider.stopRiding();
@@ -159,28 +159,28 @@ public final class SpecialMobReplacer {
             replacement.startRiding( vehicle, true );
         }
         
-        entityToReplace.remove();
+        entityToReplace.discard();
     }
     
     /** @return A selector that filters out variants that are likely to die a stupid death if chosen. */
     @Nullable
     private static Predicate<MobFamily.Species<?>> getVariantFilter( MobFamily<?, ?> mobFamily, Entity entityToReplace,
-                                                                     World world, BlockPos entityPos ) {
+                                                                     Level level, BlockPos entityPos ) {
         Predicate<MobFamily.Species<?>> selector = null;
         
         // Note that we do not check for any fluids (water/lava) since that is handled by spawn logic
         if( !mobFamily.vanillaReplacement.bestiaryInfo.isDamagedByWater && // Skip this check if the base vanilla mob dies in water
-                world.isRainingAt( entityPos ) ) {
+                level.isRainingAt( entityPos ) ) {
             selector = WATER_INSENSITIVE_SELECTOR;
         }
         
         // Does not consider overly wide mobs or extra-tall (>1 block taller) mobs
         if( mobFamily.hasAnyGiants() ) {
-            final AxisAlignedBB bb = entityToReplace.getBoundingBox();
-            final int y = MathHelper.ceil( bb.maxY );
+            final AABB bb = entityToReplace.getBoundingBox();
+            final int y = Mth.ceil( bb.maxY );
             // Only check the FULL block above current collision - not a perfect representation, but keeps things simple
-            if( !world.isUnobstructed( entityToReplace, VoxelShapes.create(
-                    new AxisAlignedBB( bb.minX, y, bb.minZ, bb.maxX, y + 1, bb.maxZ ) ) ) ) {
+            if( !level.isUnobstructed( entityToReplace, Shapes.create(
+                    new AABB( bb.minX, y, bb.minZ, bb.maxX, y + 1, bb.maxZ ) ) ) ) {
                 selector = selector == null ? NO_GIANTS_SELECTOR : selector.and( NO_GIANTS_SELECTOR );
             }
         }
@@ -194,15 +194,15 @@ public final class SpecialMobReplacer {
         final boolean isSpecial;
         
         final LivingEntity entityToReplace;
-        final World entityWorld;
+        final Level entityWorld;
         final BlockPos entityPos;
         
-        MobReplacementEntry( MobFamily<?, ?> family, boolean special, Entity entity, World world, BlockPos pos ) {
+        MobReplacementEntry( MobFamily<?, ?> family, boolean special, Entity entity, Level level, BlockPos pos ) {
             mobFamily = family;
             isSpecial = special;
             
             entityToReplace = (LivingEntity) entity;
-            entityWorld = world;
+            entityWorld = level;
             entityPos = pos;
         }
     }

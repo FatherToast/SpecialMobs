@@ -6,23 +6,23 @@ import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.util.ExplosionHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.entity.effect.LightningBoltEntity;
-import net.minecraft.item.Items;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.FluidTags;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.Direction;
-import net.minecraft.util.IndirectEntityDamageSource;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.damagesource.IndirectEntityDamageSource;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LightningBolt;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.ForgeEventFactory;
-import net.minecraftforge.event.entity.living.EntityTeleportEvent;
+import net.minecraftforge.event.entity.EntityTeleportEvent;
 
 @SpecialMob
 public class JoltBlazeEntity extends _SpecialBlazeEntity {
@@ -54,7 +54,7 @@ public class JoltBlazeEntity extends _SpecialBlazeEntity {
     }
     
     @SpecialMob.Factory
-    public static EntityType.IFactory<JoltBlazeEntity> getVariantFactory() { return JoltBlazeEntity::new; }
+    public static EntityType.EntityFactory<JoltBlazeEntity> getVariantFactory() { return JoltBlazeEntity::new; }
     
     /** @return This entity's mob species. */
     @SpecialMob.SpeciesSupplier
@@ -64,7 +64,7 @@ public class JoltBlazeEntity extends _SpecialBlazeEntity {
     
     //--------------- Variant-Specific Implementations ----------------
     
-    public JoltBlazeEntity( EntityType<? extends _SpecialBlazeEntity> entityType, World world ) { super( entityType, world ); }
+    public JoltBlazeEntity( EntityType<? extends _SpecialBlazeEntity> entityType, Level level ) { super( entityType, level ); }
     
     /** Called each tick to update this entity's movement. */
     @Override
@@ -80,10 +80,10 @@ public class JoltBlazeEntity extends _SpecialBlazeEntity {
     
     /** @return Attempts to damage this entity; returns true if the hit was successful. */
     @Override
-    public boolean hurt( DamageSource source, float amount ) {
+    public boolean hurt(DamageSource source, float amount ) {
         if( isInvulnerableTo( source ) || fireImmune() && source.isFire() ) return false;
         
-        if( source instanceof IndirectEntityDamageSource ) {
+        if( source instanceof IndirectEntityDamageSource) {
             for( int i = 0; i < 64; i++ ) {
                 if( teleport() ) return true;
             }
@@ -92,7 +92,7 @@ public class JoltBlazeEntity extends _SpecialBlazeEntity {
         
         final boolean success = super.hurt( source, amount );
         if( !level.isClientSide() && getHealth() > 0.0F ) {
-            if( source.getEntity() instanceof LivingEntity ) {
+            if( source.getEntity() instanceof LivingEntity) {
                 for( int i = 0; i < 16; i++ ) {
                     if( teleport() ) break;
                 }
@@ -106,7 +106,7 @@ public class JoltBlazeEntity extends _SpecialBlazeEntity {
     
     /** Called when this entity is struck by lightning. */
     @Override
-    public void thunderHit( ServerWorld world, LightningBoltEntity lightningBolt ) { }
+    public void thunderHit( ServerLevel level, LightningBolt lightningBolt ) { }
     
     /** @return Teleports this "enderman" to a random nearby position; returns true if successful. */
     protected boolean teleport() {
@@ -120,7 +120,7 @@ public class JoltBlazeEntity extends _SpecialBlazeEntity {
     
     /** @return Teleports this "enderman" towards another entity; returns true if successful. */
     protected boolean teleportTowards( Entity target ) {
-        final Vector3d directionFromTarget = new Vector3d(
+        final Vec3 directionFromTarget = new Vec3(
                 getX() - target.getX(),
                 getY( 0.5 ) - target.getEyeY(),
                 getZ() - target.getZ() )
@@ -134,7 +134,7 @@ public class JoltBlazeEntity extends _SpecialBlazeEntity {
     
     /** @return Teleports this "enderman" to a new position; returns true if successful. */
     protected boolean teleport( double x, double y, double z ) {
-        final BlockPos.Mutable pos = new BlockPos.Mutable( x, y, z );
+        final BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos( x, y, z );
         
         while( pos.getY() > 0 && !level.getBlockState( pos ).getMaterial().blocksMotion() ) {
             pos.move( Direction.DOWN );

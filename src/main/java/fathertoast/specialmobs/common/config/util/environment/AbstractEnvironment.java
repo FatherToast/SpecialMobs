@@ -1,7 +1,7 @@
 package fathertoast.specialmobs.common.config.util.environment;
 
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 
 import javax.annotation.Nullable;
 
@@ -17,5 +17,5 @@ public abstract class AbstractEnvironment {
     public abstract String value();
     
     /** @return Returns true if this environment matches the provided environment. */
-    public abstract boolean matches( World world, @Nullable BlockPos pos );
+    public abstract boolean matches( Level level, @Nullable BlockPos pos );
 }

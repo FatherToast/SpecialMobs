@@ -1,11 +1,11 @@
 package fathertoast.specialmobs.common.entity.ai.goal;
 
-import net.minecraft.entity.CreatureEntity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.MobEntity;
-import net.minecraft.entity.ai.goal.HurtByTargetGoal;
-import net.minecraft.entity.passive.TameableEntity;
-import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.PathfinderMob;
+import net.minecraft.world.entity.TamableAnimal;
+import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
+import net.minecraft.world.phys.AABB;
 
 import java.util.List;
 
@@ -16,11 +16,11 @@ import java.util.List;
  */
 public class SpecialHurtByTargetGoal extends HurtByTargetGoal {
     
-    private final Class<? extends MobEntity> parentClass;
+    private final Class<? extends Mob> parentClass;
     
     private Class<?>[] toIgnoreAlert;
     
-    public SpecialHurtByTargetGoal( CreatureEntity entity, Class<? extends MobEntity> parent, Class<?>... ignoreEntities ) {
+    public SpecialHurtByTargetGoal( PathfinderMob entity, Class<? extends Mob> parent, Class<?>... ignoreEntities ) {
         super( entity, ignoreEntities );
         parentClass = parent;
     }
@@ -38,20 +38,20 @@ public class SpecialHurtByTargetGoal extends HurtByTargetGoal {
         if( target == null ) return;
         
         final double range = getFollowDistance();
-        final AxisAlignedBB boundingBox = AxisAlignedBB.unitCubeFromLowerCorner( mob.position() ).inflate( range, 10.0, range );
-        final List<MobEntity> nearbyEntities = mob.level.getLoadedEntitiesOfClass( parentClass, boundingBox ); // Insert parent class
+        final AABB boundingBox = AABB.unitCubeFromLowerCorner( mob.position() ).inflate( range, 10.0, range );
+        final List<? extends Mob> nearbyEntities = mob.level.getEntitiesOfClass( parentClass, boundingBox ); // Insert parent class
         
         // This is the exact same logic as the vanilla super method, just a lot more understandable
-        for( MobEntity entity : nearbyEntities ) {
+        for( Mob entity : nearbyEntities ) {
             if( mob != entity && entity.getTarget() == null &&
-                    (!(mob instanceof TameableEntity) || ((TameableEntity) mob).getOwner() == ((TameableEntity) entity).getOwner()) &&
+                    (!(mob instanceof TamableAnimal) || ((TamableAnimal) mob).getOwner() == ((TamableAnimal) entity).getOwner()) &&
                     !entity.isAlliedTo( target ) && shouldAlert( entity ) ) {
                 alertOther( entity, target );
             }
         }
     }
     
-    private boolean shouldAlert( MobEntity entity ) {
+    private boolean shouldAlert( Mob entity ) {
         if( toIgnoreAlert == null ) return true;
         
         for( Class<?> ignoreClass : toIgnoreAlert ) {

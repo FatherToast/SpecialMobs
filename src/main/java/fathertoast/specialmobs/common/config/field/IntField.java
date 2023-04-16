@@ -2,6 +2,7 @@ package fathertoast.specialmobs.common.config.field;
 
 import fathertoast.specialmobs.common.config.file.TomlHelper;
 import fathertoast.specialmobs.common.core.SpecialMobs;
+import net.minecraft.util.RandomSource;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -144,6 +145,19 @@ public class IntField extends AbstractConfigField {
         
         /** @return Returns a random value between the minimum and the maximum (inclusive). */
         public int next( Random random ) {
+            final int delta = getMax() - getMin();
+            if( delta > 0 ) {
+                return getMin() + random.nextInt( delta + 1 );
+            }
+            if( delta < 0 ) {
+                SpecialMobs.LOG.warn( "Value for range \"({},{})\" is invalid ({} > {})! Ignoring maximum value.",
+                        MINIMUM.getKey(), MAXIMUM.getKey(), getMin(), getMax() );
+            }
+            return getMin();
+        }
+
+        /** @return Returns a random value between the minimum and the maximum (inclusive). */
+        public int next( RandomSource random ) {
             final int delta = getMax() - getMin();
             if( delta > 0 ) {
                 return getMin() + random.nextInt( delta + 1 );

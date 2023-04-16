@@ -1,17 +1,16 @@
 package fathertoast.specialmobs.datagen.loot;
 
 import fathertoast.specialmobs.datagen.SMLootTableProvider;
-import net.minecraft.enchantment.Enchantment;
-import net.minecraft.item.ItemStack;
-import net.minecraft.loot.ItemLootEntry;
-import net.minecraft.loot.LootContext;
-import net.minecraft.loot.LootEntry;
-import net.minecraft.loot.RandomValueRange;
-import net.minecraft.loot.conditions.EntityHasProperty;
-import net.minecraft.loot.conditions.ILootCondition;
-import net.minecraft.loot.functions.*;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.IItemProvider;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.level.ItemLike;
+import net.minecraft.world.level.storage.loot.LootContext;
+import net.minecraft.world.level.storage.loot.entries.LootItem;
+import net.minecraft.world.level.storage.loot.functions.*;
+import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
+import net.minecraft.world.level.storage.loot.predicates.LootItemEntityPropertyCondition;
+import net.minecraft.world.level.storage.loot.providers.number.UniformGenerator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,15 +18,15 @@ import java.util.List;
 @SuppressWarnings( { "unused", "WeakerAccess", "UnusedReturnValue" } )
 public class LootEntryItemBuilder {
     
-    private final IItemProvider item;
+    private final ItemLike item;
     
     private int weight = 1;
     private int quality = 0;
     
-    private final List<ILootFunction.IBuilder> itemFunctions = new ArrayList<>();
-    private final List<ILootCondition.IBuilder> entryConditions = new ArrayList<>();
+    private final List<LootItemFunction.Builder> itemFunctions = new ArrayList<>();
+    private final List<LootItemCondition.Builder> entryConditions = new ArrayList<>();
     
-    public LootEntryItemBuilder( IItemProvider baseItem ) {
+    public LootEntryItemBuilder( ItemLike baseItem ) {
         item = baseItem;
     }
     
@@ -39,8 +38,8 @@ public class LootEntryItemBuilder {
     }
     
     /** @return A new loot entry object reflecting the current state of this builder. */
-    public LootEntry.Builder<?> toLootEntry() {
-        return LootHelper.build( ItemLootEntry.lootTableItem( item ), entryConditions, itemFunctions )
+    public LootItem.Builder<?> toLootEntry() {
+        return LootHelper.build( LootItem.lootTableItem( item ), entryConditions, itemFunctions )
                 .setWeight( weight ).setQuality( quality );
     }
     
@@ -57,83 +56,84 @@ public class LootEntryItemBuilder {
     }
     
     /** @param condition A condition to add to this builder. */
-    public LootEntryItemBuilder addCondition( ILootCondition.IBuilder condition ) {
+    public LootEntryItemBuilder addCondition( LootItemCondition.Builder condition ) {
         entryConditions.add( condition );
         return this;
     }
     
     /** Adds a stack size function. */
     public LootEntryItemBuilder setCount( int value ) {
-        return addFunction( SetCount.setCount( new RandomValueRange( value ) ) );
+        return addFunction( SetItemCountFunction.setCount( UniformGenerator.between( 0.0F, value ) ) );
     }
     
     /** Adds a stack size function. */
     public LootEntryItemBuilder setCount( int min, int max ) {
-        return addFunction( SetCount.setCount( new RandomValueRange( min, max ) ) );
+        return addFunction( SetItemCountFunction.setCount( UniformGenerator.between( min, max ) ) );
     }
     
     /** Adds a looting enchant (luck) bonus function. Gross. */
     public LootEntryItemBuilder addLootingBonus( float value ) {
-        return addFunction( LootingEnchantBonus.lootingMultiplier( new RandomValueRange( value ) ) );
+        return addFunction( LootingEnchantFunction.lootingMultiplier( UniformGenerator.between( 0.0F, value ) ) );
     }
     
     /** Adds a looting enchant (luck) bonus function. Gross. */
     public LootEntryItemBuilder addLootingBonus( float min, float max ) {
-        return addFunction( LootingEnchantBonus.lootingMultiplier( new RandomValueRange( min, max ) ) );
+        return addFunction( LootingEnchantFunction.lootingMultiplier( UniformGenerator.between( min, max ) ) );
     }
     
     /** Adds a looting enchant (luck) bonus function. Gross. */
     public LootEntryItemBuilder addLootingBonus( float min, float max, int limit ) {
-        return addFunction( LootingEnchantBonus.lootingMultiplier( new RandomValueRange( min, max ) ).setLimit( limit ) );
+        return addFunction( LootingEnchantFunction.lootingMultiplier( UniformGenerator.between( min, max ) ).setLimit( limit ) );
     }
     
     /** Adds a set damage function. */
     public LootEntryItemBuilder setDamage( int value ) {
-        return addFunction( SetDamage.setDamage( new RandomValueRange( value ) ) );
+        return addFunction( SetItemDamageFunction.setDamage( UniformGenerator.between( 0.0F, value ) ) );
     }
     
     /** Adds a set damage function. */
     public LootEntryItemBuilder setDamage( int min, int max ) {
-        return addFunction( SetDamage.setDamage( new RandomValueRange( min, max ) ) );
+        return addFunction( SetItemDamageFunction.setDamage( UniformGenerator.between( min, max ) ) );
     }
     
     /** Adds an nbt tag compound function. */
-    public LootEntryItemBuilder setNBTTag( CompoundNBT tag ) { return addFunction( SetNBT.setTag( tag ) ); }
+    @SuppressWarnings("deprecation")
+    public LootEntryItemBuilder setNBTTag( CompoundTag tag ) { return addFunction( SetNbtFunction.setTag( tag ) ); }
     
     /** Adds a smelt function with the EntityOnFire condition. */
     public LootEntryItemBuilder smeltIfBurning() {
-        return addFunction( Smelt.smelted().when( EntityHasProperty.hasProperties( LootContext.EntityTarget.THIS,
+        return addFunction( SmeltItemFunction.smelted().when( LootItemEntityPropertyCondition.hasProperties( LootContext.EntityTarget.THIS,
                 SMLootTableProvider.EntitySubProvider.ENTITY_ON_FIRE ) ) );
     }
     
     /** Adds a random enchantment function. */
     public LootEntryItemBuilder applyOneRandomApplicableEnchant() {
-        return addFunction( EnchantRandomly.randomApplicableEnchantment() );
+        return addFunction( EnchantRandomlyFunction.randomApplicableEnchantment() );
     }
     
     /** Adds a random enchantment function. */
     public LootEntryItemBuilder applyOneRandomEnchant( Enchantment... enchantments ) {
-        final EnchantRandomly.Builder builder = new EnchantRandomly.Builder();
+        final EnchantRandomlyFunction.Builder builder = new EnchantRandomlyFunction.Builder();
         for( Enchantment enchant : enchantments ) builder.withEnchantment( enchant );
         return addFunction( builder );
     }
     
     /** Adds an enchanting function. */
     public LootEntryItemBuilder enchant( int level, boolean treasure ) {
-        final EnchantWithLevels.Builder builder = EnchantWithLevels.enchantWithLevels( new RandomValueRange( level ) );
+        final EnchantWithLevelsFunction.Builder builder = EnchantWithLevelsFunction.enchantWithLevels( UniformGenerator.between( 0.0F, level ) );
         if( treasure ) builder.allowTreasure();
         return addFunction( builder );
     }
     
     /** Adds an enchanting function. */
     public LootEntryItemBuilder enchant( int levelMin, int levelMax, boolean treasure ) {
-        final EnchantWithLevels.Builder builder = EnchantWithLevels.enchantWithLevels( new RandomValueRange( levelMin, levelMax ) );
+        final EnchantWithLevelsFunction.Builder builder = EnchantWithLevelsFunction.enchantWithLevels( UniformGenerator.between( levelMin, levelMax ) );
         if( treasure ) builder.allowTreasure();
         return addFunction( builder );
     }
     
     /** Adds an item function to this builder. */
-    public LootEntryItemBuilder addFunction( ILootFunction.IBuilder function ) {
+    public LootEntryItemBuilder addFunction( LootItemFunction.Builder function ) {
         itemFunctions.add( function );
         return this;
     }

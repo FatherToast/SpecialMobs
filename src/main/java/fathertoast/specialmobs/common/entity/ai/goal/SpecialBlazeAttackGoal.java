@@ -2,8 +2,8 @@ package fathertoast.specialmobs.common.entity.ai.goal;
 
 import fathertoast.specialmobs.common.entity.SpecialMobData;
 import fathertoast.specialmobs.common.entity.blaze._SpecialBlazeEntity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.goal.Goal;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.goal.Goal;
 
 import java.util.EnumSet;
 
@@ -53,7 +53,7 @@ public class SpecialBlazeAttackGoal extends Goal {
         
         final SpecialMobData<_SpecialBlazeEntity> data = blaze.getSpecialData();
         
-        final boolean canSee = blaze.getSensing().canSee( target );
+        final boolean canSee = blaze.getSensing().hasLineOfSight( target );
         if( canSee ) lastSeen = 0;
         else lastSeen++;
         

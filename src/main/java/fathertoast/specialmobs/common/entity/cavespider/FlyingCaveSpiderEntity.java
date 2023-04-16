@@ -6,10 +6,10 @@ import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.entity.ai.goal.SpecialLeapAtTargetGoal;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.item.Items;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
 
 @SpecialMob
 public class FlyingCaveSpiderEntity extends _SpecialCaveSpiderEntity {
@@ -40,7 +40,7 @@ public class FlyingCaveSpiderEntity extends _SpecialCaveSpiderEntity {
     }
     
     @SpecialMob.Factory
-    public static EntityType.IFactory<FlyingCaveSpiderEntity> getVariantFactory() { return FlyingCaveSpiderEntity::new; }
+    public static EntityType.EntityFactory<FlyingCaveSpiderEntity> getVariantFactory() { return FlyingCaveSpiderEntity::new; }
     
     /** @return This entity's mob species. */
     @SpecialMob.SpeciesSupplier
@@ -50,7 +50,7 @@ public class FlyingCaveSpiderEntity extends _SpecialCaveSpiderEntity {
     
     //--------------- Variant-Specific Implementations ----------------
     
-    public FlyingCaveSpiderEntity( EntityType<? extends _SpecialCaveSpiderEntity> entityType, World world ) { super( entityType, world ); }
+    public FlyingCaveSpiderEntity( EntityType<? extends _SpecialCaveSpiderEntity> entityType, Level level ) { super( entityType, level ); }
     
     /** Override to change this entity's AI goals. */
     @Override

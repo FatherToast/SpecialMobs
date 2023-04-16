@@ -4,17 +4,17 @@ import fathertoast.specialmobs.common.entity.ISpecialMob;
 import fathertoast.specialmobs.common.entity.SpecialMobData;
 import fathertoast.specialmobs.common.entity.ai.IAngler;
 import fathertoast.specialmobs.common.entity.projectile.SpecialFishingBobberEntity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.MobEntity;
-import net.minecraft.entity.ai.goal.Goal;
-import net.minecraft.util.SoundEvents;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.ai.goal.Goal;
 
 import javax.annotation.Nullable;
 
 /**
  * Causes the entity to use a fishing rod to pull its target in close.
  */
-public class AnglerGoal<T extends MobEntity & ISpecialMob<? super T> & IAngler> extends Goal {
+public class AnglerGoal<T extends Mob & ISpecialMob<? super T> & IAngler> extends Goal {
     
     private final T mob;
     
@@ -27,7 +27,7 @@ public class AnglerGoal<T extends MobEntity & ISpecialMob<? super T> & IAngler> 
     
     private void setBobber( @Nullable SpecialFishingBobberEntity newBobber ) {
         if( bobber != null ) {
-            bobber.remove();
+            bobber.discard();
         }
         bobber = newBobber;
         mob.setLineOut( newBobber != null );
@@ -59,7 +59,7 @@ public class AnglerGoal<T extends MobEntity & ISpecialMob<? super T> & IAngler> 
         final SpecialMobData<?> data = mob.getSpecialData();
         
         final double distSqr = target.distanceToSqr( mob );
-        if( distSqr > 16.0 && distSqr <= data.getRangedAttackMaxRange() * data.getRangedAttackMaxRange() && mob.canSee( target ) ) {
+        if( distSqr > 16.0 && distSqr <= data.getRangedAttackMaxRange() * data.getRangedAttackMaxRange() && mob.hasLineOfSight( target ) ) {
             castTime++;
             if( castTime >= data.getRangedAttackCooldown() && mob.getRandom().nextInt( 5 ) == 0 ) {
                 castTime = 0;

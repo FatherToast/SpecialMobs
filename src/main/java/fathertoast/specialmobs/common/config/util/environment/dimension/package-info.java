@@ -2,6 +2,6 @@
 @ParametersAreNonnullByDefault
 package fathertoast.specialmobs.common.config.util.environment.dimension;
 
-import mcp.MethodsReturnNonnullByDefault;
+import net.minecraft.MethodsReturnNonnullByDefault;
 
 import javax.annotation.ParametersAreNonnullByDefault;

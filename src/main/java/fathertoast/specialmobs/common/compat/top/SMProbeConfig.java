@@ -5,18 +5,16 @@ import mcjty.theoneprobe.api.IProbeConfig;
 import mcjty.theoneprobe.api.IProbeConfigProvider;
 import mcjty.theoneprobe.api.IProbeHitData;
 import mcjty.theoneprobe.api.IProbeHitEntityData;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class SMProbeConfig implements IProbeConfigProvider {
 
     @Override
-    public void getProbeConfig(IProbeConfig probeConfig, PlayerEntity playerEntity, World world, Entity entity, IProbeHitEntityData iProbeHitEntityData) {
-        if (entity instanceof INinja) {
-            INinja ninja = (INinja) entity;
-
+    public void getProbeConfig(IProbeConfig probeConfig, Player player, Level level, Entity entity, IProbeHitEntityData iProbeHitEntityData) {
+        if (entity instanceof INinja ninja) {
             if (ninja.getHiddenDragon() != null) {
                 probeConfig.showMobHealth(IProbeConfig.ConfigMode.NOT);
             }
@@ -24,7 +22,7 @@ public class SMProbeConfig implements IProbeConfigProvider {
     }
 
     @Override
-    public void getProbeConfig(IProbeConfig probeConfig, PlayerEntity playerEntity, World world, BlockState blockState, IProbeHitData iProbeHitData) {
+    public void getProbeConfig(IProbeConfig probeConfig, Player playerEntity, Level level, BlockState blockState, IProbeHitData iProbeHitData) {
 
     }
 }

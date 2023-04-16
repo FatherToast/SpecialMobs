@@ -3,8 +3,8 @@ package fathertoast.specialmobs.common.entity.ai.goal;
 import fathertoast.specialmobs.common.entity.SpecialMobData;
 import fathertoast.specialmobs.common.entity.ghast._SpecialGhastEntity;
 import fathertoast.specialmobs.common.util.References;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.goal.Goal;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.goal.Goal;
 
 /**
  * Implementation of GhastEntity.FireballAttackGoal that is visible to special ghasts and allows variants to
@@ -38,7 +38,7 @@ public class SpecialGhastFireballAttackGoal extends Goal {
         
         final SpecialMobData<_SpecialGhastEntity> data = ghast.getSpecialData();
         
-        if( target.distanceToSqr( ghast ) < data.getRangedAttackMaxRange() * data.getRangedAttackMaxRange() && ghast.canSee( target ) ) {
+        if( target.distanceToSqr( ghast ) < data.getRangedAttackMaxRange() * data.getRangedAttackMaxRange() && ghast.hasLineOfSight( target ) ) {
             chargeTime++;
             if( chargeTime == (data.getRangedAttackCooldown() >> 1) && !ghast.isSilent() ) {
                 References.LevelEvent.GHAST_WARN.play( ghast );

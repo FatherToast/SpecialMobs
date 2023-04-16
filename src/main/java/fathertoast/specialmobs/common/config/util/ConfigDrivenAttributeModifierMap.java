@@ -1,10 +1,10 @@
 package fathertoast.specialmobs.common.config.util;
 
 import fathertoast.specialmobs.common.config.field.AttributeListField;
-import mcp.MethodsReturnNonnullByDefault;
-import net.minecraft.entity.ai.attributes.Attribute;
-import net.minecraft.entity.ai.attributes.AttributeModifierMap;
-import net.minecraft.entity.ai.attributes.ModifiableAttributeInstance;
+import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
+import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -14,14 +14,14 @@ import java.util.function.Consumer;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class ConfigDrivenAttributeModifierMap extends AttributeModifierMap {
+public class ConfigDrivenAttributeModifierMap extends AttributeSupplier {
     
     private final AttributeListField FIELD;
-    private final Map<Attribute, ModifiableAttributeInstance> BASE_ATTRIBUTES;
+    private final Map<Attribute, AttributeInstance> BASE_ATTRIBUTES;
     
-    private AttributeModifierMap underlyingMap;
+    private AttributeSupplier underlyingSupplier;
     
-    public ConfigDrivenAttributeModifierMap( AttributeListField field, MutableAttribute builder ) {
+    public ConfigDrivenAttributeModifierMap( AttributeListField field, AttributeSupplier.Builder builder ) {
         super( builder.builder );
         FIELD = field;
         BASE_ATTRIBUTES = builder.builder;
@@ -29,44 +29,44 @@ public class ConfigDrivenAttributeModifierMap extends AttributeModifierMap {
     }
     
     /** Called when the config field is loaded to force a reload. */
-    public void invalidate() { underlyingMap = null; }
+    public void invalidate() { underlyingSupplier = null; }
     
     /** Called before any access to the underlying map to ensure it is loaded (nonnull). */
     private void validate() {
-        if( underlyingMap != null ) return;
+        if( underlyingSupplier != null ) return;
         
         // Create a deep clone of the base attribute map
-        final MutableAttribute builder = builder();
-        for( Map.Entry<Attribute, ModifiableAttributeInstance> entry : BASE_ATTRIBUTES.entrySet() ) {
+        final Builder builder = builder();
+        for( Map.Entry<Attribute, AttributeInstance> entry : BASE_ATTRIBUTES.entrySet() ) {
             builder.add( entry.getKey(), entry.getValue().getBaseValue() );
         }
         FIELD.apply( builder );
-        underlyingMap = builder.build();
+        underlyingSupplier = builder.build();
     }
     
     @Override
     public double getValue( Attribute attribute ) {
         validate();
-        return underlyingMap.getValue( attribute );
+        return underlyingSupplier.getValue( attribute );
     }
     
     @Override
     public double getBaseValue( Attribute attribute ) {
         validate();
-        return underlyingMap.getBaseValue( attribute );
+        return underlyingSupplier.getBaseValue( attribute );
     }
     
     @Override
     public double getModifierValue( Attribute attribute, UUID uuid ) {
         validate();
-        return underlyingMap.getModifierValue( attribute, uuid );
+        return underlyingSupplier.getModifierValue( attribute, uuid );
     }
     
     @Override
     @Nullable
-    public ModifiableAttributeInstance createInstance( Consumer<ModifiableAttributeInstance> onChanged, Attribute attribute ) {
+    public AttributeInstance createInstance( Consumer<AttributeInstance> onChanged, Attribute attribute ) {
         validate();
-        return underlyingMap.createInstance( onChanged, attribute );
+        return underlyingSupplier.createInstance( onChanged, attribute );
     }
     
     @Override
@@ -75,6 +75,6 @@ public class ConfigDrivenAttributeModifierMap extends AttributeModifierMap {
     @Override
     public boolean hasModifier( Attribute attribute, UUID uuid ) {
         validate();
-        return underlyingMap.hasModifier( attribute, uuid );
+        return underlyingSupplier.hasModifier( attribute, uuid );
     }
 }

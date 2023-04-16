@@ -2,9 +2,8 @@ package fathertoast.specialmobs.common.config.util.environment;
 
 import fathertoast.specialmobs.common.config.field.AbstractConfigField;
 import fathertoast.specialmobs.common.core.SpecialMobs;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.registries.IForgeRegistry;
-import net.minecraftforge.registries.IForgeRegistryEntry;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -13,7 +12,7 @@ import java.util.List;
 /**
  * Registries are contained in {@link net.minecraftforge.registries.ForgeRegistries}
  */
-public abstract class RegistryGroupEnvironment<T extends IForgeRegistryEntry<T>> extends AbstractEnvironment {
+public abstract class RegistryGroupEnvironment<T> extends AbstractEnvironment {
     /** The field containing this entry. We save a reference to help improve error/warning reports. */
     private final AbstractConfigField FIELD;
     
@@ -24,9 +23,9 @@ public abstract class RegistryGroupEnvironment<T extends IForgeRegistryEntry<T>>
     
     private List<T> registryEntries;
     
-    public RegistryGroupEnvironment( T regEntry, boolean invert ) {
+    public RegistryGroupEnvironment( T regEntry, IForgeRegistry<T> registry, boolean invert ) {
         //noinspection ConstantConditions
-        this( regEntry.getRegistryName(), invert );
+        this( registry.getKey(regEntry), invert );
     }
     
     public RegistryGroupEnvironment( ResourceLocation regKey, boolean invert ) {

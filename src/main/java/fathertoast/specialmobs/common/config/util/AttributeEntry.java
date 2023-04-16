@@ -2,13 +2,13 @@ package fathertoast.specialmobs.common.config.util;
 
 import fathertoast.specialmobs.common.config.field.AbstractConfigField;
 import fathertoast.specialmobs.common.core.SpecialMobs;
-import mcp.MethodsReturnNonnullByDefault;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.Attribute;
-import net.minecraft.entity.ai.attributes.AttributeModifierMap;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.entity.ai.attributes.ModifiableAttributeInstance;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
+import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import javax.annotation.Nullable;
@@ -91,7 +91,7 @@ public class AttributeEntry {
     }
     
     /** Applies this attribute change to the entity attribute builder. */
-    public void apply( AttributeModifierMap.MutableAttribute builder ) {
+    public void apply( AttributeSupplier.Builder builder ) {
         if( validate() ) apply( builder.builder.get( attribute ) );
     }
     
@@ -101,7 +101,7 @@ public class AttributeEntry {
     }
     
     /** Applies this attribute change to the attribute instance. Assumes that the instance is for this entry's target attribute. */
-    private void apply( @Nullable ModifiableAttributeInstance attributeInstance ) {
+    private void apply( @Nullable AttributeInstance attributeInstance ) {
         if( attributeInstance == null )
             throw new IllegalStateException( "Attempted to modify non-registered attribute " + ATTRIBUTE_KEY );
         

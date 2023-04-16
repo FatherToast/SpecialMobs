@@ -2,20 +2,20 @@ package fathertoast.specialmobs.common.entity.ai.goal;
 
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.entity.enderman.RunicEndermanEntity;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.MobEntity;
-import net.minecraft.entity.ai.goal.Goal;
-import net.minecraft.entity.boss.dragon.EnderDragonEntity;
-import net.minecraft.entity.monster.EndermanEntity;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.EntityDamageSource;
-import net.minecraft.util.SoundEvents;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.RayTraceContext;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.util.Mth;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.damagesource.EntityDamageSource;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.ai.goal.Goal;
+import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
+import net.minecraft.world.entity.monster.EnderMan;
+import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -28,7 +28,7 @@ public class RunicEndermanBeamAttackGoal extends Goal {
     private final DamageSource beamDamageSource;
     
     private LivingEntity targetEntity;
-    private Vector3d targetPos;
+    private Vec3 targetPos;
     private int attackTime;
     
     public RunicEndermanBeamAttackGoal( RunicEndermanEntity entity ) {
@@ -43,7 +43,7 @@ public class RunicEndermanBeamAttackGoal extends Goal {
         if( mob.isVehicle() ) return false;
         
         final LivingEntity target = mob.getTarget();
-        if( target != null && target.isAlive() && mob.getSensing().canSee( target ) &&
+        if( target != null && target.isAlive() && mob.getSensing().hasLineOfSight( target ) &&
                 mob.tickCount % 8 == 0 && mob.getRandom().nextInt( 10 ) == 0 && target.distanceToSqr( mob ) <=
                 mob.getSpecialData().getRangedAttackMaxRange() * mob.getSpecialData().getRangedAttackMaxRange() ) {
             
@@ -81,13 +81,9 @@ public class RunicEndermanBeamAttackGoal extends Goal {
     @Override
     public void tick() {
         attackTime++;
-        switch( mob.getBeamState() ) {
-            case CHARGING:
-                chargingTick();
-                break;
-            case DAMAGING:
-                damagingTick();
-                break;
+        switch (mob.getBeamState()) {
+            case CHARGING -> chargingTick();
+            case DAMAGING -> damagingTick();
         }
     }
     
@@ -112,23 +108,23 @@ public class RunicEndermanBeamAttackGoal extends Goal {
         }
         
         lookTowardTarget( 1.7F * mob.getSpecialData().getRangedWalkSpeed() ); // Use move speed as a turn rate modifier
-        final Vector3d viewVec = mob.getViewVector( 1.0F ).scale( RunicEndermanEntity.BEAM_MAX_RANGE );
+        final Vec3 viewVec = mob.getViewVector( 1.0F ).scale( RunicEndermanEntity.BEAM_MAX_RANGE );
         
-        final Vector3d beamStartPos = mob.getEyePosition( 1.0F );
-        Vector3d beamEndPos = beamStartPos.add( viewVec );
+        final Vec3 beamStartPos = mob.getEyePosition( 1.0F );
+        Vec3 beamEndPos = beamStartPos.add( viewVec );
         
-        final RayTraceResult blockRayTrace = mob.level.clip(
-                new RayTraceContext( beamStartPos, beamEndPos,
-                        RayTraceContext.BlockMode.COLLIDER, RayTraceContext.FluidMode.NONE, mob ) );
-        if( blockRayTrace.getType() != RayTraceResult.Type.MISS ) {
+        final HitResult blockRayTrace = mob.level.clip(
+                new ClipContext( beamStartPos, beamEndPos,
+                        ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, mob ) );
+        if( blockRayTrace.getType() != HitResult.Type.MISS ) {
             beamEndPos = blockRayTrace.getLocation();
         }
         
         final List<Entity> hitEntities = rayTraceEntities( beamStartPos, beamEndPos,
                 mob.getBoundingBox().expandTowards( viewVec ).inflate( 1.0 ) );
         for( Entity entity : hitEntities ) {
-            if( entity instanceof EndermanEntity || entity instanceof EnderDragonEntity ) {
-                if( mob.tickCount % 10 == 0 ) ((MobEntity) entity).heal( 1.0F );
+            if( entity instanceof EnderMan || entity instanceof EnderDragon) {
+                if( mob.tickCount % 10 == 0 ) ((Mob) entity).heal( 1.0F );
             }
             else if( entity.hurt( beamDamageSource, mob.getSpecialData().getRangedAttackDamage() ) &&
                     entity instanceof LivingEntity ) {
@@ -140,7 +136,7 @@ public class RunicEndermanBeamAttackGoal extends Goal {
     
     /** Updates the target position based on an entity we want to hit. */
     private void updateTargetPos() {
-        targetPos = new Vector3d( targetEntity.getX(), targetEntity.getY( 0.5 ), targetEntity.getZ() );
+        targetPos = new Vec3( targetEntity.getX(), targetEntity.getY( 0.5 ), targetEntity.getZ() );
     }
     
     /** Sets the target look position. Modifies the target position to limit vertical look speed. */
@@ -148,12 +144,12 @@ public class RunicEndermanBeamAttackGoal extends Goal {
         final double dX = targetPos.x - mob.getX();
         final double dY = targetPos.y - mob.getEyeY();
         final double dZ = targetPos.z - mob.getZ();
-        final double dH = MathHelper.sqrt( dX * dX + dZ * dZ );
-        final float targetXRot = (float) MathHelper.atan2( dY, dH );
+        final double dH = Mth.sqrt( (float) (dX * dX + dZ * dZ) );
+        final float targetXRot = (float) Mth.atan2( dY, dH );
         
-        final float clampedXRot = (mob.xRot + MathHelper.clamp( MathHelper.degreesDifference( mob.xRot,
+        final float clampedXRot = (mob.getXRot() + Mth.clamp( Mth.degreesDifference( mob.getXRot(),
                 targetXRot * -57.2957763671875F ), -speed, speed )) / -57.2957763671875F;
-        final double clampedDY = dH * MathHelper.sin( clampedXRot ) / MathHelper.cos( clampedXRot );
+        final double clampedDY = dH * Mth.sin( clampedXRot ) / Mth.cos( clampedXRot );
         targetPos = targetPos.add( 0.0, clampedDY - dY, 0.0 );
         
         mob.getLookControl().setLookAt( targetPos.x, targetPos.y, targetPos.z,
@@ -161,10 +157,10 @@ public class RunicEndermanBeamAttackGoal extends Goal {
     }
     
     /** @return A list of all entities between the two vector positions and within the search area, in no particular order. */
-    private List<Entity> rayTraceEntities( Vector3d from, Vector3d to, AxisAlignedBB searchArea ) {
+    private List<Entity> rayTraceEntities( Vec3 from, Vec3 to, AABB searchArea ) {
         final List<Entity> entitiesHit = new ArrayList<>();
         for( Entity entity : mob.level.getEntities( mob, searchArea, this::canBeamHitTarget ) ) {
-            final Optional<Vector3d> hitPos = entity.getBoundingBox().inflate( 0.3 ).clip( from, to );
+            final Optional<Vec3> hitPos = entity.getBoundingBox().inflate( 0.3 ).clip( from, to );
             if( hitPos.isPresent() ) {
                 entitiesHit.add( entity );
             }

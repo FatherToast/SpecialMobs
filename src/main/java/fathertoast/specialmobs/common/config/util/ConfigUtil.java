@@ -2,10 +2,10 @@ package fathertoast.specialmobs.common.config.util;
 
 import com.electronwill.nightconfig.core.file.FileConfig;
 import fathertoast.specialmobs.common.core.SpecialMobs;
+import net.minecraftforge.event.server.ServerAboutToStartEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.server.FMLServerAboutToStartEvent;
 import net.minecraftforge.fml.loading.FMLPaths;
 
 import java.io.File;
@@ -59,5 +59,5 @@ public final class ConfigUtil {
      * @param event The event data.
      */
     @SubscribeEvent( priority = EventPriority.NORMAL )
-    public static void onServerAboutToStart( FMLServerAboutToStartEvent event ) { DYNAMIC_REGISTRY_VERSION++; }
+    public static void onServerAboutToStart( ServerAboutToStartEvent event ) { DYNAMIC_REGISTRY_VERSION++; }
 }

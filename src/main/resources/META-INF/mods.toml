@@ -1,5 +1,5 @@
 modLoader = "javafml"
-loaderVersion = "[36,)"
+loaderVersion = "[43,)"
 license = "GNU General Public License v3.0"
 issueTrackerURL = "https://github.com/FatherToast/SpecialMobs/issues/"
 
@@ -27,25 +27,21 @@ Discussion: https://discord.gg/GFTzTdX
 [[dependencies.specialmobs]]
 modId = "forge"
 mandatory = true
-versionRange = "[36.2.17,)"
+versionRange = "[43,)"
 ordering = "NONE"
 side = "BOTH"
 
 [[dependencies.specialmobs]]
 modId = "minecraft"
 mandatory = true
-versionRange = "[1.16.5,1.17)"
+versionRange = "[1.19.2]"
 ordering = "NONE"
 side = "BOTH"
 
 [[dependencies.specialmobs]]
 modId = "theoneprobe"
 mandatory = false
-versionRange = "[1.16,)"
+versionRange = "[1.19,)"
 ordering = "BEFORE"
 side = "BOTH"
 
-# A URL to query for updates for this mod. See the JSON update specification https://mcforge.readthedocs.io/en/latest/gettingstarted/autoupdate/
-#updateJSONURL="https://change.me.example.invalid/updates.json" #optional
-# A URL for the "homepage" for this mod, displayed in the mod UI
-#displayURL="" #optional

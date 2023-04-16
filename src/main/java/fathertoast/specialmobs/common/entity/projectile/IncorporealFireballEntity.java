@@ -6,34 +6,33 @@ import fathertoast.specialmobs.common.core.register.SMItems;
 import fathertoast.specialmobs.common.entity.ghast.CorporealShiftGhastEntity;
 import fathertoast.specialmobs.common.event.PlayerVelocityWatcher;
 import fathertoast.specialmobs.common.util.References;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.projectile.AbstractFireballEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.IPacket;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.SoundEvents;
-import net.minecraft.util.math.EntityRayTraceResult;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.Explosion;
-import net.minecraft.world.World;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.util.Constants;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.util.Mth;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.AbstractHurtingProjectile;
+import net.minecraft.world.entity.projectile.ItemSupplier;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Explosion;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.EntityHitResult;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.entity.IEntityAdditionalSpawnData;
 import net.minecraftforge.event.ForgeEventFactory;
-import net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData;
-import net.minecraftforge.fml.network.NetworkHooks;
+import net.minecraftforge.network.NetworkHooks;
 
 import javax.annotation.Nullable;
 
-public class IncorporealFireballEntity extends AbstractFireballEntity implements IEntityAdditionalSpawnData {
-    
+public class IncorporealFireballEntity extends AbstractHurtingProjectile implements IEntityAdditionalSpawnData, ItemSupplier {
+
     public int explosionPower = 1;
     private boolean shouldExplode = false;
     
@@ -41,24 +40,24 @@ public class IncorporealFireballEntity extends AbstractFireballEntity implements
     private LivingEntity target;
     
     
-    public IncorporealFireballEntity( EntityType<? extends AbstractFireballEntity> entityType, World world ) {
-        super( entityType, world );
+    public IncorporealFireballEntity( EntityType<? extends AbstractHurtingProjectile> entityType, Level level ) {
+        super( entityType, level );
     }
     
-    public IncorporealFireballEntity( World world, CorporealShiftGhastEntity ghast, double x, double y, double z ) {
-        super( SMEntities.INCORPOREAL_FIREBALL.get(), ghast, x, y, z, world );
+    public IncorporealFireballEntity( Level level, CorporealShiftGhastEntity ghast, double x, double y, double z ) {
+        super( SMEntities.INCORPOREAL_FIREBALL.get(), ghast, x, y, z, level );
         explosionPower = ghast.getExplosionPower();
         target = ghast.getTarget();
     }
     
-    public IncorporealFireballEntity( World world, @Nullable PlayerEntity owner, @Nullable LivingEntity target, double x, double y, double z ) {
-        this( SMEntities.INCORPOREAL_FIREBALL.get(), world );
+    public IncorporealFireballEntity(Level level, @Nullable Player owner, @Nullable LivingEntity target, double x, double y, double z ) {
+        this( SMEntities.INCORPOREAL_FIREBALL.get(), level );
         setPos( x, y, z );
         this.target = target;
 
-        moveTo( x, y, z, yRot, xRot );
+        moveTo( x, y, z, getYRot(), getXRot() );
         reapplyPosition();
-        double d = MathHelper.sqrt( x * x + y * y + z * z );
+        double d = Mth.sqrt( (float) (x * x + y * y + z * z) );
 
         if ( d != 0.0D ) {
             xPower = x / d * 0.1D;
@@ -68,7 +67,7 @@ public class IncorporealFireballEntity extends AbstractFireballEntity implements
 
         if ( owner != null ) {
             setOwner( owner );
-            setRot( owner.yRot, owner.xRot );
+            setRot( owner.getYRot(), owner.getXRot() );
         }
     }
     
@@ -87,12 +86,12 @@ public class IncorporealFireballEntity extends AbstractFireballEntity implements
         if( target == null || !target.isAlive() ) {
             playSound( SoundEvents.FIRE_EXTINGUISH, 1.0F, 1.0F );
 
-            if ( !level.isClientSide ) remove();
+            if ( !level.isClientSide ) discard();
             return;
         }
         // Follow target
-        Vector3d vector3d = new Vector3d( target.getX() - this.getX(), (target.getY() + (target.getEyeHeight() / 2)) - this.getY(), target.getZ() - this.getZ() );
-        setDeltaMovement( vector3d.normalize().scale( 0.5 ) );
+        Vec3 vec3 = new Vec3( target.getX() - this.getX(), (target.getY() + (target.getEyeHeight() / 2)) - this.getY(), target.getZ() - this.getZ() );
+        setDeltaMovement( vec3.normalize().scale( 0.5 ) );
 
         // Boof
         if ( !level.isClientSide && shouldExplode ) explode();
@@ -100,11 +99,11 @@ public class IncorporealFireballEntity extends AbstractFireballEntity implements
     
     private void explode() {
         boolean mobGrief = ForgeEventFactory.getMobGriefingEvent( level, getOwner() );
-        Explosion.Mode mode = mobGrief ? Explosion.Mode.DESTROY : Explosion.Mode.NONE;
+        Explosion.BlockInteraction mode = mobGrief ? Explosion.BlockInteraction.DESTROY : Explosion.BlockInteraction.NONE;
 
         level.explode( null, this.getX(), this.getY(), this.getZ(), (float) explosionPower, mobGrief, mode );
         target = null;
-        remove();
+        discard();
     }
     
     @Override
@@ -113,19 +112,18 @@ public class IncorporealFireballEntity extends AbstractFireballEntity implements
     }
     
     @Override
-    protected void onHit( RayTraceResult traceResult ) {
-        super.onHit( traceResult );
+    protected void onHit( HitResult hitResult ) {
+        super.onHit( hitResult );
     }
     
     @Override
-    protected void onHitEntity( EntityRayTraceResult traceResult ) {
-        super.onHitEntity( traceResult );
+    protected void onHitEntity( EntityHitResult hitResult ) {
+        super.onHitEntity( hitResult );
         
         if( !this.level.isClientSide ) {
-            Entity target = traceResult.getEntity();
+            Entity target = hitResult.getEntity();
 
-            if( target instanceof PlayerEntity ) {
-                PlayerEntity player = (PlayerEntity) target;
+            if( target instanceof Player player ) {
                 if (PlayerVelocityWatcher.get(player).isMoving()) {
                     explode();
                     return;
@@ -138,7 +136,7 @@ public class IncorporealFireballEntity extends AbstractFireballEntity implements
                 }
             }
             playSound( SoundEvents.FIRE_EXTINGUISH, 1.0F, 1.0F );
-            remove();
+            discard();
         }
     }
     
@@ -151,27 +149,27 @@ public class IncorporealFireballEntity extends AbstractFireballEntity implements
         return true;
     }
     
-    @OnlyIn( Dist.CLIENT )
+    @Override
     public ItemStack getItem() {
         return new ItemStack( SMItems.INCORPOREAL_FIREBALL.get() );
     }
     
     @Override
-    public void addAdditionalSaveData( CompoundNBT compoundNBT ) {
-        super.addAdditionalSaveData( compoundNBT );
-        compoundNBT.putInt( "ExplosionPower", explosionPower );
-        compoundNBT.putInt( "TargetId", target == null ? -1 : target.getId() );
+    public void addAdditionalSaveData( CompoundTag compoundTag ) {
+        super.addAdditionalSaveData( compoundTag );
+        compoundTag.putInt( "ExplosionPower", explosionPower );
+        compoundTag.putInt( "TargetId", target == null ? -1 : target.getId() );
     }
     
     @Override
-    public void readAdditionalSaveData( CompoundNBT compoundNBT ) {
-        super.readAdditionalSaveData( compoundNBT );
-        if( compoundNBT.contains( "ExplosionPower", Constants.NBT.TAG_ANY_NUMERIC ) ) {
-            explosionPower = compoundNBT.getInt( "ExplosionPower" );
+    public void readAdditionalSaveData( CompoundTag compoundTag ) {
+        super.readAdditionalSaveData( compoundTag );
+        if( compoundTag.contains( "ExplosionPower", Tag.TAG_ANY_NUMERIC ) ) {
+            explosionPower = compoundTag.getInt( "ExplosionPower" );
         }
         
-        if( compoundNBT.contains( "TargetId", Constants.NBT.TAG_ANY_NUMERIC ) ) {
-            Entity entity = level.getEntity( compoundNBT.getInt( "TargetId" ) );
+        if( compoundTag.contains( "TargetId", Tag.TAG_ANY_NUMERIC ) ) {
+            Entity entity = level.getEntity( compoundTag.getInt( "TargetId" ) );
             
             if( entity instanceof LivingEntity ) {
                 target = (LivingEntity) entity;
@@ -180,19 +178,19 @@ public class IncorporealFireballEntity extends AbstractFireballEntity implements
     }
     
     @Override
-    public IPacket<?> getAddEntityPacket() {
+    public Packet<?> getAddEntityPacket() {
         return NetworkHooks.getEntitySpawningPacket( this );
     }
 
     @Override
-    public void writeSpawnData( PacketBuffer buffer ) {
+    public void writeSpawnData( FriendlyByteBuf buffer ) {
         final Entity owner = getOwner();
         buffer.writeInt( owner == null ? 0 : owner.getId() );
         buffer.writeInt( target == null ? 0 : target.getId() );
     }
 
     @Override
-    public void readSpawnData( PacketBuffer additionalData ) {
+    public void readSpawnData( FriendlyByteBuf additionalData ) {
         final int ownerId = additionalData.readInt();
         final int targetId = additionalData.readInt();
 

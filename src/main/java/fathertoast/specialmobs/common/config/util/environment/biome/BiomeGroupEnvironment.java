@@ -3,21 +3,21 @@ package fathertoast.specialmobs.common.config.util.environment.biome;
 import fathertoast.specialmobs.common.config.field.AbstractConfigField;
 import fathertoast.specialmobs.common.config.field.EnvironmentListField;
 import fathertoast.specialmobs.common.config.util.environment.DynamicRegistryGroupEnvironment;
-import net.minecraft.util.RegistryKey;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.world.biome.Biome;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.biome.Biome;
 
 import javax.annotation.Nullable;
 import java.util.List;
 
 public class BiomeGroupEnvironment extends DynamicRegistryGroupEnvironment<Biome> {
     
-    public BiomeGroupEnvironment( RegistryKey<Biome> biome, boolean invert ) { this( biome.location(), invert ); }
+    public BiomeGroupEnvironment( ResourceKey<Biome> biome, boolean invert ) { this( biome.location(), invert ); }
     
-    public BiomeGroupEnvironment( ResourceLocation regKey, boolean invert ) { super( regKey, invert ); }
+    public BiomeGroupEnvironment(ResourceLocation regKey, boolean invert ) { super( regKey, invert ); }
     
     public BiomeGroupEnvironment( AbstractConfigField field, String line ) { super( field, line ); }
     
@@ -27,14 +27,14 @@ public class BiomeGroupEnvironment extends DynamicRegistryGroupEnvironment<Biome
     
     /** @return The registry used. */
     @Override
-    public RegistryKey<Registry<Biome>> getRegistry() { return Registry.BIOME_REGISTRY; }
+    public ResourceKey<Registry<Biome>> getRegistry() { return Registry.BIOME_REGISTRY; }
     
     /** @return Returns true if this environment matches the provided environment. */
     @Override
-    public final boolean matches( ServerWorld world, @Nullable BlockPos pos ) {
-        final Biome target = pos == null ? null : world.getBiome( pos );
+    public final boolean matches( ServerLevel level, @Nullable BlockPos pos ) {
+        final Biome target = pos == null ? null : level.getBiome( pos ).get();
         if( target != null ) {
-            final List<Biome> entries = getRegistryEntries( world );
+            final List<Biome> entries = getRegistryEntries( level );
             for( Biome entry : entries ) {
                 if( entry.equals( target ) ) return !INVERT;
             }

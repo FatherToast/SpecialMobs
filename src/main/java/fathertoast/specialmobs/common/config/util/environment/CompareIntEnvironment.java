@@ -3,8 +3,8 @@ package fathertoast.specialmobs.common.config.util.environment;
 import fathertoast.specialmobs.common.config.field.AbstractConfigField;
 import fathertoast.specialmobs.common.config.file.TomlHelper;
 import fathertoast.specialmobs.common.core.SpecialMobs;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 
 import javax.annotation.Nullable;
 
@@ -76,12 +76,12 @@ public abstract class CompareIntEnvironment extends AbstractEnvironment {
     
     /** @return Returns true if this environment matches the provided environment. */
     @Override
-    public boolean matches( World world, @Nullable BlockPos pos ) {
-        final Integer actual = getActual( world, pos );
+    public boolean matches( Level level, @Nullable BlockPos pos ) {
+        final Integer actual = getActual( level, pos );
         return actual != null && COMPARATOR.apply( actual, VALUE );
     }
     
     /** @return Returns the actual value to compare, or null if there isn't enough information. */
     @Nullable
-    public abstract Integer getActual( World world, @Nullable BlockPos pos );
+    public abstract Integer getActual( Level level, @Nullable BlockPos pos );
 }

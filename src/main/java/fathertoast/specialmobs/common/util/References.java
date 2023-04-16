@@ -1,17 +1,17 @@
 package fathertoast.specialmobs.common.util;
 
 import fathertoast.specialmobs.common.core.SpecialMobs;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.ListNBT;
-import net.minecraft.nbt.StringNBT;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.StringTag;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 
 import javax.annotation.Nullable;
 import java.util.UUID;
@@ -64,7 +64,7 @@ public final class References {
     public static final String TEXTURE_SHOOTING_SUFFIX = "_shooting";
     public static final String TEXTURE_SHOOTING_EYES_SUFFIX = "_shooting_eyes";
     
-    public static ResourceLocation getEntityTexture( String path, String fileName ) { return getEntityTexture( path, fileName, "" ); }
+    public static ResourceLocation getEntityTexture(String path, String fileName ) { return getEntityTexture( path, fileName, "" ); }
     
     @SuppressWarnings( "unused" )
     public static ResourceLocation getEntityBaseTexture( String path, String fileName ) {
@@ -96,7 +96,7 @@ public final class References {
     
     //--------------- EVENT CODES ----------------
     
-    /** Bit flags that can be provided to {@link net.minecraft.world.World#setBlock(BlockPos, BlockState, int)}. */
+    /** Bit flags that can be provided to {@link net.minecraft.world.level.Level#setBlock(BlockPos, BlockState, int)}. */
     @SuppressWarnings( "unused" )
     public static final class SetBlockFlags {
         /** Triggers a block update. */
@@ -121,7 +121,7 @@ public final class References {
     }
     
     /**
-     * Entity events. Sent from the server, executed on the client via {@link Entity#handleEntityEvent(byte)}.
+     * Entity events. Sent from the server, executed on the client via {@link net.minecraft.world.entity.Entity#handleEntityEvent(byte)}.
      * This only contains event codes for Entity and LivingEntity.
      */
     public enum EntityEvent {
@@ -148,7 +148,7 @@ public final class References {
     
     /**
      * Simple level events (ones that do not use extra metadata). Sent from the server, then executed on the client
-     * via {@link net.minecraft.client.renderer.WorldRenderer#levelEvent(PlayerEntity, int, BlockPos, int)}.
+     * via {@link net.minecraft.client.renderer.LevelRenderer#levelEvent(int, BlockPos, int)}.
      */
     public enum LevelEvent {
         // Note: if metadata events are needed, they will need to be implemented in a separate class
@@ -186,19 +186,19 @@ public final class References {
         }
         
         /** Plays this event at a particular position. */
-        public void play( World world, BlockPos pos ) { play( world, null, pos ); }
+        public void play( Level level, BlockPos pos ) { play( level, null, pos ); }
         
         /** Plays this event at a particular position, excluding a particular player. */
-        public void play( World world, @Nullable PlayerEntity player, BlockPos pos ) { world.levelEvent( player, ID, pos, 0 ); }
+        public void play( Level level, @Nullable Player player, BlockPos pos ) { level.levelEvent( player, ID, pos, 0 ); }
     }
     
     
     //--------------- NBT STUFF ----------------
     
     public static final int NBT_TYPE_NUMERICAL = 99;
-    public static final int NBT_TYPE_STRING = StringNBT.valueOf( "" ).getId(); // 8
-    public static final int NBT_TYPE_LIST = new ListNBT().getId(); // 9
-    public static final int NBT_TYPE_COMPOUND = new CompoundNBT().getId(); // 10
+    public static final int NBT_TYPE_STRING = StringTag.valueOf( "" ).getId(); // 8
+    public static final int NBT_TYPE_LIST = new ListTag().getId(); // 9
+    public static final int NBT_TYPE_COMPOUND = new CompoundTag().getId(); // 10
     
     // Projectiles
     public static final String TAG_KNOCKBACK = "Knockback";

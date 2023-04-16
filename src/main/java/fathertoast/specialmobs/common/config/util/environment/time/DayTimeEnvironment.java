@@ -3,8 +3,8 @@ package fathertoast.specialmobs.common.config.util.environment.time;
 import fathertoast.specialmobs.common.config.field.AbstractConfigField;
 import fathertoast.specialmobs.common.config.field.EnvironmentListField;
 import fathertoast.specialmobs.common.config.util.environment.EnumEnvironment;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 
 import javax.annotation.Nullable;
 
@@ -37,7 +37,7 @@ public class DayTimeEnvironment extends EnumEnvironment<DayTimeEnvironment.Value
     
     /** @return Returns true if this environment matches the provided environment. */
     @Override
-    public boolean matches( World world, @Nullable BlockPos pos ) {
-        return (VALUE.matches( (int) (world.dayTime() / 24_000L) )) != INVERT;
+    public boolean matches( Level level, @Nullable BlockPos pos ) {
+        return (VALUE.matches( (int) (level.dayTime() / 24_000L) )) != INVERT;
     }
 }

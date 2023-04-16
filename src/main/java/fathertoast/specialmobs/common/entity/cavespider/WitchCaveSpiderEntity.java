@@ -6,12 +6,12 @@ import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.potion.EffectInstance;
-import net.minecraft.potion.EffectType;
-import net.minecraft.world.World;
+import net.minecraft.world.effect.MobEffectCategory;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.level.Level;
 
 @SpecialMob
 public class WitchCaveSpiderEntity extends _SpecialCaveSpiderEntity {
@@ -43,7 +43,7 @@ public class WitchCaveSpiderEntity extends _SpecialCaveSpiderEntity {
     }
     
     @SpecialMob.Factory
-    public static EntityType.IFactory<WitchCaveSpiderEntity> getVariantFactory() { return WitchCaveSpiderEntity::new; }
+    public static EntityType.EntityFactory<WitchCaveSpiderEntity> getVariantFactory() { return WitchCaveSpiderEntity::new; }
     
     /** @return This entity's mob species. */
     @SpecialMob.SpeciesSupplier
@@ -53,7 +53,7 @@ public class WitchCaveSpiderEntity extends _SpecialCaveSpiderEntity {
     
     //--------------- Variant-Specific Implementations ----------------
     
-    public WitchCaveSpiderEntity( EntityType<? extends _SpecialCaveSpiderEntity> entityType, World world ) { super( entityType, world ); }
+    public WitchCaveSpiderEntity( EntityType<? extends _SpecialCaveSpiderEntity> entityType, Level level ) { super( entityType, level ); }
     
     /** Override to change the color of this entity's spit attack. */
     @Override
@@ -68,8 +68,8 @@ public class WitchCaveSpiderEntity extends _SpecialCaveSpiderEntity {
     
     /** @return True if the effect can be applied to this entity. */
     @Override
-    public boolean canBeAffected( EffectInstance effect ) {
+    public boolean canBeAffected( MobEffectInstance effect ) {
         // Witch spider is immune to debuffs
-        return effect.getEffect().getCategory() != EffectType.HARMFUL && super.canBeAffected( effect );
+        return effect.getEffect().getCategory() != MobEffectCategory.HARMFUL && super.canBeAffected( effect );
     }
 }

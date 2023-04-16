@@ -2,16 +2,13 @@ package fathertoast.specialmobs.common.core;
 
 import fathertoast.specialmobs.common.compat.top.SMTheOneProbe;
 import fathertoast.specialmobs.common.config.Config;
-import fathertoast.specialmobs.common.core.register.SMBlocks;
-import fathertoast.specialmobs.common.core.register.SMEffects;
-import fathertoast.specialmobs.common.core.register.SMEntities;
-import fathertoast.specialmobs.common.core.register.SMItems;
+import fathertoast.specialmobs.common.core.register.*;
 import fathertoast.specialmobs.common.event.AdvancementFixer;
 import fathertoast.specialmobs.common.event.GameEvents;
 import fathertoast.specialmobs.common.event.NaturalSpawnManager;
 import fathertoast.specialmobs.common.network.PacketHandler;
 import fathertoast.specialmobs.common.util.SMDispenserBehavior;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -21,7 +18,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.InterModEnqueueEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.registries.ForgeRegistryEntry;
+import net.minecraftforge.registries.IForgeRegistry;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -136,10 +133,12 @@ public class SpecialMobs {
         SMItems.REGISTRY.register( modEventBus );
         SMEntities.REGISTRY.register( modEventBus );
         SMEffects.REGISTRY.register( modEventBus );
+        SMBiomeMods.REGISTRY.register( modEventBus );
         
         modEventBus.addListener( SMEntities::createAttributes );
         modEventBus.addListener( this::setup );
         modEventBus.addListener( this::sendIMCMessages );
+        modEventBus.addListener( NaturalSpawnManager::registerSpawnPlacements );
         
         MinecraftForge.EVENT_BUS.addListener( EventPriority.LOW, NaturalSpawnManager::onBiomeLoad );
         MinecraftForge.EVENT_BUS.register( new GameEvents() );
@@ -152,7 +151,6 @@ public class SpecialMobs {
     
     public void setup( FMLCommonSetupEvent event ) {
         event.enqueueWork(() -> {
-            NaturalSpawnManager.registerSpawnPlacements();
             SMDispenserBehavior.registerBehaviors();
         });
     }
@@ -165,10 +163,14 @@ public class SpecialMobs {
     }
     
     /** @return A ResourceLocation with the mod's namespace. */
-    public static ResourceLocation resourceLoc( String path ) { return new ResourceLocation( MOD_ID, path ); }
+    public static ResourceLocation resourceLoc(String path ) { return new ResourceLocation( MOD_ID, path ); }
     
     /** @return Returns a Forge registry entry as a string, or "null" if it is null. */
-    public static String toString( @Nullable ForgeRegistryEntry<?> regEntry ) { return regEntry == null ? "null" : toString( regEntry.getRegistryName() ); }
+    public static <T> String toString( @Nullable T regEntry, IForgeRegistry<T> registry ) {
+        return regEntry == null || !registry.containsValue(regEntry)
+                ? "null"
+                : toString( registry.getKey(regEntry) );
+    }
     
     /** @return Returns the resource location as a string, or "null" if it is null. */
     public static String toString( @Nullable ResourceLocation res ) { return res == null ? "null" : res.toString(); }

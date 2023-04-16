@@ -4,22 +4,21 @@ import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.core.register.SMBlocks;
 import fathertoast.specialmobs.common.entity.silverfish.PufferSilverfishEntity;
 import fathertoast.specialmobs.common.util.References;
-import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.SilverfishBlock;
-import net.minecraft.block.material.Material;
-import net.minecraft.entity.monster.SilverfishEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.InfestedBlock;
+import net.minecraft.world.level.material.Material;
 
-import java.util.Random;
 import java.util.function.Function;
 
 /**
  * A variation of the regular silverfish block intended for placement under water.
  * Contains a puffer silverfish instead of a vanilla one.
  */
-public class UnderwaterSilverfishBlock extends SilverfishBlock {
+public class UnderwaterSilverfishBlock extends InfestedBlock {
     
     public enum Type {
         TUBE( "tube", Blocks.TUBE_CORAL_BLOCK,
@@ -77,7 +76,7 @@ public class UnderwaterSilverfishBlock extends SilverfishBlock {
         }
         
         /** @return A random underwater silverfish block type. */
-        public static Type next( Random random ) { return values()[random.nextInt( values().length )]; }
+        public static Type next( RandomSource random ) { return values()[random.nextInt( values().length )]; }
     }
     
     @SpecialMob.LanguageProvider
@@ -88,12 +87,12 @@ public class UnderwaterSilverfishBlock extends SilverfishBlock {
     }
     
     @Override
-    protected void spawnInfestation( ServerWorld world, BlockPos pos ) {
-        final SilverfishEntity silverfish = PufferSilverfishEntity.SPECIES.entityType.get().create( world );
+    protected void spawnInfestation( ServerLevel level, BlockPos pos ) {
+        final PufferSilverfishEntity silverfish = PufferSilverfishEntity.SPECIES.entityType.get().create( level );
         if( silverfish == null ) return;
         
         silverfish.moveTo( pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5, 0.0F, 0.0F );
-        world.addFreshEntity( silverfish );
+        level.addFreshEntity( silverfish );
         silverfish.spawnAnim();
     }
 }

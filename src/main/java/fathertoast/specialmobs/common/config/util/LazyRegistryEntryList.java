@@ -2,12 +2,12 @@ package fathertoast.specialmobs.common.config.util;
 
 import fathertoast.specialmobs.common.config.field.AbstractConfigField;
 import fathertoast.specialmobs.common.core.SpecialMobs;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.RegistryObject;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.registries.IForgeRegistry;
-import net.minecraftforge.registries.IForgeRegistryEntry;
+import net.minecraftforge.registries.RegistryObject;
 
 import javax.annotation.Nullable;
+import java.lang.reflect.ParameterizedType;
 import java.util.List;
 import java.util.Set;
 
@@ -17,7 +17,7 @@ import java.util.Set;
  * <p>
  * See also: {@link net.minecraftforge.registries.ForgeRegistries}
  */
-public class LazyRegistryEntryList<T extends IForgeRegistryEntry<T>> extends RegistryEntryList<T> {
+public class LazyRegistryEntryList<T> extends RegistryEntryList<T> {
     /** The field containing this list. We save a reference to help improve error/warning reports. */
     private final AbstractConfigField FIELD;
     /** True if the underlying set has been populated from the print list. */
@@ -26,44 +26,43 @@ public class LazyRegistryEntryList<T extends IForgeRegistryEntry<T>> extends Reg
     /**
      * Create a new registry entry list from an array of entries. Used for creating default configs.
      * <p>
-     * This method of creation can only use entries that are loaded (typically only vanilla entries)
-     * and cannot take advantage of the * notation.
-     */
-    @SafeVarargs
-    public LazyRegistryEntryList( IForgeRegistry<T> registry, T... entries ) {
-        super( registry, entries );
-        FIELD = null;
-        populated = true;
-    }
-    
-    /**
-     * Create a new registry entry list from an array of entries. Used for creating default configs.
-     * <p>
      * This method of creation is less safe, but can take advantage of the regular vanilla entries, deferred entries,
      * resource locations, and raw strings.
+     * <p>
+     * @param vanilla If true, assume all entries are from vanilla (already loaded)
      */
-    public LazyRegistryEntryList( IForgeRegistry<T> registry, Object... entries ) {
+    @SuppressWarnings("unchecked")
+    public LazyRegistryEntryList( IForgeRegistry<T> registry, boolean vanilla, Object... entries ) {
         super( registry );
         FIELD = null;
-        for( Object entry : entries ) {
-            if( entry instanceof IForgeRegistryEntry ) {
-                final ResourceLocation regKey = ((IForgeRegistryEntry<?>) entry).getRegistryName();
-                if( regKey == null ) {
-                    throw new IllegalArgumentException( "Invalid default lazy registry list entry! " + entry );
+
+        if (vanilla) {
+            populated = true;
+        }
+        else {
+            Class<T> type = (Class<T>) ((ParameterizedType) getClass().getGenericSuperclass())
+                    .getActualTypeArguments()[0];
+
+            for (Object entry : entries) {
+                if (type.isInstance(entry) && registry.containsValue((T) entry)) {
+                    final ResourceLocation regKey = registry.getKey((T) entry);
+                    if (regKey == null) {
+                        throw new IllegalArgumentException("Invalid default lazy registry list entry! " + entry);
+                    }
+                    PRINT_LIST.add(regKey.toString());
                 }
-                PRINT_LIST.add( regKey.toString() );
-            }
-            else if( entry instanceof RegistryObject ) {
-                PRINT_LIST.add( ((RegistryObject<?>) entry).getId().toString() );
-            }
-            else if( entry instanceof ResourceLocation ) {
-                PRINT_LIST.add( entry.toString() );
-            }
-            else if( entry instanceof String ) {
-                PRINT_LIST.add( (String) entry );
-            }
-            else {
-                throw new IllegalArgumentException( "Invalid default lazy registry list entry! " + entry );
+                else if (entry instanceof RegistryObject) {
+                    PRINT_LIST.add(((RegistryObject<?>) entry).getId().toString());
+                }
+                else if (entry instanceof ResourceLocation) {
+                    PRINT_LIST.add(entry.toString());
+                }
+                else if (entry instanceof String) {
+                    PRINT_LIST.add((String) entry);
+                }
+                else {
+                    throw new IllegalArgumentException("Invalid default lazy registry list entry! " + entry);
+                }
             }
         }
     }

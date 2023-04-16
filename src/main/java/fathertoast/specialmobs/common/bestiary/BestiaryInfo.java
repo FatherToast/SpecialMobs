@@ -2,17 +2,17 @@ package fathertoast.specialmobs.common.bestiary;
 
 import fathertoast.specialmobs.common.config.field.DoubleField;
 import fathertoast.specialmobs.common.config.util.*;
-import fathertoast.specialmobs.common.config.util.environment.biome.BiomeCategory;
 import fathertoast.specialmobs.common.util.References;
-import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.ai.attributes.Attribute;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.potion.Effect;
-import net.minecraft.potion.Effects;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.biome.Biomes;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.BiomeTags;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.level.biome.Biomes;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import javax.annotation.Nullable;
@@ -48,7 +48,6 @@ public class BestiaryInfo {
                 EnvironmentEntry.builder( DefaultWeight.LOWEST.value ).isFreezing().build(),
                 // Regular frozen ocean is actually freezing, so already covered
                 EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).inBiome( Biomes.WARM_OCEAN ).build(),
-                EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).inBiome( Biomes.DEEP_WARM_OCEAN ).build(),
                 EnvironmentEntry.builder( DefaultWeight.HIGH.value ).inBiome( Biomes.LUKEWARM_OCEAN ).build(),
                 EnvironmentEntry.builder( DefaultWeight.HIGH.value ).inBiome( Biomes.DEEP_LUKEWARM_OCEAN ).build(),
                 EnvironmentEntry.builder( DefaultWeight.LOW.value ).inBiome( Biomes.COLD_OCEAN ).build(),
@@ -66,8 +65,7 @@ public class BestiaryInfo {
                 EnvironmentEntry.builder( DefaultWeight.HIGH.value ).inBiome( Biomes.DEEP_COLD_OCEAN ).build(),
                 EnvironmentEntry.builder( DefaultWeight.LOW.value ).inBiome( Biomes.LUKEWARM_OCEAN ).build(),
                 EnvironmentEntry.builder( DefaultWeight.LOW.value ).inBiome( Biomes.DEEP_LUKEWARM_OCEAN ).build(),
-                EnvironmentEntry.builder( DefaultWeight.LOWEST.value ).inBiome( Biomes.WARM_OCEAN ).build(),
-                EnvironmentEntry.builder( DefaultWeight.LOWEST.value ).inBiome( Biomes.DEEP_WARM_OCEAN ).build()
+                EnvironmentEntry.builder( DefaultWeight.LOWEST.value ).inBiome( Biomes.WARM_OCEAN ).build()
         ) ),
         DESERT( new EnvironmentList(
                 EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).inUltraWarmDimension().build(),
@@ -86,10 +84,10 @@ public class BestiaryInfo {
                 EnvironmentEntry.builder( DefaultWeight.HIGH.value ).aboveHalfMoonLight().build()
         ) ),
         FOREST( new EnvironmentList(
-                EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).inBiomeCategory( BiomeCategory.TAIGA ).build(),
-                EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).inBiomeCategory( BiomeCategory.JUNGLE ).build(),
-                EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).inBiomeCategory( BiomeCategory.FOREST ).build(),
-                EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).inBiomeCategory( BiomeCategory.SWAMP ).build(),
+                EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).inBiomeTag( BiomeTags.IS_TAIGA ).build(),
+                EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).inBiomeTag( BiomeTags.IS_JUNGLE ).build(),
+                EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).inBiomeTag( BiomeTags.IS_FOREST ).build(),
+                //EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).inBiomeTag( BiomeTags.IS_SWAMP ).build(),
                 EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).inBiome( Biomes.CRIMSON_FOREST ).build(),
                 EnvironmentEntry.builder( DefaultWeight.HIGH.value ).atMaxMoonLight().build()
         ) ),
@@ -107,7 +105,6 @@ public class BestiaryInfo {
         TROPICAL( new EnvironmentList(
                 // All ocean biomes (except regular frozen ocean) have the same temp of 0.5, so we must call out specific biomes
                 EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).inBiome( Biomes.WARM_OCEAN ).build(),
-                EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).inBiome( Biomes.DEEP_WARM_OCEAN ).build(),
                 EnvironmentEntry.builder( DefaultWeight.DISABLED.value ).isFreezing().build(),
                 EnvironmentEntry.builder( DefaultWeight.DISABLED.value ).inBiome( Biomes.DEEP_FROZEN_OCEAN ).build()
         ) ),
@@ -156,7 +153,7 @@ public class BestiaryInfo {
     public final boolean allowLeashing;
     public final boolean ignorePressurePlates;
     public final RegistryEntryList<Block> immuneToStickyBlocks;
-    public final RegistryEntryList<Effect> immuneToPotions;
+    public final RegistryEntryList<MobEffect> immuneToPotions;
     public final double rangedAttackDamage;
     public final double rangedAttackSpread;
     public final double rangedWalkSpeed;
@@ -197,8 +194,8 @@ public class BestiaryInfo {
         isDamagedByWater = waterDmg;
         allowLeashing = leash;
         ignorePressurePlates = plateImm;
-        immuneToStickyBlocks = new LazyRegistryEntryList<>( ForgeRegistries.BLOCKS, blockImm );
-        immuneToPotions = new LazyRegistryEntryList<>( ForgeRegistries.POTIONS, effectImm );
+        immuneToStickyBlocks = new LazyRegistryEntryList<>( ForgeRegistries.BLOCKS, false, blockImm );
+        immuneToPotions = new LazyRegistryEntryList<>( ForgeRegistries.MOB_EFFECTS, false, effectImm );
         rangedAttackDamage = raDmg;
         rangedAttackSpread = raVar;
         rangedWalkSpeed = raSpd;
@@ -451,10 +448,10 @@ public class BestiaryInfo {
         //--------------- Creature Type Templates ----------------
         
         /** Sets the standard species stats implied by being undead. */
-        public Builder undead() { return drownImmune().effectImmune( Effects.REGENERATION, Effects.POISON ); }
+        public Builder undead() { return drownImmune().effectImmune( MobEffects.REGENERATION, MobEffects.POISON ); }
         
         /** Sets the standard species stats implied by being a spider. */
-        public Builder spider() { return webImmune().effectImmune( Effects.POISON ); }
+        public Builder spider() { return webImmune().effectImmune( MobEffects.POISON ); }
         
         
         //--------------- Special Mob Data ----------------
@@ -686,7 +683,7 @@ public class BestiaryInfo {
         //--------------- Attribute Changes ----------------
         
         /** Adds a flat value to the base attribute. Not applicable for the movement speed attribute, use a multiplier instead. */
-        public Builder addToAttribute( Attribute attribute, double value ) {
+        public Builder addToAttribute(Attribute attribute, double value ) {
             if( attribute == Attributes.MOVEMENT_SPEED )
                 throw new IllegalArgumentException( "Do not add flat movement speed!" );
             attributes.add( AttributeEntry.add( attribute, value ) );

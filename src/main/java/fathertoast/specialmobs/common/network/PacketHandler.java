@@ -1,13 +1,13 @@
 package fathertoast.specialmobs.common.network;
 
 import fathertoast.specialmobs.common.core.SpecialMobs;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.network.NetworkDirection;
-import net.minecraftforge.fml.network.NetworkEvent;
-import net.minecraftforge.fml.network.NetworkRegistry;
-import net.minecraftforge.fml.network.simple.SimpleChannel;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraftforge.network.NetworkDirection;
+import net.minecraftforge.network.NetworkEvent;
+import net.minecraftforge.network.NetworkRegistry;
+import net.minecraftforge.network.simple.SimpleChannel;
 
 import java.util.Optional;
 import java.util.function.BiConsumer;
@@ -35,7 +35,7 @@ public class PacketHandler {
         //registerMessage( C2SSpawnIncorporealFireball.class, C2SSpawnIncorporealFireball::encode, C2SSpawnIncorporealFireball::decode, C2SSpawnIncorporealFireball::handle );
     }
     
-    public <MSG> void registerMessage( Class<MSG> messageType, BiConsumer<MSG, PacketBuffer> encoder, Function<PacketBuffer, MSG> decoder, BiConsumer<MSG, Supplier<NetworkEvent.Context>> handler ) {
+    public <MSG> void registerMessage(Class<MSG> messageType, BiConsumer<MSG, FriendlyByteBuf> encoder, Function<FriendlyByteBuf, MSG> decoder, BiConsumer<MSG, Supplier<NetworkEvent.Context>> handler ) {
         CHANNEL.registerMessage( this.messageIndex++, messageType, encoder, decoder, handler, Optional.empty() );
     }
     
@@ -46,7 +46,7 @@ public class PacketHandler {
      * @param player  The player client that should receive this message.
      * @param <MSG>   Packet type.
      */
-    public static <MSG> void sendToClient( MSG message, ServerPlayerEntity player ) {
+    public static <MSG> void sendToClient( MSG message, ServerPlayer player ) {
         CHANNEL.sendTo( message, player.connection.getConnection(), NetworkDirection.PLAY_TO_CLIENT );
     }
 }

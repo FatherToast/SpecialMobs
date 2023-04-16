@@ -1,9 +1,9 @@
 package fathertoast.specialmobs.common.entity.ai.goal;
 
 import fathertoast.specialmobs.common.entity.ghast._SpecialGhastEntity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.goal.Goal;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.goal.Goal;
 
 import java.util.EnumSet;
 
@@ -42,6 +42,7 @@ public class SpecialGhastLookAroundGoal extends Goal {
     }
     
     private void setFacing( double x, double z ) {
-        ghast.yBodyRot = ghast.yRot = (float) MathHelper.atan2( x, z ) * -180.0F / (float) Math.PI;
+        ghast.setYRot((float) Mth.atan2( x, z ) * -180.0F / (float) Math.PI);
+        ghast.yBodyRot = ghast.getYRot();
     }
 }

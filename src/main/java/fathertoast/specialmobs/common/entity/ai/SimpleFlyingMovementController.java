@@ -1,41 +1,41 @@
 package fathertoast.specialmobs.common.entity.ai;
 
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.MobEntity;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.entity.ai.controller.MovementController;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.ai.control.MoveControl;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 
 /**
  * Simple movement controller that can be used by flying entities, which takes their movement speed attribute into account.
  */
-public class SimpleFlyingMovementController extends MovementController {
+public class SimpleFlyingMovementController extends MoveControl {
     
     private int floatDuration;
     
-    public SimpleFlyingMovementController( MobEntity entity ) { super( entity ); }
+    public SimpleFlyingMovementController( Mob entity ) { super( entity ); }
     
     /** Called each tick while this move controller is active. */
     @Override
     public void tick() {
-        if( operation == MovementController.Action.MOVE_TO ) {
+        if( operation == MoveControl.Operation.MOVE_TO ) {
             if( floatDuration-- <= 0 ) {
                 floatDuration = mob.getRandom().nextInt( 5 ) + 2;
                 
-                Vector3d moveVec = new Vector3d(
+                Vec3 moveVec = new Vec3(
                         wantedX - mob.getX(),
                         wantedY - mob.getY(),
                         wantedZ - mob.getZ() );
-                final int distance = MathHelper.ceil( moveVec.length() );
+                final int distance = Mth.ceil( moveVec.length() );
                 moveVec = moveVec.normalize();
                 
                 if( mob.getRandom().nextBoolean() || canReach( moveVec, distance ) ) { // Skip the "boxcast" sometimes
                     mob.setDeltaMovement( mob.getDeltaMovement().add( moveVec.scale( getScaledMoveSpeed() ) ) );
                 }
                 else {
-                    operation = MovementController.Action.WAIT;
+                    operation = MoveControl.Operation.WAIT;
                 }
             }
         }
@@ -67,13 +67,13 @@ public class SimpleFlyingMovementController extends MovementController {
     }
     
     public boolean canReachPosition( double x, double y, double z ) {
-        final Vector3d targetVec = new Vector3d( x - mob.getX(), y - mob.getY(), z - mob.getZ() );
-        final int distance = MathHelper.ceil( targetVec.length() );
+        final Vec3 targetVec = new Vec3( x - mob.getX(), y - mob.getY(), z - mob.getZ() );
+        final int distance = Mth.ceil( targetVec.length() );
         return canReach( targetVec.normalize(), distance );
     }
     
-    private boolean canReach( Vector3d direction, int distance ) {
-        AxisAlignedBB boundingBox = mob.getBoundingBox();
+    private boolean canReach( Vec3 direction, int distance ) {
+        AABB boundingBox = mob.getBoundingBox();
         for( int i = 1; i < distance; i++ ) {
             boundingBox = boundingBox.move( direction );
             if( !mob.level.noCollision( mob, boundingBox ) ) return false;

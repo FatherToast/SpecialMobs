@@ -8,8 +8,8 @@ import fathertoast.specialmobs.common.config.field.*;
 import fathertoast.specialmobs.common.config.file.ToastConfigSpec;
 import fathertoast.specialmobs.common.config.util.ConfigUtil;
 import fathertoast.specialmobs.common.config.util.EnvironmentList;
-import net.minecraft.block.Block;
-import net.minecraft.potion.Effect;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.level.block.Block;
 
 /**
  * This is the base config for mob species. This may be extended to add categories specific to the species, but all
@@ -56,7 +56,7 @@ public class SpeciesConfig extends Config.AbstractConfig {
         public final BooleanField allowLeashing;
         public final BooleanField ignorePressurePlates;
         public final RegistryEntryListField<Block> immuneToStickyBlocks;
-        public final RegistryEntryListField<Effect> immuneToPotions;
+        public final RegistryEntryListField<MobEffect> immuneToPotions;
         
         // These are at the end because they may or may not be present (not applicable for all families)
         public final DoubleField rangedAttackDamage;

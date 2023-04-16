@@ -5,13 +5,14 @@ import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.config.species.SpeciesConfig;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
-import net.minecraft.block.Block;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.AttributeModifierMap;
-import net.minecraft.item.Item;
-import net.minecraft.tags.ITag;
-import net.minecraftforge.registries.ForgeRegistryEntry;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.block.Block;
+import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.IForgeRegistry;
 
 import javax.annotation.Nullable;
 import java.lang.annotation.Annotation;
@@ -51,7 +52,7 @@ public final class AnnotationHelper {
     }
     
     /** Gets bestiary info from a special mob species. Throws an exception if anything goes wrong. */
-    public static <T extends LivingEntity> BestiaryInfo.Builder getBestiaryInfo( MobFamily.Species<T> species, BestiaryInfo.Builder bestiaryInfo ) {
+    public static <T extends LivingEntity> BestiaryInfo.Builder getBestiaryInfo(MobFamily.Species<T> species, BestiaryInfo.Builder bestiaryInfo ) {
         try {
             getMethod( species.entityClass, SpecialMob.BestiaryInfoSupplier.class ).invoke( null, bestiaryInfo );
             return bestiaryInfo;
@@ -76,9 +77,9 @@ public final class AnnotationHelper {
     }
     
     /** Creates an attribute modifier map from a special mob species. Throws an exception if anything goes wrong. */
-    public static AttributeModifierMap.MutableAttribute createAttributes( MobFamily.Species<?> species ) {
+    public static AttributeSupplier.Builder createAttributes(MobFamily.Species<?> species ) {
         try {
-            return (AttributeModifierMap.MutableAttribute) getMethodOrSuper( species.entityClass, SpecialMob.AttributeSupplier.class )
+            return (AttributeSupplier.Builder) getMethodOrSuper( species.entityClass, SpecialMob.AttributeSupplier.class )
                     .invoke( null );
         }
         catch( NoSuchMethodException | InvocationTargetException | IllegalAccessException ex ) {
@@ -108,19 +109,19 @@ public final class AnnotationHelper {
     }
     
     /** Gets the translations from a block. Throws an exception if anything goes wrong. */
-    public static String[] getTranslations( Block block ) { return getTranslations( block, block.getDescriptionId() ); }
+    public static String[] getTranslations( Block block ) { return getTranslations( ForgeRegistries.BLOCKS, block, block.getDescriptionId() ); }
     
     /** Gets the translations from an item. Throws an exception if anything goes wrong. */
-    public static String[] getTranslations( Item item ) { return getTranslations( item, item.getDescriptionId() ); }
+    public static String[] getTranslations( Item item ) { return getTranslations( ForgeRegistries.ITEMS, item, item.getDescriptionId() ); }
     
     /** Gets the translations from a registry entry. Throws an exception if anything goes wrong. */
-    public static String[] getTranslations( ForgeRegistryEntry<?> entry, String key ) {
+    public static <T> String[] getTranslations( IForgeRegistry<T> registry, T entry, String key ) {
         try {
             return (String[]) getMethod( entry.getClass(), SpecialMob.LanguageProvider.class )
                     .invoke( null, key );
         }
         catch( NoSuchMethodException | InvocationTargetException | IllegalAccessException ex ) {
-            throw new RuntimeException( "Class for " + entry.getRegistryName() + " has invalid language provider method", ex );
+            throw new RuntimeException( "Class for " + registry.getKey(entry) + " has invalid language provider method", ex );
         }
     }
     
@@ -138,7 +139,7 @@ public final class AnnotationHelper {
 
     @SuppressWarnings("unchecked")
     @Nullable
-    public static List<ITag.INamedTag<EntityType<?>>> getEntityTags( Class<? extends LivingEntity> entityClass ) {
+    public static List<TagKey<EntityType<?>>> getEntityTags(Class<? extends LivingEntity> entityClass ) {
         try {
             Method method = getMethodOrSuperOptional( entityClass, SpecialMob.EntityTagProvider.class );
 
@@ -146,7 +147,7 @@ public final class AnnotationHelper {
                 Object ret = method.invoke( null );
 
                 if (ret != null)
-                    return (List<ITag.INamedTag<EntityType<?>>>) ret;
+                    return (List<TagKey<EntityType<?>>>) ret;
             }
             return null;
         }
@@ -157,10 +158,10 @@ public final class AnnotationHelper {
     }
     
     /** Creates an entity factory from a special mob species. Throws an exception if anything goes wrong. */
-    public static <T extends LivingEntity> EntityType.IFactory<T> getEntityFactory( MobFamily.Species<T> species ) {
+    public static <T extends LivingEntity> EntityType.EntityFactory<T> getEntityFactory( MobFamily.Species<T> species ) {
         try {
             //noinspection unchecked
-            return (EntityType.IFactory<T>) getMethod( species.entityClass, SpecialMob.Factory.class ).invoke( null );
+            return (EntityType.EntityFactory<T>) getMethod( species.entityClass, SpecialMob.Factory.class ).invoke( null );
         }
         catch( NoSuchMethodException | InvocationTargetException | IllegalAccessException ex ) {
             throw new RuntimeException( "Entity class for " + species.name + " has invalid factory provider method", ex );

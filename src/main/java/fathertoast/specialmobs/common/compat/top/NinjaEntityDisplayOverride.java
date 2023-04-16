@@ -2,31 +2,28 @@ package fathertoast.specialmobs.common.compat.top;
 
 import fathertoast.specialmobs.common.entity.ai.INinja;
 import mcjty.theoneprobe.api.*;
-import net.minecraft.block.Block;
-import net.minecraft.client.resources.I18n;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.world.World;
+import net.minecraft.client.resources.language.I18n;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.Objects;
 
 public class NinjaEntityDisplayOverride implements IEntityDisplayOverride {
 
-
-
     @Override
-    public boolean overrideStandardInfo(ProbeMode probeMode, IProbeInfo iProbeInfo, PlayerEntity playerEntity, World world, Entity entity, IProbeHitEntityData iProbeHitEntityData) {
-        if (entity instanceof INinja) {
-            INinja ninja = (INinja) entity;
-
+    public boolean overrideStandardInfo(ProbeMode probeMode, IProbeInfo iProbeInfo, Player playerEntity, Level level, Entity entity, IProbeHitEntityData iProbeHitEntityData) {
+        if (entity instanceof INinja ninja) {
             if (ninja.getHiddenDragon() != null) {
                 Block block = ninja.getHiddenDragon().getBlock();
 
                 iProbeInfo.horizontal().item(new ItemStack(block.asItem()));
-                iProbeInfo.horizontal().text(CompoundText.create().text(new StringTextComponent(translateBlockName(block))), iProbeInfo.defaultTextStyle());
+                iProbeInfo.horizontal().text(CompoundText.create().text(Component.literal(translateBlockName(block))), iProbeInfo.defaultTextStyle());
 
                 return true;
             }
@@ -34,9 +31,9 @@ public class NinjaEntityDisplayOverride implements IEntityDisplayOverride {
         return false;
     }
 
-    /** Returns the localized name of a block */
+    /** Returns the localized name of the block */
     private String translateBlockName(Block block) {
-        ResourceLocation resourceLocation = block.getRegistryName();
-        return I18n.get("block." + Objects.requireNonNull(resourceLocation).getNamespace() + "." + resourceLocation.getPath());
+        ResourceLocation id = ForgeRegistries.BLOCKS.getKey(block);
+        return I18n.get("block." + Objects.requireNonNull(id).getNamespace() + "." + id.getPath());
     }
 }

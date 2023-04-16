@@ -98,7 +98,6 @@ public @interface SpecialMob {
      * {@code public static void METHOD_NAME( MobFamily.Species<?> species )}
      *
      * @see fathertoast.specialmobs.common.event.NaturalSpawnManager
-     * @see net.minecraft.entity.EntitySpawnPlacementRegistry
      */
     @Retention( RetentionPolicy.RUNTIME )
     @Target( ElementType.METHOD )

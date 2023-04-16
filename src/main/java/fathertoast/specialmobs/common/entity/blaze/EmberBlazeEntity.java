@@ -6,11 +6,11 @@ import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.item.Items;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.item.Items;
+
 
 @SpecialMob
 public class EmberBlazeEntity extends _SpecialBlazeEntity {
@@ -42,7 +42,7 @@ public class EmberBlazeEntity extends _SpecialBlazeEntity {
     }
     
     @SpecialMob.Factory
-    public static EntityType.IFactory<EmberBlazeEntity> getVariantFactory() { return EmberBlazeEntity::new; }
+    public static EntityType.EntityFactory<EmberBlazeEntity> getVariantFactory() { return EmberBlazeEntity::new; }
     
     /** @return This entity's mob species. */
     @SpecialMob.SpeciesSupplier

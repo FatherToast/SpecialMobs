@@ -4,27 +4,27 @@ import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.config.Config;
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.util.References;
-import mcp.MethodsReturnNonnullByDefault;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.monster.CreeperEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemGroup;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Rarity;
-import net.minecraft.potion.Effects;
-import net.minecraft.util.*;
-import net.minecraft.world.World;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.monster.Creeper;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Rarity;
+import net.minecraft.world.level.Level;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.function.Supplier;
 
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
 public class SyringeItem extends Item {
     
     public SyringeItem() {
-        super( new Item.Properties().stacksTo( 1 ).rarity( Rarity.UNCOMMON ).defaultDurability( 5 ).setNoRepair().tab( ItemGroup.TAB_MISC ) );
+        super( new Item.Properties().stacksTo( 1 ).rarity( Rarity.UNCOMMON ).defaultDurability( 5 ).setNoRepair().tab( CreativeModeTab.TAB_MISC ) );
     }
     
     @SpecialMob.LanguageProvider
@@ -34,45 +34,45 @@ public class SyringeItem extends Item {
     }
     
     @Override
-    public ActionResult<ItemStack> use( World world, PlayerEntity player, Hand hand ) {
+    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand ) {
         ItemStack usedItem = player.getItemInHand( hand );
         
-        if( !world.isClientSide ) {
+        if( !level.isClientSide ) {
             if( player.getCooldowns().isOnCooldown( usedItem.getItem() ) ) {
-                return ActionResult.pass( usedItem );
+                return InteractionResultHolder.pass( usedItem );
             }
             else {
-                MobHelper.applyEffect( player, Effects.MOVEMENT_SPEED, 3, 300 );
-                MobHelper.applyEffect( player, Effects.DOLPHINS_GRACE, 1, 300 );
-                if( Config.MAIN.GENERAL.enableNausea.get() ) MobHelper.applyEffect( player, Effects.CONFUSION, 1, 400 );
+                MobHelper.applyEffect( player, MobEffects.MOVEMENT_SPEED, 3, 300 );
+                MobHelper.applyEffect( player, MobEffects.DOLPHINS_GRACE, 1, 300 );
+                if( Config.MAIN.GENERAL.enableNausea.get() ) MobHelper.applyEffect( player, MobEffects.CONFUSION, 1, 400 );
                 
-                world.playSound( null, player.getX(), player.getY(), player.getZ(), SoundEvents.BEE_STING, SoundCategory.PLAYERS, 0.9F, 1.0F );
+                level.playSound( null, player.getX(), player.getY(), player.getZ(), SoundEvents.BEE_STING, SoundSource.PLAYERS, 0.9F, 1.0F );
                 usedItem.hurtAndBreak( 1, player, ( entity ) -> entity.broadcastBreakEvent( hand ) );
                 if( !player.isCreative() ) {
                     player.getCooldowns().addCooldown( usedItem.getItem(), 1200 );
                 }
-                return ActionResult.success( usedItem );
+                return InteractionResultHolder.success( usedItem );
             }
         }
-        return ActionResult.fail( usedItem );
+        return InteractionResultHolder.fail( usedItem );
     }
     
     @Override
-    public ActionResultType interactLivingEntity( ItemStack itemStack, PlayerEntity player, LivingEntity livingEntity, Hand hand ) {
-        if( livingEntity instanceof CreeperEntity && !((CreeperEntity) livingEntity).isPowered() ) {
+    public InteractionResult interactLivingEntity(ItemStack itemStack, Player player, LivingEntity livingEntity, InteractionHand hand ) {
+        if( livingEntity instanceof Creeper creeper && !creeper.isPowered() ) {
             if( player.getCooldowns().isOnCooldown( itemStack.getItem() ) ) {
-                return ActionResultType.PASS;
+                return InteractionResult.PASS;
             }
             
-            MobHelper.charge( (CreeperEntity) livingEntity );
-            livingEntity.level.playSound( null, player.getX(), player.getY(), player.getZ(), SoundEvents.BEE_STING, SoundCategory.PLAYERS, 0.9F, 1.0F );
+            MobHelper.charge( creeper );
+            livingEntity.level.playSound( null, player.getX(), player.getY(), player.getZ(), SoundEvents.BEE_STING, SoundSource.PLAYERS, 0.9F, 1.0F );
             itemStack.hurtAndBreak( 1, player, ( entity ) -> entity.broadcastBreakEvent( hand ) );
             if( !player.isCreative() ) {
                 player.getCooldowns().addCooldown( itemStack.getItem(), 1200 );
             }
-            return ActionResultType.sidedSuccess( player.level.isClientSide );
+            return InteractionResult.sidedSuccess( player.level.isClientSide );
         }
-        return ActionResultType.PASS;
+        return InteractionResult.PASS;
     }
     
     // Not enchantable

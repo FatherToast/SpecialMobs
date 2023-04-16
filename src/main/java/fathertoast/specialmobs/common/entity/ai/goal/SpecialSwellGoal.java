@@ -1,18 +1,18 @@
 package fathertoast.specialmobs.common.entity.ai.goal;
 
 import fathertoast.specialmobs.common.entity.ai.IExplodingMob;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.MobEntity;
-import net.minecraft.entity.ai.goal.Goal;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.ai.goal.Goal;
 
 import java.util.EnumSet;
 
 /**
  * The "creeper swell" goal repurposed for use on other mobs.
  * <p>
- * {@link net.minecraft.entity.ai.goal.CreeperSwellGoal}
+ * {@link net.minecraft.world.entity.ai.goal.SwellGoal}
  */
-public class SpecialSwellGoal<T extends MobEntity & IExplodingMob> extends Goal {
+public class SpecialSwellGoal<T extends Mob & IExplodingMob> extends Goal {
     
     private final T mob;
     
@@ -47,7 +47,7 @@ public class SpecialSwellGoal<T extends MobEntity & IExplodingMob> extends Goal 
     /** Called each tick while this AI is active. */
     @Override
     public void tick() {
-        if( target == null || mob.distanceToSqr( target ) > 49.0 || !mob.getSensing().canSee( target ) ) {
+        if( target == null || mob.distanceToSqr( target ) > 49.0 || !mob.getSensing().hasLineOfSight( target ) ) {
             mob.setSwellDir( -1 );
         }
         else {

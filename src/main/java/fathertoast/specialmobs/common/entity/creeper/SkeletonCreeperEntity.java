@@ -8,17 +8,17 @@ import fathertoast.specialmobs.common.entity.projectile.BoneShrapnelEntity;
 import fathertoast.specialmobs.common.util.ExplosionHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
-import net.minecraft.entity.CreatureAttribute;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.entity.ai.goal.FleeSunGoal;
-import net.minecraft.entity.ai.goal.RestrictSunGoal;
-import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.SoundEvents;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.World;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.MobType;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.ai.goal.FleeSunGoal;
+import net.minecraft.world.entity.ai.goal.RestrictSunGoal;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 
 @SpecialMob
 public class SkeletonCreeperEntity extends _SpecialCreeperEntity {
@@ -50,7 +50,7 @@ public class SkeletonCreeperEntity extends _SpecialCreeperEntity {
     }
     
     @SpecialMob.Factory
-    public static EntityType.IFactory<SkeletonCreeperEntity> getVariantFactory() { return SkeletonCreeperEntity::new; }
+    public static EntityType.EntityFactory<SkeletonCreeperEntity> getVariantFactory() { return SkeletonCreeperEntity::new; }
     
     /** @return This entity's mob species. */
     @SpecialMob.SpeciesSupplier
@@ -60,7 +60,7 @@ public class SkeletonCreeperEntity extends _SpecialCreeperEntity {
     
     //--------------- Variant-Specific Implementations ----------------
     
-    public SkeletonCreeperEntity( EntityType<? extends _SpecialCreeperEntity> entityType, World world ) { super( entityType, world ); }
+    public SkeletonCreeperEntity( EntityType<? extends _SpecialCreeperEntity> entityType, Level level ) { super( entityType, level ); }
     
     /** Override to change this entity's AI goals. */
     @Override
@@ -87,10 +87,10 @@ public class SkeletonCreeperEntity extends _SpecialCreeperEntity {
             final float speed = (0.7F + random.nextFloat()) * shootPower / 20.0F;
             final float pitch = random.nextFloat() * (float) Math.PI;
             final float yaw = random.nextFloat() * 2.0F * (float) Math.PI;
-            final Vector3d velocity = new Vector3d(
-                    MathHelper.cos( yaw ) * speed,
-                    MathHelper.sin( pitch ) * (shootPower + random.nextFloat() * shootPower) / 18.0F,
-                    MathHelper.sin( yaw ) * speed );
+            final Vec3 velocity = new Vec3(
+                    Mth.cos( yaw ) * speed,
+                    Mth.sin( pitch ) * (shootPower + random.nextFloat() * shootPower) / 18.0F,
+                    Mth.sin( yaw ) * speed );
             shrapnel.shoot( velocity.x, velocity.y, velocity.z, (float) velocity.length(), 0.0F );
             
             shrapnel.life += pitch * 6.0F;
@@ -113,7 +113,7 @@ public class SkeletonCreeperEntity extends _SpecialCreeperEntity {
             pierce++;
         }
         if( isSupercharged() ) {
-            shrapnel.setKnockback( shrapnel.knockback + 2 );
+            shrapnel.setKnockback( shrapnel.getKnockback() + 2 );
             pierce++;
         }
         shrapnel.setPierceLevel( pierce );
@@ -123,19 +123,19 @@ public class SkeletonCreeperEntity extends _SpecialCreeperEntity {
     
     /** @return This entity's creature type. */
     @Override
-    public CreatureAttribute getMobType() { return CreatureAttribute.UNDEAD; }
+    public MobType getMobType() { return MobType.UNDEAD; }
     
     /** Called each tick to update this entity's movement. */
     @Override
     public void aiStep() {
         if( isSunBurnTick() ) {
-            final ItemStack hat = getItemBySlot( EquipmentSlotType.HEAD );
+            final ItemStack hat = getItemBySlot( EquipmentSlot.HEAD );
             if( !hat.isEmpty() ) {
                 if( hat.isDamageableItem() ) {
                     hat.setDamageValue( hat.getDamageValue() + random.nextInt( 2 ) );
                     if( hat.getDamageValue() >= hat.getMaxDamage() ) {
-                        broadcastBreakEvent( EquipmentSlotType.HEAD );
-                        setItemSlot( EquipmentSlotType.HEAD, ItemStack.EMPTY );
+                        broadcastBreakEvent( EquipmentSlot.HEAD );
+                        setItemSlot( EquipmentSlot.HEAD, ItemStack.EMPTY );
                     }
                 }
             }

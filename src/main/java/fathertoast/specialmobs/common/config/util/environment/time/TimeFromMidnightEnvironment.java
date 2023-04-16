@@ -4,8 +4,8 @@ import fathertoast.specialmobs.common.config.field.AbstractConfigField;
 import fathertoast.specialmobs.common.config.field.EnvironmentListField;
 import fathertoast.specialmobs.common.config.util.environment.CompareIntEnvironment;
 import fathertoast.specialmobs.common.config.util.environment.ComparisonOperator;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 
 import javax.annotation.Nullable;
 
@@ -29,7 +29,7 @@ public class TimeFromMidnightEnvironment extends CompareIntEnvironment {
     
     /** @return Returns the actual value to compare, or null if there isn't enough information. */
     @Override
-    public Integer getActual( World world, @Nullable BlockPos pos ) {
+    public Integer getActual( Level world, @Nullable BlockPos pos ) {
         int dayTime = (int) (world.dayTime() / 24_000L);
         if( dayTime < 18_000 ) dayTime += 24_000;
         return dayTime - 18_000;

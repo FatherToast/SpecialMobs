@@ -2,6 +2,6 @@
 @ParametersAreNonnullByDefault
 package fathertoast.specialmobs.common.entity.cavespider;
 
-import mcp.MethodsReturnNonnullByDefault;
+import net.minecraft.MethodsReturnNonnullByDefault;
 
 import javax.annotation.ParametersAreNonnullByDefault;

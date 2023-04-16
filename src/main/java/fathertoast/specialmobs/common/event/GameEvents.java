@@ -1,8 +1,9 @@
 package fathertoast.specialmobs.common.event;
 
 import fathertoast.specialmobs.common.core.register.SMEffects;
-import net.minecraft.potion.EffectInstance;
-import net.minecraft.util.DamageSource;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraftforge.event.entity.living.LivingFallEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
@@ -12,10 +13,12 @@ public class GameEvents {
 
     @SubscribeEvent( priority = EventPriority.NORMAL )
     public void onLivingHurt( LivingHurtEvent event ) {
-        if( event.getEntityLiving() != null && event.getSource() != DamageSource.OUT_OF_WORLD && !event.getSource().isBypassMagic() &&
-                event.getEntityLiving().hasEffect( SMEffects.VULNERABILITY.get() ) ) {
+        final LivingEntity entity = event.getEntity();
 
-            final EffectInstance vulnerability = event.getEntityLiving().getEffect( SMEffects.VULNERABILITY.get() );
+        if( entity != null && event.getSource() != DamageSource.OUT_OF_WORLD && !event.getSource().isBypassMagic() &&
+                entity.hasEffect( SMEffects.VULNERABILITY.get() ) ) {
+
+            final MobEffectInstance vulnerability = entity.getEffect( SMEffects.VULNERABILITY.get() );
             if( vulnerability == null ) return;
 
             // Take 25% more damage per effect level (vs. Damage Resistance's 20% less per level)
@@ -25,9 +28,11 @@ public class GameEvents {
 
     @SubscribeEvent( priority = EventPriority.NORMAL )
     public void onLivingFall( LivingFallEvent event ) {
-        if( event.getEntityLiving() != null && event.getEntityLiving().hasEffect( SMEffects.WEIGHT.get() ) ) {
+        final LivingEntity entity = event.getEntity();
 
-            final EffectInstance weight = event.getEntityLiving().getEffect( SMEffects.WEIGHT.get() );
+        if( entity != null && entity.hasEffect( SMEffects.WEIGHT.get() ) ) {
+
+            final MobEffectInstance weight = entity.getEffect( SMEffects.WEIGHT.get() );
             if( weight == null ) return;
 
             // Increase effective fall distance by ~33% per effect level

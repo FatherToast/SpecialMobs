@@ -1,18 +1,19 @@
 package fathertoast.specialmobs.common.entity.ai.goal;
 
-import net.minecraft.entity.ai.goal.ZombieAttackGoal;
-import net.minecraft.entity.monster.DrownedEntity;
+import net.minecraft.world.entity.ai.goal.ZombieAttackGoal;
+import net.minecraft.world.entity.monster.Drowned;
 
 /**
  * Copy of the drowned attack goal made accessible.
  * <p>
- * {@link DrownedEntity.AttackGoal}
+ * {@link net.minecraft.world.entity.monster.Drowned.DrownedAttackGoal}
  */
+@SuppressWarnings("JavadocReference")
 public class SpecialDrownedAttackGoal extends ZombieAttackGoal {
     
-    private final DrownedEntity drowned;
+    private final Drowned drowned;
     
-    public SpecialDrownedAttackGoal( DrownedEntity entity, double moveSpeed, boolean longMemory ) {
+    public SpecialDrownedAttackGoal( Drowned entity, double moveSpeed, boolean longMemory ) {
         super( entity, moveSpeed, longMemory );
         drowned = entity;
     }

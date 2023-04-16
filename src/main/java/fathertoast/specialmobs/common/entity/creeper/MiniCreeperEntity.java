@@ -5,9 +5,9 @@ import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.level.Level;
 
 @SpecialMob
 public class MiniCreeperEntity extends _SpecialCreeperEntity {
@@ -36,7 +36,7 @@ public class MiniCreeperEntity extends _SpecialCreeperEntity {
     }
     
     @SpecialMob.Factory
-    public static EntityType.IFactory<MiniCreeperEntity> getVariantFactory() { return MiniCreeperEntity::new; }
+    public static EntityType.EntityFactory<MiniCreeperEntity> getVariantFactory() { return MiniCreeperEntity::new; }
     
     /** @return This entity's mob species. */
     @SpecialMob.SpeciesSupplier
@@ -46,7 +46,7 @@ public class MiniCreeperEntity extends _SpecialCreeperEntity {
     
     //--------------- Variant-Specific Implementations ----------------
     
-    public MiniCreeperEntity( EntityType<? extends _SpecialCreeperEntity> entityType, World world ) { super( entityType, world ); }
+    public MiniCreeperEntity( EntityType<? extends _SpecialCreeperEntity> entityType, Level level ) { super( entityType, level ); }
     
     /** Override to change this creeper's explosion power multiplier. */
     protected float getVariantExplosionPower( float radius ) { return super.getVariantExplosionPower( radius / 2.0F ); }

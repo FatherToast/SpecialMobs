@@ -8,12 +8,12 @@ import fathertoast.specialmobs.common.core.register.SMEffects;
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.item.Items;
-import net.minecraft.potion.Effects;
-import net.minecraft.world.World;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
 
 @SpecialMob
 public class DesertCaveSpiderEntity extends _SpecialCaveSpiderEntity {
@@ -28,7 +28,7 @@ public class DesertCaveSpiderEntity extends _SpecialCaveSpiderEntity {
         bestiaryInfo.color( 0xE6DDAC ).theme( BestiaryInfo.Theme.DESERT )
                 .uniqueTextureWithEyes()
                 .size( 0.6F, 0.7F, 0.5F )
-                .addExperience( 2 ).effectImmune( Effects.MOVEMENT_SLOWDOWN, SMEffects.VULNERABILITY )
+                .addExperience( 2 ).effectImmune( MobEffects.MOVEMENT_SLOWDOWN, SMEffects.VULNERABILITY )
                 .addToAttribute( Attributes.MAX_HEALTH, 4.0 );
     }
     
@@ -45,7 +45,7 @@ public class DesertCaveSpiderEntity extends _SpecialCaveSpiderEntity {
     }
     
     @SpecialMob.Factory
-    public static EntityType.IFactory<DesertCaveSpiderEntity> getVariantFactory() { return DesertCaveSpiderEntity::new; }
+    public static EntityType.EntityFactory<DesertCaveSpiderEntity> getVariantFactory() { return DesertCaveSpiderEntity::new; }
     
     /** @return This entity's mob species. */
     @SpecialMob.SpeciesSupplier
@@ -55,19 +55,19 @@ public class DesertCaveSpiderEntity extends _SpecialCaveSpiderEntity {
     
     //--------------- Variant-Specific Implementations ----------------
     
-    public DesertCaveSpiderEntity( EntityType<? extends _SpecialCaveSpiderEntity> entityType, World world ) { super( entityType, world ); }
+    public DesertCaveSpiderEntity( EntityType<? extends _SpecialCaveSpiderEntity> entityType, Level level ) { super( entityType, level ); }
     
     /** Override to change the color of this entity's spit attack. */
     @Override
-    protected int getVariantSpitColor() { return Effects.BLINDNESS.getColor(); }
+    protected int getVariantSpitColor() { return MobEffects.BLINDNESS.getColor(); }
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override
     protected void onVariantAttack( LivingEntity target ) {
-        if( Config.MAIN.GENERAL.enableNausea.get() ) MobHelper.applyEffect( target, Effects.CONFUSION );
-        MobHelper.applyEffect( target, Effects.BLINDNESS );
+        if( Config.MAIN.GENERAL.enableNausea.get() ) MobHelper.applyEffect( target, MobEffects.CONFUSION );
+        MobHelper.applyEffect( target, MobEffects.BLINDNESS );
         MobHelper.removeNightVision( target );
-        MobHelper.applyEffect( target, Effects.MOVEMENT_SLOWDOWN, 2 );
+        MobHelper.applyEffect( target, MobEffects.MOVEMENT_SLOWDOWN, 2 );
         MobHelper.applyEffect( target, SMEffects.VULNERABILITY.get() );
     }
 }

@@ -2,29 +2,29 @@ package fathertoast.specialmobs.common.util;
 
 import fathertoast.specialmobs.common.core.register.SMItems;
 import fathertoast.specialmobs.common.entity.projectile.IncorporealFireballEntity;
-import net.minecraft.block.DispenserBlock;
-import net.minecraft.dispenser.IPosition;
-import net.minecraft.dispenser.ProjectileDispenseBehavior;
-import net.minecraft.entity.EntityPredicate;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.projectile.ProjectileEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Position;
+import net.minecraft.core.dispenser.AbstractProjectileDispenseBehavior;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.targeting.TargetingConditions;
+import net.minecraft.world.entity.projectile.Projectile;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.DispenserBlock;
+import net.minecraft.world.phys.AABB;
 
 public class SMDispenserBehavior {
 
     public static void registerBehaviors() {
-        DispenserBlock.registerBehavior(SMItems.INCORPOREAL_FIREBALL.get(), new ProjectileDispenseBehavior() {
-            protected ProjectileEntity getProjectile(World world, IPosition pos, ItemStack itemStack) {
+        DispenserBlock.registerBehavior(SMItems.INCORPOREAL_FIREBALL.get(), new AbstractProjectileDispenseBehavior() {
+            protected Projectile getProjectile(Level level, Position pos, ItemStack itemStack) {
                 final double x = pos.x();
                 final double y = pos.y();
                 final double z = pos.z();
-                LivingEntity nearestEntity = world.getNearestEntity(LivingEntity.class, EntityPredicate.DEFAULT, null, x, y, z,
-                        new AxisAlignedBB(new BlockPos(x + 0.5D, y + 0.5D, z + 0.5D)).inflate(50.0F));
+                LivingEntity nearestEntity = level.getNearestEntity(LivingEntity.class, TargetingConditions.DEFAULT, null, x, y, z,
+                        new AABB(new BlockPos(x + 0.5D, y + 0.5D, z + 0.5D)).inflate(50.0F));
 
-                return new IncorporealFireballEntity(world, null, nearestEntity, x, y, z);
+                return new IncorporealFireballEntity(level, null, nearestEntity, x, y, z);
             }
         });
     }

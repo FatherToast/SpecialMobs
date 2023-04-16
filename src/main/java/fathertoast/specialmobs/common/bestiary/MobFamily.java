@@ -7,16 +7,16 @@ import fathertoast.specialmobs.common.core.register.SMEntities;
 import fathertoast.specialmobs.common.core.register.SMItems;
 import fathertoast.specialmobs.common.util.AnnotationHelper;
 import fathertoast.specialmobs.common.util.References;
-import net.minecraft.block.Block;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.monster.*;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.monster.*;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraftforge.common.ForgeSpawnEggItem;
-import net.minecraftforge.fml.RegistryObject;
+import net.minecraftforge.registries.RegistryObject;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -29,7 +29,7 @@ import java.util.function.Predicate;
  *
  * @see MobFamily.Species
  */
-public class MobFamily<T extends LivingEntity, V extends FamilyConfig> {
+public class MobFamily<T extends Mob, V extends FamilyConfig> {
     /** List of all families, generated to make iteration possible. */
     private static final ArrayList<MobFamily<?, ?>> FAMILY_LIST = new ArrayList<>();
     /** List of all species, generated to make iteration more convenient. */
@@ -40,73 +40,73 @@ public class MobFamily<T extends LivingEntity, V extends FamilyConfig> {
     
     // NOTE: When adding a new mob family, do not forget to also register its renderer in the client register!
     
-    public static final MobFamily<CreeperEntity, CreeperFamilyConfig> CREEPER = new MobFamily<>( CreeperFamilyConfig::new,
+    public static final MobFamily<Creeper, CreeperFamilyConfig> CREEPER = new MobFamily<>( CreeperFamilyConfig::new,
             "Creeper", "creepers", 0x0DA70B, new EntityType[] { EntityType.CREEPER },
             "Dark", "Death", "Dirt", "Doom", "Drowning", "Ender", "Fire", "Gravel", "Jumping", "Lightning",
             "Mini", "Sand", /*"Scope",*/ "Snow", "Skeleton", "Splitting"
     );//TODO scope - maybe in 1.18 when spyglasses exist
     
-    public static final MobFamily<ZombieEntity, FamilyConfig> ZOMBIE = new MobFamily<>( FamilyConfig::newLessSpecial,
+    public static final MobFamily<Zombie, FamilyConfig> ZOMBIE = new MobFamily<>( FamilyConfig::newLessSpecial,
             "Zombie", "zombies", 0x00AFAF, new EntityType[] { EntityType.ZOMBIE, EntityType.HUSK },
             "Brute", "Fire", "Fishing", "Frozen", "Giant", "Hungry", "Husk", "MadScientist", "Plague"
     );
-    public static final MobFamily<DrownedEntity, FamilyConfig> DROWNED = new MobFamily<>( FamilyConfig::new,
+    public static final MobFamily<Drowned, FamilyConfig> DROWNED = new MobFamily<>( FamilyConfig::new,
             "Drowned", "drowned", 0x8FF1D7, new EntityType[] { EntityType.DROWNED },
             "Abyssal", "Brute", "Fishing", "Frozen", "Giant", "Hungry", "Knight", "Plague"//, "Tropical"
     );
-    public static final MobFamily<ZombifiedPiglinEntity, FamilyConfig> ZOMBIFIED_PIGLIN = new MobFamily<>( FamilyConfig::new,
+    public static final MobFamily<ZombifiedPiglin, FamilyConfig> ZOMBIFIED_PIGLIN = new MobFamily<>( FamilyConfig::new,
             "ZombifiedPiglin", "zombified piglins", 0xEA9393, new EntityType[] { EntityType.ZOMBIFIED_PIGLIN },
             "Brute", "Fishing", "Giant", "Hungry", "Knight", "Plague", "Vampire"//TODO figure out crossbows
     );//TODO crimson/warped
     
-    public static final MobFamily<AbstractSkeletonEntity, SkeletonFamilyConfig> SKELETON = new MobFamily<>( SkeletonFamilyConfig::new,
+    public static final MobFamily<AbstractSkeleton, SkeletonFamilyConfig> SKELETON = new MobFamily<>( SkeletonFamilyConfig::new,
             "Skeleton", "skeletons", 0xC1C1C1, new EntityType[] { EntityType.SKELETON, EntityType.STRAY },
             "Brute", "Fire", "Gatling", "Giant", "Knight", "Ninja", "Poison", "Sniper", "Spitfire", "Stray", "Weathered"
     );
-    public static final MobFamily<AbstractSkeletonEntity, SkeletonFamilyConfig> WITHER_SKELETON = new MobFamily<>( SkeletonFamilyConfig::new,
+    public static final MobFamily<AbstractSkeleton, SkeletonFamilyConfig> WITHER_SKELETON = new MobFamily<>( SkeletonFamilyConfig::new,
             "WitherSkeleton", "wither skeletons", 0x141414, new EntityType[] { EntityType.WITHER_SKELETON },
             "Brute", "Gatling", "Giant", "Knight", "Ninja", "Sniper", "Spitfire"
     );//TODO crimson/warped
     
-    public static final MobFamily<SlimeEntity, SlimeFamilyConfig> SLIME = new MobFamily<>( SlimeFamilyConfig::new,
+    public static final MobFamily<Slime, SlimeFamilyConfig> SLIME = new MobFamily<>( SlimeFamilyConfig::new,
             "Slime", "slimes", 0x51A03E, new EntityType[] { EntityType.SLIME },
             "Blackberry", "Blueberry", "Caramel", "Frozen", "Grape", "Lemon", "Potion", "Strawberry", "Watermelon"
     );
-    public static final MobFamily<MagmaCubeEntity, FamilyConfig> MAGMA_CUBE = new MobFamily<>( FamilyConfig::newMoreSpecial,
+    public static final MobFamily<MagmaCube, FamilyConfig> MAGMA_CUBE = new MobFamily<>( FamilyConfig::newMoreSpecial,
             "MagmaCube", "magma cubes", 0x340000, new EntityType[] { EntityType.MAGMA_CUBE },
             "Bouncing", "Hardened", "Sticky", "Volatile"
     );
     
-    public static final MobFamily<SpiderEntity, FamilyConfig> SPIDER = new MobFamily<>( FamilyConfig::newMoreSpecial,
+    public static final MobFamily<Spider, FamilyConfig> SPIDER = new MobFamily<>( FamilyConfig::newMoreSpecial,
             "Spider", "spiders", 0x342D27, new EntityType[] { EntityType.SPIDER },
             "Baby", "Desert", "Fire", "Flying", "Giant", "Hungry", "Mother", "Pale", "Poison", "Water", "Web", "Witch"
     );
-    public static final MobFamily<CaveSpiderEntity, FamilyConfig> CAVE_SPIDER = new MobFamily<>( FamilyConfig::newMoreSpecial,
+    public static final MobFamily<CaveSpider, FamilyConfig> CAVE_SPIDER = new MobFamily<>( FamilyConfig::newMoreSpecial,
             "CaveSpider", "cave spiders", 0x0C424E, new EntityType[] { EntityType.CAVE_SPIDER },
             "Baby", "Desert", "Fire", "Flying", "Mother", "Pale", "Water", "Web", "Witch"
     );
     
-    public static final MobFamily<SilverfishEntity, SilverfishFamilyConfig> SILVERFISH = new MobFamily<>( SilverfishFamilyConfig::new,
+    public static final MobFamily<Silverfish, SilverfishFamilyConfig> SILVERFISH = new MobFamily<>( SilverfishFamilyConfig::new,
             "Silverfish", "silverfish", 0x6E6E6E, new EntityType[] { EntityType.SILVERFISH },
             "Albino", "Blinding", "Desiccated", "Fire", "Fishing", "Flying", "Poison", "Puffer", "Tough"
     );
     
-    public static final MobFamily<EndermanEntity, FamilyConfig> ENDERMAN = new MobFamily<>( FamilyConfig::new,
+    public static final MobFamily<EnderMan, FamilyConfig> ENDERMAN = new MobFamily<>( FamilyConfig::new,
             "Enderman", "endermen", 0x161616, new EntityType[] { EntityType.ENDERMAN },
             "Blinding", "Flame", "Icy", "Lightning", "Mini", "Mirage", "Runic", "Thief"
     );
     
-    public static final MobFamily<WitchEntity, WitchFamilyConfig> WITCH = new MobFamily<>( WitchFamilyConfig::new,
+    public static final MobFamily<Witch, WitchFamilyConfig> WITCH = new MobFamily<>( WitchFamilyConfig::new,
             "Witch", "witches", 0x340000, new EntityType[] { EntityType.WITCH },
             /*"Burned",*/ "Domination", /*"Drowned", "Ice", "Sands",*/ "Shadows", "Undead", "Wilds", "Wind"
     );//TODO burned, drowned, ice, sands
     
-    public static final MobFamily<GhastEntity, GhastFamilyConfig> GHAST = new MobFamily<>( GhastFamilyConfig::new,
+    public static final MobFamily<Ghast, GhastFamilyConfig> GHAST = new MobFamily<>( GhastFamilyConfig::new,
             "Ghast", "ghasts", 0xF9F9F9, new EntityType[] { EntityType.GHAST },
             "Baby", "CorporealShift", "Fighter", "King", "Queen", "Unholy"
     );
     
-    public static final MobFamily<BlazeEntity, FamilyConfig> BLAZE = new MobFamily<>( FamilyConfig::new,
+    public static final MobFamily<Blaze, FamilyConfig> BLAZE = new MobFamily<>( FamilyConfig::new,
             "Blaze", "blazes", 0xF6B201, new EntityType[] { EntityType.BLAZE },
             "Cinder", "Conflagration", "Ember", "Hellfire", "Inferno", "Jolt", "Wildfire"
     );
@@ -201,13 +201,13 @@ public class MobFamily<T extends LivingEntity, V extends FamilyConfig> {
     }
     
     /** Pick a new species from this family, based on the location. */
-    public Species<? extends T> nextVariant( World world, @Nullable BlockPos pos, @Nullable Predicate<Species<?>> selector ) {
-        return nextVariant( world, pos, selector, vanillaReplacement );
+    public Species<? extends T> nextVariant( Level level, @Nullable BlockPos pos, @Nullable Predicate<Species<?>> selector ) {
+        return nextVariant( level, pos, selector, vanillaReplacement );
     }
     
     /** Pick a new species from this family, based on the location. */
-    public Species<? extends T> nextVariant( World world, @Nullable BlockPos pos, @Nullable Predicate<Species<?>> selector, Species<? extends T> fallback ) {
-        final Species<?> species = config.GENERAL.specialVariantList.next( world.random, world, pos, selector );
+    public Species<? extends T> nextVariant( Level level, @Nullable BlockPos pos, @Nullable Predicate<Species<?>> selector, Species<? extends T> fallback ) {
+        final Species<?> species = config.GENERAL.specialVariantList.next( level.random, level, pos, selector );
         //noinspection unchecked
         return species == null ? fallback : (Species<? extends T>) species;
     }
@@ -244,7 +244,7 @@ public class MobFamily<T extends LivingEntity, V extends FamilyConfig> {
      *
      * @see MobFamily
      */
-    public static class Species<T extends LivingEntity> {
+    public static class Species<T extends Mob> {
         /** Maps each species's entity type back to the species. */
         private static final Map<EntityType<?>, Species<?>> TYPE_TO_SPECIES_MAP = new HashMap<>();
         
@@ -322,7 +322,7 @@ public class MobFamily<T extends LivingEntity, V extends FamilyConfig> {
          * Leaves the new entity type "un-built" so it can be further modified, if needed.
          */
         private EntityType.Builder<T> makeEntityTypeBuilder( EntityType<?> original ) {
-            final EntityType.IFactory<T> factory = AnnotationHelper.getEntityFactory( this );
+            final EntityType.EntityFactory<T> factory = AnnotationHelper.getEntityFactory( this );
             final EntityType.Builder<T> clone = EntityType.Builder.of( factory, original.getCategory() );
             
             if( !original.canSummon() ) clone.noSummon();
@@ -361,7 +361,7 @@ public class MobFamily<T extends LivingEntity, V extends FamilyConfig> {
          */
         public boolean isNotGiant() {
             if( isNotGiant == null ) {
-                isNotGiant = MathHelper.ceil( entityType.get().getHeight() ) <= MathHelper.ceil( family.replaceableTypes[0].getHeight() );
+                isNotGiant = Mth.ceil( entityType.get().getHeight() ) <= Mth.ceil( family.replaceableTypes[0].getHeight() );
             }
             return isNotGiant;
         }

@@ -1,23 +1,24 @@
 package fathertoast.specialmobs.common.entity.ai.goal;
 
-import net.minecraft.block.Blocks;
-import net.minecraft.entity.MobEntity;
-import net.minecraft.entity.ai.goal.Goal;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.core.BlockPos;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.ai.goal.Goal;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.phys.Vec3;
 
 import javax.annotation.Nullable;
 import java.util.EnumSet;
-import java.util.Random;
 
 /**
  * The drowned "go to water" goal repurposed for use on other mobs.
  * <p>
- * {@link net.minecraft.entity.monster.DrownedEntity.GoToWaterGoal}
+ * {@link net.minecraft.world.entity.monster.Drowned.DrownedGoToWaterGoal}
  */
+@SuppressWarnings("JavadocReference")
 public class AmphibiousGoToWaterGoal extends Goal {
     
-    private final MobEntity mob;
+    private final Mob mob;
     private final double speedModifier;
     
     private boolean disableAtNight = true;
@@ -26,7 +27,7 @@ public class AmphibiousGoToWaterGoal extends Goal {
     private double wantedY;
     private double wantedZ;
     
-    public AmphibiousGoToWaterGoal( MobEntity entity, double speed ) {
+    public AmphibiousGoToWaterGoal( Mob entity, double speed ) {
         mob = entity;
         speedModifier = speed;
         setFlags( EnumSet.of( Goal.Flag.MOVE ) );
@@ -43,7 +44,7 @@ public class AmphibiousGoToWaterGoal extends Goal {
     public boolean canUse() {
         if( disableAtNight && !mob.level.isDay() || mob.isInWater() ) return false;
         
-        final Vector3d targetPos = findWaterPos();
+        final Vec3 targetPos = findWaterPos();
         if( targetPos == null ) return false;
         
         wantedX = targetPos.x;
@@ -62,8 +63,8 @@ public class AmphibiousGoToWaterGoal extends Goal {
     
     /** @return A random nearby position of water, or null if none is found after a few tries. */
     @Nullable
-    private Vector3d findWaterPos() {
-        final Random random = mob.getRandom();
+    private Vec3 findWaterPos() {
+        final RandomSource random = mob.getRandom();
         final BlockPos origin = mob.blockPosition();
         
         for( int i = 0; i < 10; i++ ) {
@@ -72,7 +73,7 @@ public class AmphibiousGoToWaterGoal extends Goal {
                     2 - random.nextInt( 8 ),
                     random.nextInt( 20 ) - 10 );
             if( mob.level.getBlockState( target ).is( Blocks.WATER ) ) {
-                return Vector3d.atBottomCenterOf( target );
+                return Vec3.atBottomCenterOf( target );
             }
         }
         return null;

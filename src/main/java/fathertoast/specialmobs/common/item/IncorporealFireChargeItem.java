@@ -3,21 +3,21 @@ package fathertoast.specialmobs.common.item;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.entity.projectile.IncorporealFireballEntity;
 import fathertoast.specialmobs.common.util.References;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.projectile.ProjectileHelper;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemGroup;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.SoundEvents;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.EntityRayTraceResult;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.World;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.ProjectileUtil;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.EntityHitResult;
+import net.minecraft.world.phys.Vec3;
 
 import javax.annotation.Nullable;
 
@@ -29,39 +29,39 @@ public class IncorporealFireChargeItem extends Item {
                 "", "", "", "", "", "" );//TODO
     }
     
-    public IncorporealFireChargeItem() { super( new Item.Properties().tab( ItemGroup.TAB_MISC ) ); }
+    public IncorporealFireChargeItem() { super( new Item.Properties().tab( CreativeModeTab.TAB_MISC ) ); }
     
     @Override
-    public ActionResult<ItemStack> use( World world, PlayerEntity player, Hand hand ) {
+    public InteractionResultHolder<ItemStack> use( Level level, Player player, InteractionHand hand ) {
         final ItemStack item = player.getItemInHand( hand );
-        if( player.getCooldowns().isOnCooldown( item.getItem() ) ) return ActionResult.pass( item );
+        if( player.getCooldowns().isOnCooldown( item.getItem() ) ) return InteractionResultHolder.pass( item );
         
         final Entity target = pickEntity( player, 127.0 );
-        if( target instanceof LivingEntity ) {
-            if( !world.isClientSide() ) {
-                world.addFreshEntity( new IncorporealFireballEntity( world, player, (LivingEntity) target,
+        if( target instanceof LivingEntity) {
+            if( !level.isClientSide() ) {
+                level.addFreshEntity( new IncorporealFireballEntity( level, player, (LivingEntity) target,
                         player.getX(), player.getEyeY(), player.getZ() ) );
-                world.playSound( null, player.blockPosition(), SoundEvents.FIRECHARGE_USE, SoundCategory.BLOCKS, 1.0F, (random.nextFloat() - random.nextFloat()) * 0.2F + 1.0F );
+                level.playSound( null, player.blockPosition(), SoundEvents.FIRECHARGE_USE, SoundSource.BLOCKS, 1.0F, (level.random.nextFloat() - level.random.nextFloat()) * 0.2F + 1.0F );
                 
-                if( !player.abilities.instabuild ) {
+                if( !player.getAbilities().instabuild ) {
                     item.shrink( 1 );
                 }
                 player.getCooldowns().addCooldown( item.getItem(), 10 );
-                return ActionResult.consume( item );
+                return InteractionResultHolder.consume( item );
             }
-            return ActionResult.pass( item );
+            return InteractionResultHolder.pass( item );
         }
         
-        return ActionResult.fail( item );
+        return InteractionResultHolder.fail( item );
     }
     
     @Nullable
-    private static Entity pickEntity( PlayerEntity player, double range ) {
-        final Vector3d eyePos = player.getEyePosition( 1.0F );
-        final Vector3d viewVec = player.getViewVector( 1.0F ).scale( range );
+    private static Entity pickEntity( Player player, double range ) {
+        final Vec3 eyePos = player.getEyePosition( 1.0F );
+        final Vec3 viewVec = player.getViewVector( 1.0F ).scale( range );
         
-        final AxisAlignedBB bb = player.getBoundingBox().expandTowards( viewVec ).inflate( 1.0 );
-        final EntityRayTraceResult result = ProjectileHelper.getEntityHitResult( player.level, player, eyePos, eyePos.add( viewVec ), bb,
+        final AABB box = player.getBoundingBox().expandTowards( viewVec ).inflate( 1.0 );
+        final EntityHitResult result = ProjectileUtil.getEntityHitResult( player.level, player, eyePos, eyePos.add( viewVec ), box,
                 ( entity ) -> !entity.isSpectator() && entity.isAlive() && entity.isPickable() && !player.isPassengerOfSameVehicle( entity ) );
         
         return result == null ? null : result.getEntity();

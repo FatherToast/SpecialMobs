@@ -1,17 +1,18 @@
 package fathertoast.specialmobs.common.entity.ai.goal;
 
 import fathertoast.specialmobs.common.entity.ai.IAmphibiousMob;
-import net.minecraft.entity.CreatureEntity;
-import net.minecraft.entity.ai.goal.MoveToBlockGoal;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IWorldReader;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.PathfinderMob;
+import net.minecraft.world.entity.ai.goal.MoveToBlockGoal;
+import net.minecraft.world.level.LevelReader;
 
 /**
  * The drowned "go to beach" goal repurposed for use on other mobs.
  * <p>
- * {@link net.minecraft.entity.monster.DrownedEntity.GoToBeachGoal}
+ * {@link net.minecraft.world.entity.monster.Drowned.DrownedGoToBeachGoal}
  */
-public class AmphibiousGoToShoreGoal<T extends CreatureEntity & IAmphibiousMob> extends MoveToBlockGoal {
+@SuppressWarnings("JavadocReference")
+public class AmphibiousGoToShoreGoal<T extends PathfinderMob & IAmphibiousMob> extends MoveToBlockGoal {
     
     private final T amphibiousMob;
     
@@ -36,9 +37,9 @@ public class AmphibiousGoToShoreGoal<T extends CreatureEntity & IAmphibiousMob> 
     
     /** @return True if the position is valid to move to. */
     @Override
-    protected boolean isValidTarget( IWorldReader world, BlockPos targetPos ) {
-        return world.isEmptyBlock( targetPos.above() ) && world.isEmptyBlock( targetPos.above( 2 ) ) &&
-                world.getBlockState( targetPos ).entityCanStandOn( world, targetPos, mob );
+    protected boolean isValidTarget( LevelReader level, BlockPos targetPos ) {
+        return level.isEmptyBlock( targetPos.above() ) && level.isEmptyBlock( targetPos.above( 2 ) ) &&
+                level.getBlockState( targetPos ).entityCanStandOn( level, targetPos, mob );
     }
     
     /** Called when this AI is activated. */

@@ -8,17 +8,16 @@ import fathertoast.specialmobs.common.entity.ai.AIHelper;
 import fathertoast.specialmobs.common.entity.ai.goal.RunicEndermanBeamAttackGoal;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
-import net.minecraft.block.Blocks;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.item.Items;
-import net.minecraft.network.datasync.DataParameter;
-import net.minecraft.network.datasync.DataSerializers;
-import net.minecraft.network.datasync.EntityDataManager;
-import net.minecraft.potion.Effects;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.world.World;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -56,7 +55,7 @@ public class RunicEndermanEntity extends _SpecialEndermanEntity {
     }
     
     @SpecialMob.Factory
-    public static EntityType.IFactory<RunicEndermanEntity> getVariantFactory() { return RunicEndermanEntity::new; }
+    public static EntityType.EntityFactory<RunicEndermanEntity> getVariantFactory() { return RunicEndermanEntity::new; }
     
     /** @return This entity's mob species. */
     @SpecialMob.SpeciesSupplier
@@ -69,9 +68,9 @@ public class RunicEndermanEntity extends _SpecialEndermanEntity {
     /** The actual range of the beam when fired. Roughly based on end crystal max range. */
     public static final double BEAM_MAX_RANGE = 32.0;
     /** The parameter for beam attack state. */
-    private static final DataParameter<Byte> BEAM_STATE = EntityDataManager.defineId( RunicEndermanEntity.class, DataSerializers.BYTE );
+    private static final EntityDataAccessor<Byte> BEAM_STATE = SynchedEntityData.defineId( RunicEndermanEntity.class, EntityDataSerializers.BYTE );
     
-    public RunicEndermanEntity( EntityType<? extends _SpecialEndermanEntity> entityType, World world ) { super( entityType, world ); }
+    public RunicEndermanEntity( EntityType<? extends _SpecialEndermanEntity> entityType, Level level ) { super( entityType, level ); }
     
     /** Called from the Entity.class constructor to define data watcher variables. */
     @Override
@@ -89,7 +88,7 @@ public class RunicEndermanEntity extends _SpecialEndermanEntity {
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override
     protected void onVariantAttack( LivingEntity target ) {
-        MobHelper.applyEffect( target, Effects.LEVITATION );
+        MobHelper.applyEffect( target, MobEffects.LEVITATION );
         MobHelper.knockback( this, target, 2.0F, 0.0F );
     }
     

@@ -4,21 +4,22 @@ import fathertoast.specialmobs.common.entity.ISpecialMob;
 import fathertoast.specialmobs.common.entity.ghast._SpecialGhastEntity;
 import fathertoast.specialmobs.common.entity.skeleton._SpecialSkeletonEntity;
 import net.minecraft.advancements.Advancement;
-import net.minecraft.advancements.AdvancementManager;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.entity.projectile.AbstractFireballEntity;
-import net.minecraft.entity.projectile.ProjectileEntity;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.World;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.ServerAdvancementManager;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.Mth;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.AbstractHurtingProjectile;
+import net.minecraft.world.entity.projectile.Projectile;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
+import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
+import net.minecraftforge.registries.ForgeRegistries;
 
 import javax.annotation.Nullable;
 import java.util.Objects;
@@ -35,23 +36,21 @@ public class AdvancementFixer {
     private static final ResourceLocation RETURN_TO_SENDER_ADV = new ResourceLocation( "nether/return_to_sender" );
     private static final ResourceLocation UNEASY_ALLIANCE_ADV = new ResourceLocation( "nether/uneasy_alliance" );
 
-    private AdvancementManager manager;
+    private ServerAdvancementManager manager;
 
 
     @SubscribeEvent
-    public void onServerStarting( FMLServerStartingEvent event ) {
+    public void onServerStarting( ServerStartingEvent event ) {
         manager = event.getServer().getAdvancements();
     }
 
     @SubscribeEvent( priority = EventPriority.LOWEST )
     public void onLivingDeath( LivingDeathEvent event ) {
-        LivingEntity livingEntity = event.getEntityLiving();
+        LivingEntity livingEntity = event.getEntity();
         DamageSource source = event.getSource();
 
-        if ( !livingEntity.level.isClientSide && source.getEntity() instanceof ServerPlayerEntity ) {
+        if ( !livingEntity.level.isClientSide && source.getEntity() instanceof ServerPlayer player ) {
             if ( livingEntity instanceof ISpecialMob<?> ) {
-                ServerPlayerEntity player = (ServerPlayerEntity) source.getEntity();
-
                 Advancement killAMob = getFromId( KILL_A_MOB_ADV );
                 if ( notCompleted( player, killAMob )) {
                     maybeGrantKillAMob( (LivingEntity & ISpecialMob<?>) livingEntity, player, source, killAMob );
@@ -77,27 +76,27 @@ public class AdvancementFixer {
     }
 
     /** Checks if a player has killed a Special Mobs mob, and grants the "Monster Hunter" advancement if so. */
-    private <T extends LivingEntity & ISpecialMob<?>> void maybeGrantKillAMob( T dead, ServerPlayerEntity player, DamageSource damageSource, Advancement advancement ) {
-        if ( damageSource.getEntity() instanceof PlayerEntity && !dead.level.isClientSide ) {
+    private <T extends LivingEntity & ISpecialMob<?>> void maybeGrantKillAMob( T dead, ServerPlayer player, DamageSource damageSource, Advancement advancement ) {
+        if ( damageSource.getEntity() instanceof Player && !dead.level.isClientSide ) {
             // Second parameter doesn't matter, just has to be the reg name of an EntityType
             // that is one of the criteria for the advancement. If only it was EntityType tag based :(((
             player.getAdvancements().award( advancement, "minecraft:creeper");
         }
     }
 
-    private <T extends LivingEntity & ISpecialMob<?>> void maybeGrantKillAllMobs( T dead, ServerPlayerEntity player, DamageSource damageSource, Advancement advancement ) {
-        if ( damageSource.getEntity() instanceof PlayerEntity && !dead.level.isClientSide ) {
+    private <T extends LivingEntity & ISpecialMob<?>> void maybeGrantKillAllMobs( T dead, ServerPlayer player, DamageSource damageSource, Advancement advancement ) {
+        if ( damageSource.getEntity() instanceof Player && !dead.level.isClientSide ) {
             for (EntityType<?> type : dead.getSpecies().family.replaceableTypes) {
-                player.getAdvancements().award( advancement, Objects.requireNonNull(type.getRegistryName()).toString() );
+                player.getAdvancements().award( advancement, Objects.requireNonNull(ForgeRegistries.ENTITY_TYPES.getKey(type)).toString() );
             }
         }
     }
 
-    private <T extends LivingEntity & ISpecialMob<?>> void maybeGrantSniperDuel( T dead, ServerPlayerEntity player, DamageSource damageSource, Advancement advancement ) {
-        if ( dead instanceof _SpecialSkeletonEntity && damageSource.getDirectEntity() instanceof ProjectileEntity ) {
+    private <T extends LivingEntity & ISpecialMob<?>> void maybeGrantSniperDuel( T dead, ServerPlayer player, DamageSource damageSource, Advancement advancement ) {
+        if ( dead instanceof _SpecialSkeletonEntity && damageSource.getDirectEntity() instanceof Projectile ) {
             float x = (float)(dead.getX() - player.getX());
             float z = (float)(dead.getZ() - player.getZ());
-            float dist = MathHelper.sqrt(x * x + z * z);
+            float dist = Mth.sqrt(x * x + z * z);
 
             if ( dist >= 50.0F ) {
                 player.getAdvancements().award( advancement, "killed_skeleton" );
@@ -105,19 +104,19 @@ public class AdvancementFixer {
         }
     }
 
-    private <T extends LivingEntity & ISpecialMob<?>> void maybeGrantReturnToSender( T dead, ServerPlayerEntity player, DamageSource damageSource, Advancement advancement ) {
-        if ( dead instanceof _SpecialGhastEntity && damageSource.getDirectEntity() instanceof AbstractFireballEntity ){
+    private <T extends LivingEntity & ISpecialMob<?>> void maybeGrantReturnToSender( T dead, ServerPlayer player, DamageSource damageSource, Advancement advancement ) {
+        if ( dead instanceof _SpecialGhastEntity && damageSource.getDirectEntity() instanceof AbstractHurtingProjectile ){
             player.getAdvancements().award( advancement, "killed_ghast" );
         }
     }
 
-    private static <T extends LivingEntity & ISpecialMob<?>> void maybeGrantUneasyAlliance( T dead, ServerPlayerEntity player, DamageSource damageSource, Advancement advancement ) {
-        if ( dead instanceof _SpecialGhastEntity && dead.level.dimension().equals( World.OVERWORLD ) ) {
+    private static <T extends LivingEntity & ISpecialMob<?>> void maybeGrantUneasyAlliance( T dead, ServerPlayer player, DamageSource damageSource, Advancement advancement ) {
+        if ( dead instanceof _SpecialGhastEntity && dead.level.dimension().equals( Level.OVERWORLD ) ) {
             player.getAdvancements().award( advancement, "killed_ghast" );
         }
     }
 
-    private boolean notCompleted( ServerPlayerEntity player, @Nullable Advancement advancement ) {
+    private boolean notCompleted( ServerPlayer player, @Nullable Advancement advancement ) {
         if ( advancement == null ) {
             return false;
         }

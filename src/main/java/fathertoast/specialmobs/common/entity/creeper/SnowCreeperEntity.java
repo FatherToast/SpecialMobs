@@ -13,25 +13,25 @@ import fathertoast.specialmobs.common.entity.skeleton.StraySkeletonEntity;
 import fathertoast.specialmobs.common.util.ExplosionHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.FlowingFluidBlock;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.SpawnReason;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.item.Items;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.pathfinding.PathNavigator;
-import net.minecraft.pathfinding.PathNodeType;
-import net.minecraft.potion.Effects;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.FluidTags;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.Explosion;
-import net.minecraft.world.IServerWorld;
-import net.minecraft.world.World;
+import net.minecraft.util.Mth;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.ai.navigation.PathNavigation;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Explosion;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.ServerLevelAccessor;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.LiquidBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.level.pathfinder.BlockPathTypes;
 
 @SpecialMob
 public class SnowCreeperEntity extends _SpecialCreeperEntity {
@@ -45,7 +45,7 @@ public class SnowCreeperEntity extends _SpecialCreeperEntity {
     public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
         bestiaryInfo.color( 0xE8F8F8 ).weight( BestiaryInfo.DefaultWeight.LOW ).theme( BestiaryInfo.Theme.ICE )
                 .uniqueTextureWithEyes()
-                .addExperience( 2 ).effectImmune( Effects.MOVEMENT_SLOWDOWN )
+                .addExperience( 2 ).effectImmune( MobEffects.MOVEMENT_SLOWDOWN )
                 .addToAttribute( Attributes.MAX_HEALTH, 10.0 );
     }
     
@@ -74,7 +74,7 @@ public class SnowCreeperEntity extends _SpecialCreeperEntity {
     }
     
     @SpecialMob.Factory
-    public static EntityType.IFactory<SnowCreeperEntity> getVariantFactory() { return SnowCreeperEntity::new; }
+    public static EntityType.EntityFactory<SnowCreeperEntity> getVariantFactory() { return SnowCreeperEntity::new; }
     
     /** @return This entity's mob species. */
     @SpecialMob.SpeciesSupplier
@@ -84,9 +84,9 @@ public class SnowCreeperEntity extends _SpecialCreeperEntity {
     
     //--------------- Variant-Specific Implementations ----------------
     
-    public SnowCreeperEntity( EntityType<? extends _SpecialCreeperEntity> entityType, World world ) {
-        super( entityType, world );
-        setPathfindingMalus( PathNodeType.WATER, PathNodeType.WALKABLE.getMalus() );
+    public SnowCreeperEntity( EntityType<? extends _SpecialCreeperEntity> entityType, Level level ) {
+        super( entityType, level );
+        setPathfindingMalus( BlockPathTypes.WATER, BlockPathTypes.WALKABLE.getMalus() );
     }
     
     /** Override to change this entity's AI goals. */
@@ -97,13 +97,13 @@ public class SnowCreeperEntity extends _SpecialCreeperEntity {
     
     /** @return A new path navigator for this entity to use. */
     @Override
-    protected PathNavigator createNavigation( World world ) {
-        return new FluidPathNavigator( this, world, true, false );
+    protected PathNavigation createNavigation(Level level ) {
+        return new FluidPathNavigator( this, level, true, false );
     }
-    
+
     /** @return Whether this entity can stand on a particular type of fluid. */
     @Override
-    public boolean canStandOnFluid( Fluid fluid ) { return fluid.is( FluidTags.WATER ); }
+    public boolean canStandOnFluid( FluidState fluid ) { return fluid.is( FluidTags.WATER ); }
     
     /** Called each tick to update this entity. */
     @Override
@@ -127,16 +127,16 @@ public class SnowCreeperEntity extends _SpecialCreeperEntity {
     /** Override to change this creeper's explosion. */
     @Override
     protected void makeVariantExplosion( float explosionPower ) {
-        final Explosion.Mode explosionMode = ExplosionHelper.getMode( this );
+        final Explosion.BlockInteraction explosionMode = ExplosionHelper.getMode( this );
         final ExplosionHelper explosion = new ExplosionHelper( this,
-                explosionMode == Explosion.Mode.NONE ? explosionPower : 2.0F, false, false );
+                explosionMode == Explosion.BlockInteraction.NONE ? explosionPower : 2.0F, false, false );
         if( !explosion.initializeExplosion() ) return;
         explosion.finalizeExplosion();
         
         final int radius = (int) Math.floor( explosionPower );
         final BlockPos center = new BlockPos( explosion.getPos() );
         
-        if( explosionMode != Explosion.Mode.NONE ) {
+        if( explosionMode != Explosion.BlockInteraction.NONE ) {
             final boolean snowGlobe = isUnderWater() || random.nextDouble() < getConfig().SNOW.snowGlobeChance.get();
             
             final int radiusSq = radius * radius;
@@ -152,7 +152,7 @@ public class SnowCreeperEntity extends _SpecialCreeperEntity {
                             
                             // Freeze top layer of water sources and frosted ice within affected volume
                             final BlockState block = level.getBlockState( pos );
-                            if( block.is( Blocks.FROSTED_ICE ) || block.getBlock() == Blocks.WATER && block.getValue( FlowingFluidBlock.LEVEL ) == 0 ) {
+                            if( block.is( Blocks.FROSTED_ICE ) || block.getBlock() == Blocks.WATER && block.getValue( LiquidBlock.LEVEL ) == 0 ) {
                                 final BlockState blockAbove = level.getBlockState( pos.above() );
                                 if( !blockAbove.getMaterial().blocksMotion() && !blockAbove.getFluidState().is( FluidTags.WATER ) &&
                                         MobHelper.placeBlock( this, pos, MeltingIceBlock.getState( level, pos ) ) ) {
@@ -189,7 +189,7 @@ public class SnowCreeperEntity extends _SpecialCreeperEntity {
     
     /** Try to place an ice pillar at the location. */
     private void placePillar( BlockPos pos, int radius ) {
-        final BlockPos.Mutable currentPos = pos.mutable();
+        final BlockPos.MutableBlockPos currentPos = pos.mutable();
         if( shouldReplace( currentPos ) ) findGroundBelow( currentPos, radius );
         else if( findGroundAbove( currentPos, radius ) ) return;
         
@@ -208,7 +208,7 @@ public class SnowCreeperEntity extends _SpecialCreeperEntity {
     }
     
     /** Attempts to find the ground. Resets the position if none can be found. */
-    private void findGroundBelow( BlockPos.Mutable currentPos, int radius ) {
+    private void findGroundBelow( BlockPos.MutableBlockPos currentPos, int radius ) {
         final int yI = currentPos.getY();
         final int minY = Math.max( yI - radius, 0 );
         
@@ -225,7 +225,7 @@ public class SnowCreeperEntity extends _SpecialCreeperEntity {
     }
     
     /** @return Attempts to find the ground. Returns true if the pillar should be canceled. */
-    private boolean findGroundAbove( BlockPos.Mutable currentPos, int radius ) {
+    private boolean findGroundAbove( BlockPos.MutableBlockPos currentPos, int radius ) {
         final int yI = currentPos.getY();
         final int maxY = Math.min( yI + radius, level.getMaxBuildHeight() - 2 );
         
@@ -247,36 +247,36 @@ public class SnowCreeperEntity extends _SpecialCreeperEntity {
     
     /** @return Helper method to simplify spawning strays. Returns true if it spawns one. */
     private boolean trySpawnStray( BlockPos center, int radius ) {
-        if( !(level instanceof IServerWorld) ) return false;
+        if( !(level instanceof ServerLevelAccessor) ) return false;
         final StraySkeletonEntity stray = StraySkeletonEntity.SPECIES.entityType.get().create( level );
         if( stray == null ) return false;
         
         // Pick a random position within the ice prison, then cancel if we can't spawn at that position
         final float angle = random.nextFloat() * 2.0F * (float) Math.PI;
         final float distance = random.nextFloat() * (radius - 1);
-        final BlockPos.Mutable currentPos = center.mutable().move(
-                MathHelper.floor( MathHelper.cos( angle ) * distance ),
+        final BlockPos.MutableBlockPos currentPos = center.mutable().move(
+                Mth.floor( Mth.cos( angle ) * distance ),
                 0,
-                MathHelper.floor( MathHelper.sin( angle ) * distance )
+                Mth.floor( Mth.sin( angle ) * distance )
         );
         if( shouldReplace( currentPos ) ) findGroundBelow( currentPos, radius );
         else if( findGroundAbove( currentPos, radius ) ) {
-            stray.remove();
+            stray.discard();
             return false; // No floor found
         }
         stray.moveTo( currentPos, angle * 180.0F / (float) Math.PI + 180.0F, 0.0F );
         while( !level.noCollision( stray.getBoundingBox() ) ) {
             if( currentPos.getY() > center.getY() + radius ) {
-                stray.remove();
+                stray.discard();
                 return false; // Too high
             }
             currentPos.move( 0, 1, 0 );
-            stray.moveTo( currentPos, stray.yRot, stray.xRot );
+            stray.moveTo( currentPos, stray.getYRot(), stray.getXRot() );
         }
         
         stray.setTarget( getTarget() );
-        stray.finalizeSpawn( (IServerWorld) level, level.getCurrentDifficultyAt( blockPosition() ),
-                SpawnReason.MOB_SUMMONED, null, null );
+        stray.finalizeSpawn( (ServerLevelAccessor) level, level.getCurrentDifficultyAt( blockPosition() ),
+                MobSpawnType.MOB_SUMMONED, null, null );
         level.addFreshEntity( stray );
         stray.spawnAnim();
         return true;
@@ -284,7 +284,7 @@ public class SnowCreeperEntity extends _SpecialCreeperEntity {
     
     /** Override to load data from this entity's NBT data. */
     @Override
-    public void readVariantSaveData( CompoundNBT saveTag ) {
-        setPathfindingMalus( PathNodeType.WATER, PathNodeType.WALKABLE.getMalus() );
+    public void readVariantSaveData( CompoundTag saveTag ) {
+        setPathfindingMalus( BlockPathTypes.WATER, BlockPathTypes.WALKABLE.getMalus() );
     }
 }

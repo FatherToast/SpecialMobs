@@ -2,16 +2,15 @@ package fathertoast.specialmobs.common.config.util.environment;
 
 import fathertoast.specialmobs.common.config.field.AbstractConfigField;
 import fathertoast.specialmobs.common.core.SpecialMobs;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.registries.IForgeRegistry;
-import net.minecraftforge.registries.IForgeRegistryEntry;
 
 import javax.annotation.Nullable;
 
 /**
  * Registries are contained in {@link net.minecraftforge.registries.ForgeRegistries}
  */
-public abstract class RegistryEnvironment<T extends IForgeRegistryEntry<T>> extends AbstractEnvironment {
+public abstract class RegistryEnvironment<T> extends AbstractEnvironment {
     /** The field containing this entry. We save a reference to help improve error/warning reports. */
     private final AbstractConfigField FIELD;
     
@@ -25,7 +24,7 @@ public abstract class RegistryEnvironment<T extends IForgeRegistryEntry<T>> exte
     public RegistryEnvironment( T regEntry, boolean invert ) {
         FIELD = null;
         INVERT = invert;
-        REGISTRY_KEY = regEntry.getRegistryName();
+        REGISTRY_KEY = getRegistry().getKey(regEntry);
         registryEntry = regEntry;
     }
     

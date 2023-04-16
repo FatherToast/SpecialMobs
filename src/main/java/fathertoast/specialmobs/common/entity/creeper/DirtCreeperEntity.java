@@ -7,14 +7,14 @@ import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.util.ExplosionHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.item.Items;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.Explosion;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Explosion;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
 
 @SpecialMob
 public class DirtCreeperEntity extends _SpecialCreeperEntity {
@@ -47,7 +47,7 @@ public class DirtCreeperEntity extends _SpecialCreeperEntity {
     }
     
     @SpecialMob.Factory
-    public static EntityType.IFactory<DirtCreeperEntity> getVariantFactory() { return DirtCreeperEntity::new; }
+    public static EntityType.EntityFactory<DirtCreeperEntity> getVariantFactory() { return DirtCreeperEntity::new; }
     
     /** @return This entity's mob species. */
     @SpecialMob.SpeciesSupplier
@@ -57,17 +57,17 @@ public class DirtCreeperEntity extends _SpecialCreeperEntity {
     
     //--------------- Variant-Specific Implementations ----------------
     
-    public DirtCreeperEntity( EntityType<? extends _SpecialCreeperEntity> entityType, World world ) { super( entityType, world ); }
+    public DirtCreeperEntity( EntityType<? extends _SpecialCreeperEntity> entityType, Level level ) { super( entityType, level ); }
     
     /** Override to change this creeper's explosion. */
     @Override
     protected void makeVariantExplosion( float explosionPower ) {
-        final Explosion.Mode explosionMode = ExplosionHelper.getMode( this );
+        final Explosion.BlockInteraction explosionMode = ExplosionHelper.getMode( this );
         final ExplosionHelper explosion = new ExplosionHelper( this, explosionPower, false, false );
         if( !explosion.initializeExplosion() ) return;
         explosion.finalizeExplosion();
         
-        if( explosionMode == Explosion.Mode.NONE ) return;
+        if( explosionMode == Explosion.BlockInteraction.NONE ) return;
         
         final BlockState dirt = Blocks.DIRT.defaultBlockState();
         final int radius = (int) Math.floor( explosionPower );

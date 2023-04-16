@@ -8,7 +8,6 @@ import fathertoast.specialmobs.client.renderer.entity.species.*;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.config.Config;
 import fathertoast.specialmobs.common.core.SpecialMobs;
-import fathertoast.specialmobs.common.core.register.SMBlocks;
 import fathertoast.specialmobs.common.core.register.SMEntities;
 import fathertoast.specialmobs.common.entity.creeper.EnderCreeperEntity;
 import fathertoast.specialmobs.common.entity.enderman.RunicEndermanEntity;
@@ -20,24 +19,20 @@ import fathertoast.specialmobs.common.entity.witherskeleton.NinjaWitherSkeletonE
 import fathertoast.specialmobs.common.entity.zombie.MadScientistZombieEntity;
 import fathertoast.specialmobs.common.entity.zombifiedpiglin.VampireZombifiedPiglinEntity;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.ItemRenderer;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.RenderTypeLookup;
-import net.minecraft.client.renderer.entity.SpriteRenderer;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.IRendersAsItem;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.item.ItemModelsProperties;
-import net.minecraft.item.Items;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
+import net.minecraft.client.renderer.entity.ItemRenderer;
+import net.minecraft.client.renderer.item.ItemProperties;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.Items;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.RegistryObject;
-import net.minecraftforge.fml.client.registry.IRenderFactory;
-import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+import net.minecraftforge.registries.RegistryObject;
 
 import java.util.function.Supplier;
 
@@ -46,17 +41,16 @@ public class ClientRegister {
     
     @SubscribeEvent
     public static void onClientSetup( FMLClientSetupEvent event ) {
-        RenderTypeLookup.setRenderLayer( SMBlocks.MELTING_ICE.get(), RenderType.translucent() );
-        
         if( Config.MAIN.GENERAL.fancyFishingMobs.get() ) {
-            ItemModelsProperties.register( Items.FISHING_ROD, new ResourceLocation( "cast" ), new FishingRodItemPropertyGetter() );
+            event.enqueueWork(() -> {
+                ItemProperties.register( Items.FISHING_ROD, new ResourceLocation( "cast" ), new FishingRodItemPropertyGetter() );
+            });
         }
-        
         ClientEventHandler.registerConfigGUIFactory();
         registerEntityRenderers( event.getMinecraftSupplier() );
     }
     
-    private static void registerEntityRenderers( Supplier<Minecraft> game ) {
+    private static void registerEntityRenderers( EntityRenderersEvent.RegisterRenderers event ) {
         // Family-based renderers
         registerFamilyRenderers( MobFamily.CREEPER, SpecialCreeperRenderer::new );
         registerFamilyRenderers( MobFamily.ZOMBIE, SpecialZombieRenderer::new );
@@ -98,18 +92,18 @@ public class ClientRegister {
         registerRenderer( SMEntities.FISHING_BOBBER, SpecialFishingBobberRenderer::new );
     }
     
-    private static <T extends LivingEntity> void registerFamilyRenderers( MobFamily<T, ?> family, IRenderFactory<? super T> renderFactory ) {
-        RenderingRegistry.registerEntityRenderingHandler( family.vanillaReplacement.entityType.get(), renderFactory );
+    private static <T extends LivingEntity> void registerFamilyRenderers(EntityRenderersEvent.RegisterRenderers event, MobFamily<T, ?> family, EntityRendererProvider<? super T> renderFactory ) {
+        event.registerEntityRenderer( family.vanillaReplacement.entityType.get(), renderFactory );
         for( MobFamily.Species<? extends T> species : family.variants )
             registerSpeciesRenderer( species, renderFactory );
     }
     
-    private static <T extends LivingEntity> void registerSpeciesRenderer( MobFamily.Species<T> species, IRenderFactory<? super T> renderFactory ) {
+    private static <T extends LivingEntity> void registerSpeciesRenderer( EntityRenderersEvent.RegisterRenderers event, MobFamily.Species<T> species, EntityRendererProvider<? super T> renderFactory ) {
         registerRenderer( species.entityType, renderFactory );
     }
     
-    private static <T extends Entity> void registerRenderer( RegistryObject<EntityType<T>> entityType, IRenderFactory<? super T> renderFactory ) {
-        RenderingRegistry.registerEntityRenderingHandler( entityType.get(), renderFactory );
+    private static <T extends Entity> void registerRenderer( EntityRenderersEvent.RegisterRenderers event, RegistryObject<EntityType<T>> entityType, EntityRendererProvider<? super T> renderFactory ) {
+        event.registerEntityRenderer( entityType.get(), renderFactory );
     }
     
     @SuppressWarnings( "SameParameterValue" )

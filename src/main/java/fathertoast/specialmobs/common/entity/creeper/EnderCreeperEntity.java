@@ -9,27 +9,36 @@ import fathertoast.specialmobs.common.core.SpecialMobs;
 import fathertoast.specialmobs.common.entity.ai.AIHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.*;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.entity.ai.goal.Goal;
-import net.minecraft.entity.ai.goal.NearestAttackableTargetGoal;
-import net.minecraft.entity.ai.goal.ResetAngerGoal;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.datasync.DataParameter;
-import net.minecraft.network.datasync.DataSerializers;
-import net.minecraft.network.datasync.EntityDataManager;
-import net.minecraft.particles.ParticleTypes;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.FluidTags;
-import net.minecraft.util.*;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.util.TimeUtil;
+import net.minecraft.util.valueproviders.UniformInt;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.damagesource.IndirectEntityDamageSource;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.NeutralMob;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.ai.goal.Goal;
+import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
+import net.minecraft.world.entity.ai.goal.target.ResetUniversalAngerTargetGoal;
+import net.minecraft.world.entity.ai.targeting.TargetingConditions;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.ForgeEventFactory;
-import net.minecraftforge.event.entity.living.EntityTeleportEvent;
+import net.minecraftforge.event.entity.EntityTeleportEvent;
 
 import javax.annotation.Nullable;
 import java.util.EnumSet;
@@ -37,10 +46,10 @@ import java.util.UUID;
 import java.util.function.Predicate;
 
 @SpecialMob
-public class EnderCreeperEntity extends _SpecialCreeperEntity implements IAngerable {
+public class EnderCreeperEntity extends _SpecialCreeperEntity implements NeutralMob {
     
     //--------------- Static Special Mob Hooks ----------------
-    
+
     @SpecialMob.SpeciesReference
     public static MobFamily.Species<EnderCreeperEntity> SPECIES;
     
@@ -70,7 +79,7 @@ public class EnderCreeperEntity extends _SpecialCreeperEntity implements IAngera
     }
     
     @SpecialMob.Factory
-    public static EntityType.IFactory<EnderCreeperEntity> getVariantFactory() { return EnderCreeperEntity::new; }
+    public static EntityType.EntityFactory<EnderCreeperEntity> getVariantFactory() { return EnderCreeperEntity::new; }
     
     /** @return This entity's mob species. */
     @SpecialMob.SpeciesSupplier
@@ -80,7 +89,7 @@ public class EnderCreeperEntity extends _SpecialCreeperEntity implements IAngera
     
     //--------------- Variant-Specific Implementations ----------------
     
-    public EnderCreeperEntity( EntityType<? extends _SpecialCreeperEntity> entityType, World world ) { super( entityType, world ); }
+    public EnderCreeperEntity( EntityType<? extends _SpecialCreeperEntity> entityType, Level level ) { super( entityType, level ); }
     
     /** Override to change this entity's AI goals. */
     @Override
@@ -89,29 +98,29 @@ public class EnderCreeperEntity extends _SpecialCreeperEntity implements IAngera
         
         AIHelper.removeGoals( targetSelector, NearestAttackableTargetGoal.class );
         targetSelector.addGoal( 1, new FindPlayerGoal( this, this::isAngryAt ) );
-        targetSelector.addGoal( 4, new ResetAngerGoal<>( this, false ) );
+        targetSelector.addGoal( 4, new ResetUniversalAngerTargetGoal<>( this, false ) );
     }
     
     /** Override to save data to this entity's NBT data. */
-    public void addVariantSaveData( CompoundNBT saveTag ) {
+    public void addVariantSaveData( CompoundTag saveTag ) {
         addPersistentAngerSaveData( saveTag );
     }
     
     /** Override to load data from this entity's NBT data. */
-    public void readVariantSaveData( CompoundNBT saveTag ) {
+    public void readVariantSaveData( CompoundTag saveTag ) {
         if( !level.isClientSide )
-            readPersistentAngerSaveData( (ServerWorld) level, saveTag );
+            readPersistentAngerSaveData( level, saveTag );
     }
     
     
     //--------------- IAngerable Implementations ----------------
     
-    private static final RangedInteger PERSISTENT_ANGER_TIME = TickRangeConverter.rangeOfSeconds( 20, 39 );
+    private static final UniformInt PERSISTENT_ANGER_TIME = TimeUtil.rangeOfSeconds( 20, 39 );
     private int remainingPersistentAngerTime;
     private UUID persistentAngerTarget;
     
     @Override
-    public void startPersistentAngerTimer() { setRemainingPersistentAngerTime( PERSISTENT_ANGER_TIME.randomValue( random ) ); }
+    public void startPersistentAngerTimer() { setRemainingPersistentAngerTime( PERSISTENT_ANGER_TIME.sample( random ) ); }
     
     @Override
     public void setRemainingPersistentAngerTime( int ticks ) { remainingPersistentAngerTime = ticks; }
@@ -128,8 +137,8 @@ public class EnderCreeperEntity extends _SpecialCreeperEntity implements IAngera
     
     //--------------- Enderman Implementations ----------------
     
-    private static final DataParameter<Boolean> DATA_CREEPY = EntityDataManager.defineId( EnderCreeperEntity.class, DataSerializers.BOOLEAN );
-    private static final DataParameter<Boolean> DATA_STARED_AT = EntityDataManager.defineId( EnderCreeperEntity.class, DataSerializers.BOOLEAN );
+    private static final EntityDataAccessor<Boolean> DATA_CREEPY = SynchedEntityData.defineId( EnderCreeperEntity.class, EntityDataSerializers.BOOLEAN );
+    private static final EntityDataAccessor<Boolean> DATA_STARED_AT = SynchedEntityData.defineId( EnderCreeperEntity.class, EntityDataSerializers.BOOLEAN );
     
     private int lastStareSound = Integer.MIN_VALUE;
     private int targetChangeTime;
@@ -175,7 +184,7 @@ public class EnderCreeperEntity extends _SpecialCreeperEntity implements IAngera
     
     /** Called when a data watcher parameter is changed. */
     @Override
-    public void onSyncedDataUpdated( DataParameter<?> parameter ) {
+    public void onSyncedDataUpdated( EntityDataAccessor<?> parameter ) {
         if( DATA_CREEPY.equals( parameter ) && hasBeenStaredAt() && level.isClientSide ) {
             playStareSound();
         }
@@ -183,8 +192,8 @@ public class EnderCreeperEntity extends _SpecialCreeperEntity implements IAngera
     }
     
     /** @return True if the player is looking at this "enderman". */
-    private boolean isLookingAtMe( PlayerEntity player ) {
-        final ItemStack playerHelm = player.inventory.armor.get( 3 );
+    private boolean isLookingAtMe( Player player ) {
+        final ItemStack playerHelm = player.getInventory().armor.get( 3 );
         try {
             if( playerHelm.isEnderMask( player, null ) ) return false;
         }
@@ -194,14 +203,14 @@ public class EnderCreeperEntity extends _SpecialCreeperEntity implements IAngera
             return false;
         }
         
-        final Vector3d playerViewVec = player.getViewVector( 1.0F ).normalize();
-        final Vector3d playerToThisVec = new Vector3d(
+        final Vec3 playerViewVec = player.getViewVector( 1.0F ).normalize();
+        final Vec3 playerToThisVec = new Vec3(
                 getX() - player.getX(),
                 getEyeY() - player.getEyeY(),
                 getZ() - player.getZ() );
         final double distance = playerToThisVec.length();
         final double viewProjection = playerViewVec.dot( playerToThisVec.normalize() );
-        return viewProjection > 1.0 - 0.025 / distance && player.canSee( this );
+        return viewProjection > 1.0 - 0.025 / distance && player.hasLineOfSight( this );
     }
     
     /** Called each tick to update this entity's movement. */
@@ -216,7 +225,7 @@ public class EnderCreeperEntity extends _SpecialCreeperEntity implements IAngera
         }
         //jumping = false;
         if( !level.isClientSide ) {
-            updatePersistentAnger( (ServerWorld) level, true );
+            updatePersistentAnger( (ServerLevel) level, true );
         }
         super.aiStep();
     }
@@ -224,7 +233,7 @@ public class EnderCreeperEntity extends _SpecialCreeperEntity implements IAngera
     @Override
     protected void customServerAiStep() {
         if( level.isDay() && tickCount >= targetChangeTime + 600 ) {
-            final float brightness = getBrightness();
+            final float brightness = getLightLevelDependentMagicValue();
             if( brightness > 0.5F && level.canSeeSky( blockPosition() ) && random.nextFloat() * 30.0F < (brightness - 0.4F) * 2.0F ) {
                 setTarget( null );
                 teleport();
@@ -238,7 +247,7 @@ public class EnderCreeperEntity extends _SpecialCreeperEntity implements IAngera
     public boolean hurt( DamageSource source, float amount ) {
         if( isInvulnerableTo( source ) ) return false;
         
-        if( source instanceof IndirectEntityDamageSource ) {
+        if( source instanceof IndirectEntityDamageSource) {
             for( int i = 0; i < 64; ++i ) {
                 if( teleport() ) return true;
             }
@@ -265,7 +274,7 @@ public class EnderCreeperEntity extends _SpecialCreeperEntity implements IAngera
     
     /** @return Teleports this "enderman" towards another entity; returns true if successful. */
     protected boolean teleportTowards( Entity target ) {
-        final Vector3d directionFromTarget = new Vector3d(
+        final Vec3 directionFromTarget = new Vec3(
                 getX() - target.getX(),
                 getY( 0.5 ) - target.getEyeY(),
                 getZ() - target.getZ() )
@@ -279,7 +288,7 @@ public class EnderCreeperEntity extends _SpecialCreeperEntity implements IAngera
     
     /** @return Teleports this "enderman" to a new position; returns true if successful. */
     protected boolean teleport( double x, double y, double z ) {
-        final BlockPos.Mutable pos = new BlockPos.Mutable( x, y, z );
+        final BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos( x, y, z );
         
         while( pos.getY() > 0 && !level.getBlockState( pos ).getMaterial().blocksMotion() ) {
             pos.move( Direction.DOWN );
@@ -316,7 +325,7 @@ public class EnderCreeperEntity extends _SpecialCreeperEntity implements IAngera
         @Override
         public boolean canUse() {
             target = creeper.getTarget();
-            return target instanceof PlayerEntity && target.distanceToSqr( creeper ) <= 256.0 && creeper.isLookingAtMe( (PlayerEntity) target );
+            return target instanceof Player && target.distanceToSqr( creeper ) <= 256.0 && creeper.isLookingAtMe( (Player) target );
         }
         
         /** Called when this AI is activated. */
@@ -331,21 +340,22 @@ public class EnderCreeperEntity extends _SpecialCreeperEntity implements IAngera
     }
     
     /** The enderman find player goal adapted for use by a creeper. */
-    static class FindPlayerGoal extends NearestAttackableTargetGoal<PlayerEntity> {
+    static class FindPlayerGoal extends NearestAttackableTargetGoal<Player> {
         
         private final EnderCreeperEntity creeper;
-        private final EntityPredicate startAggroTargetConditions;
-        private final EntityPredicate continueAggroTargetConditions = new EntityPredicate().allowUnseeable();
+        private final TargetingConditions startAggroTargetConditions;
+        private final TargetingConditions continueAggroTargetConditions = TargetingConditions.forCombat().ignoreLineOfSight();
         
-        private PlayerEntity pendingTarget;
+        private Player pendingTarget;
         private int aggroTime;
         private int teleportTime;
         
         public FindPlayerGoal( EnderCreeperEntity entity, @Nullable Predicate<LivingEntity> targetSelector ) {
-            super( entity, PlayerEntity.class, 10, false, false, targetSelector );
+            super( entity, Player.class, 10, false, false, targetSelector );
             creeper = entity;
-            startAggroTargetConditions = new EntityPredicate().range( getFollowDistance() ).selector(
-                    ( player ) -> entity.isLookingAtMe( (PlayerEntity) player ) );
+            startAggroTargetConditions = TargetingConditions.forCombat().range( getFollowDistance() ).selector(
+                    // Safe cast, we should only be searching for players anyways
+                    ( target ) -> entity.isLookingAtMe( (Player) target) );
         }
         
         /** @return Returns true if this AI can be activated. */
@@ -397,7 +407,7 @@ public class EnderCreeperEntity extends _SpecialCreeperEntity implements IAngera
             }
             else {
                 if( target != null && !creeper.isPassenger() ) {
-                    if( creeper.isLookingAtMe( (PlayerEntity) target ) ) {
+                    if( creeper.isLookingAtMe( (Player) target ) ) {
                         if( target.distanceToSqr( creeper ) < 16.0 ) {
                             creeper.teleport();
                         }

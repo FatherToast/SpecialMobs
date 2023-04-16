@@ -6,20 +6,20 @@ import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.entity.ai.attributes.ModifiableAttributeInstance;
-import net.minecraft.entity.projectile.SnowballEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.potion.PotionUtils;
-import net.minecraft.potion.Potions;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.World;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.util.Mth;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.projectile.Snowball;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.alchemy.PotionUtils;
+import net.minecraft.world.item.alchemy.Potions;
+import net.minecraft.world.level.Level;
 
 import java.util.UUID;
 
@@ -53,7 +53,7 @@ public class ConflagrationBlazeEntity extends _SpecialBlazeEntity {
     }
     
     @SpecialMob.Factory
-    public static EntityType.IFactory<ConflagrationBlazeEntity> getVariantFactory() { return ConflagrationBlazeEntity::new; }
+    public static EntityType.EntityFactory<ConflagrationBlazeEntity> getVariantFactory() { return ConflagrationBlazeEntity::new; }
     
     /** @return This entity's mob species. */
     @SpecialMob.SpeciesSupplier
@@ -70,7 +70,7 @@ public class ConflagrationBlazeEntity extends _SpecialBlazeEntity {
     /** The level of increased attack damage gained. */
     private int growthLevel;
     
-    public ConflagrationBlazeEntity( EntityType<? extends _SpecialBlazeEntity> entityType, World world ) { super( entityType, world ); }
+    public ConflagrationBlazeEntity( EntityType<? extends _SpecialBlazeEntity> entityType, Level level ) { super( entityType, level ); }
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override
@@ -84,7 +84,7 @@ public class ConflagrationBlazeEntity extends _SpecialBlazeEntity {
         if( isInvulnerableTo( source ) || fireImmune() && source.isFire() ) return false;
         
         if( !source.isExplosion() && !source.isMagic() && !DamageSource.DROWN.getMsgId().equals( source.getMsgId() ) &&
-                !(source.getDirectEntity() instanceof SnowballEntity) ) {
+                !(source.getDirectEntity() instanceof Snowball ) ) {
             
             if( !level.isClientSide() && growthLevel < 7 ) {
                 growthLevel++;
@@ -98,7 +98,7 @@ public class ConflagrationBlazeEntity extends _SpecialBlazeEntity {
     /** Recalculates the modifiers associated with this entity's feeding level counters. */
     private void updateFeedingLevels() {
         if( level != null && !level.isClientSide ) {
-            final int cooldownReduction = MathHelper.floor( getConfig().GENERAL.rangedAttackCooldown.get() * growthLevel * 0.1 );
+            final int cooldownReduction = Mth.floor( getConfig().GENERAL.rangedAttackCooldown.get() * growthLevel * 0.1 );
             getSpecialData().setRangedAttackCooldown( getConfig().GENERAL.rangedAttackCooldown.get() - cooldownReduction );
             getSpecialData().setRangedAttackMaxCooldown( getConfig().GENERAL.rangedAttackMaxCooldown.get() - cooldownReduction );
             
@@ -106,7 +106,7 @@ public class ConflagrationBlazeEntity extends _SpecialBlazeEntity {
             if( growthLevel >= 3 ) fireballBurstCount++;
             if( growthLevel >= 7 ) fireballBurstCount++;
             
-            final ModifiableAttributeInstance damage = getAttribute( Attributes.ATTACK_DAMAGE );
+            final AttributeInstance damage = getAttribute( Attributes.ATTACK_DAMAGE );
             //noinspection ConstantConditions
             damage.removeModifier( DAMAGE_BOOST.getId() );
             if( growthLevel > 0 ) {
@@ -118,13 +118,13 @@ public class ConflagrationBlazeEntity extends _SpecialBlazeEntity {
     
     /** Override to save data to this entity's NBT data. */
     @Override
-    public void addVariantSaveData( CompoundNBT saveTag ) {
+    public void addVariantSaveData( CompoundTag saveTag ) {
         saveTag.putByte( References.TAG_GROWTH_LEVEL, (byte) growthLevel );
     }
     
     /** Override to load data from this entity's NBT data. */
     @Override
-    public void readVariantSaveData( CompoundNBT saveTag ) {
+    public void readVariantSaveData( CompoundTag saveTag ) {
         if( saveTag.contains( References.TAG_GROWTH_LEVEL, References.NBT_TYPE_NUMERICAL ) )
             growthLevel = saveTag.getByte( References.TAG_GROWTH_LEVEL );
         updateFeedingLevels();

@@ -8,11 +8,11 @@ import fathertoast.specialmobs.common.config.species.SpeciesConfig;
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.item.Items;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
 
 @SpecialMob
 public class InfernoBlazeEntity extends _SpecialBlazeEntity {
@@ -50,7 +50,7 @@ public class InfernoBlazeEntity extends _SpecialBlazeEntity {
     }
     
     @SpecialMob.Factory
-    public static EntityType.IFactory<InfernoBlazeEntity> getVariantFactory() { return InfernoBlazeEntity::new; }
+    public static EntityType.EntityFactory<InfernoBlazeEntity> getVariantFactory() { return InfernoBlazeEntity::new; }
     
     /** @return This entity's mob species. */
     @SpecialMob.SpeciesSupplier
@@ -60,7 +60,7 @@ public class InfernoBlazeEntity extends _SpecialBlazeEntity {
     
     //--------------- Variant-Specific Implementations ----------------
     
-    public InfernoBlazeEntity( EntityType<? extends _SpecialBlazeEntity> entityType, World world ) { super( entityType, world ); }
+    public InfernoBlazeEntity( EntityType<? extends _SpecialBlazeEntity> entityType, Level level ) { super( entityType, level ); }
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override

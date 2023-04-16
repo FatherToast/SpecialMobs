@@ -6,18 +6,18 @@ import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.util.ExplosionHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.entity.EntityType;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.potion.EffectInstance;
-import net.minecraft.potion.Effects;
-import net.minecraft.potion.PotionUtils;
-import net.minecraft.potion.Potions;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.alchemy.PotionUtils;
+import net.minecraft.world.item.alchemy.Potions;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.List;
 
@@ -50,7 +50,7 @@ public class DarkCreeperEntity extends _SpecialCreeperEntity {
     }
     
     @SpecialMob.Factory
-    public static EntityType.IFactory<DarkCreeperEntity> getVariantFactory() { return DarkCreeperEntity::new; }
+    public static EntityType.EntityFactory<DarkCreeperEntity> getVariantFactory() { return DarkCreeperEntity::new; }
     
     /** @return This entity's mob species. */
     @SpecialMob.SpeciesSupplier
@@ -60,7 +60,7 @@ public class DarkCreeperEntity extends _SpecialCreeperEntity {
     
     //--------------- Variant-Specific Implementations ----------------
     
-    public DarkCreeperEntity( EntityType<? extends _SpecialCreeperEntity> entityType, World world ) { super( entityType, world ); }
+    public DarkCreeperEntity( EntityType<? extends _SpecialCreeperEntity> entityType, Level level ) { super( entityType, level ); }
     
     /** Override to change this creeper's explosion power multiplier. */
     protected float getVariantExplosionPower( float radius ) { return super.getVariantExplosionPower( radius / 2.0F ); }
@@ -83,7 +83,7 @@ public class DarkCreeperEntity extends _SpecialCreeperEntity {
                         final BlockState block = level.getBlockState( pos );
                         
                         // Ignore the block if it is not a light or is already exploded
-                        if( block.getLightValue( level, pos ) > 1 && !explosion.getHitBlocks().contains( pos ) &&
+                        if( block.getLightBlock( level, pos ) > 1 && !explosion.getHitBlocks().contains( pos ) &&
                                 explosion.tryExplodeBlock( pos, block, radius ) ) {
                             explosion.getHitBlocks().add( pos );
                         }
@@ -95,8 +95,7 @@ public class DarkCreeperEntity extends _SpecialCreeperEntity {
         explosion.finalizeExplosion();
         
         // Move the time forward to next night if powered
-        if( isPowered() && level instanceof ServerWorld ) {
-            final ServerWorld serverLevel = (ServerWorld) level;
+        if( isPowered() && level instanceof ServerLevel serverLevel ) {;
             
             // Days are 24k ticks long; find how far along we are in the current day (0-23,999)
             long time = serverLevel.getDayTime();
@@ -116,7 +115,7 @@ public class DarkCreeperEntity extends _SpecialCreeperEntity {
      * If this list is empty, the lingering cloud is not created.
      */
     @Override
-    protected void modifyVariantLingeringCloudEffects( List<EffectInstance> potions ) {
-        potions.add( new EffectInstance( Effects.BLINDNESS, 100 ) );
+    protected void modifyVariantLingeringCloudEffects( List<MobEffectInstance> potions ) {
+        potions.add( new MobEffectInstance( MobEffects.BLINDNESS, 100 ) );
     }
 }

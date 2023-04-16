@@ -2,15 +2,15 @@ package fathertoast.specialmobs.common.config.field;
 
 import fathertoast.specialmobs.common.config.file.TomlHelper;
 import fathertoast.specialmobs.common.core.SpecialMobs;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.Level;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
-import java.util.function.Function;
 import java.util.function.Predicate;
 
 /**
@@ -46,6 +46,8 @@ public class DoubleField extends AbstractConfigField {
     
     /** @return Treats the config field's value as a percent chance (from 0 to 1) and returns the result of a single roll. */
     public boolean rollChance( Random random ) { return random.nextDouble() < value; }
+
+    public boolean rollChance( RandomSource randomSource ) { return randomSource.nextDouble() < value; }
     
     /** Adds info about the field type, format, and bounds to the end of a field's description. */
     public void appendFieldInfo( List<String> comment ) {
@@ -180,10 +182,10 @@ public class DoubleField extends AbstractConfigField {
         }
         
         /** @return Returns the config field's value. */
-        public double get( World world, @Nullable BlockPos pos ) { return EXCEPTIONS.getOrElse( world, pos, BASE ); }
+        public double get( Level level, @Nullable BlockPos pos ) { return EXCEPTIONS.getOrElse( level, pos, BASE ); }
         
         /** @return Treats the config field's value as a percent chance (from 0 to 1) and returns the result of a single roll. */
-        public boolean rollChance( Random random, World world, @Nullable BlockPos pos ) { return random.nextDouble() < get( world, pos ); }
+        public boolean rollChance( Random random, Level level, @Nullable BlockPos pos ) { return random.nextDouble() < get( level, pos ); }
     }
     
     /**
@@ -216,18 +218,18 @@ public class DoubleField extends AbstractConfigField {
         
         /** @return Returns a random item from this weighted list. Null if none of the items have a positive weight. */
         @Nullable
-        public T next( Random random, World world, @Nullable BlockPos pos ) { return next( random, world, pos, null ); }
+        public T next( RandomSource random, Level level, @Nullable BlockPos pos ) { return next( random, level, pos, null ); }
         
         /** @return Returns a random item from this weighted list. Null if none of the items have a positive weight. */
         @Nullable
-        public T next( Random random, World world, @Nullable BlockPos pos, @Nullable Predicate<T> selector ) {
+        public T next( RandomSource random, Level level, @Nullable BlockPos pos, @Nullable Predicate<T> selector ) {
             // Due to the 'nebulous' nature of environment-based weights, we must recalculate weights for EVERY call
             final double[] weights = new double[UNDERLYING_LIST.size()];
             double targetWeight = 0.0;
             for( int i = 0; i < weights.length; i++ ) {
                 final Entry<T> entry = UNDERLYING_LIST.get( i );
                 if( selector == null || selector.test( entry.VALUE ) ) {
-                    targetWeight += weights[i] = entry.WEIGHT.get( world, pos );
+                    targetWeight += weights[i] = entry.WEIGHT.get( level, pos );
                 }
             }
             if( targetWeight <= 0.0 ) return null;

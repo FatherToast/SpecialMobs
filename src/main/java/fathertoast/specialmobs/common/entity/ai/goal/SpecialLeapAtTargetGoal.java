@@ -1,16 +1,16 @@
 package fathertoast.specialmobs.common.entity.ai.goal;
 
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.MobEntity;
-import net.minecraft.entity.ai.goal.Goal;
-import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.ai.goal.Goal;
+import net.minecraft.world.phys.Vec3;
 
 import java.util.EnumSet;
 
 public class SpecialLeapAtTargetGoal extends Goal {
     private static final float BASE_Y_VELOCITY = 0.4F;
     
-    private final MobEntity mob;
+    private final Mob mob;
     
     private final int infrequency;
     
@@ -26,7 +26,7 @@ public class SpecialLeapAtTargetGoal extends Goal {
     
     private LivingEntity target;
     
-    public SpecialLeapAtTargetGoal( MobEntity entity, int infreq, float minDist, float maxDist, float forward, float upward ) {
+    public SpecialLeapAtTargetGoal( Mob entity, int infreq, float minDist, float maxDist, float forward, float upward ) {
         mob = entity;
         infrequency = infreq;
         minDistSq = minDist * minDist;
@@ -72,7 +72,7 @@ public class SpecialLeapAtTargetGoal extends Goal {
     /** Called when this AI is activated. */
     @Override
     public void start() {
-        final Vector3d vLeap = new Vector3d( target.getX() - mob.getX(), 0.0, target.getZ() - mob.getZ() )
+        final Vec3 vLeap = new Vec3( target.getX() - mob.getX(), 0.0, target.getZ() - mob.getZ() )
                 .normalize().scale( forwardPower ).add( mob.getDeltaMovement().scale( momentum ) );
         
         mob.setDeltaMovement( vLeap.x, BASE_Y_VELOCITY * upwardPower, vLeap.z );

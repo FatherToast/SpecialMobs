@@ -3,16 +3,16 @@ package fathertoast.specialmobs.common.entity.ai.goal;
 import fathertoast.specialmobs.common.entity.ISpecialMob;
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.entity.SpecialMobData;
-import net.minecraft.entity.IRangedAttackMob;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.MobEntity;
-import net.minecraft.entity.ai.goal.Goal;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.ai.goal.Goal;
+import net.minecraft.world.entity.monster.RangedAttackMob;
 
 /**
  * A ranged attack goal that can be used passively while performing other actions.
  */
-public class PassiveRangedAttackGoal<T extends MobEntity & ISpecialMob<? super T> & IRangedAttackMob> extends Goal {
+public class PassiveRangedAttackGoal<T extends Mob & ISpecialMob<? super T> & RangedAttackMob> extends Goal {
     
     private final T mob;
     private final float recoilPower;
@@ -39,11 +39,11 @@ public class PassiveRangedAttackGoal<T extends MobEntity & ISpecialMob<? super T
         final SpecialMobData<?> data = mob.getSpecialData();
         
         final double distSqr = target.distanceToSqr( mob );
-        if( distSqr <= data.getRangedAttackMaxRange() * data.getRangedAttackMaxRange() && mob.canSee( target ) ) {
+        if( distSqr <= data.getRangedAttackMaxRange() * data.getRangedAttackMaxRange() && mob.hasLineOfSight( target ) ) {
             attackTime++;
             if( attackTime >= data.getRangedAttackCooldown() ) {
-                attackTime = MathHelper.floor( (data.getRangedAttackCooldown() - data.getRangedAttackMaxCooldown()) *
-                        MathHelper.sqrt( distSqr ) / data.getRangedAttackMaxRange() );
+                attackTime = Mth.floor( (data.getRangedAttackCooldown() - data.getRangedAttackMaxCooldown()) *
+                        Mth.sqrt( (float) distSqr ) / data.getRangedAttackMaxRange() );
                 
                 mob.performRangedAttack( target, 1.0F );
                 

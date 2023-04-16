@@ -5,49 +5,48 @@ import fathertoast.specialmobs.common.core.register.SMEntities;
 import fathertoast.specialmobs.common.entity.ISpecialMob;
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.util.References;
-import net.minecraft.block.AbstractBlock;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.projectile.ProjectileEntity;
-import net.minecraft.entity.projectile.ProjectileHelper;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.IPacket;
-import net.minecraft.network.datasync.DataParameter;
-import net.minecraft.network.datasync.DataSerializers;
-import net.minecraft.network.datasync.EntityDataManager;
-import net.minecraft.particles.ParticleTypes;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.math.EntityRayTraceResult;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.World;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.util.Mth;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.projectile.Projectile;
+import net.minecraft.world.entity.projectile.ProjectileUtil;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.phys.EntityHitResult;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.ForgeEventFactory;
-import net.minecraftforge.fml.network.NetworkHooks;
+import net.minecraftforge.network.NetworkHooks;
 
-public class BugSpitEntity extends ProjectileEntity {
+public class BugSpitEntity extends Projectile {
     private static final float DRAG_FACTOR = 0.99F;
     private static final float GRAVITY_ACCEL = 0.06F;
     
     /** The parameter for color tint. */
-    private static final DataParameter<Integer> COLOR = EntityDataManager.defineId( BugSpitEntity.class, DataSerializers.INT );
+    private static final EntityDataAccessor<Integer> COLOR = SynchedEntityData.defineId( BugSpitEntity.class, EntityDataSerializers.INT );
     
     private float damageAmount = 2.0F;
     private int knockback;
     
-    public BugSpitEntity( EntityType<? extends BugSpitEntity> entityType, World world ) { super( entityType, world ); }
+    public BugSpitEntity( EntityType<? extends BugSpitEntity> entityType, Level level ) { super( entityType, level ); }
     
     public BugSpitEntity( LivingEntity shooter, LivingEntity target ) {
         super( SMEntities.BUG_SPIT.get(), shooter.level );
         setOwner( shooter );
         
-        final Vector3d lookVec = shooter.getViewVector( 1.0F ).scale( shooter.getBbWidth() );
+        final Vec3 lookVec = shooter.getViewVector( 1.0F ).scale( shooter.getBbWidth() );
         setPos( shooter.getX() + lookVec.x, shooter.getEyeY() - 0.1, shooter.getZ() + lookVec.z );
         
         float spread = 14 - 4 * level.getDifficulty().getId();
-        if( shooter instanceof ISpecialMob ) {
-            final ISpecialMob<?> specialShooter = (ISpecialMob<?>) shooter;
+        if(shooter instanceof final ISpecialMob<?> specialShooter) {
             setDamage( specialShooter.getSpecialData().getRangedAttackDamage() );
             
             if( getDamage() < 0.0F ) {
@@ -65,7 +64,7 @@ public class BugSpitEntity extends ProjectileEntity {
         final double dX = target.getX() - getX();
         final double dY = target.getY( 0.3333 ) - getY();
         final double dZ = target.getZ() - getZ();
-        final double dH = MathHelper.sqrt( dX * dX + dZ * dZ );
+        final double dH = Mth.sqrt( (float) (dX * dX + dZ * dZ) );
         shoot( dX, dY + dH * 0.2, dZ, 1.2F, spread );
     }
 
@@ -74,7 +73,7 @@ public class BugSpitEntity extends ProjectileEntity {
     protected void defineSynchedData() { entityData.define( COLOR, 0xFFFFFF ); }
     
     @Override
-    public IPacket<?> getAddEntityPacket() { return NetworkHooks.getEntitySpawningPacket( this ); }
+    public Packet<?> getAddEntityPacket() { return NetworkHooks.getEntitySpawningPacket( this ); }
     
     /** Sets the RGB color of this spit attack. */
     public void setColor( int color ) {
@@ -90,7 +89,7 @@ public class BugSpitEntity extends ProjectileEntity {
         super.onAddedToWorld();
         
         if( level != null && level.isClientSide() ) {
-            final Vector3d v = getDeltaMovement();
+            final Vec3 v = getDeltaMovement();
             for( int i = 0; i < 7; i++ ) {
                 final double multi = 0.4 + 0.1 * i;
                 level.addParticle( ParticleTypes.SPIT, getX(), getY(), getZ(),
@@ -117,10 +116,10 @@ public class BugSpitEntity extends ProjectileEntity {
         super.tick();
         
         // Check collision
-        final Vector3d v = getDeltaMovement();
-        final RayTraceResult rayTrace = ProjectileHelper.getHitResult( this, this::canHitEntity );
-        if( rayTrace.getType() != RayTraceResult.Type.MISS && !ForgeEventFactory.onProjectileImpact( this, rayTrace ) ) {
-            onHit( rayTrace );
+        final Vec3 v = getDeltaMovement();
+        final HitResult hitResult = ProjectileUtil.getHitResult( this, this::canHitEntity );
+        if( hitResult.getType() != HitResult.Type.MISS && !ForgeEventFactory.onProjectileImpact( this, hitResult ) ) {
+            onHit( hitResult );
         }
         
         // Update physics
@@ -128,10 +127,9 @@ public class BugSpitEntity extends ProjectileEntity {
         final double nextY = getY() + v.y;
         final double nextZ = getZ() + v.z;
         updateRotation();
-        //noinspection deprecation
-        if( level.getBlockStates( getBoundingBox() ).noneMatch( AbstractBlock.AbstractBlockState::isAir ) || isInWaterOrBubble() ) {
+        if( level.getBlockStates( getBoundingBox() ).noneMatch( BlockBehaviour.BlockStateBase::isAir ) || isInWaterOrBubble() ) {
             // Oof ded (but not a hit)
-            remove();
+            discard();
         }
         else {
             setDeltaMovement( v.scale( DRAG_FACTOR ) );
@@ -143,17 +141,17 @@ public class BugSpitEntity extends ProjectileEntity {
     
     /** Called when this projectile hits anything. */
     @Override
-    protected void onHit( RayTraceResult hit ) {
+    protected void onHit( HitResult hit ) {
         super.onHit( hit );
         if( !level.isClientSide() ) {
             // Should we add any on-hit gfx?
-            remove();
+            discard();
         }
     }
     
     /** Called when this projectile hits an entity. */
     @Override
-    protected void onHitEntity( EntityRayTraceResult hit ) {
+    protected void onHitEntity( EntityHitResult hit ) {
         super.onHitEntity( hit );
         final Entity target = hit.getEntity();
         final Entity owner = getOwner();
@@ -176,7 +174,7 @@ public class BugSpitEntity extends ProjectileEntity {
     
     /** Saves data to this entity's base NBT compound that is specific to its subclass. */
     @Override
-    public void addAdditionalSaveData( CompoundNBT tag ) {
+    public void addAdditionalSaveData( CompoundTag tag ) {
         super.addAdditionalSaveData( tag );
         
         tag.putFloat( References.TAG_RANGED_DAMAGE, getDamage() );
@@ -185,7 +183,7 @@ public class BugSpitEntity extends ProjectileEntity {
     
     /** Loads data from this entity's base NBT compound that is specific to its subclass. */
     @Override
-    public void readAdditionalSaveData( CompoundNBT tag ) {
+    public void readAdditionalSaveData( CompoundTag tag ) {
         super.readAdditionalSaveData( tag );
         
         if( tag.contains( References.TAG_RANGED_DAMAGE, References.NBT_TYPE_NUMERICAL ) )

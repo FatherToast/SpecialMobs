@@ -1,7 +1,11 @@
 package fathertoast.specialmobs.common.config.util;
 
-import fathertoast.specialmobs.common.config.util.environment.*;
-import fathertoast.specialmobs.common.config.util.environment.biome.*;
+import fathertoast.specialmobs.common.config.util.environment.AbstractEnvironment;
+import fathertoast.specialmobs.common.config.util.environment.ComparisonOperator;
+import fathertoast.specialmobs.common.config.util.environment.biome.BiomeEnvironment;
+import fathertoast.specialmobs.common.config.util.environment.biome.BiomeTagKeyEnvironment;
+import fathertoast.specialmobs.common.config.util.environment.biome.RainfallEnvironment;
+import fathertoast.specialmobs.common.config.util.environment.biome.TemperatureEnvironment;
 import fathertoast.specialmobs.common.config.util.environment.dimension.DimensionPropertyEnvironment;
 import fathertoast.specialmobs.common.config.util.environment.dimension.DimensionTypeEnvironment;
 import fathertoast.specialmobs.common.config.util.environment.dimension.DimensionTypeGroupEnvironment;
@@ -10,13 +14,17 @@ import fathertoast.specialmobs.common.config.util.environment.position.Structure
 import fathertoast.specialmobs.common.config.util.environment.position.YEnvironment;
 import fathertoast.specialmobs.common.config.util.environment.position.YFromSeaEnvironment;
 import fathertoast.specialmobs.common.config.util.environment.time.*;
-import net.minecraft.util.RegistryKey;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.DimensionType;
-import net.minecraft.world.World;
-import net.minecraft.world.biome.Biome;
-import net.minecraft.world.gen.feature.structure.Structure;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.BiomeTags;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.dimension.BuiltinDimensionTypes;
+import net.minecraft.world.level.dimension.DimensionType;
+import net.minecraft.world.level.levelgen.structure.Structure;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -43,9 +51,9 @@ public class EnvironmentEntry {
     }
     
     /** @return Returns true if all this entry's conditions match the provided environment. */
-    public boolean matches( World world, @Nullable BlockPos pos ) {
+    public boolean matches( Level level, @Nullable BlockPos pos ) {
         for( AbstractEnvironment condition : CONDITIONS ) {
-            if( !condition.matches( world, pos ) ) return false;
+            if( !condition.matches( level, pos ) ) return false;
         }
         return true;
     }
@@ -116,19 +124,20 @@ public class EnvironmentEntry {
             return in( new DimensionPropertyEnvironment( property, invert ) );
         }
         
-        public Builder inOverworld() { return inDimensionType( DimensionType.OVERWORLD_LOCATION, false ); }
+        public Builder inOverworld() { return inDimensionType( BuiltinDimensionTypes.OVERWORLD, false ); }
         
-        public Builder notInOverworld() { return inDimensionType( DimensionType.OVERWORLD_LOCATION, true ); }
+        public Builder notInOverworld() { return inDimensionType( BuiltinDimensionTypes.OVERWORLD, true ); }
         
-        public Builder inNether() { return inDimensionType( DimensionType.NETHER_LOCATION, false ); }
+        public Builder inNether() { return inDimensionType( BuiltinDimensionTypes.NETHER, false ); }
         
-        public Builder notInNether() { return inDimensionType( DimensionType.NETHER_LOCATION, true ); }
+        public Builder notInNether() { return inDimensionType( BuiltinDimensionTypes.NETHER, true ); }
         
-        public Builder inTheEnd() { return inDimensionType( DimensionType.END_LOCATION, false ); }
+        public Builder inTheEnd() { return inDimensionType( BuiltinDimensionTypes.END, false ); }
         
-        public Builder notInTheEnd() { return inDimensionType( DimensionType.END_LOCATION, true ); }
+        public Builder notInTheEnd() { return inDimensionType( BuiltinDimensionTypes.END, true ); }
         
-        private Builder inDimensionType( RegistryKey<DimensionType> dimType, boolean invert ) { return in( new DimensionTypeEnvironment( dimType, invert ) ); }
+        private Builder inDimensionType( ResourceKey<DimensionType> dimType, boolean invert ) {
+            return in( new DimensionTypeEnvironment( dimType, invert ) ); }
         
         /** Check if the dimension type is vanilla (registered with the "minecraft" namespace). */
         public Builder inVanillaDimension() { return in( new DimensionTypeGroupEnvironment( new ResourceLocation( "" ), false ) ); }
@@ -138,34 +147,34 @@ public class EnvironmentEntry {
         
         
         // Biome-based
+
+        /** Check if the biome is a water or beach biome (depth at or below sea level). */
+        public Builder inWaterBiome() { return inBiomeTag( BiomeTags.IS_OCEAN ).inBiomeTag( BiomeTags.IS_BEACH ); }
         
         /** Check if the biome is a water or beach biome (depth at or below sea level). */
-        public Builder inWaterBiome() { return isDepth( ComparisonOperator.LESS_OR_EQUAL, 0.0F ); }
-        
-        /** Check if the biome is a water or beach biome (depth at or below sea level). */
-        public Builder notInWaterBiome() { return isDepth( ComparisonOperator.LESS_OR_EQUAL.invert(), 0.0F ); }
+        public Builder notInWaterBiome() { return notInBiomeTag( BiomeTags.IS_OCEAN ).notInBiomeTag( BiomeTags.IS_BEACH ); }
         
         /** Check if the biome has relatively high elevation. */
-        public Builder inMountainBiome() { return isDepth( ComparisonOperator.GREATER_OR_EQUAL, 0.4F ); }
+        public Builder inMountainBiome() { return inBiomeTag( BiomeTags.IS_MOUNTAIN ).inBiomeTag( BiomeTags.IS_HILL ); }
         
         /** Check if the biome has relatively high elevation. */
-        public Builder notInMountainBiome() { return isDepth( ComparisonOperator.GREATER_OR_EQUAL.invert(), 0.4F ); }
+        //public Builder notInMountainBiome() { return isDepth( ComparisonOperator.GREATER_OR_EQUAL.invert(), 0.4F ); }
         
-        private Builder isDepth( ComparisonOperator op, float value ) { return in( new TerrainDepthEnvironment( op, value ) ); }
-        
-        /** Check if the biome is relatively flat. */
-        public Builder inFlatBiome() { return isScale( ComparisonOperator.LESS_OR_EQUAL, 0.1F ); }
+        //private Builder isDepth( ComparisonOperator op, float value ) { return in( new TerrainDepthEnvironment( op, value ) ); }
         
         /** Check if the biome is relatively flat. */
-        public Builder notInFlatBiome() { return isScale( ComparisonOperator.LESS_OR_EQUAL.invert(), 0.1F ); }
+        //public Builder inFlatBiome() { return isScale( ComparisonOperator.LESS_OR_EQUAL, 0.1F ); }
+        
+        /** Check if the biome is relatively flat. */
+        //public Builder notInFlatBiome() { return isScale( ComparisonOperator.LESS_OR_EQUAL.invert(), 0.1F ); }
         
         /** Check if the biome is relatively hilly. */
-        public Builder inHillyBiome() { return isScale( ComparisonOperator.GREATER_OR_EQUAL, 0.3F ); }
+        //public Builder inHillyBiome() { return isScale( ComparisonOperator.GREATER_OR_EQUAL, 0.3F ); }
         
         /** Check if the biome is relatively hilly. */
-        public Builder notInHillyBiome() { return isScale( ComparisonOperator.GREATER_OR_EQUAL.invert(), 0.3F ); }
-        
-        private Builder isScale( ComparisonOperator op, float value ) { return in( new TerrainScaleEnvironment( op, value ) ); }
+        //public Builder notInHillyBiome() { return isScale( ComparisonOperator.GREATER_OR_EQUAL.invert(), 0.3F ); }
+
+        //private Builder isScale( ComparisonOperator op, float value ) { return in( new TerrainScaleEnvironment( op, value ) ); }
         
         /** Check if the biome has rain disabled. */
         public Builder inDryBiome() { return inAvgRainfall( ComparisonOperator.EQUAL_TO, 0.0F ); }
@@ -200,27 +209,29 @@ public class EnvironmentEntry {
         public Builder isNotHot() { return isTemperature( ComparisonOperator.GREATER_THAN.invert(), 1.0F ); }
         
         private Builder isTemperature( ComparisonOperator op, float value ) { return in( new TemperatureEnvironment( op, value ) ); }
+
+        public Builder inAnyBiomeTag( TagKey<Biome>... tags ) { return in( new BiomeTagKeyEnvironment( tags, false ) ); }
+
+        /** Check if the biome belongs to a specific category. */
+        public Builder inBiomeTag( TagKey<Biome> tag ) { return in( new BiomeTagKeyEnvironment( tag.location(), false ) ); }
         
         /** Check if the biome belongs to a specific category. */
-        public Builder inBiomeCategory( BiomeCategory category ) { return in( new BiomeCategoryEnvironment( category, false ) ); }
-        
-        /** Check if the biome belongs to a specific category. */
-        public Builder notInBiomeCategory( BiomeCategory category ) { return in( new BiomeCategoryEnvironment( category, true ) ); }
+        public Builder notInBiomeTag( TagKey<Biome> tag ) { return in( new BiomeTagKeyEnvironment( tag.location(), true ) ); }
         
         /** Check if the biome is a specific one. */
-        public Builder inBiome( RegistryKey<Biome> biome ) { return in( new BiomeEnvironment( biome, false ) ); }
+        public Builder inBiome( ResourceKey<Biome> biome ) { return in( new BiomeEnvironment( biome, false ) ); }
         
         /** Check if the biome is a specific one. */
-        public Builder notInBiome( RegistryKey<Biome> biome ) { return in( new BiomeEnvironment( biome, true ) ); }
+        public Builder notInBiome( ResourceKey<Biome> biome ) { return in( new BiomeEnvironment( biome, true ) ); }
         
         
         // Position-based
         
         /** Check if the position is inside a particular structure. See {@link Structure}. */
-        public Builder inStructure( Structure<?> structure ) { return in( new StructureEnvironment( structure, false ) ); }
+        public Builder inStructure( Holder<Structure> structure ) { return in( new StructureEnvironment( structure, false ) ); }
         
         /** Check if the position is inside a particular structure. See {@link Structure}. */
-        public Builder notInStructure( Structure<?> structure ) { return in( new StructureEnvironment( structure, true ) ); }
+        public Builder notInStructure( Holder<Structure> structure ) { return in( new StructureEnvironment( structure, true ) ); }
         
         /** Check if diamond/redstone ore can generate at the position. */
         public Builder belowDiamondLevel() { return belowY( 15 ); } // TODO update ore-based logic in 1.18

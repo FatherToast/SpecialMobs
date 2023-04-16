@@ -18,6 +18,7 @@ public enum ComparisonOperator {
     
     /** @return The opposite comparison operator. */
     public ComparisonOperator invert() {
+        //noinspection EnhancedSwitchMigration
         switch( this ) {
             case LESS_THAN: return GREATER_OR_EQUAL;
             case LESS_OR_EQUAL: return GREATER_THAN;
@@ -30,6 +31,7 @@ public enum ComparisonOperator {
     }
     
     public boolean apply( float first, float second ) {
+        //noinspection EnhancedSwitchMigration
         switch( this ) {
             case LESS_THAN: return first < second;
             case LESS_OR_EQUAL: return first <= second;
@@ -42,6 +44,7 @@ public enum ComparisonOperator {
     }
     
     public boolean apply( int first, int second ) {
+        //noinspection EnhancedSwitchMigration
         switch( this ) {
             case LESS_THAN: return first < second;
             case LESS_OR_EQUAL: return first <= second;
@@ -52,8 +55,9 @@ public enum ComparisonOperator {
         }
         throw new IllegalStateException( "Integer comparison implementation is invalid! :(" );
     }
-    
-    public boolean apply( long first, long second ) {
+
+    public boolean apply(long first, long second ) {
+        //noinspection EnhancedSwitchMigration
         switch( this ) {
             case LESS_THAN: return first < second;
             case LESS_OR_EQUAL: return first <= second;

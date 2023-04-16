@@ -5,13 +5,15 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '4.1.+', changing: true
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
         classpath group: "org.spongepowered", name: "mixingradle", version: "0.7-SNAPSHOT"
     }
 }
+plugins {
+    id 'eclipse'
+    id 'maven-publish'
+}
 apply plugin: 'net.minecraftforge.gradle'
-apply plugin: 'eclipse'
-apply plugin: 'maven-publish'
 apply plugin: "org.spongepowered.mixin"
 
 mixin {
@@ -23,9 +25,9 @@ version = "${mc_version}-${mod_version}"
 archivesBaseName = 'specialmobs'
 group = "fathertoast.${archivesBaseName}"
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(8) // Mojang ships Java 8 to end users, so your mod should target Java 8.
+java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
-println('Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getProperty('java.vm.version') + '(' + System.getProperty('java.vendor') + ') Arch: ' + System.getProperty('os.arch'))
+println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty 'java.vm.version'} (${System.getProperty 'java.vendor'}), Arch: ${System.getProperty 'os.arch'}"
 minecraft {
     mappings channel: 'official', version: "${mc_version}"
     accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
@@ -43,7 +45,7 @@ minecraft {
             arg "-mixin.config=specialmobs.mixins.json"
 
             mods {
-                deadlyworld {
+                specialmobs {
                     source sourceSets.main
                 }
             }
@@ -61,7 +63,21 @@ minecraft {
             arg "-mixin.config=specialmobs.mixins.json"
 
             mods {
-                deadlyworld {
+                specialmobs {
+                    source sourceSets.main
+                }
+            }
+        }
+
+        gameTestServer {
+            workingDirectory project.file('run')
+
+            property 'forge.logging.markers', 'REGISTRIES'
+            property 'forge.logging.console.level', 'debug'
+            property 'forge.enabledGameTestNamespaces', 'naturalabsorption'
+
+            mods {
+                specialmobs {
                     source sourceSets.main
                 }
             }
@@ -76,7 +92,7 @@ minecraft {
             args '--mod', 'specialmobs', '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
 
             mods {
-                deadlyworld {
+                specialmobs {
                     source sourceSets.main
                 }
             }
@@ -90,15 +106,11 @@ sourceSets.main.resources { srcDir 'src/generated/resources' }
 repositories {
     // Repos for mods to include during development
     maven {
-        name 'prog'
-        url 'http://dvs1.progwml6.com/files/maven'
-    }
-    maven {
-        name 'tterrag'
-        url 'https://maven.tterrag.com/'
-    }
-    maven {
-        url "https://cursemaven.com"
+        name 'CurseMaven'
+        url 'https://www.cursemaven.com'
+        content {
+            includeGroup 'curse.maven'
+        }
     }
 }
 
@@ -106,11 +118,10 @@ dependencies {
     minecraft "net.minecraftforge:forge:${mc_version}-${forge_version}"
 
     // Add in JEI and TOP to assist debugging during development
-    runtimeOnly fg.deobf("mezz.jei:jei-${mc_version}:${jei_version}")
-    runtimeOnly fg.deobf("mcjty.theoneprobe:TheOneProbe-${top_version}")
-    compileOnly fg.deobf("mcjty.theoneprobe:TheOneProbe-${top_version}:api")
+    runtimeOnly fg.deobf("curse.maven:jei-238222:${jei_version}")
+    implementation fg.deobf("curse.maven:top-245211:${top_version}")
 
-    annotationProcessor 'org.spongepowered:mixin:0.8.2:processor'
+    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 }
 
 jar {

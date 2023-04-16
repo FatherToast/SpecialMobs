@@ -4,22 +4,21 @@ import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.config.Config;
 import fathertoast.specialmobs.common.config.species.SpeciesConfig;
 import fathertoast.specialmobs.common.core.SpecialMobs;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.entity.EntitySize;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.Pose;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.ListNBT;
-import net.minecraft.nbt.StringNBT;
-import net.minecraft.network.datasync.DataParameter;
-import net.minecraft.pathfinding.PathNodeType;
-import net.minecraft.potion.Effect;
-import net.minecraft.potion.EffectInstance;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.StringTag;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.FireBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.pathfinder.PathComputationType;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.entity.living.PotionEvent;
+import net.minecraftforge.event.entity.living.MobEffectEvent;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import javax.annotation.Nullable;
@@ -34,14 +33,14 @@ public class SpecialMobData<T extends LivingEntity & ISpecialMob<T>> {
      * @param tag The mob's base nbt tag.
      * @return The nbt tag to save special mob data to.
      */
-    public static CompoundNBT getSaveLocation( CompoundNBT tag ) {
+    public static CompoundTag getSaveLocation(CompoundTag tag ) {
         if( !tag.contains( TAG_FORGE_DATA, NBT_TYPE_COMPOUND ) ) {
-            tag.put( TAG_FORGE_DATA, new CompoundNBT() );
+            tag.put( TAG_FORGE_DATA, new CompoundTag() );
         }
-        final CompoundNBT forgeTag = tag.getCompound( TAG_FORGE_DATA );
+        final CompoundTag forgeTag = tag.getCompound( TAG_FORGE_DATA );
         
         if( !forgeTag.contains( TAG_SPECIAL_MOB_DATA, NBT_TYPE_COMPOUND ) ) {
-            forgeTag.put( TAG_SPECIAL_MOB_DATA, new CompoundNBT() );
+            forgeTag.put( TAG_SPECIAL_MOB_DATA, new CompoundTag() );
         }
         return forgeTag.getCompound( TAG_SPECIAL_MOB_DATA );
     }
@@ -50,7 +49,7 @@ public class SpecialMobData<T extends LivingEntity & ISpecialMob<T>> {
     /** The entity this data is for. */
     private final T theEntity;
     /** Data manager parameter for render scale. */
-    private final DataParameter<Float> renderScale;
+    private final EntityDataAccessor<Float> renderScale;
     
     //    /** The base texture of the entity. */
     //    private ResourceLocation texture;
@@ -86,7 +85,7 @@ public class SpecialMobData<T extends LivingEntity & ISpecialMob<T>> {
     /** Set of blocks that the entity cannot be stuck in. */
     private final HashSet<Block> immuneToStickyBlocks = new HashSet<>();
     /** Set of potions that cannot be applied to the entity. */
-    private final HashSet<Effect> immuneToPotions = new HashSet<>();
+    private final HashSet<MobEffect> immuneToPotions = new HashSet<>();
     
     /** The damage the entity uses for its ranged attacks, when applicable. */
     private float rangedAttackDamage;
@@ -119,7 +118,7 @@ public class SpecialMobData<T extends LivingEntity & ISpecialMob<T>> {
      * @param entity The entity to store data for.
      * @param scale  Data parameter for storing the render scale.
      */
-    public SpecialMobData( T entity, DataParameter<Float> scale ) {
+    public SpecialMobData( T entity, EntityDataAccessor<Float> scale ) {
         theEntity = entity;
         renderScale = scale;
         entity.getEntityData().define( renderScale, nextScale() );
@@ -340,7 +339,8 @@ public class SpecialMobData<T extends LivingEntity & ISpecialMob<T>> {
         theEntity.clearFire();
         isImmuneToBurning = value;
         if( value ) {
-            theEntity.setSpecialPathfindingMalus( PathNodeType.DANGER_FIRE, PathNodeType.OPEN.getMalus() );
+            FireBlock
+            theEntity.setSpecialPathfindingMalus( PathComputationType., PathNodeType.OPEN.getMalus() );
             theEntity.setSpecialPathfindingMalus( PathNodeType.DAMAGE_FIRE, PathNodeType.DANGER_FIRE.getMalus() );
         }
         else {
@@ -391,18 +391,18 @@ public class SpecialMobData<T extends LivingEntity & ISpecialMob<T>> {
      * @param effect The potion effect to test.
      * @return True if the potion is allowed to be applied.
      */
-    public boolean isPotionApplicable( EffectInstance effect ) {
-        final PotionEvent.PotionApplicableEvent event = new PotionEvent.PotionApplicableEvent( theEntity, effect );
+    public boolean isPotionApplicable( MobEffectInstance effect ) {
+        final MobEffectEvent.Applicable event = new MobEffectEvent.Applicable( theEntity, effect );
         MinecraftForge.EVENT_BUS.post( event );
-        switch( event.getResult() ) {
-            case DENY: return false;
-            case ALLOW: return true;
-            default: return !immuneToPotions.contains( effect.getEffect() );
-        }
+        return switch (event.getResult()) {
+            case DENY -> false;
+            case ALLOW -> true;
+            default -> !immuneToPotions.contains(effect.getEffect());
+        };
     }
     
     /** @param effects The effect(s) to grant immunity from. */
-    private void addPotionImmunity( Collection<Effect> effects ) { immuneToPotions.addAll( effects ); }
+    private void addPotionImmunity( Collection<MobEffect> effects ) { immuneToPotions.addAll( effects ); }
     
     public float getRangedAttackDamage() { return rangedAttackDamage; }
     
@@ -435,7 +435,7 @@ public class SpecialMobData<T extends LivingEntity & ISpecialMob<T>> {
      *
      * @param tag The tag to save to.
      */
-    public void writeToNBT( CompoundNBT tag ) {
+    public void writeToNBT( CompoundTag tag ) {
         tag.putFloat( TAG_RENDER_SCALE, getRenderScale() );
         
         //        tag.putString( TAG_TEXTURE, texture.toString() );
@@ -454,17 +454,17 @@ public class SpecialMobData<T extends LivingEntity & ISpecialMob<T>> {
         tag.putBoolean( TAG_WATER_PUSH_IMMUNE, ignoreWaterPush() );
         tag.putBoolean( TAG_WATER_DAMAGE, isDamagedByWater() );
         
-        final ListNBT stickyBlocksTag = new ListNBT();
+        final ListTag stickyBlocksTag = new ListTag();
         for( Block block : immuneToStickyBlocks ) {
             final ResourceLocation regKey = ForgeRegistries.BLOCKS.getKey( block );
-            if( regKey != null ) stickyBlocksTag.add( StringNBT.valueOf( SpecialMobs.toString( regKey ) ) );
+            if( regKey != null ) stickyBlocksTag.add( StringTag.valueOf( SpecialMobs.toString( regKey ) ) );
         }
         tag.put( TAG_STICKY_IMMUNE, stickyBlocksTag );
         
-        final ListNBT potionsTag = new ListNBT();
-        for( Effect effect : immuneToPotions ) {
-            final ResourceLocation regKey = ForgeRegistries.POTIONS.getKey( effect );
-            if( regKey != null ) potionsTag.add( StringNBT.valueOf( SpecialMobs.toString( regKey ) ) );
+        final ListTag potionsTag = new ListTag();
+        for( MobEffect effect : immuneToPotions ) {
+            final ResourceLocation regKey = ForgeRegistries.MOB_EFFECTS.getKey( effect );
+            if( regKey != null ) potionsTag.add( StringTag.valueOf( SpecialMobs.toString( regKey ) ) );
         }
         tag.put( TAG_POTION_IMMUNE, potionsTag );
         
@@ -488,7 +488,7 @@ public class SpecialMobData<T extends LivingEntity & ISpecialMob<T>> {
      *
      * @param tag The tag to load from.
      */
-    public void readFromNBT( CompoundNBT tag ) {
+    public void readFromNBT( CompoundTag tag ) {
         if( tag.contains( TAG_RENDER_SCALE, NBT_TYPE_NUMERICAL ) ) {
             setRenderScale( tag.getFloat( TAG_RENDER_SCALE ) );
         }
@@ -540,19 +540,19 @@ public class SpecialMobData<T extends LivingEntity & ISpecialMob<T>> {
             setIgnorePressurePlates( tag.getBoolean( TAG_TRAP_IMMUNE ) );
         }
         if( tag.contains( TAG_STICKY_IMMUNE, NBT_TYPE_LIST ) ) {
-            final ListNBT stickyBlocksTag = tag.getList( TAG_STICKY_IMMUNE, NBT_TYPE_STRING );
+            final ListTag stickyBlocksTag = tag.getList( TAG_STICKY_IMMUNE, NBT_TYPE_STRING );
             immuneToStickyBlocks.clear();
             for( int i = 0; i < stickyBlocksTag.size(); i++ ) {
                 final Block block = ForgeRegistries.BLOCKS.getValue( new ResourceLocation( stickyBlocksTag.getString( i ) ) );
-                if( block != null && !block.is( Blocks.AIR ) )
+                if( block != null && !block.defaultBlockState().is( Blocks.AIR ) )
                     immuneToStickyBlocks.add( block );
             }
         }
         if( tag.contains( TAG_POTION_IMMUNE, NBT_TYPE_LIST ) ) {
-            final ListNBT potionsTag = tag.getList( TAG_POTION_IMMUNE, NBT_TYPE_STRING );
+            final ListTag potionsTag = tag.getList( TAG_POTION_IMMUNE, NBT_TYPE_STRING );
             immuneToPotions.clear();
             for( int i = 0; i < potionsTag.size(); i++ ) {
-                final Effect effect = ForgeRegistries.POTIONS.getValue( new ResourceLocation( potionsTag.getString( i ) ) );
+                final MobEffect effect = ForgeRegistries.MOB_EFFECTS.getValue( new ResourceLocation( potionsTag.getString( i ) ) );
                 if( effect != null )
                     immuneToPotions.add( effect );
             }

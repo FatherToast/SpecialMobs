@@ -1,31 +1,32 @@
 package fathertoast.specialmobs.common.entity.ai.goal;
 
 import fathertoast.specialmobs.common.entity.ai.INinja;
-import net.minecraft.block.BlockRenderType;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.SweetBerryBushBlock;
-import net.minecraft.entity.MobEntity;
-import net.minecraft.entity.ai.goal.Goal;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.state.properties.AttachFace;
-import net.minecraft.state.properties.BlockStateProperties;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.tags.BlockTags;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.ai.goal.Goal;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.RenderShape;
+import net.minecraft.world.level.block.SweetBerryBushBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.AttachFace;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.Random;
 
 /**
  * This AI goal tells the ninja when players are looking in its direction so it can 'freeze' in place and act like a block.
  * <p>
  * It also contains static methods to help ninjas choose a block to disguise as.
  */
-public class NinjaGoal<T extends MobEntity & INinja> extends Goal {
+public class NinjaGoal<T extends Mob & INinja> extends Goal {
     
     private final T ninja;
     
@@ -37,16 +38,16 @@ public class NinjaGoal<T extends MobEntity & INinja> extends Goal {
     /** @return Returns true if this AI can be activated. */
     @Override
     public boolean canUse() {
-        if( ninja.getHiddenDragon() == null || ninja.getHiddenDragon().getRenderShape() == BlockRenderType.INVISIBLE )
+        if( ninja.getHiddenDragon() == null || ninja.getHiddenDragon().getRenderShape() == RenderShape.INVISIBLE )
             return false;
         
-        final List<PlayerEntity> players = new ArrayList<>( ninja.level.players() );
-        for( PlayerEntity player : players ) {
+        final List<Player> players = new ArrayList<>( ninja.level.players() );
+        for( Player player : players ) {
             final float dX = (float) (ninja.getX() - player.getX());
             final float dZ = (float) (ninja.getZ() - player.getZ());
             final float angleFromPlayer = (float) Math.atan2( dX, -dZ ) * 180.0F / (float) Math.PI;
             
-            if( Math.abs( angleFromPlayer - MathHelper.wrapDegrees( player.yHeadRot ) ) > 90.0F ) {
+            if( Math.abs( angleFromPlayer - Mth.wrapDegrees( player.yHeadRot ) ) > 90.0F ) {
                 return true; // A player is looking in the ninja's general direction!
             }
         }
@@ -80,8 +81,8 @@ public class NinjaGoal<T extends MobEntity & INinja> extends Goal {
     //--------------- Static Disguise Helper ----------------
     
     /** Finds a nearby block for the entity to hide as and flags it to start hiding. */
-    public static <T extends MobEntity & INinja> BlockState pickDisguise( T entity ) {
-        final Random random = entity.getRandom();
+    public static <T extends Mob & INinja> BlockState pickDisguise(T entity ) {
+        final RandomSource random = entity.getRandom();
         
         // Random blocks to be picked regardless of position
         switch( random.nextInt( 200 ) ) {
@@ -104,7 +105,7 @@ public class NinjaGoal<T extends MobEntity & INinja> extends Goal {
         
         final BlockPos posUnderFeet = entity.blockPosition().below();
         final BlockState blockUnderFeet = entity.level.getBlockState( posUnderFeet );
-        if( !blockUnderFeet.getBlock().isAir( blockUnderFeet, entity.level, posUnderFeet ) ) {
+        if( !blockUnderFeet.isAir() ) {
             // Options available based on the block we are standing on
 
             if( blockUnderFeet.is( Blocks.STONE ) || blockUnderFeet.is( Blocks.STONE_BRICKS ) ) {
@@ -122,6 +123,26 @@ public class NinjaGoal<T extends MobEntity & INinja> extends Goal {
                     case 9: return Blocks.DIAMOND_ORE.defaultBlockState();
                     case 10: return Blocks.EMERALD_ORE.defaultBlockState();
                     case 11: return Blocks.MOSSY_COBBLESTONE.defaultBlockState();
+                }
+            }
+            else if ( blockUnderFeet.is( Blocks.DEEPSLATE )) {
+                // Deep cave theme
+                switch ( random.nextInt(30) ) {
+                    case 0: return Blocks.BROWN_MUSHROOM.defaultBlockState();
+                    case 1: return Blocks.RED_MUSHROOM.defaultBlockState();
+                    case 2: return Blocks.TUFF.defaultBlockState();
+                    case 3: return Blocks.GRAVEL.defaultBlockState();
+                    case 4: return Blocks.DEEPSLATE_COAL_ORE.defaultBlockState();
+                    case 5: return Blocks.DEEPSLATE_IRON_ORE.defaultBlockState();
+                    case 6: return Blocks.DEEPSLATE_LAPIS_ORE.defaultBlockState();
+                    case 7: return Blocks.DEEPSLATE_GOLD_ORE.defaultBlockState();
+                    case 8: return Blocks.DEEPSLATE_REDSTONE_ORE.defaultBlockState();
+                    case 9: return Blocks.DEEPSLATE_DIAMOND_ORE.defaultBlockState();
+                    case 10: return Blocks.DEEPSLATE_EMERALD_ORE.defaultBlockState();
+                    case 11: return Blocks.DEEPSLATE.defaultBlockState();
+                    case 12: return Blocks.DEEPSLATE_BRICK_SLAB.defaultBlockState();
+                    case 13: return Blocks.SCULK.defaultBlockState();
+                    case 14: return Blocks.SCULK_CATALYST.defaultBlockState();
                 }
             }
             else if( blockUnderFeet.is( Blocks.GRASS ) || blockUnderFeet.is( Blocks.DIRT ) || blockUnderFeet.is( Blocks.PODZOL ) ) {
@@ -182,7 +203,7 @@ public class NinjaGoal<T extends MobEntity & INinja> extends Goal {
         }
         
         // Pick a random nearby render-able block
-        final BlockPos.Mutable randPos = new BlockPos.Mutable();
+        final BlockPos.MutableBlockPos randPos = new BlockPos.MutableBlockPos();
         for( int i = 0; i < 16; i++ ) {
             randPos.set(
                     posUnderFeet.getX() + random.nextInt( 17 ) - 8,
@@ -190,7 +211,7 @@ public class NinjaGoal<T extends MobEntity & INinja> extends Goal {
                     posUnderFeet.getZ() + random.nextInt( 17 ) - 8 );
             
             final BlockState randBlock = entity.level.getBlockState( randPos );
-            if( randBlock.getRenderShape() == BlockRenderType.MODEL ) return randBlock;
+            if( randBlock.getRenderShape() == RenderShape.MODEL ) return randBlock;
         }
         
         // Hide as a log if none of the other options are chosen
@@ -198,78 +219,80 @@ public class NinjaGoal<T extends MobEntity & INinja> extends Goal {
     }
     
     /** @return The block state with a random rotation (horizontal facing). */
-    private static BlockState randomRotation( BlockState block, Random random ) {
+    private static BlockState randomRotation( BlockState block, RandomSource random ) {
+
         return block.setValue( BlockStateProperties.HORIZONTAL_FACING, Direction.Plane.HORIZONTAL.getRandomDirection( random ) );
     }
     
     /** @return A random flower. */
-    private static BlockState randomFlower( Random random ) {
-        return BlockTags.SMALL_FLOWERS.getRandomElement( random ).defaultBlockState();
+    @SuppressWarnings("ConstantConditions")
+    private static BlockState randomFlower(RandomSource random ) {
+        return ForgeRegistries.BLOCKS.tags().getTag(BlockTags.SMALL_FLOWERS).getRandomElement( random ).orElse( Blocks.POPPY ).defaultBlockState();
     }
     
     /** @return A random potted flower. */
-    private static BlockState randomPottedFlower( Random random ) {
-        
-        switch( random.nextInt( 12 ) ) {
-            case 0: return Blocks.POTTED_DANDELION.defaultBlockState();
-            case 1: return Blocks.POTTED_POPPY.defaultBlockState();
-            case 2: return Blocks.POTTED_BLUE_ORCHID.defaultBlockState();
-            case 3: return Blocks.POTTED_ALLIUM.defaultBlockState();
-            case 4: return Blocks.POTTED_AZURE_BLUET.defaultBlockState();
-            case 5: return Blocks.POTTED_RED_TULIP.defaultBlockState();
-            case 6: return Blocks.POTTED_ORANGE_TULIP.defaultBlockState();
-            case 7: return Blocks.POTTED_WHITE_TULIP.defaultBlockState();
-            case 8: return Blocks.POTTED_PINK_TULIP.defaultBlockState();
-            case 9: return Blocks.POTTED_OXEYE_DAISY.defaultBlockState();
-            case 10: return Blocks.POTTED_CORNFLOWER.defaultBlockState();
-            default: return Blocks.POTTED_LILY_OF_THE_VALLEY.defaultBlockState();
-        }
+    private static BlockState randomPottedFlower( RandomSource random ) {
+
+        return switch (random.nextInt(12)) {
+            case 0 -> Blocks.POTTED_DANDELION.defaultBlockState();
+            case 1 -> Blocks.POTTED_POPPY.defaultBlockState();
+            case 2 -> Blocks.POTTED_BLUE_ORCHID.defaultBlockState();
+            case 3 -> Blocks.POTTED_ALLIUM.defaultBlockState();
+            case 4 -> Blocks.POTTED_AZURE_BLUET.defaultBlockState();
+            case 5 -> Blocks.POTTED_RED_TULIP.defaultBlockState();
+            case 6 -> Blocks.POTTED_ORANGE_TULIP.defaultBlockState();
+            case 7 -> Blocks.POTTED_WHITE_TULIP.defaultBlockState();
+            case 8 -> Blocks.POTTED_PINK_TULIP.defaultBlockState();
+            case 9 -> Blocks.POTTED_OXEYE_DAISY.defaultBlockState();
+            case 10 -> Blocks.POTTED_CORNFLOWER.defaultBlockState();
+            default -> Blocks.POTTED_LILY_OF_THE_VALLEY.defaultBlockState();
+        };
     }
     
     /** @return A random potted non-flower plant. */
-    private static BlockState randomPottedPlant( Random random ) {
-        switch( random.nextInt( 8 ) ) {
-            case 0: return Blocks.POTTED_OAK_SAPLING.defaultBlockState();
-            case 1: return Blocks.POTTED_SPRUCE_SAPLING.defaultBlockState();
-            case 2: return Blocks.POTTED_BIRCH_SAPLING.defaultBlockState();
-            case 3: return Blocks.POTTED_JUNGLE_SAPLING.defaultBlockState();
-            case 4: return Blocks.POTTED_ACACIA_SAPLING.defaultBlockState();
-            case 5: return Blocks.POTTED_DARK_OAK_SAPLING.defaultBlockState();
-            case 6: return Blocks.POTTED_FERN.defaultBlockState();
-            default: return Blocks.POTTED_BAMBOO.defaultBlockState();
-        }
+    private static BlockState randomPottedPlant( RandomSource random ) {
+        return switch (random.nextInt(8)) {
+            case 0 -> Blocks.POTTED_OAK_SAPLING.defaultBlockState();
+            case 1 -> Blocks.POTTED_SPRUCE_SAPLING.defaultBlockState();
+            case 2 -> Blocks.POTTED_BIRCH_SAPLING.defaultBlockState();
+            case 3 -> Blocks.POTTED_JUNGLE_SAPLING.defaultBlockState();
+            case 4 -> Blocks.POTTED_ACACIA_SAPLING.defaultBlockState();
+            case 5 -> Blocks.POTTED_DARK_OAK_SAPLING.defaultBlockState();
+            case 6 -> Blocks.POTTED_FERN.defaultBlockState();
+            default -> Blocks.POTTED_BAMBOO.defaultBlockState();
+        };
     }
     
     /** @return A random potted desert plant. */
-    private static BlockState randomPottedDesertPlant( Random random ) {
+    private static BlockState randomPottedDesertPlant( RandomSource random ) {
         //noinspection SwitchStatementWithTooFewBranches
-        switch( random.nextInt( 2 ) ) {
-            case 0: return Blocks.POTTED_DEAD_BUSH.defaultBlockState();
-            default: return Blocks.POTTED_CACTUS.defaultBlockState();
-        }
+        return switch (random.nextInt(2)) {
+            case 0 -> Blocks.POTTED_DEAD_BUSH.defaultBlockState();
+            default -> Blocks.POTTED_CACTUS.defaultBlockState();
+        };
     }
     
     /** @return A random potted Nether plant/fungus. */
-    private static BlockState randomPottedNetherThing( Random random ) {
-        switch( random.nextInt( 7 ) ) {
-            case 0: return Blocks.POTTED_WITHER_ROSE.defaultBlockState();
-            case 1: return Blocks.POTTED_RED_MUSHROOM.defaultBlockState();
-            case 2: return Blocks.POTTED_BROWN_MUSHROOM.defaultBlockState();
-            case 3: return Blocks.POTTED_CRIMSON_FUNGUS.defaultBlockState();
-            case 4: return Blocks.POTTED_WARPED_FUNGUS.defaultBlockState();
-            case 5: return Blocks.POTTED_CRIMSON_ROOTS.defaultBlockState();
-            default: return Blocks.POTTED_WARPED_ROOTS.defaultBlockState();
-        }
+    private static BlockState randomPottedNetherThing( RandomSource random ) {
+        return switch (random.nextInt(7)) {
+            case 0 -> Blocks.POTTED_WITHER_ROSE.defaultBlockState();
+            case 1 -> Blocks.POTTED_RED_MUSHROOM.defaultBlockState();
+            case 2 -> Blocks.POTTED_BROWN_MUSHROOM.defaultBlockState();
+            case 3 -> Blocks.POTTED_CRIMSON_FUNGUS.defaultBlockState();
+            case 4 -> Blocks.POTTED_WARPED_FUNGUS.defaultBlockState();
+            case 5 -> Blocks.POTTED_CRIMSON_ROOTS.defaultBlockState();
+            default -> Blocks.POTTED_WARPED_ROOTS.defaultBlockState();
+        };
     }
     
     /** @return A random potted End-themed plant. */
-    private static BlockState randomPottedEndThing( Random random ) {
-        switch( random.nextInt( 5 ) ) {
-            case 0: return Blocks.POTTED_WITHER_ROSE.defaultBlockState();
-            case 1: return Blocks.POTTED_ALLIUM.defaultBlockState();
-            case 2: return Blocks.POTTED_AZURE_BLUET.defaultBlockState();
-            case 3: return Blocks.POTTED_OXEYE_DAISY.defaultBlockState();
-            default: return Blocks.POTTED_LILY_OF_THE_VALLEY.defaultBlockState();
-        }
+    private static BlockState randomPottedEndThing( RandomSource random ) {
+        return switch (random.nextInt(5)) {
+            case 0 -> Blocks.POTTED_WITHER_ROSE.defaultBlockState();
+            case 1 -> Blocks.POTTED_ALLIUM.defaultBlockState();
+            case 2 -> Blocks.POTTED_AZURE_BLUET.defaultBlockState();
+            case 3 -> Blocks.POTTED_OXEYE_DAISY.defaultBlockState();
+            default -> Blocks.POTTED_LILY_OF_THE_VALLEY.defaultBlockState();
+        };
     }
 }
