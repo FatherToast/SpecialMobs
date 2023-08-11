@@ -8,15 +8,15 @@ import fathertoast.specialmobs.common.config.species.WebSpiderSpeciesConfig;
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
-import net.minecraft.block.Blocks;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.entity.monster.SpiderEntity;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.monster.Spider;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
 
 @SpecialMob
 public class WebSpiderEntity extends _SpecialSpiderEntity {
@@ -58,7 +58,7 @@ public class WebSpiderEntity extends _SpecialSpiderEntity {
     }
     
     @SpecialMob.Factory
-    public static EntityType.IFactory<WebSpiderEntity> getVariantFactory() { return WebSpiderEntity::new; }
+    public static EntityType.EntityFactory<WebSpiderEntity> getVariantFactory() { return WebSpiderEntity::new; }
     
     /** @return This entity's mob species. */
     @SpecialMob.SpeciesSupplier
@@ -71,8 +71,8 @@ public class WebSpiderEntity extends _SpecialSpiderEntity {
     /** The number of cobwebs this spider can place. */
     private int webCount;
     
-    public WebSpiderEntity( EntityType<? extends _SpecialSpiderEntity> entityType, World world ) {
-        super( entityType, world );
+    public WebSpiderEntity( EntityType<? extends _SpecialSpiderEntity> entityType, Level level ) {
+        super( entityType, level );
         webCount = getConfig().WEB.webCount.next( random );
     }
     
@@ -83,7 +83,7 @@ public class WebSpiderEntity extends _SpecialSpiderEntity {
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override
     protected void onVariantAttack( LivingEntity target ) {
-        if( !level.isClientSide() && webCount > 0 && !(target instanceof SpiderEntity) ) {
+        if( !level.isClientSide() && webCount > 0 && !(target instanceof Spider) ) {
             final BlockPos pos = target.blockPosition();
             if( !tryPlaceWeb( pos ) && target.getBbHeight() > 1.0F ) {
                 tryPlaceWeb( pos.above() );
@@ -110,13 +110,13 @@ public class WebSpiderEntity extends _SpecialSpiderEntity {
     
     /** Override to save data to this entity's NBT data. */
     @Override
-    public void addVariantSaveData( CompoundNBT saveTag ) {
+    public void addVariantSaveData( CompoundTag saveTag ) {
         saveTag.putByte( References.TAG_AMMO, (byte) webCount );
     }
     
     /** Override to load data from this entity's NBT data. */
     @Override
-    public void readVariantSaveData( CompoundNBT saveTag ) {
+    public void readVariantSaveData( CompoundTag saveTag ) {
         if( saveTag.contains( References.TAG_AMMO, References.NBT_TYPE_NUMERICAL ) )
             webCount = saveTag.getByte( References.TAG_AMMO );
     }

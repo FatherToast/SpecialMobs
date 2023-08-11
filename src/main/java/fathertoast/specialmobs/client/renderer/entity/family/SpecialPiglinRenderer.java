@@ -1,54 +1,52 @@
 package fathertoast.specialmobs.client.renderer.entity.family;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import fathertoast.specialmobs.client.renderer.entity.layers.SpecialMobEyesLayer;
 import fathertoast.specialmobs.client.renderer.entity.layers.SpecialMobOverlayLayer;
 import fathertoast.specialmobs.common.entity.ISpecialMob;
-import net.minecraft.client.renderer.entity.EntityRendererManager;
+import net.minecraft.client.model.PiglinModel;
+import net.minecraft.client.model.geom.ModelLayers;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.PiglinRenderer;
-import net.minecraft.client.renderer.entity.model.PiglinModel;
-import net.minecraft.entity.MobEntity;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.Mob;
 
-@OnlyIn( Dist.CLIENT )
 public class SpecialPiglinRenderer extends PiglinRenderer {
     
     /** The default renderer for non-zombified piglins. */
-    public static SpecialPiglinRenderer newBothEars( EntityRendererManager rendererManager ) {
-        return new SpecialPiglinRenderer( rendererManager, false );
+    public static SpecialPiglinRenderer newBothEars( EntityRendererProvider.Context context ) {
+        return new SpecialPiglinRenderer( context, false );
     }
     
     /** The default renderer for zombified piglins. */
-    public static SpecialPiglinRenderer newMissingRightEar( EntityRendererManager rendererManager ) {
-        return new SpecialPiglinRenderer( rendererManager, true );
+    public static SpecialPiglinRenderer newMissingRightEar( EntityRendererProvider.Context context ) {
+        return new SpecialPiglinRenderer( context, true );
     }
     
     private final float baseShadowRadius;
     
-    public SpecialPiglinRenderer( EntityRendererManager rendererManager, boolean missingRightEar ) {
-        super( rendererManager, missingRightEar );
+    public SpecialPiglinRenderer( EntityRendererProvider.Context context, boolean missingRightEar ) {
+        super( context, ModelLayers.PIGLIN, ModelLayers.PIGLIN_INNER_ARMOR, ModelLayers.PIGLIN_OUTER_ARMOR, missingRightEar );
         baseShadowRadius = shadowRadius;
         addLayer( new SpecialMobEyesLayer<>( this ) );
         
-        final PiglinModel<MobEntity> model = new PiglinModel<>( 0.25F, 64, 64 );
+        final PiglinModel<Mob> model = new PiglinModel<>( context.getModelSet().bakeLayer( ModelLayers.PIGLIN ) );
         if( missingRightEar )
-            model.earLeft.visible = false; // This is "stage left" - actually on the piglin's right side
+            model.rightEar.visible = false; // This is "stage left" - actually on the piglin's right side
         addLayer( new SpecialMobOverlayLayer<>( this, model ) );
     }
     
     @Override
-    public ResourceLocation getTextureLocation( MobEntity entity ) {
+    public ResourceLocation getTextureLocation( Mob entity ) {
         return ((ISpecialMob<?>) entity).getSpecialData().getTexture();
     }
     
     @Override
-    protected void scale( MobEntity entity, MatrixStack matrixStack, float partialTick ) {
-        super.scale( entity, matrixStack, partialTick );
+    protected void scale( Mob entity, PoseStack poseStack, float partialTick ) {
+        super.scale( entity, poseStack, partialTick );
         
         final float scale = ((ISpecialMob<?>) entity).getSpecialData().getRenderScale();
         shadowRadius = baseShadowRadius * scale;
-        matrixStack.scale( scale, scale, scale );
+        poseStack.scale( scale, scale, scale );
     }
 }

@@ -6,15 +6,15 @@ import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
-import net.minecraft.entity.CreatureAttribute;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.util.DamageSource;
-import net.minecraft.world.World;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.MobType;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
 
 @SpecialMob
 public class UnholyGhastEntity extends _SpecialGhastEntity {
@@ -49,7 +49,7 @@ public class UnholyGhastEntity extends _SpecialGhastEntity {
     }
     
     @SpecialMob.Factory
-    public static EntityType.IFactory<UnholyGhastEntity> getVariantFactory() { return UnholyGhastEntity::new; }
+    public static EntityType.EntityFactory<UnholyGhastEntity> getVariantFactory() { return UnholyGhastEntity::new; }
     
     /** @return This entity's mob species. */
     @SpecialMob.SpeciesSupplier
@@ -59,7 +59,7 @@ public class UnholyGhastEntity extends _SpecialGhastEntity {
     
     //--------------- Variant-Specific Implementations ----------------
     
-    public UnholyGhastEntity( EntityType<? extends _SpecialGhastEntity> entityType, World world ) { super( entityType, world ); }
+    public UnholyGhastEntity( EntityType<? extends _SpecialGhastEntity> entityType, Level level ) { super( entityType, level ); }
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override
@@ -78,19 +78,19 @@ public class UnholyGhastEntity extends _SpecialGhastEntity {
     
     /** @return This entity's creature type. */
     @Override
-    public CreatureAttribute getMobType() { return CreatureAttribute.UNDEAD; }
+    public MobType getMobType() { return MobType.UNDEAD; }
     
     /** Called each tick to update this entity's movement. */
     @Override
     public void aiStep() {
         if( isSunBurnTick() ) {
-            final ItemStack hat = getItemBySlot( EquipmentSlotType.HEAD );
+            final ItemStack hat = getItemBySlot( EquipmentSlot.HEAD );
             if( !hat.isEmpty() ) {
                 if( hat.isDamageableItem() ) {
                     hat.setDamageValue( hat.getDamageValue() + random.nextInt( 2 ) );
                     if( hat.getDamageValue() >= hat.getMaxDamage() ) {
-                        broadcastBreakEvent( EquipmentSlotType.HEAD );
-                        setItemSlot( EquipmentSlotType.HEAD, ItemStack.EMPTY );
+                        broadcastBreakEvent( EquipmentSlot.HEAD );
+                        setItemSlot( EquipmentSlot.HEAD, ItemStack.EMPTY );
                     }
                 }
             }

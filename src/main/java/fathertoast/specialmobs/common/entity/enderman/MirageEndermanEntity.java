@@ -5,14 +5,14 @@ import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
-import net.minecraft.block.Blocks;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.item.Items;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.DamageSource;
-import net.minecraft.world.World;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
 
 @SpecialMob
 public class MirageEndermanEntity extends _SpecialEndermanEntity {
@@ -46,7 +46,7 @@ public class MirageEndermanEntity extends _SpecialEndermanEntity {
     }
     
     @SpecialMob.Factory
-    public static EntityType.IFactory<MirageEndermanEntity> getVariantFactory() { return MirageEndermanEntity::new; }
+    public static EntityType.EntityFactory<MirageEndermanEntity> getVariantFactory() { return MirageEndermanEntity::new; }
     
     /** @return This entity's mob species. */
     @SpecialMob.SpeciesSupplier
@@ -59,7 +59,7 @@ public class MirageEndermanEntity extends _SpecialEndermanEntity {
     /** Whether this mirage enderman is fake. */
     public boolean isFake = false;
     
-    public MirageEndermanEntity( EntityType<? extends _SpecialEndermanEntity> entityType, World world ) { super( entityType, world ); }
+    public MirageEndermanEntity( EntityType<? extends _SpecialEndermanEntity> entityType, Level level ) { super( entityType, level ); }
     
     /** Sets this mirage enderman as fake. */
     public void setFake() {
@@ -82,7 +82,7 @@ public class MirageEndermanEntity extends _SpecialEndermanEntity {
     public void tick() {
         if( isFake && tickCount >= 200 ) {
             spawnAnim();
-            remove();
+            discard();
         }
         super.tick();
     }
@@ -139,13 +139,13 @@ public class MirageEndermanEntity extends _SpecialEndermanEntity {
     
     /** Override to save data to this entity's NBT data. */
     @Override
-    public void addVariantSaveData( CompoundNBT saveTag ) {
+    public void addVariantSaveData( CompoundTag saveTag ) {
         saveTag.putBoolean( References.TAG_IS_FAKE, isFake );
     }
     
     /** Override to load data from this entity's NBT data. */
     @Override
-    public void readVariantSaveData( CompoundNBT saveTag ) {
+    public void readVariantSaveData( CompoundTag saveTag ) {
         if( saveTag.contains( References.TAG_IS_FAKE, References.NBT_TYPE_NUMERICAL ) )
             isFake = saveTag.getBoolean( References.TAG_IS_FAKE );
     }

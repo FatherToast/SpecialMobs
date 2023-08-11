@@ -7,16 +7,16 @@ import fathertoast.specialmobs.common.config.species.MotherSpiderSpeciesConfig;
 import fathertoast.specialmobs.common.config.species.SpeciesConfig;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.ILivingEntityData;
-import net.minecraft.entity.SpawnReason;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.item.Items;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.SoundEvents;
-import net.minecraft.world.IServerWorld;
-import net.minecraft.world.World;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.SpawnGroupData;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.ServerLevelAccessor;
 
 import javax.annotation.Nullable;
 
@@ -61,7 +61,7 @@ public class MotherSpiderEntity extends _SpecialSpiderEntity {
     }
     
     @SpecialMob.Factory
-    public static EntityType.IFactory<MotherSpiderEntity> getVariantFactory() { return MotherSpiderEntity::new; }
+    public static EntityType.EntityFactory<MotherSpiderEntity> getVariantFactory() { return MotherSpiderEntity::new; }
     
     /** @return This entity's mob species. */
     @SpecialMob.SpeciesSupplier
@@ -76,8 +76,8 @@ public class MotherSpiderEntity extends _SpecialSpiderEntity {
     /** The number of extra babies that can be spawned from hits. */
     private int extraBabies;
     
-    public MotherSpiderEntity( EntityType<? extends _SpecialSpiderEntity> entityType, World world ) {
-        super( entityType, world );
+    public MotherSpiderEntity( EntityType<? extends _SpecialSpiderEntity> entityType, Level level ) {
+        super( entityType, level );
         babies = getConfig().MOTHER.babies.next( random );
         extraBabies = getConfig().MOTHER.extraBabies.next( random );
     }
@@ -87,7 +87,7 @@ public class MotherSpiderEntity extends _SpecialSpiderEntity {
     public boolean hurt( DamageSource source, float amount ) {
         if( super.hurt( source, amount ) ) {
             // Spawn babies when damaged
-            if( extraBabies > 0 && amount > 1.0F && level instanceof IServerWorld && random.nextFloat() < 0.33F ) {
+            if( extraBabies > 0 && amount > 1.0F && level instanceof ServerLevelAccessor && random.nextFloat() < 0.33F ) {
                 extraBabies--;
                 spawnBaby( 0.66F, null );
                 spawnAnim();
@@ -100,32 +100,32 @@ public class MotherSpiderEntity extends _SpecialSpiderEntity {
     
     /** Called to remove this entity from the world. Includes death, unloading, interdimensional travel, etc. */
     @Override
-    public void remove( boolean keepData ) {
+    public void remove( RemovalReason removalReason ) {
         //noinspection deprecation
-        if( isDeadOrDying() && !removed && level instanceof IServerWorld ) { // Same conditions as slime splitting
+        if( isDeadOrDying() && !isRemoved() && level instanceof ServerLevelAccessor ) { // Same conditions as slime splitting
             // Spawn babies on death
             final int babiesToSpawn = babies + extraBabies;
-            ILivingEntityData groupData = null;
+            SpawnGroupData groupData = null;
             for( int i = 0; i < babiesToSpawn; i++ ) {
                 groupData = spawnBaby( 0.33F, groupData );
             }
             spawnAnim();
             playSound( SoundEvents.EGG_THROW, 1.0F, 2.0F / (random.nextFloat() * 0.4F + 0.8F) );
         }
-        super.remove( keepData );
+        super.remove( removalReason );
     }
     
     /** Helper method to simplify spawning babies. */
     @Nullable
-    private ILivingEntityData spawnBaby( float speed, @Nullable ILivingEntityData groupData ) {
+    private SpawnGroupData spawnBaby( float speed, @Nullable SpawnGroupData groupData ) {
         final BabySpiderEntity baby = BabySpiderEntity.SPECIES.entityType.get().create( level );
         if( baby == null ) return groupData;
         
         baby.copyPosition( this );
-        baby.yHeadRot = yRot;
-        baby.yBodyRot = yRot;
-        groupData = baby.finalizeSpawn( (IServerWorld) level, level.getCurrentDifficultyAt( blockPosition() ),
-                SpawnReason.MOB_SUMMONED, groupData, null );
+        baby.yHeadRot = getYRot();
+        baby.yBodyRot = getYRot();
+        groupData = baby.finalizeSpawn( (ServerLevelAccessor) level, level.getCurrentDifficultyAt( blockPosition() ),
+                MobSpawnType.MOB_SUMMONED, groupData, null );
         baby.setTarget( getTarget() );
         
         baby.setDeltaMovement(
@@ -140,14 +140,14 @@ public class MotherSpiderEntity extends _SpecialSpiderEntity {
     
     /** Override to save data to this entity's NBT data. */
     @Override
-    public void addVariantSaveData( CompoundNBT saveTag ) {
+    public void addVariantSaveData( CompoundTag saveTag ) {
         saveTag.putByte( References.TAG_BABIES, (byte) babies );
         saveTag.putByte( References.TAG_EXTRA_BABIES, (byte) extraBabies );
     }
     
     /** Override to load data from this entity's NBT data. */
     @Override
-    public void readVariantSaveData( CompoundNBT saveTag ) {
+    public void readVariantSaveData( CompoundTag saveTag ) {
         if( saveTag.contains( References.TAG_BABIES, References.NBT_TYPE_NUMERICAL ) )
             babies = saveTag.getByte( References.TAG_BABIES );
         if( saveTag.contains( References.TAG_EXTRA_BABIES, References.NBT_TYPE_NUMERICAL ) )

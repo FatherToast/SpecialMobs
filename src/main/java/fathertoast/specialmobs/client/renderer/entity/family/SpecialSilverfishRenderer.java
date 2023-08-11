@@ -1,22 +1,19 @@
 package fathertoast.specialmobs.client.renderer.entity.family;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import fathertoast.specialmobs.client.renderer.entity.layers.SpecialMobEyesLayer;
 import fathertoast.specialmobs.common.entity.ISpecialMob;
-import net.minecraft.client.renderer.entity.EntityRendererManager;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.SilverfishRenderer;
-import net.minecraft.entity.monster.SilverfishEntity;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.monster.Silverfish;
 
-@OnlyIn( Dist.CLIENT )
 public class SpecialSilverfishRenderer extends SilverfishRenderer {
     
     private final float baseShadowRadius;
     
-    public SpecialSilverfishRenderer( EntityRendererManager rendererManager ) {
-        super( rendererManager );
+    public SpecialSilverfishRenderer( EntityRendererProvider.Context context ) {
+        super( context );
         baseShadowRadius = shadowRadius;
         addLayer( new SpecialMobEyesLayer<>( this ) );
         // Model doesn't support size parameter
@@ -24,16 +21,16 @@ public class SpecialSilverfishRenderer extends SilverfishRenderer {
     }
     
     @Override
-    public ResourceLocation getTextureLocation( SilverfishEntity entity ) {
+    public ResourceLocation getTextureLocation( Silverfish entity ) {
         return ((ISpecialMob<?>) entity).getSpecialData().getTexture();
     }
     
     @Override
-    protected void scale( SilverfishEntity entity, MatrixStack matrixStack, float partialTick ) {
-        super.scale( entity, matrixStack, partialTick );
+    protected void scale(Silverfish entity, PoseStack poseStack, float partialTick ) {
+        super.scale( entity, poseStack, partialTick );
         
         final float scale = ((ISpecialMob<?>) entity).getSpecialData().getRenderScale();
         shadowRadius = baseShadowRadius * scale;
-        matrixStack.scale( scale, scale, scale );
+        poseStack.scale( scale, scale, scale );
     }
 }

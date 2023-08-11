@@ -185,7 +185,7 @@ public class DoubleField extends AbstractConfigField {
         public double get( Level level, @Nullable BlockPos pos ) { return EXCEPTIONS.getOrElse( level, pos, BASE ); }
         
         /** @return Treats the config field's value as a percent chance (from 0 to 1) and returns the result of a single roll. */
-        public boolean rollChance( Random random, Level level, @Nullable BlockPos pos ) { return random.nextDouble() < get( level, pos ); }
+        public boolean rollChance( RandomSource random, Level level, @Nullable BlockPos pos ) { return random.nextDouble() < get( level, pos ); }
     }
     
     /**

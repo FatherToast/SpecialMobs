@@ -2,6 +2,6 @@
 @ParametersAreNonnullByDefault
 package fathertoast.specialmobs.client.renderer.entity.projectile;
 
-import mcp.MethodsReturnNonnullByDefault;
+import net.minecraft.MethodsReturnNonnullByDefault;
 
 import javax.annotation.ParametersAreNonnullByDefault;

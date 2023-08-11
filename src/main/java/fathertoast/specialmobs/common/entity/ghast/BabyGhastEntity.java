@@ -5,11 +5,11 @@ import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.item.Items;
-import net.minecraft.util.SoundEvent;
-import net.minecraft.world.World;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
 
 @SpecialMob
 public class BabyGhastEntity extends _SpecialGhastEntity {
@@ -39,7 +39,7 @@ public class BabyGhastEntity extends _SpecialGhastEntity {
     }
     
     @SpecialMob.Factory
-    public static EntityType.IFactory<BabyGhastEntity> getVariantFactory() { return BabyGhastEntity::new; }
+    public static EntityType.EntityFactory<BabyGhastEntity> getVariantFactory() { return BabyGhastEntity::new; }
     
     /** @return This entity's mob species. */
     @SpecialMob.SpeciesSupplier
@@ -49,7 +49,7 @@ public class BabyGhastEntity extends _SpecialGhastEntity {
     
     //--------------- Variant-Specific Implementations ----------------
     
-    public BabyGhastEntity( EntityType<? extends _SpecialGhastEntity> entityType, World world ) { super( entityType, world ); }
+    public BabyGhastEntity( EntityType<? extends _SpecialGhastEntity> entityType, Level level ) { super( entityType, level ); }
     
     /** @return The sound this entity makes idly. */
     @Override

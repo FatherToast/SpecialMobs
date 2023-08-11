@@ -9,12 +9,12 @@ import fathertoast.specialmobs.common.entity.ai.AIHelper;
 import fathertoast.specialmobs.common.entity.ai.goal.AmphibiousGoToWaterGoal;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.item.Items;
-import net.minecraft.potion.Effects;
-import net.minecraft.world.World;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
 
 @SpecialMob
 public class AbyssalDrownedEntity extends _SpecialDrownedEntity {
@@ -28,7 +28,7 @@ public class AbyssalDrownedEntity extends _SpecialDrownedEntity {
     public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
         bestiaryInfo.color( 0x223844 ).weight( BestiaryInfo.DefaultWeight.LOW )
                 .uniqueTexturesAll()
-                .addExperience( 2 ).effectImmune( SMEffects.WEIGHT, Effects.LEVITATION )
+                .addExperience( 2 ).effectImmune( SMEffects.WEIGHT.get(), MobEffects.LEVITATION )
                 .addToAttribute( Attributes.MAX_HEALTH, 20.0 )
                 .multiplyAttribute( Attributes.MOVEMENT_SPEED, 1.2 );
     }
@@ -47,7 +47,7 @@ public class AbyssalDrownedEntity extends _SpecialDrownedEntity {
     }
     
     @SpecialMob.Factory
-    public static EntityType.IFactory<AbyssalDrownedEntity> getVariantFactory() { return AbyssalDrownedEntity::new; }
+    public static EntityType.EntityFactory<AbyssalDrownedEntity> getVariantFactory() { return AbyssalDrownedEntity::new; }
     
     /** @return This entity's mob species. */
     @SpecialMob.SpeciesSupplier
@@ -57,7 +57,7 @@ public class AbyssalDrownedEntity extends _SpecialDrownedEntity {
     
     //--------------- Variant-Specific Implementations ----------------
     
-    public AbyssalDrownedEntity( EntityType<? extends _SpecialDrownedEntity> entityType, World world ) { super( entityType, world ); }
+    public AbyssalDrownedEntity( EntityType<? extends _SpecialDrownedEntity> entityType, Level level ) { super( entityType, level ); }
     
     /** Override to change this entity's AI goals. */
     @Override

@@ -6,18 +6,18 @@ import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.entity.ai.attributes.ModifiableAttributeInstance;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Food;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.SoundEvents;
-import net.minecraft.world.World;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.food.FoodProperties;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.event.ForgeEventFactory;
 
 import java.util.UUID;
@@ -54,7 +54,7 @@ public class HungrySpiderEntity extends _SpecialSpiderEntity {
     }
     
     @SpecialMob.Factory
-    public static EntityType.IFactory<HungrySpiderEntity> getVariantFactory() { return HungrySpiderEntity::new; }
+    public static EntityType.EntityFactory<HungrySpiderEntity> getVariantFactory() { return HungrySpiderEntity::new; }
     
     /** @return This entity's mob species. */
     @SpecialMob.SpeciesSupplier
@@ -76,15 +76,15 @@ public class HungrySpiderEntity extends _SpecialSpiderEntity {
     /** The level of increased max health gained. */
     private int maxHealthStacks;
     
-    public HungrySpiderEntity( EntityType<? extends _SpecialSpiderEntity> entityType, World world ) { super( entityType, world ); }
+    public HungrySpiderEntity( EntityType<? extends _SpecialSpiderEntity> entityType, Level level ) { super( entityType, level ); }
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override
     protected void onVariantAttack( LivingEntity target ) {
         if( level.isClientSide() ) return;
         
-        if( target instanceof PlayerEntity && ForgeEventFactory.getMobGriefingEvent( level, this ) ) {
-            final ItemStack food = MobHelper.stealRandomFood( (PlayerEntity) target );
+        if( target instanceof Player player && ForgeEventFactory.getMobGriefingEvent( level, this ) ) {
+            final ItemStack food = MobHelper.stealRandomFood( player );
             if( !food.isEmpty() ) {
                 final float previousHealth = getMaxHealth();
                 if( maxHealthStacks < 32 ) maxHealthStacks++;
@@ -92,7 +92,7 @@ public class HungrySpiderEntity extends _SpecialSpiderEntity {
                 updateFeedingLevels();
                 setHealth( getHealth() + getMaxHealth() - previousHealth );
                 
-                final Food foodStats = food.getItem().getFoodProperties();
+                final FoodProperties foodStats = food.getItem().getFoodProperties( food, this );
                 heal( Math.max( foodStats == null ? 0.0F : foodStats.getNutrition(), 1.0F ) );
                 playSound( SoundEvents.PLAYER_BURP, 0.5F, random.nextFloat() * 0.1F + 0.9F );
             }
@@ -105,8 +105,8 @@ public class HungrySpiderEntity extends _SpecialSpiderEntity {
     /** Recalculates the modifiers associated with this entity's feeding level counters. */
     private void updateFeedingLevels() {
         if( level != null && !level.isClientSide ) {
-            final ModifiableAttributeInstance health = getAttribute( Attributes.MAX_HEALTH );
-            final ModifiableAttributeInstance damage = getAttribute( Attributes.ATTACK_DAMAGE );
+            final AttributeInstance health = getAttribute( Attributes.MAX_HEALTH );
+            final AttributeInstance damage = getAttribute( Attributes.ATTACK_DAMAGE );
             //noinspection ConstantConditions
             health.removeModifier( HEALTH_BOOST.getId() );
             //noinspection ConstantConditions
@@ -125,14 +125,14 @@ public class HungrySpiderEntity extends _SpecialSpiderEntity {
     
     /** Override to save data to this entity's NBT data. */
     @Override
-    public void addVariantSaveData( CompoundNBT saveTag ) {
+    public void addVariantSaveData( CompoundTag saveTag ) {
         saveTag.putByte( References.TAG_HEALTH_STACKS, (byte) maxHealthStacks );
         saveTag.putByte( References.TAG_GROWTH_LEVEL, (byte) growthLevel );
     }
     
     /** Override to load data from this entity's NBT data. */
     @Override
-    public void readVariantSaveData( CompoundNBT saveTag ) {
+    public void readVariantSaveData( CompoundTag saveTag ) {
         if( saveTag.contains( References.TAG_HEALTH_STACKS, References.NBT_TYPE_NUMERICAL ) )
             maxHealthStacks = saveTag.getByte( References.TAG_HEALTH_STACKS );
         if( saveTag.contains( References.TAG_GROWTH_LEVEL, References.NBT_TYPE_NUMERICAL ) )

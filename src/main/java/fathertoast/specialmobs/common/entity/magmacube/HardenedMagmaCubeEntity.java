@@ -7,11 +7,11 @@ import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.entity.ai.goal.SpecialLeapAtTargetGoal;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
-import net.minecraft.block.Blocks;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
 
 @SpecialMob
 public class HardenedMagmaCubeEntity extends _SpecialMagmaCubeEntity {
@@ -44,7 +44,7 @@ public class HardenedMagmaCubeEntity extends _SpecialMagmaCubeEntity {
     }
     
     @SpecialMob.Factory
-    public static EntityType.IFactory<HardenedMagmaCubeEntity> getVariantFactory() { return HardenedMagmaCubeEntity::new; }
+    public static EntityType.EntityFactory<HardenedMagmaCubeEntity> getVariantFactory() { return HardenedMagmaCubeEntity::new; }
     
     /** @return This entity's mob species. */
     @SpecialMob.SpeciesSupplier
@@ -54,7 +54,7 @@ public class HardenedMagmaCubeEntity extends _SpecialMagmaCubeEntity {
     
     //--------------- Variant-Specific Implementations ----------------
     
-    public HardenedMagmaCubeEntity( EntityType<? extends _SpecialMagmaCubeEntity> entityType, World world ) { super( entityType, world ); }
+    public HardenedMagmaCubeEntity( EntityType<? extends _SpecialMagmaCubeEntity> entityType, Level level ) { super( entityType, level ); }
     
     /** Override to change this entity's AI goals. */
     @Override

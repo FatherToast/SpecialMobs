@@ -19,7 +19,8 @@ import net.minecraftforge.registries.RegistryObject;
 public class SMEntities {
     
     public static final DeferredRegister<EntityType<?>> REGISTRY = DeferredRegister.create( ForgeRegistries.ENTITY_TYPES, SpecialMobs.MOD_ID );
-    
+
+
     // Misc entities
     public static final RegistryObject<EntityType<BoneShrapnelEntity>> BONE_SHRAPNEL = register( "bone_shrapnel",
             EntityType.Builder.<BoneShrapnelEntity>of( BoneShrapnelEntity::new, MobCategory.MISC )

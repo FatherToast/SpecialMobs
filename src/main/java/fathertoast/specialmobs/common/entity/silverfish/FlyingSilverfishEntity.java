@@ -6,10 +6,10 @@ import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.entity.ai.goal.SpecialLeapAtTargetGoal;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.item.Items;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
 
 @SpecialMob
 public class FlyingSilverfishEntity extends _SpecialSilverfishEntity {
@@ -40,7 +40,7 @@ public class FlyingSilverfishEntity extends _SpecialSilverfishEntity {
     }
     
     @SpecialMob.Factory
-    public static EntityType.IFactory<FlyingSilverfishEntity> getVariantFactory() { return FlyingSilverfishEntity::new; }
+    public static EntityType.EntityFactory<FlyingSilverfishEntity> getVariantFactory() { return FlyingSilverfishEntity::new; }
     
     /** @return This entity's mob species. */
     @SpecialMob.SpeciesSupplier
@@ -50,7 +50,7 @@ public class FlyingSilverfishEntity extends _SpecialSilverfishEntity {
     
     //--------------- Variant-Specific Implementations ----------------
     
-    public FlyingSilverfishEntity( EntityType<? extends _SpecialSilverfishEntity> entityType, World world ) { super( entityType, world ); }
+    public FlyingSilverfishEntity( EntityType<? extends _SpecialSilverfishEntity> entityType, Level level ) { super( entityType, level ); }
     
     /** Override to change this entity's AI goals. */
     @Override

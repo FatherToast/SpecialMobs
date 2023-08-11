@@ -11,38 +11,42 @@ import fathertoast.specialmobs.common.entity.ai.AIHelper;
 import fathertoast.specialmobs.common.event.NaturalSpawnManager;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.*;
-import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.entity.ai.attributes.AttributeModifierMap;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.entity.ai.attributes.ModifiableAttributeInstance;
-import net.minecraft.entity.ai.goal.RangedAttackGoal;
-import net.minecraft.entity.monster.AbstractRaiderEntity;
-import net.minecraft.entity.monster.WitchEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.projectile.PotionEntity;
-import net.minecraft.entity.projectile.SnowballEntity;
-import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.datasync.DataParameter;
-import net.minecraft.network.datasync.DataSerializers;
-import net.minecraft.network.datasync.EntityDataManager;
-import net.minecraft.pathfinding.PathNodeType;
-import net.minecraft.potion.*;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.EntityTypeTags;
 import net.minecraft.tags.FluidTags;
-import net.minecraft.tags.ITag;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.IItemProvider;
-import net.minecraft.util.SoundEvents;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.tags.TagKey;
+import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.DifficultyInstance;
-import net.minecraft.world.IServerWorld;
-import net.minecraft.world.World;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.ai.goal.RangedAttackGoal;
+import net.minecraft.world.entity.monster.Witch;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.Snowball;
+import net.minecraft.world.entity.projectile.ThrownPotion;
+import net.minecraft.world.entity.raid.Raider;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.alchemy.Potion;
+import net.minecraft.world.item.alchemy.PotionUtils;
+import net.minecraft.world.item.alchemy.Potions;
+import net.minecraft.world.level.ItemLike;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.ServerLevelAccessor;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.pathfinder.BlockPathTypes;
+import net.minecraft.world.phys.Vec3;
 
 import javax.annotation.Nullable;
 import java.util.Collection;
@@ -51,7 +55,7 @@ import java.util.List;
 import java.util.UUID;
 
 @SpecialMob
-public class _SpecialWitchEntity extends WitchEntity implements ISpecialMob<_SpecialWitchEntity> {
+public class _SpecialWitchEntity extends Witch implements ISpecialMob<_SpecialWitchEntity> {
     
     //--------------- Static Special Mob Hooks ----------------
     
@@ -67,7 +71,7 @@ public class _SpecialWitchEntity extends WitchEntity implements ISpecialMob<_Spe
     }
     
     @SpecialMob.AttributeSupplier
-    public static AttributeModifierMap.MutableAttribute createAttributes() { return WitchEntity.createAttributes(); }
+    public static AttributeSupplier.Builder createAttributes() { return Witch.createAttributes(); }
     
     @SpecialMob.SpawnPlacementRegistrar
     public static void registerSpawnPlacement( MobFamily.Species<? extends _SpecialWitchEntity> species ) {
@@ -83,16 +87,17 @@ public class _SpecialWitchEntity extends WitchEntity implements ISpecialMob<_Spe
     
     @SpecialMob.LootTableProvider
     public static void addBaseLoot( LootTableBuilder loot ) {
-        loot.addLootTable( "main", EntityType.WITCH.getDefaultLootTable() );
+        loot.addLootTable("main", EntityType.WITCH.getDefaultLootTable());
     }
 
+
     @SpecialMob.EntityTagProvider
-    public static List<ITag.INamedTag<EntityType<?>>> getEntityTags() {
+    public static List<TagKey<EntityType<?>>> getEntityTags() {
         return Collections.singletonList(EntityTypeTags.RAIDERS);
     }
     
     @SpecialMob.Factory
-    public static EntityType.IFactory<_SpecialWitchEntity> getFactory() { return _SpecialWitchEntity::new; }
+    public static EntityType.EntityFactory<_SpecialWitchEntity> getFactory() { return _SpecialWitchEntity::new; }
     
     
     //--------------- Variant-Specific Breakouts ----------------
@@ -109,8 +114,8 @@ public class _SpecialWitchEntity extends WitchEntity implements ISpecialMob<_Spe
     
     /** Override to change starting equipment or stats. */
     @SuppressWarnings( "unused" )
-    public void finalizeVariantSpawn( IServerWorld world, DifficultyInstance difficulty, @Nullable SpawnReason spawnReason,
-                                      @Nullable ILivingEntityData groupData ) { }
+    public void finalizeVariantSpawn( ServerLevelAccessor level, DifficultyInstance difficulty, @Nullable MobSpawnType spawnType,
+                                     @Nullable SpawnGroupData groupData ) { }
     
     /** Called when this entity successfully damages a target to apply on-hit effects. */
     @Override
@@ -128,18 +133,18 @@ public class _SpecialWitchEntity extends WitchEntity implements ISpecialMob<_Spe
     public void performRangedAttack( LivingEntity target, float damageMulti ) {
         if( isDrinkingPotion() ) return;
         
-        final Vector3d vTarget = target.getDeltaMovement();
+        final Vec3 vTarget = target.getDeltaMovement();
         final double dX = target.getX() + vTarget.x - getX();
         final double dY = target.getEyeY() - 1.1 - getY();
         final double dZ = target.getZ() + vTarget.z - getZ();
-        final float dH = MathHelper.sqrt( dX * dX + dZ * dZ );
+        final float dH = Mth.sqrt( (float) (dX * dX + dZ * dZ) );
         
         final ItemStack potion = pickThrownPotion( target, damageMulti, dH );
         if( potion.isEmpty() ) return;
         
-        final PotionEntity thrownPotion = new PotionEntity( level, this );
+        final ThrownPotion thrownPotion = new ThrownPotion( level, this );
         thrownPotion.setItem( potion );
-        thrownPotion.xRot += 20.0F;
+        thrownPotion.setXRot(thrownPotion.getXRot() + 20.0F);
         thrownPotion.shoot( dX, dY + (double) (dH * 0.2F), dZ, 0.75F, 8.0F * getSpecialData().getRangedAttackSpread() );
         if( !isSilent() ) {
             level.playSound( null, getX(), getY(), getZ(), SoundEvents.WITCH_THROW, getSoundSource(),
@@ -153,8 +158,8 @@ public class _SpecialWitchEntity extends WitchEntity implements ISpecialMob<_Spe
         final ItemStack potion;
         
         // Healing an ally
-        if( target instanceof AbstractRaiderEntity ) {
-            if( target.getMobType() == CreatureAttribute.UNDEAD ) {
+        if( target instanceof Raider ) {
+            if( target.getMobType() == MobType.UNDEAD ) {
                 potion = makeSplashPotion( Potions.HARMING );
             }
             else if( target.getHealth() <= 4.0F ) {
@@ -166,20 +171,20 @@ public class _SpecialWitchEntity extends WitchEntity implements ISpecialMob<_Spe
             setTarget( null );
             
             // Let the variant change the choice or cancel potion throwing
-            return pickVariantSupportPotion( potion, (AbstractRaiderEntity) target, distance );
+            return pickVariantSupportPotion( potion, (Raider) target, distance );
         }
         
         // Attack potions
-        if( distance >= 8.0F && !target.hasEffect( Effects.MOVEMENT_SLOWDOWN ) ) {
+        if( distance >= 8.0F && !target.hasEffect( MobEffects.MOVEMENT_SLOWDOWN ) ) {
             potion = makeSplashPotion( Potions.SLOWNESS );
         }
-        else if( target.getHealth() >= 8.0F && !target.hasEffect( Effects.POISON ) ) {
+        else if( target.getHealth() >= 8.0F && !target.hasEffect( MobEffects.POISON ) ) {
             potion = makeSplashPotion( Potions.POISON );
         }
-        else if( distance <= 3.0F && !target.hasEffect( Effects.WEAKNESS ) && random.nextFloat() < 0.25F ) {
+        else if( distance <= 3.0F && !target.hasEffect( MobEffects.WEAKNESS ) && random.nextFloat() < 0.25F ) {
             potion = makeSplashPotion( Potions.WEAKNESS );
         }
-        else if( target.getMobType() == CreatureAttribute.UNDEAD ) {
+        else if( target.getMobType() == MobType.UNDEAD ) {
             potion = makeSplashPotion( Potions.HEALING );
         }
         else {
@@ -191,7 +196,7 @@ public class _SpecialWitchEntity extends WitchEntity implements ISpecialMob<_Spe
     
     /** Override to modify potion support. Return an empty item stack to cancel the potion throw. */
     @SuppressWarnings( "unused" )
-    protected ItemStack pickVariantSupportPotion( ItemStack originalPotion, AbstractRaiderEntity target, float distance ) {
+    protected ItemStack pickVariantSupportPotion( ItemStack originalPotion, Raider target, float distance ) {
         return originalPotion;
     }
     
@@ -202,17 +207,17 @@ public class _SpecialWitchEntity extends WitchEntity implements ISpecialMob<_Spe
     
     /** Called each tick while this witch is capable of using a potion on itself. */
     protected void tryUsingPotion() {
-        if( random.nextFloat() < 0.15F && isEyeInFluid( FluidTags.WATER ) && !hasEffect( Effects.WATER_BREATHING ) ) {
+        if( random.nextFloat() < 0.15F && isEyeInFluid( FluidTags.WATER ) && !hasEffect( MobEffects.WATER_BREATHING ) ) {
             usePotion( makePotion( Potions.WATER_BREATHING ) );
         }
         else if( random.nextFloat() < 0.15F && (isOnFire() || getLastDamageSource() != null && getLastDamageSource().isFire()) &&
-                !hasEffect( Effects.FIRE_RESISTANCE ) ) {
+                !hasEffect( MobEffects.FIRE_RESISTANCE ) ) {
             usePotion( makePotion( Potions.FIRE_RESISTANCE ) );
         }
         else if( random.nextFloat() < 0.05F && getHealth() < getMaxHealth() ) {
-            usePotion( makePotion( getMobType() == CreatureAttribute.UNDEAD ? Potions.HARMING : Potions.HEALING ) );
+            usePotion( makePotion( getMobType() == MobType.UNDEAD ? Potions.HARMING : Potions.HEALING ) );
         }
-        else if( random.nextFloat() < 0.5F && getTarget() != null && !hasEffect( Effects.MOVEMENT_SPEED ) &&
+        else if( random.nextFloat() < 0.5F && getTarget() != null && !hasEffect( MobEffects.MOVEMENT_SPEED ) &&
                 getTarget().distanceToSqr( this ) > 121.0 ) {
             usePotion( MobFamily.WITCH.config.WITCHES.useSplashSwiftness.get() ? makeSplashPotion( Potions.SWIFTNESS ) :
                     makePotion( Potions.SWIFTNESS ) );
@@ -226,10 +231,10 @@ public class _SpecialWitchEntity extends WitchEntity implements ISpecialMob<_Spe
     protected void tryVariantUsingPotion() { }
     
     /** Override to save data to this entity's NBT data. */
-    public void addVariantSaveData( CompoundNBT saveTag ) { }
+    public void addVariantSaveData( CompoundTag saveTag ) { }
     
     /** Override to load data from this entity's NBT data. */
-    public void readVariantSaveData( CompoundNBT saveTag ) { }
+    public void readVariantSaveData( CompoundTag saveTag ) { }
     
     
     //--------------- Family-Specific Implementations ----------------
@@ -239,7 +244,7 @@ public class _SpecialWitchEntity extends WitchEntity implements ISpecialMob<_Spe
             "Drinking speed penalty", -0.25, AttributeModifier.Operation.ADDITION );
     
     /** The parameter for special mob render scale. */
-    private static final DataParameter<Float> SCALE = EntityDataManager.defineId( _SpecialWitchEntity.class, DataSerializers.FLOAT );
+    private static final EntityDataAccessor<Float> SCALE = SynchedEntityData.defineId( _SpecialWitchEntity.class, EntityDataSerializers.FLOAT );
     
     /** Used to prevent vanilla code from handling potion-drinking. */
     private boolean fakeDrinkingPotion;
@@ -252,8 +257,8 @@ public class _SpecialWitchEntity extends WitchEntity implements ISpecialMob<_Spe
     /** While the witch is drinking a potion, it stores its 'actual' held item here. */
     public ItemStack sheathedItem = ItemStack.EMPTY;
     
-    public _SpecialWitchEntity( EntityType<? extends _SpecialWitchEntity> entityType, World world ) {
-        super( entityType, world );
+    public _SpecialWitchEntity( EntityType<? extends _SpecialWitchEntity> entityType, Level level ) {
+        super( entityType, level );
         usingTime = Integer.MAX_VALUE; // Effectively disable vanilla witch potion drinking logic in combo with "fake drinking"
         recalculateAttackGoal();
         
@@ -287,9 +292,9 @@ public class _SpecialWitchEntity extends WitchEntity implements ISpecialMob<_Spe
                 usePotion( ItemStack.EMPTY );
                 
                 if( drinkingItem.getItem() == Items.POTION ) {
-                    final List<EffectInstance> effects = PotionUtils.getMobEffects( drinkingItem );
-                    for( EffectInstance effect : effects ) {
-                        addEffect( new EffectInstance( effect ) );
+                    final List<MobEffectInstance> effects = PotionUtils.getMobEffects( drinkingItem );
+                    for( MobEffectInstance effect : effects ) {
+                        addEffect( new MobEffectInstance( effect ) );
                     }
                 }
             }
@@ -310,10 +315,10 @@ public class _SpecialWitchEntity extends WitchEntity implements ISpecialMob<_Spe
                 setUsingItem( false );
                 potionDrinkTimer = 0;
                 
-                final ModifiableAttributeInstance attribute = getAttribute( Attributes.MOVEMENT_SPEED );
+                final AttributeInstance attribute = getAttribute( Attributes.MOVEMENT_SPEED );
                 if( attribute != null ) attribute.removeModifier( DRINKING_SPEED_PENALTY );
                 
-                setItemSlot( EquipmentSlotType.MAINHAND, sheathedItem );
+                setItemSlot( EquipmentSlot.MAINHAND, sheathedItem );
                 sheathedItem = ItemStack.EMPTY;
             }
         }
@@ -321,7 +326,7 @@ public class _SpecialWitchEntity extends WitchEntity implements ISpecialMob<_Spe
             // It is a normal potion, start drinking and sheathe the held item
             sheathedItem = getMainHandItem();
             
-            setItemSlot( EquipmentSlotType.MAINHAND, potion );
+            setItemSlot( EquipmentSlot.MAINHAND, potion );
             setUsingItem( true );
             potionDrinkTimer = getMainHandItem().getUseDuration();
             
@@ -330,7 +335,7 @@ public class _SpecialWitchEntity extends WitchEntity implements ISpecialMob<_Spe
                         1.0F, 0.8F + random.nextFloat() * 0.4F );
             }
             
-            final ModifiableAttributeInstance attribute = getAttribute( Attributes.MOVEMENT_SPEED );
+            final AttributeInstance attribute = getAttribute( Attributes.MOVEMENT_SPEED );
             if( attribute != null ) {
                 attribute.removeModifier( DRINKING_SPEED_PENALTY );
                 attribute.addTransientModifier( DRINKING_SPEED_PENALTY );
@@ -340,9 +345,9 @@ public class _SpecialWitchEntity extends WitchEntity implements ISpecialMob<_Spe
             // It is a splash or lingering potion, throw it straight down to apply to self
             potionUseCooldownTimer = 40;
             
-            final PotionEntity thrownPotion = new PotionEntity( level, this );
+            final ThrownPotion thrownPotion = new ThrownPotion( level, this );
             thrownPotion.setItem( potion );
-            thrownPotion.xRot += 20.0F;
+            thrownPotion.setXRot(thrownPotion.getXRot() + 20.0F);
             thrownPotion.shoot( 0.0, -1.0, 0.0, 0.2F, 0.0F );
             if( !isSilent() ) {
                 level.playSound( null, getX(), getY(), getZ(), SoundEvents.WITCH_THROW, getSoundSource(),
@@ -360,28 +365,28 @@ public class _SpecialWitchEntity extends WitchEntity implements ISpecialMob<_Spe
     
     /** @return A new regular potion with custom effects. */
     @SuppressWarnings( "unused" )
-    public ItemStack makePotion( Collection<EffectInstance> effects ) { return newPotion( Items.POTION, effects ); }
+    public ItemStack makePotion( Collection<MobEffectInstance> effects ) { return newPotion( Items.POTION, effects ); }
     
     /** @return A new splash potion with standard effects. */
     public ItemStack makeSplashPotion( Potion type ) { return newPotion( Items.SPLASH_POTION, type ); }
     
     /** @return A new splash potion on self with custom effects. */
-    public ItemStack makeSplashPotion( Collection<EffectInstance> effects ) { return newPotion( Items.SPLASH_POTION, effects ); }
+    public ItemStack makeSplashPotion( Collection<MobEffectInstance> effects ) { return newPotion( Items.SPLASH_POTION, effects ); }
     
     /** @return A new lingering splash potion with standard effects. */
     public ItemStack makeLingeringPotion( Potion type ) { return newPotion( Items.LINGERING_POTION, type ); }
     
     /** @return A new lingering splash potion with custom effects. */
     @SuppressWarnings( "unused" )
-    public ItemStack makeLingeringPotion( Collection<EffectInstance> effects ) { return newPotion( Items.LINGERING_POTION, effects ); }
+    public ItemStack makeLingeringPotion( Collection<MobEffectInstance> effects ) { return newPotion( Items.LINGERING_POTION, effects ); }
     
     /** @return A new potion with standard effects. */
-    private ItemStack newPotion( IItemProvider item, Potion type ) {
+    private ItemStack newPotion( ItemLike item, Potion type ) {
         return PotionUtils.setPotion( new ItemStack( item ), type );
     }
     
     /** @return A new potion with custom effects. */
-    private ItemStack newPotion( IItemProvider item, Collection<EffectInstance> effects ) {
+    private ItemStack newPotion( ItemLike item, Collection<MobEffectInstance> effects ) {
         return PotionUtils.setCustomEffects( new ItemStack( item ), effects );
     }
     
@@ -410,11 +415,11 @@ public class _SpecialWitchEntity extends WitchEntity implements ISpecialMob<_Spe
     /** Converts this entity to one of another type. */
     @Nullable
     @Override
-    public <T extends MobEntity> T convertTo( EntityType<T> entityType, boolean keepEquipment ) {
+    public <T extends Mob> T convertTo( EntityType<T> entityType, boolean keepEquipment ) {
         final T replacement = super.convertTo( entityType, keepEquipment );
-        if( replacement instanceof ISpecialMob && level instanceof IServerWorld ) {
-            MobHelper.finalizeSpawn( replacement, (IServerWorld) level, level.getCurrentDifficultyAt( blockPosition() ),
-                    SpawnReason.CONVERSION, null );
+        if( replacement instanceof ISpecialMob && level instanceof ServerLevelAccessor serverLevel ) {
+            MobHelper.finalizeSpawn( replacement, serverLevel, level.getCurrentDifficultyAt( blockPosition() ),
+                    MobSpawnType.CONVERSION, null );
         }
         return replacement;
     }
@@ -422,26 +427,26 @@ public class _SpecialWitchEntity extends WitchEntity implements ISpecialMob<_Spe
     /** Called on spawn to initialize properties based on the world, difficulty, and the group it spawns with. */
     @Nullable
     @Override
-    public final ILivingEntityData finalizeSpawn( IServerWorld world, DifficultyInstance difficulty, SpawnReason spawnReason,
-                                                  @Nullable ILivingEntityData groupData, @Nullable CompoundNBT eggTag ) {
-        return MobHelper.finalizeSpawn( this, world, difficulty, spawnReason,
-                super.finalizeSpawn( world, difficulty, spawnReason, groupData, eggTag ) );
+    public final SpawnGroupData finalizeSpawn( ServerLevelAccessor level, DifficultyInstance difficulty, MobSpawnType spawnType,
+                                                  @Nullable SpawnGroupData groupData, @Nullable CompoundTag eggTag ) {
+        return MobHelper.finalizeSpawn( this, level, difficulty, spawnType,
+                super.finalizeSpawn( level, difficulty, spawnType, groupData, eggTag ) );
     }
     
     @Override
-    public void setSpecialPathfindingMalus( PathNodeType nodeType, float malus ) {
-        this.setPathfindingMalus( nodeType, malus );
+    public void setSpecialPathfindingMalus( BlockPathTypes type, float malus ) {
+        this.setPathfindingMalus( type, malus );
     }
     
     /** Called on spawn to set starting equipment. */
     @Override // Seal method to force spawn equipment changes through ISpecialMob
-    protected final void populateDefaultEquipmentSlots( DifficultyInstance difficulty ) { super.populateDefaultEquipmentSlots( difficulty ); }
+    protected final void populateDefaultEquipmentSlots( RandomSource random, DifficultyInstance difficulty ) { super.populateDefaultEquipmentSlots( random, difficulty ); }
     
     /** Called on spawn to initialize properties based on the world, difficulty, and the group it spawns with. */
     @Override
-    public void finalizeSpecialSpawn( IServerWorld world, DifficultyInstance difficulty, @Nullable SpawnReason spawnReason,
-                                      @Nullable ILivingEntityData groupData ) {
-        finalizeVariantSpawn( world, difficulty, spawnReason, groupData );
+    public void finalizeSpecialSpawn( ServerLevelAccessor level, DifficultyInstance difficulty, @Nullable MobSpawnType spawnReason,
+                                      @Nullable SpawnGroupData groupData ) {
+        finalizeVariantSpawn( level, difficulty, spawnReason, groupData );
     }
     
     
@@ -471,7 +476,7 @@ public class _SpecialWitchEntity extends WitchEntity implements ISpecialMob<_Spe
     
     /** @return The eye height of this entity when standing. */
     @Override
-    protected float getStandingEyeHeight( Pose pose, EntitySize size ) {
+    protected float getStandingEyeHeight( Pose pose, EntityDimensions size ) {
         return super.getStandingEyeHeight( pose, size ) * getSpecialData().getHeightScaleByAge();
     }
     
@@ -487,18 +492,18 @@ public class _SpecialWitchEntity extends WitchEntity implements ISpecialMob<_Spe
     
     /** @return True if this entity can be leashed. */
     @Override
-    public boolean canBeLeashed( PlayerEntity player ) { return !isLeashed() && getSpecialData().allowLeashing(); }
+    public boolean canBeLeashed( Player player ) { return !isLeashed() && getSpecialData().allowLeashing(); }
     
     /** Sets this entity 'stuck' inside a block, such as a cobweb or sweet berry bush. Mod blocks could use this as a speed boost. */
     @Override
-    public void makeStuckInBlock( BlockState block, Vector3d speedMulti ) {
+    public void makeStuckInBlock( BlockState block, Vec3 speedMulti ) {
         if( getSpecialData().canBeStuckIn( block ) ) super.makeStuckInBlock( block, speedMulti );
     }
     
     /** @return Called when this mob falls. Calculates and applies fall damage. Returns false if canceled. */
     @Override
-    public boolean causeFallDamage( float distance, float damageMultiplier ) {
-        return super.causeFallDamage( distance, damageMultiplier * getSpecialData().getFallDamageMultiplier() );
+    public boolean causeFallDamage( float distance, float damageMultiplier, DamageSource damageSource ) {
+        return super.causeFallDamage( distance, damageMultiplier * getSpecialData().getFallDamageMultiplier(), damageSource );
     }
     
     /** @return True if this entity should NOT trigger pressure plates or tripwires. */
@@ -520,7 +525,7 @@ public class _SpecialWitchEntity extends WitchEntity implements ISpecialMob<_Spe
     /** @return Attempts to damage this entity; returns true if the hit was successful. */
     @Override
     public boolean hurt( DamageSource source, float amount ) {
-        if( isSensitiveToWater() && source.getDirectEntity() instanceof SnowballEntity ) {
+        if( isSensitiveToWater() && source.getDirectEntity() instanceof Snowball ) {
             amount = Math.max( 3.0F, amount );
         }
         return super.hurt( source, amount );
@@ -528,16 +533,16 @@ public class _SpecialWitchEntity extends WitchEntity implements ISpecialMob<_Spe
     
     /** @return True if the effect can be applied to this entity. */
     @Override
-    public boolean canBeAffected( EffectInstance effect ) { return getSpecialData().isPotionApplicable( effect ); }
+    public boolean canBeAffected( MobEffectInstance effect ) { return getSpecialData().isPotionApplicable( effect ); }
     
     /** Saves data to this entity's base NBT compound that is specific to its subclass. */
     @Override
-    public void addAdditionalSaveData( CompoundNBT tag ) {
+    public void addAdditionalSaveData( CompoundTag tag ) {
         super.addAdditionalSaveData( tag );
         
-        final CompoundNBT saveTag = SpecialMobData.getSaveLocation( tag );
+        final CompoundTag saveTag = SpecialMobData.getSaveLocation( tag );
         
-        final CompoundNBT itemTag = new CompoundNBT();
+        final CompoundTag itemTag = new CompoundTag();
         if( !sheathedItem.isEmpty() ) sheathedItem.save( itemTag );
         saveTag.put( References.TAG_SHEATHED_ITEM, itemTag );
         saveTag.putShort( References.TAG_POTION_USE_TIME, (short) potionDrinkTimer );
@@ -548,10 +553,10 @@ public class _SpecialWitchEntity extends WitchEntity implements ISpecialMob<_Spe
     
     /** Loads data from this entity's base NBT compound that is specific to its subclass. */
     @Override
-    public void readAdditionalSaveData( CompoundNBT tag ) {
+    public void readAdditionalSaveData( CompoundTag tag ) {
         super.readAdditionalSaveData( tag );
         
-        final CompoundNBT saveTag = SpecialMobData.getSaveLocation( tag );
+        final CompoundTag saveTag = SpecialMobData.getSaveLocation( tag );
         
         if( saveTag.contains( References.TAG_SHEATHED_ITEM, References.NBT_TYPE_COMPOUND ) )
             sheathedItem = ItemStack.of( saveTag.getCompound( References.TAG_SHEATHED_ITEM ) );

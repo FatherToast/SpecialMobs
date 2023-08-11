@@ -8,25 +8,25 @@ import fathertoast.specialmobs.common.entity.ai.AIHelper;
 import fathertoast.specialmobs.common.entity.ai.FluidPathNavigator;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.enchantment.FrostWalkerEnchantment;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.item.Items;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.pathfinding.PathNavigator;
-import net.minecraft.pathfinding.PathNodeType;
-import net.minecraft.potion.Effects;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.FluidTags;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.Direction;
-import net.minecraft.util.SoundEvents;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.navigation.PathNavigation;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.enchantment.FrostWalkerEnchantment;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.level.pathfinder.BlockPathTypes;
 import net.minecraftforge.event.ForgeEventFactory;
-import net.minecraftforge.event.entity.living.EntityTeleportEvent;
+import net.minecraftforge.event.entity.EntityTeleportEvent;
 
 @SpecialMob
 public class IcyEndermanEntity extends _SpecialEndermanEntity {
@@ -40,7 +40,7 @@ public class IcyEndermanEntity extends _SpecialEndermanEntity {
     public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
         bestiaryInfo.color( 0xDDEAEA ).theme( BestiaryInfo.Theme.ICE )
                 .uniqueTextureWithEyes()
-                .addExperience( 1 ).effectImmune( Effects.MOVEMENT_SLOWDOWN );
+                .addExperience( 1 ).effectImmune( MobEffects.MOVEMENT_SLOWDOWN );
         
     }
     
@@ -58,7 +58,7 @@ public class IcyEndermanEntity extends _SpecialEndermanEntity {
     }
     
     @SpecialMob.Factory
-    public static EntityType.IFactory<IcyEndermanEntity> getVariantFactory() { return IcyEndermanEntity::new; }
+    public static EntityType.EntityFactory<IcyEndermanEntity> getVariantFactory() { return IcyEndermanEntity::new; }
     
     /** @return This entity's mob species. */
     @SpecialMob.SpeciesSupplier
@@ -68,16 +68,16 @@ public class IcyEndermanEntity extends _SpecialEndermanEntity {
     
     //--------------- Variant-Specific Implementations ----------------
     
-    public IcyEndermanEntity( EntityType<? extends _SpecialEndermanEntity> entityType, World world ) {
-        super( entityType, world );
-        setPathfindingMalus( PathNodeType.WATER, PathNodeType.WALKABLE.getMalus() );
+    public IcyEndermanEntity( EntityType<? extends _SpecialEndermanEntity> entityType, Level level ) {
+        super( entityType, level );
+        setPathfindingMalus( BlockPathTypes.WATER, BlockPathTypes.WALKABLE.getMalus() );
     }
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override
     protected void onVariantAttack( LivingEntity target ) {
-        MobHelper.applyEffect( target, Effects.MOVEMENT_SLOWDOWN, 5, 0.5F );
-        MobHelper.applyEffect( target, Effects.DIG_SLOWDOWN, 3 );
+        MobHelper.applyEffect( target, MobEffects.MOVEMENT_SLOWDOWN, 5, 0.5F );
+        MobHelper.applyEffect( target, MobEffects.DIG_SLOWDOWN, 3 );
     }
     
     /** Override to change this entity's AI goals. */
@@ -88,13 +88,13 @@ public class IcyEndermanEntity extends _SpecialEndermanEntity {
     
     /** @return A new path navigator for this entity to use. */
     @Override
-    protected PathNavigator createNavigation( World world ) {
-        return new FluidPathNavigator( this, world, true, false );
+    protected PathNavigation createNavigation( Level level ) {
+        return new FluidPathNavigator( this, level, true, false );
     }
     
     /** @return Whether this entity can stand on a particular type of fluid. */
     @Override
-    public boolean canStandOnFluid( Fluid fluid ) { return fluid.is( FluidTags.WATER ); }
+    public boolean canStandOnFluid( FluidState fluid ) { return fluid.is( FluidTags.WATER ); }
     
     /** @return Attempts to damage this entity; returns true if the hit was successful. */
     @Override
@@ -118,7 +118,7 @@ public class IcyEndermanEntity extends _SpecialEndermanEntity {
     /** @return Teleports this enderman to a new position; returns true if successful. */
     @Override
     protected boolean teleport( double x, double y, double z ) {
-        final BlockPos.Mutable pos = new BlockPos.Mutable( x, y, z );
+        final BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos( x, y, z );
         
         while( pos.getY() > 0 ) {
             // Allow icy endermen to teleport on top of water
@@ -170,8 +170,8 @@ public class IcyEndermanEntity extends _SpecialEndermanEntity {
     
     /** Override to load data from this entity's NBT data. */
     @Override
-    public void readVariantSaveData( CompoundNBT saveTag ) {
-        setPathfindingMalus( PathNodeType.WATER, PathNodeType.WALKABLE.getMalus() );
+    public void readVariantSaveData( CompoundTag saveTag ) {
+        setPathfindingMalus( BlockPathTypes.WATER, BlockPathTypes.WALKABLE.getMalus() );
     }
     
     /** Called to make the frost walker ice platform around this entity, as needed. */

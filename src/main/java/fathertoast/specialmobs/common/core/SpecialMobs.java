@@ -10,7 +10,6 @@ import fathertoast.specialmobs.common.network.PacketHandler;
 import fathertoast.specialmobs.common.util.SMDispenserBehavior;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.InterModComms;
 import net.minecraftforge.fml.ModList;
@@ -134,13 +133,13 @@ public class SpecialMobs {
         SMEntities.REGISTRY.register( modEventBus );
         SMEffects.REGISTRY.register( modEventBus );
         SMBiomeMods.REGISTRY.register( modEventBus );
-        
+
         modEventBus.addListener( SMEntities::createAttributes );
         modEventBus.addListener( this::setup );
         modEventBus.addListener( this::sendIMCMessages );
         modEventBus.addListener( NaturalSpawnManager::registerSpawnPlacements );
-        
-        MinecraftForge.EVENT_BUS.addListener( EventPriority.LOW, NaturalSpawnManager::onBiomeLoad );
+
+        //MinecraftForge.EVENT_BUS.addListener( EventPriority.LOW, NaturalSpawnManager::onBiomeLoad );
         MinecraftForge.EVENT_BUS.register( new GameEvents() );
         MinecraftForge.EVENT_BUS.register( new AdvancementFixer() );
     }

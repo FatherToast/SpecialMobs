@@ -5,13 +5,13 @@ import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.item.Items;
-import net.minecraft.util.DamageSource;
-import net.minecraft.world.World;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
 
 import java.util.List;
 
@@ -44,7 +44,7 @@ public class StickyMagmaCubeEntity extends _SpecialMagmaCubeEntity {
     }
     
     @SpecialMob.Factory
-    public static EntityType.IFactory<StickyMagmaCubeEntity> getVariantFactory() { return StickyMagmaCubeEntity::new; }
+    public static EntityType.EntityFactory<StickyMagmaCubeEntity> getVariantFactory() { return StickyMagmaCubeEntity::new; }
     
     /** @return This entity's mob species. */
     @SpecialMob.SpeciesSupplier
@@ -58,7 +58,7 @@ public class StickyMagmaCubeEntity extends _SpecialMagmaCubeEntity {
     
     private int grabTime;
     
-    public StickyMagmaCubeEntity( EntityType<? extends _SpecialMagmaCubeEntity> entityType, World world ) { super( entityType, world ); }
+    public StickyMagmaCubeEntity( EntityType<? extends _SpecialMagmaCubeEntity> entityType, Level level ) { super( entityType, level ); }
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override

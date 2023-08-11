@@ -10,26 +10,28 @@ import fathertoast.specialmobs.common.entity.ai.AIHelper;
 import fathertoast.specialmobs.common.event.NaturalSpawnManager;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
-import net.minecraft.block.FlowingFluidBlock;
-import net.minecraft.entity.EntitySpawnPlacementRegistry;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.SpawnReason;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.item.Items;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.particles.IParticleData;
-import net.minecraft.particles.ParticleTypes;
-import net.minecraft.pathfinding.PathNodeType;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.tags.BiomeTags;
 import net.minecraft.tags.FluidTags;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.shapes.ISelectionContext;
-import net.minecraft.world.IServerWorld;
-import net.minecraft.world.IWorldReader;
-import net.minecraft.world.World;
-import net.minecraft.world.biome.Biome;
-
-import java.util.Random;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.SpawnPlacements;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.ServerLevelAccessor;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.block.LiquidBlock;
+import net.minecraft.world.level.pathfinder.BlockPathTypes;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraftforge.common.ForgeMod;
 
 @SpecialMob
 public class BlueberrySlimeEntity extends _SpecialSlimeEntity {
@@ -60,22 +62,22 @@ public class BlueberrySlimeEntity extends _SpecialSlimeEntity {
     
     @SpecialMob.SpawnPlacementRegistrar
     public static void registerSpeciesSpawnPlacement( MobFamily.Species<? extends BlueberrySlimeEntity> species ) {
-        NaturalSpawnManager.registerSpawnPlacement( species, EntitySpawnPlacementRegistry.PlacementType.IN_WATER,
+        NaturalSpawnManager.registerSpawnPlacement( species, SpawnPlacements.Type.IN_WATER,
                 BlueberrySlimeEntity::checkSpeciesSpawnRules );
     }
     
-    public static boolean checkSpeciesSpawnRules( EntityType<? extends BlueberrySlimeEntity> type, IServerWorld world,
-                                                  SpawnReason reason, BlockPos pos, Random random ) {
-        final Biome.Category biomeCategory = world.getBiome( pos ).getBiomeCategory();
-        if( biomeCategory == Biome.Category.OCEAN || biomeCategory == Biome.Category.RIVER ) {
-            return NaturalSpawnManager.checkSpawnRulesWater( type, world, reason, pos, random );
+    public static boolean checkSpeciesSpawnRules(EntityType<? extends BlueberrySlimeEntity> type, ServerLevelAccessor level,
+                                                 MobSpawnType spawnType, BlockPos pos, RandomSource random ) {
+        final Holder<Biome> biome = level.getBiome( pos );
+        if( biome.is( BiomeTags.IS_RIVER ) || biome.is( BiomeTags.IS_OCEAN ) ) {
+            return NaturalSpawnManager.checkSpawnRulesWater( type, level, spawnType, pos, random );
         }
-        return _SpecialSlimeEntity.checkFamilySpawnRules( type, world, reason, pos, random );
+        return _SpecialSlimeEntity.checkFamilySpawnRules( type, level, spawnType, pos, random );
     }
     
     /** @return True if this entity's position is currently obstructed. */
     @Override
-    public boolean checkSpawnObstruction( IWorldReader world ) { return world.isUnobstructed( this ); }
+    public boolean checkSpawnObstruction( LevelReader level ) { return level.isUnobstructed( this ); }
     
     @SpecialMob.LanguageProvider
     public static String[] getTranslations( String langKey ) {
@@ -91,7 +93,7 @@ public class BlueberrySlimeEntity extends _SpecialSlimeEntity {
     }
     
     @SpecialMob.Factory
-    public static EntityType.IFactory<BlueberrySlimeEntity> getVariantFactory() { return BlueberrySlimeEntity::new; }
+    public static EntityType.EntityFactory<BlueberrySlimeEntity> getVariantFactory() { return BlueberrySlimeEntity::new; }
     
     /** @return This entity's mob species. */
     @SpecialMob.SpeciesSupplier
@@ -101,9 +103,9 @@ public class BlueberrySlimeEntity extends _SpecialSlimeEntity {
     
     //--------------- Variant-Specific Implementations ----------------
     
-    public BlueberrySlimeEntity( EntityType<? extends _SpecialSlimeEntity> entityType, World world ) {
-        super( entityType, world );
-        setPathfindingMalus( PathNodeType.WATER, PathNodeType.WALKABLE.getMalus() );
+    public BlueberrySlimeEntity( EntityType<? extends _SpecialSlimeEntity> entityType, Level level ) {
+        super( entityType, level );
+        setPathfindingMalus( BlockPathTypes.WATER, BlockPathTypes.WALKABLE.getMalus() );
     }
     
     /** Override to change this entity's AI goals. */
@@ -128,8 +130,8 @@ public class BlueberrySlimeEntity extends _SpecialSlimeEntity {
             if( dX * dX + dZ * dZ < range * range )
                 floatAccel = -0.12;
         }
-        if( tickCount > 1 && getFluidHeight( FluidTags.WATER ) > 0.0 ) {
-            if( !ISelectionContext.of( this ).isAbove( FlowingFluidBlock.STABLE_SHAPE, blockPosition(), true ) ||
+        if( tickCount > 1 && getFluidTypeHeight( ForgeMod.WATER_TYPE.get() ) > 0.0 ) {
+            if( !CollisionContext.of( this ).isAbove( LiquidBlock.STABLE_SHAPE, blockPosition(), true ) ||
                     level.getFluidState( blockPosition().above() ).is( FluidTags.WATER ) ) {
                 setDeltaMovement( getDeltaMovement().scale( 0.5 ).add( 0.0, floatAccel, 0.0 ) );
             }
@@ -149,11 +151,11 @@ public class BlueberrySlimeEntity extends _SpecialSlimeEntity {
     
     /** Override to load data from this entity's NBT data. */
     @Override
-    public void readVariantSaveData( CompoundNBT saveTag ) {
-        setPathfindingMalus( PathNodeType.WATER, PathNodeType.WALKABLE.getMalus() );
+    public void readVariantSaveData( CompoundTag saveTag ) {
+        setPathfindingMalus( BlockPathTypes.WATER, BlockPathTypes.WALKABLE.getMalus() );
     }
     
     /** @return This slime's particle type for jump effects. */
     @Override
-    protected IParticleData getParticleType() { return ParticleTypes.SPLASH; }
+    protected ParticleOptions getParticleType() { return ParticleTypes.SPLASH; }
 }

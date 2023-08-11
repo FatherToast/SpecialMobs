@@ -6,13 +6,13 @@ import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.entity.ai.goal.SpecialLeapAtTargetGoal;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.item.Items;
-import net.minecraft.particles.IParticleData;
-import net.minecraft.particles.ItemParticleData;
-import net.minecraft.particles.ParticleTypes;
-import net.minecraft.world.World;
+import net.minecraft.core.particles.ItemParticleOption;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
 
 @SpecialMob
 public class GrapeSlimeEntity extends _SpecialSlimeEntity {
@@ -45,7 +45,7 @@ public class GrapeSlimeEntity extends _SpecialSlimeEntity {
     }
     
     @SpecialMob.Factory
-    public static EntityType.IFactory<GrapeSlimeEntity> getVariantFactory() { return GrapeSlimeEntity::new; }
+    public static EntityType.EntityFactory<GrapeSlimeEntity> getVariantFactory() { return GrapeSlimeEntity::new; }
     
     /** @return This entity's mob species. */
     @SpecialMob.SpeciesSupplier
@@ -55,7 +55,7 @@ public class GrapeSlimeEntity extends _SpecialSlimeEntity {
     
     //--------------- Variant-Specific Implementations ----------------
     
-    public GrapeSlimeEntity( EntityType<? extends _SpecialSlimeEntity> entityType, World world ) { super( entityType, world ); }
+    public GrapeSlimeEntity( EntityType<? extends _SpecialSlimeEntity> entityType, Level level ) { super( entityType, level ); }
     
     /** Override to change this entity's AI goals. */
     @Override
@@ -64,9 +64,9 @@ public class GrapeSlimeEntity extends _SpecialSlimeEntity {
                 this, 10, 6.0F, 12.0F, 1.1F, 2.6F ) );
     }
     
-    private static final IParticleData JUMP_PARTICLE = new ItemParticleData( ParticleTypes.ITEM, Items.PURPLE_DYE.getDefaultInstance() );
+    private static final ParticleOptions JUMP_PARTICLE = new ItemParticleOption( ParticleTypes.ITEM, Items.PURPLE_DYE.getDefaultInstance() );
     
     /** @return This slime's particle type for jump effects. */
     @Override
-    protected IParticleData getParticleType() { return JUMP_PARTICLE; }
+    protected ParticleOptions getParticleType() { return JUMP_PARTICLE; }
 }

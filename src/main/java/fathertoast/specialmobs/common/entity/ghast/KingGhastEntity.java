@@ -5,10 +5,10 @@ import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.item.Items;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
 
 @SpecialMob
 public class KingGhastEntity extends _SpecialGhastEntity {
@@ -43,7 +43,7 @@ public class KingGhastEntity extends _SpecialGhastEntity {
     }
     
     @SpecialMob.Factory
-    public static EntityType.IFactory<KingGhastEntity> getVariantFactory() { return KingGhastEntity::new; }
+    public static EntityType.EntityFactory<KingGhastEntity> getVariantFactory() { return KingGhastEntity::new; }
     
     /** @return This entity's mob species. */
     @SpecialMob.SpeciesSupplier
@@ -53,7 +53,7 @@ public class KingGhastEntity extends _SpecialGhastEntity {
     
     //--------------- Variant-Specific Implementations ----------------
     
-    public KingGhastEntity( EntityType<? extends _SpecialGhastEntity> entityType, World world ) { super( entityType, world ); }
+    public KingGhastEntity( EntityType<? extends _SpecialGhastEntity> entityType, Level level ) { super( entityType, level ); }
     
     /** Override to change this ghast's explosion power multiplier. */
     @Override

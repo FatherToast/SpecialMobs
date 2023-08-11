@@ -11,45 +11,45 @@ import fathertoast.specialmobs.common.entity.SpecialMobData;
 import fathertoast.specialmobs.common.event.NaturalSpawnManager;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.*;
-import net.minecraft.entity.ai.attributes.AttributeModifierMap;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.entity.ai.attributes.ModifiableAttributeInstance;
-import net.minecraft.entity.ai.goal.Goal;
-import net.minecraft.entity.ai.goal.MeleeAttackGoal;
-import net.minecraft.entity.ai.goal.RangedBowAttackGoal;
-import net.minecraft.entity.monster.WitherSkeletonEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.projectile.AbstractArrowEntity;
-import net.minecraft.entity.projectile.ProjectileHelper;
-import net.minecraft.entity.projectile.SnowballEntity;
-import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.item.BowItem;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.datasync.DataParameter;
-import net.minecraft.network.datasync.DataSerializers;
-import net.minecraft.network.datasync.EntityDataManager;
-import net.minecraft.pathfinding.PathNodeType;
-import net.minecraft.potion.EffectInstance;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.EntityTypeTags;
-import net.minecraft.tags.ITag;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.SoundEvents;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.tags.TagKey;
+import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.DifficultyInstance;
-import net.minecraft.world.IServerWorld;
-import net.minecraft.world.World;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
+import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.ai.goal.Goal;
+import net.minecraft.world.entity.ai.goal.MeleeAttackGoal;
+import net.minecraft.world.entity.ai.goal.RangedBowAttackGoal;
+import net.minecraft.world.entity.monster.WitherSkeleton;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.AbstractArrow;
+import net.minecraft.world.entity.projectile.ProjectileUtil;
+import net.minecraft.world.entity.projectile.Snowball;
+import net.minecraft.world.item.BowItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.ServerLevelAccessor;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.pathfinder.BlockPathTypes;
+import net.minecraft.world.phys.Vec3;
 
 import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
 
 @SpecialMob
-public class _SpecialWitherSkeletonEntity extends WitherSkeletonEntity implements ISpecialMob<_SpecialWitherSkeletonEntity> {
+public class _SpecialWitherSkeletonEntity extends WitherSkeleton implements ISpecialMob<_SpecialWitherSkeletonEntity> {
     
     //--------------- Static Special Mob Hooks ----------------
     
@@ -77,7 +77,7 @@ public class _SpecialWitherSkeletonEntity extends WitherSkeletonEntity implement
     public SkeletonSpeciesConfig getConfig() { return (SkeletonSpeciesConfig) getSpecies().config; }
     
     @SpecialMob.AttributeSupplier
-    public static AttributeModifierMap.MutableAttribute createAttributes() { return WitherSkeletonEntity.createAttributes(); }
+    public static AttributeSupplier.Builder createAttributes() { return WitherSkeleton.createAttributes(); }
     
     @SpecialMob.SpawnPlacementRegistrar
     public static void registerSpawnPlacement( MobFamily.Species<? extends _SpecialWitherSkeletonEntity> species ) {
@@ -98,12 +98,12 @@ public class _SpecialWitherSkeletonEntity extends WitherSkeletonEntity implement
     }
 
     @SpecialMob.EntityTagProvider
-    public static List<ITag.INamedTag<EntityType<?>>> getEntityTags() {
+    public static List<TagKey<EntityType<?>>> getEntityTags() {
         return Collections.singletonList(EntityTypeTags.SKELETONS);
     }
     
     @SpecialMob.Factory
-    public static EntityType.IFactory<_SpecialWitherSkeletonEntity> getFactory() { return _SpecialWitherSkeletonEntity::new; }
+    public static EntityType.EntityFactory<_SpecialWitherSkeletonEntity> getFactory() { return _SpecialWitherSkeletonEntity::new; }
     
     
     //--------------- Variant-Specific Breakouts ----------------
@@ -122,22 +122,22 @@ public class _SpecialWitherSkeletonEntity extends WitherSkeletonEntity implement
     protected int getVariantAttackPriority() { return 4; }
     
     /** Override to change starting equipment or stats. */
-    public void finalizeVariantSpawn( IServerWorld world, DifficultyInstance difficulty, @Nullable SpawnReason spawnReason,
-                                      @Nullable ILivingEntityData groupData ) { }
+    public void finalizeVariantSpawn( ServerLevelAccessor level, DifficultyInstance difficulty, @Nullable MobSpawnType spawnReason,
+                                     @Nullable SpawnGroupData groupData ) { }
     
     /** Called to attack the target with a ranged attack. */
     @Override
     public void performRangedAttack( LivingEntity target, float damageMulti ) {
-        final ItemStack arrowItem = getProjectile( getItemInHand( ProjectileHelper.getWeaponHoldingHand(
+        final ItemStack arrowItem = getProjectile( getItemInHand( ProjectileUtil.getWeaponHoldingHand(
                 this, item -> item instanceof BowItem ) ) );
-        AbstractArrowEntity arrow = getArrow( arrowItem, damageMulti );
+        AbstractArrow arrow = getArrow( arrowItem, damageMulti );
         if( getMainHandItem().getItem() instanceof BowItem )
             arrow = ((BowItem) getMainHandItem().getItem()).customArrow( arrow );
         
         final double dX = target.getX() - getX();
         final double dY = target.getY( 0.3333 ) - arrow.getY();
         final double dZ = target.getZ() - getZ();
-        final double dH = MathHelper.sqrt( dX * dX + dZ * dZ );
+        final double dH = Mth.sqrt( (float) (dX * dX + dZ * dZ) );
         arrow.shoot( dX, dY + dH * 0.2, dZ, 1.6F,
                 getSpecialData().getRangedAttackSpread() * (14 - 4 * level.getDifficulty().getId()) );
         
@@ -147,13 +147,13 @@ public class _SpecialWitherSkeletonEntity extends WitherSkeletonEntity implement
     
     /** @return The arrow for this skeleton to shoot. */
     @Override
-    protected AbstractArrowEntity getArrow( ItemStack arrowItem, float damageMulti ) {
+    protected AbstractArrow getArrow( ItemStack arrowItem, float damageMulti ) {
         return getVariantArrow( super.getArrow( arrowItem,
                 damageMulti * getSpecialData().getRangedAttackDamage() / 2.0F ), arrowItem, damageMulti );
     }
     
     /** Override to modify this entity's ranged attack projectile. */
-    protected AbstractArrowEntity getVariantArrow( AbstractArrowEntity arrow, ItemStack arrowItem, float damageMulti ) {
+    protected AbstractArrow getVariantArrow( AbstractArrow arrow, ItemStack arrowItem, float damageMulti ) {
         return arrow;
     }
     
@@ -168,22 +168,22 @@ public class _SpecialWitherSkeletonEntity extends WitherSkeletonEntity implement
     protected void onVariantAttack( LivingEntity target ) { }
     
     /** Override to save data to this entity's NBT data. */
-    public void addVariantSaveData( @SuppressWarnings( "unused" ) CompoundNBT saveTag ) { }
+    public void addVariantSaveData( @SuppressWarnings( "unused" ) CompoundTag saveTag ) { }
     
     /** Override to load data from this entity's NBT data. */
-    public void readVariantSaveData( @SuppressWarnings( "unused" ) CompoundNBT saveTag ) { }
+    public void readVariantSaveData( @SuppressWarnings( "unused" ) CompoundTag saveTag ) { }
     
     
     //--------------- Family-Specific Implementations ----------------
     
     /** The parameter for special mob render scale. */
-    private static final DataParameter<Float> SCALE = EntityDataManager.defineId( _SpecialWitherSkeletonEntity.class, DataSerializers.FLOAT );
+    private static final EntityDataAccessor<Float> SCALE = SynchedEntityData.defineId( _SpecialWitherSkeletonEntity.class, EntityDataSerializers.FLOAT );
     
     /** This entity's attack AI. */
     private Goal currentAttackAI;
     
-    public _SpecialWitherSkeletonEntity( EntityType<? extends _SpecialWitherSkeletonEntity> entityType, World world ) {
-        super( entityType, world );
+    public _SpecialWitherSkeletonEntity( EntityType<? extends _SpecialWitherSkeletonEntity> entityType, Level level ) {
+        super( entityType, level );
         getSpecialData().initialize();
     }
     
@@ -202,7 +202,7 @@ public class _SpecialWitherSkeletonEntity extends WitherSkeletonEntity implement
             if( currentAttackAI != null ) goalSelector.removeGoal( currentAttackAI );
             
             final SpecialMobData<_SpecialWitherSkeletonEntity> data = getSpecialData();
-            final ItemStack weapon = getItemInHand( ProjectileHelper.getWeaponHoldingHand(
+            final ItemStack weapon = getItemInHand( ProjectileUtil.getWeaponHoldingHand(
                     this, item -> item instanceof BowItem ) );
             if( data.getRangedAttackMaxRange() > 0.0F && weapon.getItem() == Items.BOW ) {
                 currentAttackAI = new RangedBowAttackGoal<>( this, data.getRangedWalkSpeed(),
@@ -219,14 +219,14 @@ public class _SpecialWitherSkeletonEntity extends WitherSkeletonEntity implement
     //--------------- Baby-able Implementations ----------------
     
     /** The parameter for baby status. */
-    private static final DataParameter<Boolean> IS_BABY = EntityDataManager.defineId( _SpecialWitherSkeletonEntity.class, DataSerializers.BOOLEAN );
+    private static final EntityDataAccessor<Boolean> IS_BABY = SynchedEntityData.defineId( _SpecialWitherSkeletonEntity.class, EntityDataSerializers.BOOLEAN );
     
     /** Sets this entity as a baby. */
     @Override
     public void setBaby( boolean value ) {
         getEntityData().set( IS_BABY, value );
         if( level != null && !level.isClientSide ) {
-            final ModifiableAttributeInstance attributeInstance = getAttribute( Attributes.MOVEMENT_SPEED );
+            final AttributeInstance attributeInstance = getAttribute( Attributes.MOVEMENT_SPEED );
             //noinspection ConstantConditions
             attributeInstance.removeModifier( References.BABY_SPEED_BOOST );
             if( value ) {
@@ -241,7 +241,7 @@ public class _SpecialWitherSkeletonEntity extends WitherSkeletonEntity implement
     
     /** Called when a data watcher parameter is changed. */
     @Override
-    public void onSyncedDataUpdated( DataParameter<?> parameter ) {
+    public void onSyncedDataUpdated( EntityDataAccessor<?> parameter ) {
         if( IS_BABY.equals( parameter ) ) {
             refreshDimensions();
         }
@@ -250,11 +250,11 @@ public class _SpecialWitherSkeletonEntity extends WitherSkeletonEntity implement
     
     /** @return The amount of experience to drop from this entity. */
     @Override
-    protected int getExperienceReward( PlayerEntity player ) {
+    public int getExperienceReward( ) {
         if( isBaby() ) {
             xpReward = (int) ((float) xpReward * 2.5F);
         }
-        return super.getExperienceReward( player );
+        return super.getExperienceReward( );
     }
     
     //TODO make sure this works for differing base-scale variants
@@ -286,11 +286,11 @@ public class _SpecialWitherSkeletonEntity extends WitherSkeletonEntity implement
     /** Converts this entity to one of another type. */
     @Nullable
     @Override
-    public <T extends MobEntity> T convertTo( EntityType<T> entityType, boolean keepEquipment ) {
+    public <T extends Mob> T convertTo( EntityType<T> entityType, boolean keepEquipment ) {
         final T replacement = super.convertTo( entityType, keepEquipment );
-        if( replacement instanceof ISpecialMob && level instanceof IServerWorld ) {
-            MobHelper.finalizeSpawn( replacement, (IServerWorld) level, level.getCurrentDifficultyAt( blockPosition() ),
-                    SpawnReason.CONVERSION, null );
+        if( replacement instanceof ISpecialMob && level instanceof ServerLevelAccessor serverLevel ) {
+            MobHelper.finalizeSpawn( replacement, serverLevel, level.getCurrentDifficultyAt( blockPosition() ),
+                    MobSpawnType.CONVERSION, null );
         }
         return replacement;
     }
@@ -298,35 +298,35 @@ public class _SpecialWitherSkeletonEntity extends WitherSkeletonEntity implement
     /** Called on spawn to initialize properties based on the world, difficulty, and the group it spawns with. */
     @Nullable
     @Override
-    public final ILivingEntityData finalizeSpawn( IServerWorld world, DifficultyInstance difficulty, SpawnReason spawnReason,
-                                                  @Nullable ILivingEntityData groupData, @Nullable CompoundNBT eggTag ) {
-        return MobHelper.finalizeSpawn( this, world, difficulty, spawnReason,
-                super.finalizeSpawn( world, difficulty, spawnReason, groupData, eggTag ) );
+    public final SpawnGroupData finalizeSpawn( ServerLevelAccessor level, DifficultyInstance difficulty, MobSpawnType spawnType,
+                                                  @Nullable SpawnGroupData groupData, @Nullable CompoundTag eggTag ) {
+        return MobHelper.finalizeSpawn( this, level, difficulty, spawnType,
+                super.finalizeSpawn( level, difficulty, spawnType, groupData, eggTag ) );
     }
     
     @Override
-    public void setSpecialPathfindingMalus( PathNodeType nodeType, float malus ) {
-        this.setPathfindingMalus( nodeType, malus );
+    public void setSpecialPathfindingMalus( BlockPathTypes type, float malus ) {
+        this.setPathfindingMalus( type, malus );
     }
     
     /** Called on spawn to set starting equipment. */
     @Override // Seal method to force spawn equipment changes through ISpecialMob
-    protected final void populateDefaultEquipmentSlots( DifficultyInstance difficulty ) { super.populateDefaultEquipmentSlots( difficulty ); }
+    protected final void populateDefaultEquipmentSlots( RandomSource random, DifficultyInstance difficulty ) { super.populateDefaultEquipmentSlots( random, difficulty ); }
     
     /** Called on spawn to initialize properties based on the world, difficulty, and the group it spawns with. */
     @Override
-    public void finalizeSpecialSpawn( IServerWorld world, DifficultyInstance difficulty, @Nullable SpawnReason spawnReason,
-                                      @Nullable ILivingEntityData groupData ) {
+    public void finalizeSpecialSpawn( ServerLevelAccessor level, DifficultyInstance difficulty, @Nullable MobSpawnType spawnType,
+                                      @Nullable SpawnGroupData groupData ) {
         setBaby( MobFamily.WITHER_SKELETON.config.SKELETONS.babyChance.rollChance( random ) );
         
         if( getSpecialData().getRangedAttackMaxRange() > 0.0F && getConfig().SKELETONS.bowEquipChance.rollChance( random ) ) {
-            setItemSlot( EquipmentSlotType.MAINHAND, new ItemStack( Items.BOW ) );
+            setItemSlot( EquipmentSlot.MAINHAND, new ItemStack( Items.BOW ) );
         }
         else if( getConfig().SKELETONS.shieldEquipChance.rollChance( random ) ) {
-            setItemSlot( EquipmentSlotType.OFFHAND, new ItemStack( Items.SHIELD ) );
+            setItemSlot( EquipmentSlot.OFFHAND, new ItemStack( Items.SHIELD ) );
         }
         
-        finalizeVariantSpawn( world, difficulty, spawnReason, groupData );
+        finalizeVariantSpawn( level, difficulty, spawnType, groupData );
         reassessWeaponGoal();
     }
     
@@ -342,7 +342,7 @@ public class _SpecialWitherSkeletonEntity extends WitherSkeletonEntity implement
     
     /** @return The eye height of this entity when standing. */
     @Override
-    protected float getStandingEyeHeight( Pose pose, EntitySize size ) {
+    protected float getStandingEyeHeight( Pose pose, EntityDimensions size ) {
         return super.getStandingEyeHeight( pose, size ) * getSpecialData().getHeightScaleByAge();
     }
     
@@ -358,18 +358,18 @@ public class _SpecialWitherSkeletonEntity extends WitherSkeletonEntity implement
     
     /** @return True if this entity can be leashed. */
     @Override
-    public boolean canBeLeashed( PlayerEntity player ) { return !isLeashed() && getSpecialData().allowLeashing(); }
+    public boolean canBeLeashed( Player player ) { return !isLeashed() && getSpecialData().allowLeashing(); }
     
     /** Sets this entity 'stuck' inside a block, such as a cobweb or sweet berry bush. Mod blocks could use this as a speed boost. */
     @Override
-    public void makeStuckInBlock( BlockState block, Vector3d speedMulti ) {
+    public void makeStuckInBlock( BlockState block, Vec3 speedMulti ) {
         if( getSpecialData().canBeStuckIn( block ) ) super.makeStuckInBlock( block, speedMulti );
     }
     
     /** @return Called when this mob falls. Calculates and applies fall damage. Returns false if canceled. */
     @Override
-    public boolean causeFallDamage( float distance, float damageMultiplier ) {
-        return super.causeFallDamage( distance, damageMultiplier * getSpecialData().getFallDamageMultiplier() );
+    public boolean causeFallDamage( float distance, float damageMultiplier, DamageSource damageSource ) {
+        return super.causeFallDamage( distance, damageMultiplier * getSpecialData().getFallDamageMultiplier(), damageSource );
     }
     
     /** @return True if this entity should NOT trigger pressure plates or tripwires. */
@@ -392,7 +392,7 @@ public class _SpecialWitherSkeletonEntity extends WitherSkeletonEntity implement
     @Override
     public boolean hurt( DamageSource source, float amount ) {
         final Entity entity = source.getDirectEntity();
-        if( isSensitiveToWater() && entity instanceof SnowballEntity ) {
+        if( isSensitiveToWater() && entity instanceof Snowball ) {
             amount = Math.max( 3.0F, amount );
         }
         
@@ -403,14 +403,14 @@ public class _SpecialWitherSkeletonEntity extends WitherSkeletonEntity implement
     
     /** @return True if the effect can be applied to this entity. */
     @Override
-    public boolean canBeAffected( EffectInstance effect ) { return getSpecialData().isPotionApplicable( effect ); }
+    public boolean canBeAffected( MobEffectInstance effect ) { return getSpecialData().isPotionApplicable( effect ); }
     
     /** Saves data to this entity's base NBT compound that is specific to its subclass. */
     @Override
-    public void addAdditionalSaveData( CompoundNBT tag ) {
+    public void addAdditionalSaveData( CompoundTag tag ) {
         super.addAdditionalSaveData( tag );
         
-        final CompoundNBT saveTag = SpecialMobData.getSaveLocation( tag );
+        final CompoundTag saveTag = SpecialMobData.getSaveLocation( tag );
         
         saveTag.putBoolean( References.TAG_IS_BABY, isBaby() );
         
@@ -420,10 +420,10 @@ public class _SpecialWitherSkeletonEntity extends WitherSkeletonEntity implement
     
     /** Loads data from this entity's base NBT compound that is specific to its subclass. */
     @Override
-    public void readAdditionalSaveData( CompoundNBT tag ) {
+    public void readAdditionalSaveData( CompoundTag tag ) {
         super.readAdditionalSaveData( tag );
         
-        final CompoundNBT saveTag = SpecialMobData.getSaveLocation( tag );
+        final CompoundTag saveTag = SpecialMobData.getSaveLocation( tag );
         
         if( saveTag.contains( References.TAG_IS_BABY, References.NBT_TYPE_NUMERICAL ) )
             setBaby( saveTag.getBoolean( References.TAG_IS_BABY ) );

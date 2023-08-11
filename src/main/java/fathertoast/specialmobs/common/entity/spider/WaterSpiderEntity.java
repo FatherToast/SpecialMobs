@@ -10,15 +10,15 @@ import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootEntryItemBuilder;
 import fathertoast.specialmobs.datagen.loot.LootPoolBuilder;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.item.Items;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.pathfinding.PathNavigator;
-import net.minecraft.pathfinding.PathNodeType;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.tags.FluidTags;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.ai.navigation.PathNavigation;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.level.pathfinder.BlockPathTypes;
 
 @SpecialMob
 public class WaterSpiderEntity extends _SpecialSpiderEntity {
@@ -54,7 +54,7 @@ public class WaterSpiderEntity extends _SpecialSpiderEntity {
     }
     
     @SpecialMob.Factory
-    public static EntityType.IFactory<WaterSpiderEntity> getVariantFactory() { return WaterSpiderEntity::new; }
+    public static EntityType.EntityFactory<WaterSpiderEntity> getVariantFactory() { return WaterSpiderEntity::new; }
     
     /** @return This entity's mob species. */
     @SpecialMob.SpeciesSupplier
@@ -64,9 +64,9 @@ public class WaterSpiderEntity extends _SpecialSpiderEntity {
     
     //--------------- Variant-Specific Implementations ----------------
     
-    public WaterSpiderEntity( EntityType<? extends _SpecialSpiderEntity> entityType, World world ) {
-        super( entityType, world );
-        setPathfindingMalus( PathNodeType.WATER, PathNodeType.WALKABLE.getMalus() );
+    public WaterSpiderEntity( EntityType<? extends _SpecialSpiderEntity> entityType, Level level ) {
+        super( entityType, level );
+        setPathfindingMalus( BlockPathTypes.WATER, BlockPathTypes.WALKABLE.getMalus() );
     }
     
     /** Override to change this entity's AI goals. */
@@ -77,13 +77,13 @@ public class WaterSpiderEntity extends _SpecialSpiderEntity {
     
     /** @return A new path navigator for this entity to use. */
     @Override
-    protected PathNavigator createNavigation( World world ) {
-        return new FluidPathNavigator( this, world, true, false );
+    protected PathNavigation createNavigation(Level level ) {
+        return new FluidPathNavigator( this, level, true, false );
     }
     
     /** @return Whether this entity can stand on a particular type of fluid. */
     @Override
-    public boolean canStandOnFluid( Fluid fluid ) { return fluid.is( FluidTags.WATER ); }
+    public boolean canStandOnFluid( FluidState fluid ) { return fluid.is( FluidTags.WATER ); }
     
     /** Override to change the color of this entity's spit attack. */
     @Override
@@ -98,7 +98,7 @@ public class WaterSpiderEntity extends _SpecialSpiderEntity {
     
     /** Override to load data from this entity's NBT data. */
     @Override
-    public void readVariantSaveData( CompoundNBT saveTag ) {
-        setPathfindingMalus( PathNodeType.WATER, PathNodeType.WALKABLE.getMalus() );
+    public void readVariantSaveData( CompoundTag saveTag ) {
+        setPathfindingMalus( BlockPathTypes.WATER, BlockPathTypes.WALKABLE.getMalus() );
     }
 }

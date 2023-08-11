@@ -9,19 +9,19 @@ import fathertoast.specialmobs.common.entity.spider.BabySpiderEntity;
 import fathertoast.specialmobs.common.entity.spider._SpecialSpiderEntity;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
-import net.minecraft.entity.*;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.potion.Effects;
-import net.minecraft.potion.Potion;
-import net.minecraft.potion.PotionUtils;
-import net.minecraft.potion.Potions;
-import net.minecraft.tags.FluidTags;
-import net.minecraft.util.SoundEvents;
-import net.minecraft.world.IServerWorld;
-import net.minecraft.world.World;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.alchemy.Potion;
+import net.minecraft.world.item.alchemy.PotionUtils;
+import net.minecraft.world.item.alchemy.Potions;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.ServerLevelAccessor;
+import net.minecraftforge.common.ForgeMod;
 
 import javax.annotation.Nullable;
 
@@ -63,7 +63,7 @@ public class WildsWitchEntity extends _SpecialWitchEntity {
     }
     
     @SpecialMob.Factory
-    public static EntityType.IFactory<WildsWitchEntity> getVariantFactory() { return WildsWitchEntity::new; }
+    public static EntityType.EntityFactory<WildsWitchEntity> getVariantFactory() { return WildsWitchEntity::new; }
     
     /** @return This entity's mob species. */
     @SpecialMob.SpeciesSupplier
@@ -80,8 +80,8 @@ public class WildsWitchEntity extends _SpecialWitchEntity {
     /** The number of baby spiders to spawn in each spider swarm attack. */
     private int spiderSwarmSize;
     
-    public WildsWitchEntity( EntityType<? extends _SpecialWitchEntity> entityType, World world ) {
-        super( entityType, world );
+    public WildsWitchEntity( EntityType<? extends _SpecialWitchEntity> entityType, Level level ) {
+        super( entityType, level );
         spiderMounts = getConfig().WILDS.mounts.next( random );
         spiderSwarms = getConfig().WILDS.swarms.next( random );
         spiderSwarmSize = getConfig().WILDS.swarmSize.next( random );
@@ -93,7 +93,7 @@ public class WildsWitchEntity extends _SpecialWitchEntity {
         if( spiderSwarms > 0 && random.nextFloat() < 0.33F ) {
             spiderSwarms--;
             
-            ILivingEntityData groupData = null;
+            SpawnGroupData groupData = null;
             for( int i = 0; i < spiderSwarmSize; i++ ) {
                 groupData = spawnBaby( groupData );
             }
@@ -102,7 +102,7 @@ public class WildsWitchEntity extends _SpecialWitchEntity {
             
             return ItemStack.EMPTY;
         }
-        if( !target.hasEffect( Effects.POISON ) ) {
+        if( !target.hasEffect( MobEffects.POISON ) ) {
             return makeSplashPotion( Potions.STRONG_POISON );
         }
         // Save the spiders
@@ -115,15 +115,15 @@ public class WildsWitchEntity extends _SpecialWitchEntity {
     
     /** Helper method to simplify spawning babies. */
     @Nullable
-    private ILivingEntityData spawnBaby( @Nullable ILivingEntityData groupData ) {
+    private SpawnGroupData spawnBaby( @Nullable SpawnGroupData groupData ) {
         final BabySpiderEntity baby = BabySpiderEntity.SPECIES.entityType.get().create( level );
         if( baby == null ) return groupData;
         
         baby.copyPosition( this );
-        baby.yHeadRot = yRot;
-        baby.yBodyRot = yRot;
-        groupData = baby.finalizeSpawn( (IServerWorld) level, level.getCurrentDifficultyAt( blockPosition() ),
-                SpawnReason.MOB_SUMMONED, groupData, null );
+        baby.yHeadRot = getYRot();
+        baby.yBodyRot = getYRot();
+        groupData = baby.finalizeSpawn( (ServerLevelAccessor) level, level.getCurrentDifficultyAt( blockPosition() ),
+                MobSpawnType.MOB_SUMMONED, groupData, null );
         baby.setTarget( getTarget() );
         
         baby.setDeltaMovement(
@@ -141,20 +141,20 @@ public class WildsWitchEntity extends _SpecialWitchEntity {
     protected void tryVariantUsingPotion() {
         final LivingEntity mount = getVehicle() instanceof LivingEntity ? (LivingEntity) getVehicle() : null;
         
-        if( mount != null && random.nextFloat() < 0.15F && mount.isEyeInFluid( FluidTags.WATER ) &&
-                !mount.hasEffect( Effects.WATER_BREATHING ) ) {
+        if( mount != null && random.nextFloat() < 0.15F && mount.isEyeInFluidType( ForgeMod.WATER_TYPE.get() ) &&
+                !mount.hasEffect( MobEffects.WATER_BREATHING ) ) {
             usePotion( makeSplashPotion( Potions.WATER_BREATHING ) );
         }
         else if( mount != null && random.nextFloat() < 0.15F && (mount.isOnFire() || mount.getLastDamageSource() != null &&
-                mount.getLastDamageSource().isFire()) && !hasEffect( Effects.FIRE_RESISTANCE ) ) {
+                mount.getLastDamageSource().isFire()) && !hasEffect( MobEffects.FIRE_RESISTANCE ) ) {
             usePotion( makeSplashPotion( Potions.FIRE_RESISTANCE ) );
         }
-        else if( mount != null && random.nextFloat() < 0.05F && mount.getMobType() != CreatureAttribute.UNDEAD &&
+        else if( mount != null && random.nextFloat() < 0.05F && mount.getMobType() != MobType.UNDEAD &&
                 mount.getHealth() < mount.getMaxHealth() ) {
             usePotion( makeSplashPotion( Potions.HEALING ) );
         }
         else if( !MobFamily.WITCH.config.WITCHES.useSplashSwiftness.get() && mount != null && random.nextFloat() < 0.5F && getTarget() != null &&
-                !mount.hasEffect( Effects.MOVEMENT_SPEED ) && getTarget().distanceToSqr( this ) > 121.0 ) {
+                !mount.hasEffect( MobEffects.MOVEMENT_SPEED ) && getTarget().distanceToSqr( this ) > 121.0 ) {
             usePotion( makeSplashPotion( Potions.SWIFTNESS ) );
         }
         else if( spiderMounts > 0 && random.nextFloat() < 0.15F && getVehicle() == null && getTarget() != null &&
@@ -162,16 +162,16 @@ public class WildsWitchEntity extends _SpecialWitchEntity {
             final _SpecialSpiderEntity spider = _SpecialSpiderEntity.SPECIES.entityType.get().create( level );
             if( spider != null ) {
                 spider.copyPosition( this );
-                spider.yHeadRot = yRot;
-                spider.yBodyRot = yRot;
+                spider.yHeadRot = getYRot();
+                spider.yBodyRot = getYRot();
                 
                 if( level.noCollision( spider.getBoundingBox() ) ) {
                     spiderMounts--;
                     potionUseCooldownTimer = 40;
                     
                     spider.setTarget( getTarget() );
-                    spider.finalizeSpawn( (IServerWorld) level, level.getCurrentDifficultyAt( blockPosition() ),
-                            SpawnReason.MOB_SUMMONED, null, null );
+                    spider.finalizeSpawn( (ServerLevelAccessor) level, level.getCurrentDifficultyAt( blockPosition() ),
+                            MobSpawnType.MOB_SUMMONED, null, null );
                     level.addFreshEntity( spider );
                     spider.spawnAnim();
                     playSound( SoundEvents.BLAZE_SHOOT, 1.0F, 2.0F / (random.nextFloat() * 0.4F + 0.8F) );
@@ -180,7 +180,7 @@ public class WildsWitchEntity extends _SpecialWitchEntity {
                 }
                 else {
                     // Cancel spawn; spider is in too small of a space
-                    spider.remove();
+                    spider.discard();
                 }
             }
         }
@@ -198,7 +198,7 @@ public class WildsWitchEntity extends _SpecialWitchEntity {
     
     /** Override to save data to this entity's NBT data. */
     @Override
-    public void addVariantSaveData( CompoundNBT saveTag ) {
+    public void addVariantSaveData( CompoundTag saveTag ) {
         saveTag.putByte( References.TAG_SUMMONS, (byte) spiderMounts );
         saveTag.putByte( References.TAG_BABIES, (byte) spiderSwarms );
         saveTag.putByte( References.TAG_EXTRA_BABIES, (byte) spiderSwarmSize );
@@ -206,7 +206,7 @@ public class WildsWitchEntity extends _SpecialWitchEntity {
     
     /** Override to load data from this entity's NBT data. */
     @Override
-    public void readVariantSaveData( CompoundNBT saveTag ) {
+    public void readVariantSaveData( CompoundTag saveTag ) {
         if( saveTag.contains( References.TAG_SUMMONS, References.NBT_TYPE_NUMERICAL ) )
             spiderMounts = saveTag.getByte( References.TAG_SUMMONS );
         if( saveTag.contains( References.TAG_BABIES, References.NBT_TYPE_NUMERICAL ) )

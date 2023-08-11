@@ -8,21 +8,21 @@ import fathertoast.specialmobs.common.entity.ai.AIHelper;
 import fathertoast.specialmobs.common.entity.drowned.FrozenDrownedEntity;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
-import net.minecraft.block.Blocks;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.entity.ai.attributes.ModifiableAttributeInstance;
-import net.minecraft.entity.ai.goal.LookAtGoal;
-import net.minecraft.entity.ai.goal.LookRandomlyGoal;
-import net.minecraft.entity.ai.goal.WaterAvoidingRandomWalkingGoal;
-import net.minecraft.entity.monster.ZombieEntity;
-import net.minecraft.entity.projectile.AbstractArrowEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.potion.Effects;
-import net.minecraft.world.World;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
+import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
+import net.minecraft.world.entity.ai.goal.WaterAvoidingRandomStrollGoal;
+import net.minecraft.world.entity.monster.Zombie;
+import net.minecraft.world.entity.projectile.AbstractArrow;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
 
 import java.util.UUID;
 
@@ -57,7 +57,7 @@ public class FrozenZombieEntity extends _SpecialZombieEntity {
     }
     
     @SpecialMob.Factory
-    public static EntityType.IFactory<FrozenZombieEntity> getVariantFactory() { return FrozenZombieEntity::new; }
+    public static EntityType.EntityFactory<FrozenZombieEntity> getVariantFactory() { return FrozenZombieEntity::new; }
     
     /** @return This entity's mob species. */
     @SpecialMob.SpeciesSupplier
@@ -72,38 +72,38 @@ public class FrozenZombieEntity extends _SpecialZombieEntity {
     
     private boolean wasBurning;
     
-    public FrozenZombieEntity( EntityType<? extends _SpecialZombieEntity> entityType, World world ) { super( entityType, world ); }
+    public FrozenZombieEntity( EntityType<? extends _SpecialZombieEntity> entityType, Level level ) { super( entityType, level ); }
     
     /** Override to change this entity's AI goals. */
     protected void registerVariantGoals() {
         // Make it look more creepy by removing all idle behaviors
-        AIHelper.removeGoals( goalSelector, WaterAvoidingRandomWalkingGoal.class );
-        AIHelper.removeGoals( goalSelector, LookAtGoal.class );
-        AIHelper.removeGoals( goalSelector, LookRandomlyGoal.class );
+        AIHelper.removeGoals( goalSelector, WaterAvoidingRandomStrollGoal.class );
+        AIHelper.removeGoals( goalSelector, LookAtPlayerGoal.class );
+        AIHelper.removeGoals( goalSelector, RandomLookAroundGoal.class );
     }
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override
     protected void onVariantAttack( LivingEntity target ) {
-        MobHelper.applyEffect( target, Effects.MOVEMENT_SLOWDOWN, 2 );
+        MobHelper.applyEffect( target, MobEffects.MOVEMENT_SLOWDOWN, 2 );
     }
     
     /** Override to modify this entity's ranged attack projectile. */
     @Override
-    protected AbstractArrowEntity getVariantArrow( AbstractArrowEntity arrow, ItemStack arrowItem, float damageMulti ) {
-        return MobHelper.tipArrow( arrow, Effects.MOVEMENT_SLOWDOWN );
+    protected AbstractArrow getVariantArrow( AbstractArrow arrow, ItemStack arrowItem, float damageMulti ) {
+        return MobHelper.tipArrow( arrow, MobEffects.MOVEMENT_SLOWDOWN );
     }
     
     /** Override to change the entity this converts to when drowned. */
     @Override
-    protected EntityType<? extends ZombieEntity> getVariantConversionType() { return FrozenDrownedEntity.SPECIES.entityType.get(); }
+    protected EntityType<? extends Zombie> getVariantConversionType() { return FrozenDrownedEntity.SPECIES.entityType.get(); }
     
     /** Called each tick to update this entity's movement. */
     @Override
     public void aiStep() {
         if( !level.isClientSide() && wasBurning != (getRemainingFireTicks() > 0) ) {
             wasBurning = !wasBurning;
-            final ModifiableAttributeInstance attributeInstance = getAttribute( Attributes.MOVEMENT_SPEED );
+            final AttributeInstance attributeInstance = getAttribute( Attributes.MOVEMENT_SPEED );
             //noinspection ConstantConditions
             attributeInstance.removeModifier( BURNING_SPEED_BOOST );
             if( wasBurning ) {

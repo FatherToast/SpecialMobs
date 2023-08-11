@@ -6,12 +6,12 @@ import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.util.ExplosionHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.effect.LightningBoltEntity;
-import net.minecraft.item.Items;
-import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LightningBolt;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
 
 @SpecialMob
 public class LightningEndermanEntity extends _SpecialEndermanEntity {
@@ -41,7 +41,7 @@ public class LightningEndermanEntity extends _SpecialEndermanEntity {
     }
     
     @SpecialMob.Factory
-    public static EntityType.IFactory<LightningEndermanEntity> getVariantFactory() { return LightningEndermanEntity::new; }
+    public static EntityType.EntityFactory<LightningEndermanEntity> getVariantFactory() { return LightningEndermanEntity::new; }
     
     /** @return This entity's mob species. */
     @SpecialMob.SpeciesSupplier
@@ -51,7 +51,7 @@ public class LightningEndermanEntity extends _SpecialEndermanEntity {
     
     //--------------- Variant-Specific Implementations ----------------
     
-    public LightningEndermanEntity( EntityType<? extends _SpecialEndermanEntity> entityType, World world ) { super( entityType, world ); }
+    public LightningEndermanEntity( EntityType<? extends _SpecialEndermanEntity> entityType, Level level ) { super( entityType, level ); }
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override
@@ -64,5 +64,5 @@ public class LightningEndermanEntity extends _SpecialEndermanEntity {
     
     /** Called when this entity is struck by lightning. */
     @Override
-    public void thunderHit( ServerWorld world, LightningBoltEntity lightningBolt ) { }
+    public void thunderHit( ServerLevel level, LightningBolt lightningBolt ) { }
 }

@@ -18,8 +18,7 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraft.world.phys.AABB;
 
 @SpecialMob
 public class RunicEndermanEntity extends _SpecialEndermanEntity {
@@ -99,9 +98,8 @@ public class RunicEndermanEntity extends _SpecialEndermanEntity {
     public void setBeamState( BeamState value ) { entityData.set( BEAM_STATE, value.id() ); }
     
     /** @return The bounding box to use for frustum culling. */
-    @OnlyIn( Dist.CLIENT )
     @Override
-    public AxisAlignedBB getBoundingBoxForCulling() {
+    public AABB getBoundingBoxForCulling() {
         return getBeamState() == BeamState.OFF ? super.getBoundingBoxForCulling() :
                 super.getBoundingBoxForCulling().expandTowards( getViewVector( 1.0F ).scale( BEAM_MAX_RANGE ) );
     }

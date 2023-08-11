@@ -6,15 +6,15 @@ import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.projectile.AbstractArrowEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.potion.Effects;
-import net.minecraft.potion.PotionUtils;
-import net.minecraft.potion.Potions;
-import net.minecraft.world.World;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.projectile.AbstractArrow;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.alchemy.PotionUtils;
+import net.minecraft.world.item.alchemy.Potions;
+import net.minecraft.world.level.Level;
 
 @SpecialMob
 public class PoisonSkeletonEntity extends _SpecialSkeletonEntity {
@@ -44,7 +44,7 @@ public class PoisonSkeletonEntity extends _SpecialSkeletonEntity {
     }
     
     @SpecialMob.Factory
-    public static EntityType.IFactory<PoisonSkeletonEntity> getVariantFactory() { return PoisonSkeletonEntity::new; }
+    public static EntityType.EntityFactory<PoisonSkeletonEntity> getVariantFactory() { return PoisonSkeletonEntity::new; }
     
     /** @return This entity's mob species. */
     @SpecialMob.SpeciesSupplier
@@ -54,17 +54,17 @@ public class PoisonSkeletonEntity extends _SpecialSkeletonEntity {
     
     //--------------- Variant-Specific Implementations ----------------
     
-    public PoisonSkeletonEntity( EntityType<? extends _SpecialSkeletonEntity> entityType, World world ) { super( entityType, world ); }
+    public PoisonSkeletonEntity( EntityType<? extends _SpecialSkeletonEntity> entityType, Level level ) { super( entityType, level ); }
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override
     protected void onVariantAttack( LivingEntity target ) {
-        MobHelper.applyEffect( target, Effects.POISON );
+        MobHelper.applyEffect( target, MobEffects.POISON );
     }
     
     /** Override to modify this entity's ranged attack projectile. */
     @Override
-    protected AbstractArrowEntity getVariantArrow( AbstractArrowEntity arrow, ItemStack arrowItem, float damageMulti ) {
-        return MobHelper.tipArrow( arrow, Effects.POISON );
+    protected AbstractArrow getVariantArrow(AbstractArrow arrow, ItemStack arrowItem, float damageMulti ) {
+        return MobHelper.tipArrow( arrow, MobEffects.POISON );
     }
 }

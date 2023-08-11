@@ -1,14 +1,15 @@
 package fathertoast.specialmobs.client.renderer.entity.family;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import fathertoast.specialmobs.client.renderer.entity.layers.SpecialMobEyesLayer;
 import fathertoast.specialmobs.client.renderer.entity.layers.SpecialMobOverlayLayer;
 import fathertoast.specialmobs.common.entity.ISpecialMob;
-import net.minecraft.client.renderer.entity.EntityRendererManager;
+import net.minecraft.client.model.SkeletonModel;
+import net.minecraft.client.model.geom.ModelLayers;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.SkeletonRenderer;
-import net.minecraft.client.renderer.entity.model.SkeletonModel;
-import net.minecraft.entity.monster.AbstractSkeletonEntity;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.monster.AbstractSkeleton;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -17,24 +18,24 @@ public class SpecialSkeletonRenderer extends SkeletonRenderer {
     
     private final float baseShadowRadius;
     
-    public SpecialSkeletonRenderer( EntityRendererManager rendererManager ) {
-        super( rendererManager );
+    public SpecialSkeletonRenderer( EntityRendererProvider.Context context ) {
+        super( context );
         baseShadowRadius = shadowRadius;
         addLayer( new SpecialMobEyesLayer<>( this ) );
-        addLayer( new SpecialMobOverlayLayer<>( this, new SkeletonModel<>( 0.25F, true ) ) );
+        addLayer( new SpecialMobOverlayLayer<>( this, new SkeletonModel<>( context.bakeLayer( ModelLayers.SKELETON ) ) ) );
     }
     
     @Override
-    public ResourceLocation getTextureLocation( AbstractSkeletonEntity entity ) {
+    public ResourceLocation getTextureLocation( AbstractSkeleton entity ) {
         return ((ISpecialMob<?>) entity).getSpecialData().getTexture();
     }
     
     @Override
-    protected void scale( AbstractSkeletonEntity entity, MatrixStack matrixStack, float partialTick ) {
-        super.scale( entity, matrixStack, partialTick );
+    protected void scale( AbstractSkeleton entity, PoseStack poseStack, float partialTick ) {
+        super.scale( entity, poseStack, partialTick );
         
         final float scale = ((ISpecialMob<?>) entity).getSpecialData().getRenderScale();
         shadowRadius = baseShadowRadius * scale;
-        matrixStack.scale( scale, scale, scale );
+        poseStack.scale( scale, scale, scale );
     }
 }

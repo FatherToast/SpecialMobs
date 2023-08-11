@@ -7,18 +7,18 @@ import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.util.ExplosionHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
-import net.minecraft.block.AbstractFireBlock;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.FireBlock;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.item.Items;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.Explosion;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Explosion;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.BaseFireBlock;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.FireBlock;
 
 @SpecialMob
 public class FlameEndermanEntity extends _SpecialEndermanEntity {
@@ -50,7 +50,7 @@ public class FlameEndermanEntity extends _SpecialEndermanEntity {
     }
     
     @SpecialMob.Factory
-    public static EntityType.IFactory<FlameEndermanEntity> getVariantFactory() { return FlameEndermanEntity::new; }
+    public static EntityType.EntityFactory<FlameEndermanEntity> getVariantFactory() { return FlameEndermanEntity::new; }
     
     /** @return This entity's mob species. */
     @SpecialMob.SpeciesSupplier
@@ -62,7 +62,7 @@ public class FlameEndermanEntity extends _SpecialEndermanEntity {
     
     private int flameRingCooldown;
     
-    public FlameEndermanEntity( EntityType<? extends _SpecialEndermanEntity> entityType, World world ) { super( entityType, world ); }
+    public FlameEndermanEntity( EntityType<? extends _SpecialEndermanEntity> entityType, Level level ) { super( entityType, level ); }
     
     /** Called each tick to update this entity's movement. */
     @Override
@@ -95,7 +95,7 @@ public class FlameEndermanEntity extends _SpecialEndermanEntity {
     
     /** Creates a ring of fire around the target position. */
     private void makeFireRing( BlockPos center ) {
-        if( ExplosionHelper.getMode( this ) == Explosion.Mode.NONE ) return;
+        if( ExplosionHelper.getMode( this ) == Explosion.BlockInteraction.NONE ) return;
         
         final int radius = 5;
         final int rMinusOneSq = (radius - 1) * (radius - 1);
@@ -114,7 +114,7 @@ public class FlameEndermanEntity extends _SpecialEndermanEntity {
     
     /** Try to place a fire wall part at the location. */
     private void placeFireWall( BlockPos pos, @SuppressWarnings( "SameParameterValue" ) int radius ) {
-        final BlockPos.Mutable currentPos = pos.mutable();
+        final BlockPos.MutableBlockPos currentPos = pos.mutable();
         currentPos.setY( Math.max( pos.getY() - radius, 0 ) );
         final int maxY = Math.min( pos.getY() + radius, level.getMaxBuildHeight() - 2 );
         
@@ -122,7 +122,7 @@ public class FlameEndermanEntity extends _SpecialEndermanEntity {
             currentPos.move( 0, 1, 0 );
             
             if( shouldSetFire( currentPos ) ) {
-                MobHelper.placeBlock( this, currentPos, AbstractFireBlock.getState( level, currentPos ) );
+                MobHelper.placeBlock( this, currentPos, BaseFireBlock.getState( level, currentPos ) );
             }
         }
     }

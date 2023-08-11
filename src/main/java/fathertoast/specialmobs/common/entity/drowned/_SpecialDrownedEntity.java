@@ -15,38 +15,37 @@ import fathertoast.specialmobs.common.entity.ai.goal.SpecialTridentAttackGoal;
 import fathertoast.specialmobs.common.event.NaturalSpawnManager;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.*;
-import net.minecraft.entity.ai.attributes.AttributeModifierMap;
-import net.minecraft.entity.monster.DrownedEntity;
-import net.minecraft.entity.monster.ZombieEntity;
-import net.minecraft.entity.monster.ZombifiedPiglinEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.projectile.SnowballEntity;
-import net.minecraft.entity.projectile.TridentEntity;
-import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.datasync.DataParameter;
-import net.minecraft.network.datasync.DataSerializers;
-import net.minecraft.network.datasync.EntityDataManager;
-import net.minecraft.pathfinding.PathNodeType;
-import net.minecraft.potion.EffectInstance;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.SoundEvents;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.DifficultyInstance;
-import net.minecraft.world.IServerWorld;
-import net.minecraft.world.World;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
+import net.minecraft.world.entity.monster.Drowned;
+import net.minecraft.world.entity.monster.Zombie;
+import net.minecraft.world.entity.monster.ZombifiedPiglin;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.Snowball;
+import net.minecraft.world.entity.projectile.ThrownTrident;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.ServerLevelAccessor;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.pathfinder.BlockPathTypes;
+import net.minecraft.world.phys.Vec3;
 
 import javax.annotation.Nullable;
-import java.util.Random;
 
 @SpecialMob
-public class _SpecialDrownedEntity extends DrownedEntity implements ISpecialMob<_SpecialDrownedEntity> {
+public class _SpecialDrownedEntity extends Drowned implements ISpecialMob<_SpecialDrownedEntity> {
     
     //--------------- Static Special Mob Hooks ----------------
     
@@ -73,19 +72,19 @@ public class _SpecialDrownedEntity extends DrownedEntity implements ISpecialMob<
     public DrownedSpeciesConfig getConfig() { return (DrownedSpeciesConfig) getSpecies().config; }
     
     @SpecialMob.AttributeSupplier
-    public static AttributeModifierMap.MutableAttribute createAttributes() { return DrownedEntity.createAttributes(); }
+    public static AttributeSupplier.Builder createAttributes() { return Drowned.createAttributes(); }
     
     @SpecialMob.SpawnPlacementRegistrar
     public static void registerSpawnPlacement( MobFamily.Species<? extends _SpecialDrownedEntity> species ) {
-        NaturalSpawnManager.registerSpawnPlacement( species, EntitySpawnPlacementRegistry.PlacementType.IN_WATER,
+        NaturalSpawnManager.registerSpawnPlacement( species, SpawnPlacements.Type.IN_WATER,
                 _SpecialDrownedEntity::checkFamilySpawnRules );
     }
     
-    public static boolean checkFamilySpawnRules( EntityType<? extends DrownedEntity> type, IServerWorld world,
-                                                 SpawnReason reason, BlockPos pos, Random random ) {
+    public static boolean checkFamilySpawnRules( EntityType<? extends Drowned> type, ServerLevelAccessor world,
+                                                MobSpawnType spawnType, BlockPos pos, RandomSource random ) {
         //noinspection unchecked
-        return DrownedEntity.checkDrownedSpawnRules( (EntityType<DrownedEntity>) type, world, reason, pos, random ) &&
-                NaturalSpawnManager.checkSpawnRulesConfigured( type, world, reason, pos, random );
+        return Drowned.checkDrownedSpawnRules( (EntityType<Drowned>) type, world, spawnType, pos, random ) &&
+                NaturalSpawnManager.checkSpawnRulesConfigured( type, world, spawnType, pos, random );
     }
     
     @SpecialMob.LanguageProvider
@@ -101,7 +100,7 @@ public class _SpecialDrownedEntity extends DrownedEntity implements ISpecialMob<
     }
     
     @SpecialMob.Factory
-    public static EntityType.IFactory<_SpecialDrownedEntity> getFactory() { return _SpecialDrownedEntity::new; }
+    public static EntityType.EntityFactory<_SpecialDrownedEntity> getFactory() { return _SpecialDrownedEntity::new; }
     
     
     //--------------- Variant-Specific Breakouts ----------------
@@ -116,8 +115,8 @@ public class _SpecialDrownedEntity extends DrownedEntity implements ISpecialMob<
         goalSelector.addGoal( 2, new SpecialDrownedAttackGoal( this, 1.0, false ) );
         
         // Bug fix - tweaked from vanilla behavior to cause drowned to alert zombies (vanilla zombies alert drowned)
-        AIHelper.replaceHurtByTarget( this, new SpecialHurtByTargetGoal( this, ZombieEntity.class, DrownedEntity.class )
-                .setAlertOthers( ZombifiedPiglinEntity.class ) );
+        AIHelper.replaceHurtByTarget( this, new SpecialHurtByTargetGoal( this, Zombie.class, Drowned.class )
+                .setAlertOthers( ZombifiedPiglin.class ) );
         
         registerVariantGoals();
     }
@@ -126,8 +125,8 @@ public class _SpecialDrownedEntity extends DrownedEntity implements ISpecialMob<
     protected void registerVariantGoals() { }
     
     /** Override to change starting equipment or stats. */
-    public void finalizeVariantSpawn( IServerWorld world, DifficultyInstance difficulty, @Nullable SpawnReason spawnReason,
-                                      @Nullable ILivingEntityData groupData ) { }
+    public void finalizeVariantSpawn( ServerLevelAccessor level, DifficultyInstance difficulty, @Nullable MobSpawnType spawnType,
+                                      @Nullable SpawnGroupData groupData ) { }
     
     /** Called when this entity successfully damages a target to apply on-hit effects. */
     @Override
@@ -140,19 +139,19 @@ public class _SpecialDrownedEntity extends DrownedEntity implements ISpecialMob<
     protected void onVariantAttack( LivingEntity target ) { }
     
     /** Override to save data to this entity's NBT data. */
-    public void addVariantSaveData( CompoundNBT saveTag ) { }
+    public void addVariantSaveData( CompoundTag saveTag ) { }
     
     /** Override to load data from this entity's NBT data. */
-    public void readVariantSaveData( CompoundNBT saveTag ) { }
+    public void readVariantSaveData( CompoundTag saveTag ) { }
     
     
     //--------------- Family-Specific Implementations ----------------
     
     /** The parameter for special mob render scale. */
-    private static final DataParameter<Float> SCALE = EntityDataManager.defineId( _SpecialDrownedEntity.class, DataSerializers.FLOAT );
+    private static final EntityDataAccessor<Float> SCALE = SynchedEntityData.defineId( _SpecialDrownedEntity.class, EntityDataSerializers.FLOAT );
     
-    public _SpecialDrownedEntity( EntityType<? extends _SpecialDrownedEntity> entityType, World world ) {
-        super( entityType, world );
+    public _SpecialDrownedEntity( EntityType<? extends _SpecialDrownedEntity> entityType, Level level ) {
+        super( entityType, level );
         recalculateAttackGoal();
         
         getSpecialData().initialize();
@@ -179,12 +178,12 @@ public class _SpecialDrownedEntity extends DrownedEntity implements ISpecialMob<
     /** Called to attack the target with a ranged attack. */
     @Override
     public void performRangedAttack( LivingEntity target, float damageMulti ) {
-        final TridentEntity trident = new TridentEntity( level, this, new ItemStack( Items.TRIDENT ) );
-        
+        final ThrownTrident trident = new ThrownTrident( level, this, new ItemStack( Items.TRIDENT ) );
+
         final double dX = target.getX() - getX();
         final double dY = target.getY( 0.3333 ) - trident.getY();
         final double dZ = target.getZ() - getZ();
-        final double dH = MathHelper.sqrt( dX * dX + dZ * dZ );
+        final double dH = Mth.sqrt( (float) (dX * dX + dZ * dZ) );
         trident.shoot( dX, dY + dH * 0.2, dZ, 1.6F,
                 getSpecialData().getRangedAttackSpread() * (14 - level.getDifficulty().getId() * 4) );
         
@@ -204,7 +203,7 @@ public class _SpecialDrownedEntity extends DrownedEntity implements ISpecialMob<
     
     /** Moves this entity in the desired direction. Input magnitude of < 1 scales down movement speed. */
     @Override
-    public void travel( Vector3d input ) {
+    public void travel( Vec3 input ) {
         if( isEffectiveAi() ) needsToBeDeeper = true;
         super.travel( input );
     }
@@ -246,18 +245,18 @@ public class _SpecialDrownedEntity extends DrownedEntity implements ISpecialMob<
     public final void setExperience( int xp ) { xpReward = xp; }
     
     @Override
-    public void setSpecialPathfindingMalus( PathNodeType nodeType, float malus ) {
-        this.setPathfindingMalus( nodeType, malus );
+    public void setSpecialPathfindingMalus( BlockPathTypes types, float malus ) {
+        this.setPathfindingMalus( types, malus );
     }
     
     /** Converts this entity to one of another type. */
     @Nullable
     @Override
-    public <T extends MobEntity> T convertTo( EntityType<T> entityType, boolean keepEquipment ) {
+    public <T extends Mob> T convertTo( EntityType<T> entityType, boolean keepEquipment ) {
         final T replacement = super.convertTo( entityType, keepEquipment );
-        if( replacement instanceof ISpecialMob && level instanceof IServerWorld ) {
-            MobHelper.finalizeSpawn( replacement, (IServerWorld) level, level.getCurrentDifficultyAt( blockPosition() ),
-                    SpawnReason.CONVERSION, null );
+        if( replacement instanceof ISpecialMob && level instanceof ServerLevelAccessor serverLevel ) {
+            MobHelper.finalizeSpawn( replacement, serverLevel, level.getCurrentDifficultyAt( blockPosition() ),
+                    MobSpawnType.CONVERSION, null );
         }
         return replacement;
     }
@@ -265,40 +264,40 @@ public class _SpecialDrownedEntity extends DrownedEntity implements ISpecialMob<
     /** Called on spawn to initialize properties based on the world, difficulty, and the group it spawns with. */
     @Nullable
     @Override
-    public final ILivingEntityData finalizeSpawn( IServerWorld world, DifficultyInstance difficulty, SpawnReason spawnReason,
-                                                  @Nullable ILivingEntityData groupData, @Nullable CompoundNBT eggTag ) {
-        return MobHelper.finalizeSpawn( this, world, difficulty, spawnReason,
-                super.finalizeSpawn( world, difficulty, spawnReason, groupData, eggTag ) );
+    public final SpawnGroupData finalizeSpawn( ServerLevelAccessor level, DifficultyInstance difficulty, MobSpawnType spawnType,
+                                                  @Nullable SpawnGroupData groupData, @Nullable CompoundTag eggTag ) {
+        return MobHelper.finalizeSpawn( this, level, difficulty, spawnType,
+                super.finalizeSpawn( level, difficulty, spawnType, groupData, eggTag ) );
     }
     
     /** Called on spawn to set starting equipment. */
     @Override // Seal method to force spawn equipment changes through ISpecialMob
-    protected final void populateDefaultEquipmentSlots( DifficultyInstance difficulty ) { super.populateDefaultEquipmentSlots( difficulty ); }
+    protected final void populateDefaultEquipmentSlots( RandomSource random, DifficultyInstance difficulty ) { super.populateDefaultEquipmentSlots( random, difficulty ); }
     
     /** Called on spawn to initialize properties based on the world, difficulty, and the group it spawns with. */
     @Override
-    public void finalizeSpecialSpawn( IServerWorld world, DifficultyInstance difficulty, @Nullable SpawnReason spawnReason,
-                                      @Nullable ILivingEntityData groupData ) {
+    public void finalizeSpecialSpawn( ServerLevelAccessor level, DifficultyInstance difficulty, @Nullable MobSpawnType spawnType,
+                                      @Nullable SpawnGroupData groupData ) {
         // Completely re-roll held item
-        final ItemStack heldItem = getItemBySlot( EquipmentSlotType.MAINHAND );
+        final ItemStack heldItem = getItemBySlot( EquipmentSlot.MAINHAND );
         if( heldItem.isEmpty() || heldItem.getItem() == Items.TRIDENT || heldItem.getItem() == Items.FISHING_ROD ) {
             final double heldItemChoice = random.nextDouble();
             if( getSpecialData().getRangedAttackMaxRange() > 0.0F && heldItemChoice < getConfig().DROWNED.tridentEquipChance.get() ) {
-                setItemSlot( EquipmentSlotType.MAINHAND, new ItemStack( Items.TRIDENT ) );
+                setItemSlot( EquipmentSlot.MAINHAND, new ItemStack( Items.TRIDENT ) );
             }
             else if( heldItemChoice >= 0.9625 ) { // Vanilla's 3.75% chance; not configurable because not important
-                setItemSlot( EquipmentSlotType.MAINHAND, new ItemStack( Items.FISHING_ROD ) );
+                setItemSlot( EquipmentSlot.MAINHAND, new ItemStack( Items.FISHING_ROD ) );
             }
             else {
-                setItemSlot( EquipmentSlotType.MAINHAND, ItemStack.EMPTY );
+                setItemSlot( EquipmentSlot.MAINHAND, ItemStack.EMPTY );
             }
         }
         
         if( getConfig().DROWNED.shieldEquipChance.rollChance( random ) ) {
-            setItemSlot( EquipmentSlotType.OFFHAND, new ItemStack( Items.SHIELD ) );
+            setItemSlot( EquipmentSlot.OFFHAND, new ItemStack( Items.SHIELD ) );
         }
         
-        finalizeVariantSpawn( world, difficulty, spawnReason, groupData );
+        finalizeVariantSpawn( level, difficulty, spawnType, groupData );
     }
     
     
@@ -313,7 +312,7 @@ public class _SpecialDrownedEntity extends DrownedEntity implements ISpecialMob<
     
     /** @return The eye height of this entity when standing. */
     @Override
-    protected float getStandingEyeHeight( Pose pose, EntitySize size ) {
+    protected float getStandingEyeHeight( Pose pose, EntityDimensions size ) {
         return super.getStandingEyeHeight( pose, size ) * getSpecialData().getHeightScale(); // Age handled in super
     }
     
@@ -333,18 +332,18 @@ public class _SpecialDrownedEntity extends DrownedEntity implements ISpecialMob<
     
     /** @return True if this entity can be leashed. */
     @Override
-    public boolean canBeLeashed( PlayerEntity player ) { return !isLeashed() && getSpecialData().allowLeashing(); }
+    public boolean canBeLeashed( Player player ) { return !isLeashed() && getSpecialData().allowLeashing(); }
     
     /** Sets this entity 'stuck' inside a block, such as a cobweb or sweet berry bush. Mod blocks could use this as a speed boost. */
     @Override
-    public void makeStuckInBlock( BlockState block, Vector3d speedMulti ) {
+    public void makeStuckInBlock( BlockState block, Vec3 speedMulti ) {
         if( getSpecialData().canBeStuckIn( block ) ) super.makeStuckInBlock( block, speedMulti );
     }
     
     /** @return Called when this mob falls. Calculates and applies fall damage. Returns false if canceled. */
     @Override
-    public boolean causeFallDamage( float distance, float damageMultiplier ) {
-        return super.causeFallDamage( distance, damageMultiplier * getSpecialData().getFallDamageMultiplier() );
+    public boolean causeFallDamage( float distance, float damageMultiplier, DamageSource damageSource ) {
+        return super.causeFallDamage( distance, damageMultiplier * getSpecialData().getFallDamageMultiplier(), damageSource );
     }
     
     /** @return True if this entity should NOT trigger pressure plates or tripwires. */
@@ -367,7 +366,7 @@ public class _SpecialDrownedEntity extends DrownedEntity implements ISpecialMob<
     @Override
     public boolean hurt( DamageSource source, float amount ) {
         final Entity entity = source.getDirectEntity();
-        if( isSensitiveToWater() && entity instanceof SnowballEntity ) {
+        if( isSensitiveToWater() && entity instanceof Snowball ) {
             amount = Math.max( 3.0F, amount );
         }
         
@@ -378,14 +377,14 @@ public class _SpecialDrownedEntity extends DrownedEntity implements ISpecialMob<
     
     /** @return True if the effect can be applied to this entity. */
     @Override
-    public boolean canBeAffected( EffectInstance effect ) { return getSpecialData().isPotionApplicable( effect ); }
+    public boolean canBeAffected( MobEffectInstance effect ) { return getSpecialData().isPotionApplicable( effect ); }
     
     /** Saves data to this entity's base NBT compound that is specific to its subclass. */
     @Override
-    public void addAdditionalSaveData( CompoundNBT tag ) {
+    public void addAdditionalSaveData( CompoundTag tag ) {
         super.addAdditionalSaveData( tag );
         
-        final CompoundNBT saveTag = SpecialMobData.getSaveLocation( tag );
+        final CompoundTag saveTag = SpecialMobData.getSaveLocation( tag );
         
         getSpecialData().writeToNBT( saveTag );
         addVariantSaveData( saveTag );
@@ -393,10 +392,10 @@ public class _SpecialDrownedEntity extends DrownedEntity implements ISpecialMob<
     
     /** Loads data from this entity's base NBT compound that is specific to its subclass. */
     @Override
-    public void readAdditionalSaveData( CompoundNBT tag ) {
+    public void readAdditionalSaveData( CompoundTag tag ) {
         super.readAdditionalSaveData( tag );
         
-        final CompoundNBT saveTag = SpecialMobData.getSaveLocation( tag );
+        final CompoundTag saveTag = SpecialMobData.getSaveLocation( tag );
         
         getSpecialData().readFromNBT( saveTag );
         readVariantSaveData( saveTag );

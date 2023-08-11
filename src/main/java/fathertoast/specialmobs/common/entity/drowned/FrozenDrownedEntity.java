@@ -8,19 +8,19 @@ import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.util.ExplosionHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.FlowingFluidBlock;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.potion.Effects;
-import net.minecraft.util.SoundEvents;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.shapes.ISelectionContext;
-import net.minecraft.world.Explosion;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.util.Mth;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.level.Explosion;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.LiquidBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.shapes.CollisionContext;
 
 import javax.annotation.Nullable;
 
@@ -36,7 +36,7 @@ public class FrozenDrownedEntity extends _SpecialDrownedEntity {
     public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
         bestiaryInfo.color( 0xDDEAEA ).weight( BestiaryInfo.DefaultWeight.LOW ).theme( BestiaryInfo.Theme.ICE )
                 .uniqueTextureWithOverlay()
-                .addExperience( 2 ).effectImmune( Effects.MOVEMENT_SLOWDOWN )
+                .addExperience( 2 ).effectImmune( MobEffects.MOVEMENT_SLOWDOWN )
                 .addToAttribute( Attributes.ARMOR, 10.0 )
                 .multiplyAttribute( Attributes.MOVEMENT_SPEED, 0.8 );
     }
@@ -55,7 +55,7 @@ public class FrozenDrownedEntity extends _SpecialDrownedEntity {
     }
     
     @SpecialMob.Factory
-    public static EntityType.IFactory<FrozenDrownedEntity> getVariantFactory() { return FrozenDrownedEntity::new; }
+    public static EntityType.EntityFactory<FrozenDrownedEntity> getVariantFactory() { return FrozenDrownedEntity::new; }
     
     /** @return This entity's mob species. */
     @SpecialMob.SpeciesSupplier
@@ -70,12 +70,12 @@ public class FrozenDrownedEntity extends _SpecialDrownedEntity {
     private int iceSealTimer;
     private BlockPos iceSealPos;
     
-    public FrozenDrownedEntity( EntityType<? extends _SpecialDrownedEntity> entityType, World world ) { super( entityType, world ); }
+    public FrozenDrownedEntity( EntityType<? extends _SpecialDrownedEntity> entityType, Level level ) { super( entityType, level ); }
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override
     protected void onVariantAttack( LivingEntity target ) {
-        MobHelper.applyEffect( target, Effects.MOVEMENT_SLOWDOWN, 2 );
+        MobHelper.applyEffect( target, MobEffects.MOVEMENT_SLOWDOWN, 2 );
     }
     
     /** Called each tick to update this entity's movement. */
@@ -98,8 +98,8 @@ public class FrozenDrownedEntity extends _SpecialDrownedEntity {
                 // Check if a new ice seal should be created
                 final LivingEntity target = getTarget();
                 if( target != null && target.isUnderWater() && distanceToSqr( target ) < 144.0 && random.nextInt( 20 ) == 0 ) {
-                    final BlockPos pos = findIceSealPos( target.blockPosition(), MathHelper.ceil( target.getBbHeight() ) );
-                    if( pos != null && ExplosionHelper.getMode( this ) != Explosion.Mode.NONE ) {
+                    final BlockPos pos = findIceSealPos( target.blockPosition(), Mth.ceil( target.getBbHeight() ) );
+                    if( pos != null && ExplosionHelper.getMode( this ) != Explosion.BlockInteraction.NONE ) {
                         iceSealTimer = 0;
                         iceSealPos = pos;
                     }
@@ -114,13 +114,13 @@ public class FrozenDrownedEntity extends _SpecialDrownedEntity {
     private BlockPos findIceSealPos( BlockPos targetPos, int targetHeight ) {
         // Find the water surface
         final int maxRange = 6 + targetHeight;
-        final BlockPos.Mutable pos = targetPos.mutable();
+        final BlockPos.MutableBlockPos pos = targetPos.mutable();
         for( int y = 0; y <= maxRange; y++ ) {
             pos.setY( targetPos.getY() + y );
             if( pos.getY() >= level.getMaxBuildHeight() ) break; // Can't build here
             
             final BlockState block = level.getBlockState( pos );
-            if( block.getBlock() != Blocks.WATER || block.getValue( FlowingFluidBlock.LEVEL ) != 0 ) {
+            if( block.getBlock() != Blocks.WATER || block.getValue( LiquidBlock.LEVEL ) != 0 ) {
                 if( y - 1 <= targetHeight ) break; // Don't build inside the target entity
                 return pos.below();
             }
@@ -155,7 +155,7 @@ public class FrozenDrownedEntity extends _SpecialDrownedEntity {
     /** Attempts to place a single seal block. */
     private void placeSealBlock( BlockPos pos ) {
         final BlockState block = MeltingIceBlock.getState( level, pos );
-        if( level.getBlockState( pos ).getMaterial().isReplaceable() && level.isUnobstructed( block, pos, ISelectionContext.empty() ) &&
+        if( level.getBlockState( pos ).getMaterial().isReplaceable() && level.isUnobstructed( block, pos, CollisionContext.empty() ) &&
                 MobHelper.placeBlock( this, pos, block ) ) {
             MeltingIceBlock.scheduleFirstTick( level, pos, random );
         }

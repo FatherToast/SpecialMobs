@@ -8,20 +8,21 @@ import fathertoast.specialmobs.common.entity.ai.goal.SpecialSwellGoal;
 import fathertoast.specialmobs.common.util.ExplosionHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
-import net.minecraft.entity.AreaEffectCloudEntity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.particles.IParticleData;
-import net.minecraft.particles.ParticleTypes;
-import net.minecraft.potion.EffectInstance;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Hand;
-import net.minecraft.util.SoundEvents;
-import net.minecraft.world.World;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.entity.AreaEffectCloud;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,7 +56,7 @@ public class VolatileMagmaCubeEntity extends _SpecialMagmaCubeEntity implements 
     }
     
     @SpecialMob.Factory
-    public static EntityType.IFactory<VolatileMagmaCubeEntity> getVariantFactory() { return VolatileMagmaCubeEntity::new; }
+    public static EntityType.EntityFactory<VolatileMagmaCubeEntity> getVariantFactory() { return VolatileMagmaCubeEntity::new; }
     
     /** @return This entity's mob species. */
     @SpecialMob.SpeciesSupplier
@@ -70,7 +71,7 @@ public class VolatileMagmaCubeEntity extends _SpecialMagmaCubeEntity implements 
     private int fuse = 0;
     private boolean ignited = false;
     
-    public VolatileMagmaCubeEntity( EntityType<? extends _SpecialMagmaCubeEntity> entityType, World world ) { super( entityType, world ); }
+    public VolatileMagmaCubeEntity( EntityType<? extends _SpecialMagmaCubeEntity> entityType, Level level ) { super( entityType, level ); }
     
     /** Override to change this entity's AI goals. */
     @Override
@@ -91,7 +92,7 @@ public class VolatileMagmaCubeEntity extends _SpecialMagmaCubeEntity implements 
                 else if( fuse >= MAX_FUSE ) {
                     dead = true;
                     ExplosionHelper.explode( this, getSize() + 0.5F, true, false );
-                    remove();
+                    discard();
                     spawnLingeringCloud();
                 }
                 else {
@@ -114,17 +115,17 @@ public class VolatileMagmaCubeEntity extends _SpecialMagmaCubeEntity implements 
     
     /** Called to create a lingering effect cloud as part of this slime's explosion 'attack'. */
     protected void spawnLingeringCloud() {
-        final List<EffectInstance> effects = new ArrayList<>( getActiveEffects() );
+        final List<MobEffectInstance> effects = new ArrayList<>( getActiveEffects() );
         
         if( !effects.isEmpty() ) {
-            final AreaEffectCloudEntity potionCloud = new AreaEffectCloudEntity( level, getX(), getY(), getZ() );
+            final AreaEffectCloud potionCloud = new AreaEffectCloud( level, getX(), getY(), getZ() );
             potionCloud.setRadius( getSize() + 0.5F );
             potionCloud.setRadiusOnUse( -0.5F );
             potionCloud.setWaitTime( 10 );
             potionCloud.setDuration( potionCloud.getDuration() / 2 );
             potionCloud.setRadiusPerTick( -potionCloud.getRadius() / (float) potionCloud.getDuration() );
-            for( EffectInstance effect : effects ) {
-                potionCloud.addEffect( new EffectInstance( effect ) );
+            for( MobEffectInstance effect : effects ) {
+                potionCloud.addEffect( new MobEffectInstance( effect ) );
             }
             level.addFreshEntity( potionCloud );
         }
@@ -136,18 +137,18 @@ public class VolatileMagmaCubeEntity extends _SpecialMagmaCubeEntity implements 
     
     /** @return Called when this mob falls. Calculates and applies fall damage. Returns false if canceled. */
     @Override
-    public boolean causeFallDamage( float distance, float damageMultiplier ) {
-        final boolean success = super.causeFallDamage( distance, damageMultiplier );
+    public boolean causeFallDamage( float distance, float damageMultiplier, DamageSource damageSource ) {
+        final boolean success = super.causeFallDamage( distance, damageMultiplier, damageSource );
         
         // Speed up fuse from falling like creepers
         changeFuse( (int) (distance * 1.5F) );
         if( fuse > MAX_FUSE - 5 ) changeFuse( MAX_FUSE - 5 - fuse );
         return success;
     }
-    
+
     /** @return Interacts (right click) with this entity and returns the result. */
     @Override
-    public ActionResultType mobInteract( PlayerEntity player, Hand hand ) {
+    public InteractionResult mobInteract( Player player, InteractionHand hand ) {
         final ItemStack item = player.getItemInHand( hand );
         if( item.getItem() == Items.FLINT_AND_STEEL ) {
             // Allow players to ignite blackberry slimes like creepers
@@ -157,27 +158,27 @@ public class VolatileMagmaCubeEntity extends _SpecialMagmaCubeEntity implements 
                 ignited = true;
                 item.hurtAndBreak( 1, player, ( entity ) -> entity.broadcastBreakEvent( hand ) );
             }
-            return ActionResultType.sidedSuccess( level.isClientSide );
+            return InteractionResult.sidedSuccess( level.isClientSide );
         }
         return super.mobInteract( player, hand );
     }
     
     /** Override to save data to this entity's NBT data. */
     @Override
-    public void addVariantSaveData( CompoundNBT saveTag ) {
+    public void addVariantSaveData( CompoundTag saveTag ) {
         saveTag.putByte( References.TAG_FUSE_TIME, (byte) fuse );
     }
     
     /** Override to load data from this entity's NBT data. */
     @Override
-    public void readVariantSaveData( CompoundNBT saveTag ) {
+    public void readVariantSaveData( CompoundTag saveTag ) {
         if( saveTag.contains( References.TAG_FUSE_TIME, References.NBT_TYPE_NUMERICAL ) )
             fuse = saveTag.getByte( References.TAG_FUSE_TIME );
     }
     
     /** @return This slime's particle type for jump effects. */
     @Override
-    protected IParticleData getParticleType() { return ParticleTypes.SMOKE; }
+    protected ParticleOptions getParticleType() { return ParticleTypes.SMOKE; }
     
     
     //--------------- IExplodingEntity Implementations ----------------

@@ -34,10 +34,6 @@ public final class ClientEventHandler {
      * This screen is effectively a redirect. It is opened when the "mod config" button is pressed with the goal of behaving
      * like the "mods folder" button; i.e. just opens the appropriate folder.
      */
-    private static record ConfigGuiFactory(Minecraft minecraft, Screen s, Screen screen) {
-
-    }
-
     private static class OpenConfigFolderScreen extends Screen {
         private OpenConfigFolderScreen( Minecraft game, Screen parent ) {
             // We don't need to localize the name or do anything since the opening of this screen is always canceled

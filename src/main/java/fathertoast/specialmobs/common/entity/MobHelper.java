@@ -47,7 +47,6 @@ import net.minecraftforge.event.entity.living.LivingKnockBackEvent;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
-import java.util.Random;
 
 @SuppressWarnings("JavadocReference")
 public final class MobHelper {
@@ -305,7 +304,7 @@ public final class MobHelper {
     public static void removeNightVision( LivingEntity target ) { target.removeEffect( MobEffects.NIGHT_VISION ); }
     
     /** Applies a random 'plague' potion effect to the target. */
-    public static void applyPlagueEffect( LivingEntity target, Random random ) {
+    public static void applyPlagueEffect( LivingEntity target, RandomSource random ) {
         applyEffectFromTemplate( target, PLAGUE_EFFECTS[random.nextInt( PLAGUE_EFFECTS.length -
                 (Config.MAIN.GENERAL.enableNausea.get() ? 0 : 1) )] );
     }
@@ -356,7 +355,7 @@ public final class MobHelper {
     }
     
     /** Applies a random 'plague' potion effect to the arrow. */
-    public static AbstractArrow tipPlagueArrow(AbstractArrow arrow, Random random ) {
+    public static AbstractArrow tipPlagueArrow(AbstractArrow arrow, RandomSource random ) {
         return tipArrowFromTemplate( arrow, PLAGUE_EFFECTS[random.nextInt( PLAGUE_EFFECTS.length -
                 (Config.MAIN.GENERAL.enableNausea.get() ? 0 : 1) )] );
     }

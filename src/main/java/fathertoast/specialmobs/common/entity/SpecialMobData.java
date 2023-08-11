@@ -11,12 +11,11 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.FireBlock;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.pathfinder.PathComputationType;
+import net.minecraft.world.level.pathfinder.BlockPathTypes;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.MobEffectEvent;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -27,7 +26,7 @@ import java.util.HashSet;
 
 import static fathertoast.specialmobs.common.util.References.*;
 
-public class SpecialMobData<T extends LivingEntity & ISpecialMob<T>> {
+public class SpecialMobData<T extends Mob & ISpecialMob<T>> {
     
     /**
      * @param tag The mob's base nbt tag.
@@ -322,14 +321,14 @@ public class SpecialMobData<T extends LivingEntity & ISpecialMob<T>> {
     private void setImmuneToFire( boolean value ) {
         isImmuneToFire = value;
         if( value ) {
-            theEntity.setSpecialPathfindingMalus( PathNodeType.LAVA, PathNodeType.WATER.getMalus() );
-            theEntity.setSpecialPathfindingMalus( PathNodeType.DANGER_FIRE, PathNodeType.OPEN.getMalus() );
-            theEntity.setSpecialPathfindingMalus( PathNodeType.DAMAGE_FIRE, PathNodeType.OPEN.getMalus() );
+            theEntity.setSpecialPathfindingMalus( BlockPathTypes.LAVA, BlockPathTypes.WATER.getMalus() );
+            theEntity.setSpecialPathfindingMalus( BlockPathTypes.DANGER_FIRE, BlockPathTypes.OPEN.getMalus() );
+            theEntity.setSpecialPathfindingMalus( BlockPathTypes.DAMAGE_FIRE, BlockPathTypes.OPEN.getMalus() );
         }
         else {
-            theEntity.setSpecialPathfindingMalus( PathNodeType.LAVA, PathNodeType.LAVA.getMalus() );
-            theEntity.setSpecialPathfindingMalus( PathNodeType.DANGER_FIRE, PathNodeType.DANGER_FIRE.getMalus() );
-            theEntity.setSpecialPathfindingMalus( PathNodeType.DAMAGE_FIRE, PathNodeType.DAMAGE_FIRE.getMalus() );
+            theEntity.setSpecialPathfindingMalus( BlockPathTypes.LAVA, BlockPathTypes.LAVA.getMalus() );
+            theEntity.setSpecialPathfindingMalus( BlockPathTypes.DANGER_FIRE, BlockPathTypes.DANGER_FIRE.getMalus() );
+            theEntity.setSpecialPathfindingMalus( BlockPathTypes.DAMAGE_FIRE, BlockPathTypes.DAMAGE_FIRE.getMalus() );
         }
     }
     
@@ -339,13 +338,12 @@ public class SpecialMobData<T extends LivingEntity & ISpecialMob<T>> {
         theEntity.clearFire();
         isImmuneToBurning = value;
         if( value ) {
-            FireBlock
-            theEntity.setSpecialPathfindingMalus( PathComputationType., PathNodeType.OPEN.getMalus() );
-            theEntity.setSpecialPathfindingMalus( PathNodeType.DAMAGE_FIRE, PathNodeType.DANGER_FIRE.getMalus() );
+            theEntity.setSpecialPathfindingMalus( BlockPathTypes.DAMAGE_FIRE, BlockPathTypes.OPEN.getMalus() );
+            theEntity.setSpecialPathfindingMalus( BlockPathTypes.DAMAGE_FIRE, BlockPathTypes.DANGER_FIRE.getMalus() );
         }
         else {
-            theEntity.setSpecialPathfindingMalus( PathNodeType.DANGER_FIRE, PathNodeType.DANGER_FIRE.getMalus() );
-            theEntity.setSpecialPathfindingMalus( PathNodeType.DAMAGE_FIRE, PathNodeType.DAMAGE_FIRE.getMalus() );
+            theEntity.setSpecialPathfindingMalus( BlockPathTypes.DANGER_FIRE, BlockPathTypes.DANGER_FIRE.getMalus() );
+            theEntity.setSpecialPathfindingMalus( BlockPathTypes.DAMAGE_FIRE, BlockPathTypes.DAMAGE_FIRE.getMalus() );
         }
     }
     
@@ -369,7 +367,7 @@ public class SpecialMobData<T extends LivingEntity & ISpecialMob<T>> {
     
     private void setDamagedByWater( boolean value ) {
         isDamagedByWater = value;
-        theEntity.setSpecialPathfindingMalus( PathNodeType.WATER, value ? PathNodeType.LAVA.getMalus() : PathNodeType.WATER.getMalus() );
+        theEntity.setSpecialPathfindingMalus( BlockPathTypes.WATER, value ? BlockPathTypes.LAVA.getMalus() : BlockPathTypes.WATER.getMalus() );
     }
     
     /**

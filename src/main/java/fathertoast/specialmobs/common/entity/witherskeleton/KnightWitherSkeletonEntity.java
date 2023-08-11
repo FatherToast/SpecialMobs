@@ -7,16 +7,16 @@ import fathertoast.specialmobs.common.config.species.SkeletonSpeciesConfig;
 import fathertoast.specialmobs.common.config.species.SpeciesConfig;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.ILivingEntityData;
-import net.minecraft.entity.SpawnReason;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.world.DifficultyInstance;
-import net.minecraft.world.IServerWorld;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.SpawnGroupData;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.ServerLevelAccessor;
 
 import javax.annotation.Nullable;
 
@@ -55,7 +55,7 @@ public class KnightWitherSkeletonEntity extends _SpecialWitherSkeletonEntity {
     }
     
     @SpecialMob.Factory
-    public static EntityType.IFactory<KnightWitherSkeletonEntity> getVariantFactory() { return KnightWitherSkeletonEntity::new; }
+    public static EntityType.EntityFactory<KnightWitherSkeletonEntity> getVariantFactory() { return KnightWitherSkeletonEntity::new; }
     
     /** @return This entity's mob species. */
     @SpecialMob.SpeciesSupplier
@@ -65,18 +65,18 @@ public class KnightWitherSkeletonEntity extends _SpecialWitherSkeletonEntity {
     
     //--------------- Variant-Specific Implementations ----------------
     
-    public KnightWitherSkeletonEntity( EntityType<? extends _SpecialWitherSkeletonEntity> entityType, World world ) { super( entityType, world ); }
+    public KnightWitherSkeletonEntity( EntityType<? extends _SpecialWitherSkeletonEntity> entityType, Level level ) { super( entityType, level ); }
     
     /** Override to change starting equipment or stats. */
     @Override
-    public void finalizeVariantSpawn( IServerWorld world, DifficultyInstance difficulty, @Nullable SpawnReason spawnReason,
-                                      @Nullable ILivingEntityData groupData ) {
-        if( getItemBySlot( EquipmentSlotType.MAINHAND ).getItem() == Items.STONE_SWORD ) {
-            setItemSlot( EquipmentSlotType.MAINHAND, new ItemStack( Items.IRON_SWORD ) );
+    public void finalizeVariantSpawn( ServerLevelAccessor level, DifficultyInstance difficulty, @Nullable MobSpawnType spawnType,
+                                     @Nullable SpawnGroupData groupData ) {
+        if( getItemBySlot( EquipmentSlot.MAINHAND ).getItem() == Items.STONE_SWORD ) {
+            setItemSlot( EquipmentSlot.MAINHAND, new ItemStack( Items.IRON_SWORD ) );
         }
-        setItemSlot( EquipmentSlotType.HEAD, new ItemStack( Items.CHAINMAIL_HELMET ) );
-        setItemSlot( EquipmentSlotType.CHEST, new ItemStack( Items.CHAINMAIL_CHESTPLATE ) );
-        setItemSlot( EquipmentSlotType.LEGS, new ItemStack( Items.CHAINMAIL_LEGGINGS ) );
-        setItemSlot( EquipmentSlotType.FEET, new ItemStack( Items.CHAINMAIL_BOOTS ) );
+        setItemSlot( EquipmentSlot.HEAD, new ItemStack( Items.CHAINMAIL_HELMET ) );
+        setItemSlot( EquipmentSlot.CHEST, new ItemStack( Items.CHAINMAIL_CHESTPLATE ) );
+        setItemSlot( EquipmentSlot.LEGS, new ItemStack( Items.CHAINMAIL_LEGGINGS ) );
+        setItemSlot( EquipmentSlot.FEET, new ItemStack( Items.CHAINMAIL_BOOTS ) );
     }
 }

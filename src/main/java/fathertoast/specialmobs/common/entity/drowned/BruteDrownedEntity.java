@@ -6,11 +6,11 @@ import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.item.Items;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
 
 @SpecialMob
 public class BruteDrownedEntity extends _SpecialDrownedEntity {
@@ -43,7 +43,7 @@ public class BruteDrownedEntity extends _SpecialDrownedEntity {
     }
     
     @SpecialMob.Factory
-    public static EntityType.IFactory<BruteDrownedEntity> getVariantFactory() { return BruteDrownedEntity::new; }
+    public static EntityType.EntityFactory<BruteDrownedEntity> getVariantFactory() { return BruteDrownedEntity::new; }
     
     /** @return This entity's mob species. */
     @SpecialMob.SpeciesSupplier
@@ -53,11 +53,11 @@ public class BruteDrownedEntity extends _SpecialDrownedEntity {
     
     //--------------- Variant-Specific Implementations ----------------
     
-    public BruteDrownedEntity( EntityType<? extends _SpecialDrownedEntity> entityType, World world ) { super( entityType, world ); }
+    public BruteDrownedEntity( EntityType<? extends _SpecialDrownedEntity> entityType, Level level) { super( entityType, level ); }
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override
-    protected void onVariantAttack( LivingEntity target ) {
+    protected void onVariantAttack(LivingEntity target ) {
         MobHelper.causeLifeLoss( target, 2.0F );
         MobHelper.knockback( this, target, 2.0F, 1.0F );
     }

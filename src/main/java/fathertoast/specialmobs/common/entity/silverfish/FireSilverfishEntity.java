@@ -5,13 +5,13 @@ import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.monster.SilverfishEntity;
-import net.minecraft.item.Items;
-import net.minecraft.potion.EffectInstance;
-import net.minecraft.potion.Effects;
-import net.minecraft.world.World;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.monster.Silverfish;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
 
 import java.util.List;
 
@@ -44,7 +44,7 @@ public class FireSilverfishEntity extends _SpecialSilverfishEntity {
     }
     
     @SpecialMob.Factory
-    public static EntityType.IFactory<FireSilverfishEntity> getVariantFactory() { return FireSilverfishEntity::new; }
+    public static EntityType.EntityFactory<FireSilverfishEntity> getVariantFactory() { return FireSilverfishEntity::new; }
     
     /** @return This entity's mob species. */
     @SpecialMob.SpeciesSupplier
@@ -56,7 +56,7 @@ public class FireSilverfishEntity extends _SpecialSilverfishEntity {
     
     private byte auraCooldown = 20;
     
-    public FireSilverfishEntity( EntityType<? extends _SpecialSilverfishEntity> entityType, World world ) { super( entityType, world ); }
+    public FireSilverfishEntity( EntityType<? extends _SpecialSilverfishEntity> entityType, Level level ) { super( entityType, level ); }
     
     /** Override to change the color of this entity's spit attack. */
     @Override
@@ -81,10 +81,10 @@ public class FireSilverfishEntity extends _SpecialSilverfishEntity {
     
     /** Applies this entity's aura effect. */
     private void pulseAura() {
-        final List<SilverfishEntity> friends = level.getEntitiesOfClass( SilverfishEntity.class, getBoundingBox().inflate( 7.0 ) );
-        for( SilverfishEntity cutie : friends ) {
+        final List<Silverfish> friends = level.getEntitiesOfClass( Silverfish.class, getBoundingBox().inflate( 7.0 ) );
+        for( Silverfish cutie : friends ) {
             if( cutie.isAlive() && !cutie.fireImmune() ) {
-                cutie.addEffect( new EffectInstance( Effects.FIRE_RESISTANCE, 35 + random.nextInt( 16 ),
+                cutie.addEffect( new MobEffectInstance( MobEffects.FIRE_RESISTANCE, 35 + random.nextInt( 16 ),
                         0, true, true ) );
             }
         }

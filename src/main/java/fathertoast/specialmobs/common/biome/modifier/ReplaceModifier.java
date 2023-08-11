@@ -61,6 +61,6 @@ public record ReplaceModifier(ResourceLocation entityToReplace, ResourceLocation
     // RAAAAAAAUGH
     @Override
     public Codec<? extends BiomeModifier> codec() {
-        return SMBiomeMods.REPLACE_MOD.get();
+        return SMBiomeMods.REPLACE_SPAWN.get();
     }
 }

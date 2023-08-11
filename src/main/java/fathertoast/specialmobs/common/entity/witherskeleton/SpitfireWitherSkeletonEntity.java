@@ -8,13 +8,13 @@ import fathertoast.specialmobs.common.config.species.SpeciesConfig;
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.entity.projectile.SmallFireballEntity;
-import net.minecraft.item.Items;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.World;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.projectile.SmallFireball;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
 
 @SpecialMob
 public class SpitfireWitherSkeletonEntity extends _SpecialWitherSkeletonEntity {
@@ -52,7 +52,7 @@ public class SpitfireWitherSkeletonEntity extends _SpecialWitherSkeletonEntity {
     }
     
     @SpecialMob.Factory
-    public static EntityType.IFactory<SpitfireWitherSkeletonEntity> getVariantFactory() { return SpitfireWitherSkeletonEntity::new; }
+    public static EntityType.EntityFactory<SpitfireWitherSkeletonEntity> getVariantFactory() { return SpitfireWitherSkeletonEntity::new; }
     
     /** @return This entity's mob species. */
     @SpecialMob.SpeciesSupplier
@@ -62,11 +62,15 @@ public class SpitfireWitherSkeletonEntity extends _SpecialWitherSkeletonEntity {
     
     //--------------- Variant-Specific Implementations ----------------
     
-    public SpitfireWitherSkeletonEntity( EntityType<? extends _SpecialWitherSkeletonEntity> entityType, World world ) {
-        super( entityType, world );
-        maxUpStep = 1.0F;
+    public SpitfireWitherSkeletonEntity( EntityType<? extends _SpecialWitherSkeletonEntity> entityType, Level level ) {
+        super( entityType, level );
     }
-    
+
+    @Override
+    public float getStepHeight() {
+        return 1.0F;
+    }
+
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override
     protected void onVariantAttack( LivingEntity target ) {
@@ -79,14 +83,14 @@ public class SpitfireWitherSkeletonEntity extends _SpecialWitherSkeletonEntity {
     public void performRangedAttack( LivingEntity target, float damageMulti ) {
         References.LevelEvent.BLAZE_SHOOT.play( this );
         
-        final float accelVariance = MathHelper.sqrt( distanceTo( target ) ) * 0.5F * getSpecialData().getRangedAttackSpread();
+        final float accelVariance = Mth.sqrt( distanceTo( target ) ) * 0.5F * getSpecialData().getRangedAttackSpread();
         
         for( int i = 0; i < 4; i++ ) {
             final double dX = target.getX() - getX() + getRandom().nextGaussian() * accelVariance;
             final double dY = target.getEyeY() - getEyeY();
             final double dZ = target.getZ() - getZ() + getRandom().nextGaussian() * accelVariance;
             
-            final SmallFireballEntity fireball = new SmallFireballEntity( level, this, dX, dY, dZ );
+            final SmallFireball fireball = new SmallFireball( level, this, dX, dY, dZ );
             fireball.setPos( fireball.getX(), getEyeY() - 0.1, fireball.getZ() );
             level.addFreshEntity( fireball );
         }

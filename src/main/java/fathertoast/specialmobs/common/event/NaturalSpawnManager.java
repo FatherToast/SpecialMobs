@@ -2,15 +2,7 @@ package fathertoast.specialmobs.common.event;
 
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.config.Config;
-import fathertoast.specialmobs.common.entity.creeper.DrowningCreeperEntity;
-import fathertoast.specialmobs.common.entity.creeper.EnderCreeperEntity;
-import fathertoast.specialmobs.common.entity.creeper.FireCreeperEntity;
-import fathertoast.specialmobs.common.entity.slime.BlueberrySlimeEntity;
-import fathertoast.specialmobs.common.entity.spider.FireSpiderEntity;
-import fathertoast.specialmobs.common.entity.zombie.FireZombieEntity;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.Difficulty;
@@ -19,27 +11,28 @@ import net.minecraft.world.entity.monster.CaveSpider;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
-import net.minecraft.world.level.biome.Biome;
-import net.minecraft.world.level.biome.Biomes;
-import net.minecraft.world.level.biome.MobSpawnSettings;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraftforge.event.entity.SpawnPlacementRegisterEvent;
 
-import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.List;
-
 public final class NaturalSpawnManager {
-    
+
+    /**
+     * Holder for the SpawnPlacementRegisterEvent when it is fired. Temporarily stored as a field to
+     * avoid passing the event around as an argument in a bazillion methods.
+     */
+    private static SpawnPlacementRegisterEvent registerEvent = null;
+
     //--------------- Spawn Placement Registration ----------------
     
     /** Sets the natural spawn placement rules for entity types. */
     public static void registerSpawnPlacements( SpawnPlacementRegisterEvent event ) {
         if( !Config.MAIN.GENERAL.enableNaturalSpawning.get() ) return;
+
+        registerEvent = event;
         
         // Bestiary-generated entities
         for( MobFamily.Species<?> species : MobFamily.getAllSpecies() ) {
-            species.registerSpawnPlacement();
+            species.registerSpawnPlacement( );
         }
         
         // Additional entries
@@ -52,6 +45,7 @@ public final class NaturalSpawnManager {
                 // Overwriting the vanilla entry with our own throws this exception, but we can just ignore it :^)
             }
         }
+        registerEvent = null;
     }
     
     public static void registerSpawnPlacement( MobFamily.Species<? extends Monster> species ) {
@@ -71,7 +65,7 @@ public final class NaturalSpawnManager {
     public static <T extends Mob> void registerSpawnPlacement( MobFamily.Species<T> species,
                                                                SpawnPlacements.Type type,
                                                                SpawnPlacements.SpawnPredicate<T> predicate ) {
-        EntitySpawnPlacementRegistry.register( species.entityType.get(), type, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, predicate );
+        registerEvent.register( species.entityType.get(), type, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, predicate, SpawnPlacementRegisterEvent.Operation.AND );
     }
     
     public static boolean checkSpawnRulesDefault(EntityType<? extends Monster> type, ServerLevelAccessor level,
@@ -122,7 +116,8 @@ public final class NaturalSpawnManager {
     
     
     //--------------- Added Natural Spawns ----------------
-    
+
+    /*
     public static void onBiomeLoad( BiomeLoadingEvent event ) {
         if( !Config.MAIN.GENERAL.enableNaturalSpawning.get() ) return;
         
@@ -131,8 +126,11 @@ public final class NaturalSpawnManager {
         addCopiedSpawns( spawnInfoBuilder );
         addBiomeCategorySpawns( spawnInfoBuilder, event.getCategory(), event.getName() );
     }
+
+     */
     
     /** Adds enabled spawn-copier mobs to the spawn list. */
+    /*
     private static void addCopiedSpawns( MobSpawnInfoBuilder builder ) {
         addCopiedSpawns( builder, EntityType.SPIDER, EntityType.CAVE_SPIDER,
                 Config.MAIN.NATURAL_SPAWNING.caveSpiderSpawnMultiplier.get() );
@@ -140,8 +138,11 @@ public final class NaturalSpawnManager {
         addCopiedSpawns( builder, EntityType.ENDERMAN, EnderCreeperEntity.SPECIES.entityType.get(),
                 Config.MAIN.NATURAL_SPAWNING.enderCreeperSpawnMultiplier.get() );
     }
+
+     */
     
     /** Adds an entity type to the spawn list by copying another type's spawn entries. Does nothing if the entity type is already added. */
+    /*
     private static void addCopiedSpawns( MobSpawnInfoBuilder builder, EntityType<?> typeToCopy, EntityType<?> typeToAdd, double multi ) {
         if( multi <= 0.0 ) return;
         
@@ -152,7 +153,7 @@ public final class NaturalSpawnManager {
             if( spawner.type == typeToCopy && spawner.weight > 0 ) spawnersToCopy.add( spawner );
         }
         
-        // Currently, we simply copy pack size and spawn costs directly; configs can be added later for these if needed
+        // Currently, we simply copy pack size and spawn costs directly; configs can be added later for these, if needed
         if( !spawnersToCopy.isEmpty() ) {
             for( MobSpawnInfo.Spawners spawner : spawnersToCopy ) {
                 addSpawn( builder, typeToAdd, Math.max( 1, MathHelper.floor( spawner.weight * multi ) ),
@@ -165,8 +166,11 @@ public final class NaturalSpawnManager {
             }
         }
     }
+
+     */
     
     /** Adds enabled biome-category-based mobs to the spawn list. */
+    /*
     private static void addBiomeCategorySpawns( MobSpawnInfoBuilder builder, Biome.Category category, @Nullable ResourceLocation name ) {
         switch( category ) {
             case OCEAN:
@@ -187,8 +191,11 @@ public final class NaturalSpawnManager {
                 break;
         }
     }
+
+     */
     
     /** Adds enabled extra nether mobs to the spawn list. */
+    /*
     private static void addNetherSpawns( MobSpawnInfoBuilder builder, @Nullable ResourceLocation name ) {
         // Soul sand valley and warped forest biomes have unique spawn setups
         if( isBiome( name, Biomes.WARPED_FOREST ) ) {
@@ -226,8 +233,11 @@ public final class NaturalSpawnManager {
         addSpawn( builder, FireSpiderEntity.SPECIES.entityType.get(),
                 Config.MAIN.NATURAL_SPAWNING.fireSpiderNetherWeight.get(), 4, 4 );
     }
+
+     */
     
     /** @return True if the name represents a particular biome. */
+    /*
     private static boolean isBiome( @Nullable ResourceLocation name, ResourceKey<Biome> biome ) {
         return biome.location().equals( name );
     }
@@ -242,11 +252,12 @@ public final class NaturalSpawnManager {
         }
     }
     
-    private static void addSpawn( MobSpawnInfoBuilder builder, EntityType<?> entity, int weight, int minCount, int maxCount,
-                                  double charge, double budget ) {
+    private static void addSpawn(MobSpawnSettingsBuilder builder, EntityType<?> entity, int weight, int minCount, int maxCount,
+                                 double charge, double budget ) {
         if( weight > 0 ) {
             builder.addSpawn( entity.getCategory(), new MobSpawnSettings.SpawnerData( entity, weight, minCount, maxCount ) );
             builder.addMobCharge( entity, charge, budget );
         }
     }
+    */
 }

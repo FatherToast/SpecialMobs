@@ -32,18 +32,19 @@ public class PotionSlimeSpeciesConfig extends SpeciesConfig {
                     "Options specific to " + speciesName + "." );
             
             allowedPotions = SPEC.define( new LazyRegistryEntryListField<>( "allowed_effects",
-                    new LazyRegistryEntryList<>( ForgeRegistries.MOB_EFFECTS, false,
+                    new LazyRegistryEntryList<>( ForgeRegistries.MOB_EFFECTS, false, new MobEffect[] {
                             MobEffects.MOVEMENT_SPEED, MobEffects.MOVEMENT_SLOWDOWN,
                             MobEffects.DIG_SPEED, MobEffects.DIG_SLOWDOWN,
                             MobEffects.DAMAGE_BOOST, MobEffects.WEAKNESS,
                             MobEffects.HEAL, MobEffects.HARM, MobEffects.HUNGER,
                             MobEffects.REGENERATION, MobEffects.POISON, MobEffects.WITHER,
-                            MobEffects.JUMP, MobEffects.LEVITATION, MobEffects.SLOW_FALLING, SMEffects.WEIGHT,
-                            MobEffects.DAMAGE_RESISTANCE, SMEffects.VULNERABILITY,
+                            MobEffects.JUMP, MobEffects.LEVITATION, MobEffects.SLOW_FALLING, SMEffects.WEIGHT.get(),
+                            MobEffects.DAMAGE_RESISTANCE, SMEffects.VULNERABILITY.get(),
                             MobEffects.FIRE_RESISTANCE, MobEffects.WATER_BREATHING,
                             MobEffects.BLINDNESS, MobEffects.NIGHT_VISION, MobEffects.CONFUSION,
                             MobEffects.HEALTH_BOOST, MobEffects.ABSORPTION,
                             MobEffects.GLOWING
+                        }
                     ),
                     "List of potions that " + speciesName + " can be 'filled' with on spawn (they will apply it on hit).",
                     "Each effect in the list has an equal chance to be selected." ) );

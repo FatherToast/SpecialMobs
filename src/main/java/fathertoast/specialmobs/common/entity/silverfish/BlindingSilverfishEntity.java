@@ -6,11 +6,11 @@ import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.item.Items;
-import net.minecraft.potion.Effects;
-import net.minecraft.world.World;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
 
 @SpecialMob
 public class BlindingSilverfishEntity extends _SpecialSilverfishEntity {
@@ -40,7 +40,7 @@ public class BlindingSilverfishEntity extends _SpecialSilverfishEntity {
     }
     
     @SpecialMob.Factory
-    public static EntityType.IFactory<BlindingSilverfishEntity> getVariantFactory() { return BlindingSilverfishEntity::new; }
+    public static EntityType.EntityFactory<BlindingSilverfishEntity> getVariantFactory() { return BlindingSilverfishEntity::new; }
     
     /** @return This entity's mob species. */
     @SpecialMob.SpeciesSupplier
@@ -50,16 +50,16 @@ public class BlindingSilverfishEntity extends _SpecialSilverfishEntity {
     
     //--------------- Variant-Specific Implementations ----------------
     
-    public BlindingSilverfishEntity( EntityType<? extends _SpecialSilverfishEntity> entityType, World world ) { super( entityType, world ); }
+    public BlindingSilverfishEntity( EntityType<? extends _SpecialSilverfishEntity> entityType, Level level ) { super( entityType, level ); }
     
     /** Override to change the color of this entity's spit attack. */
     @Override
-    protected int getVariantSpitColor() { return Effects.BLINDNESS.getColor(); }
+    protected int getVariantSpitColor() { return MobEffects.BLINDNESS.getColor(); }
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override
     protected void onVariantAttack( LivingEntity target ) {
-        MobHelper.applyEffect( target, Effects.BLINDNESS );
+        MobHelper.applyEffect( target, MobEffects.BLINDNESS );
         MobHelper.removeNightVision( target );
     }
 }

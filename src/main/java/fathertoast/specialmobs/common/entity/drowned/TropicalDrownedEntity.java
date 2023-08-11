@@ -8,12 +8,12 @@ import fathertoast.specialmobs.common.config.species.SpeciesConfig;
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
-import net.minecraft.block.Blocks;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.potion.Effects;
-import net.minecraft.world.World;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
 
 @SpecialMob
 public class TropicalDrownedEntity extends _SpecialDrownedEntity {
@@ -56,7 +56,7 @@ public class TropicalDrownedEntity extends _SpecialDrownedEntity {
     }
     
     @SpecialMob.Factory
-    public static EntityType.IFactory<TropicalDrownedEntity> getVariantFactory() { return TropicalDrownedEntity::new; }
+    public static EntityType.EntityFactory<TropicalDrownedEntity> getVariantFactory() { return TropicalDrownedEntity::new; }
     
     /** @return This entity's mob species. */
     @SpecialMob.SpeciesSupplier
@@ -66,11 +66,11 @@ public class TropicalDrownedEntity extends _SpecialDrownedEntity {
     
     //--------------- Variant-Specific Implementations ----------------
     
-    public TropicalDrownedEntity( EntityType<? extends _SpecialDrownedEntity> entityType, World world ) { super( entityType, world ); }
+    public TropicalDrownedEntity( EntityType<? extends _SpecialDrownedEntity> entityType, Level level ) { super( entityType, level ); }
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override
     protected void onVariantAttack( LivingEntity target ) {
-        MobHelper.applyEffect( target, Effects.POISON );
+        MobHelper.applyEffect( target, MobEffects.POISON );
     }
 }

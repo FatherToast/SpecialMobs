@@ -7,14 +7,14 @@ import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.entity.ai.goal.SpecialLeapAtTargetGoal;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.item.Items;
-import net.minecraft.particles.IParticleData;
-import net.minecraft.particles.ItemParticleData;
-import net.minecraft.particles.ParticleTypes;
-import net.minecraft.world.World;
+import net.minecraft.core.particles.ItemParticleOption;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
 
 @SpecialMob
 public class WatermelonSlimeEntity extends _SpecialSlimeEntity {
@@ -49,7 +49,7 @@ public class WatermelonSlimeEntity extends _SpecialSlimeEntity {
     }
     
     @SpecialMob.Factory
-    public static EntityType.IFactory<WatermelonSlimeEntity> getVariantFactory() { return WatermelonSlimeEntity::new; }
+    public static EntityType.EntityFactory<WatermelonSlimeEntity> getVariantFactory() { return WatermelonSlimeEntity::new; }
     
     /** @return This entity's mob species. */
     @SpecialMob.SpeciesSupplier
@@ -59,7 +59,7 @@ public class WatermelonSlimeEntity extends _SpecialSlimeEntity {
     
     //--------------- Variant-Specific Implementations ----------------
     
-    public WatermelonSlimeEntity( EntityType<? extends _SpecialSlimeEntity> entityType, World world ) { super( entityType, world ); }
+    public WatermelonSlimeEntity( EntityType<? extends _SpecialSlimeEntity> entityType, Level level ) { super( entityType, level ); }
     
     /** Override to change this entity's AI goals. */
     @Override
@@ -74,9 +74,9 @@ public class WatermelonSlimeEntity extends _SpecialSlimeEntity {
         MobHelper.knockback( this, 0.2, target, getSize(), 0.5F, 0.5 );
     }
     
-    private static final IParticleData JUMP_PARTICLE = new ItemParticleData( ParticleTypes.ITEM, Items.MELON_SLICE.getDefaultInstance() );
+    private static final ParticleOptions JUMP_PARTICLE = new ItemParticleOption( ParticleTypes.ITEM, Items.MELON_SLICE.getDefaultInstance() );
     
     /** @return This slime's particle type for jump effects. */
     @Override
-    protected IParticleData getParticleType() { return JUMP_PARTICLE; }
+    protected ParticleOptions getParticleType() { return JUMP_PARTICLE; }
 }

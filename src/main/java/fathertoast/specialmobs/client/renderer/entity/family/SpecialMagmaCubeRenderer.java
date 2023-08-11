@@ -1,20 +1,17 @@
 package fathertoast.specialmobs.client.renderer.entity.family;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import fathertoast.specialmobs.common.entity.ISpecialMob;
-import net.minecraft.client.renderer.entity.EntityRendererManager;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MagmaCubeRenderer;
-import net.minecraft.entity.monster.MagmaCubeEntity;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.monster.MagmaCube;
 
-@OnlyIn( Dist.CLIENT )
 public class SpecialMagmaCubeRenderer extends MagmaCubeRenderer {
     
     private final float baseShadowRadius;
     
-    public SpecialMagmaCubeRenderer( EntityRendererManager rendererManager ) {
+    public SpecialMagmaCubeRenderer( EntityRendererProvider.Context rendererManager ) {
         super( rendererManager );
         baseShadowRadius = shadowRadius;
         // Unneeded, the whole model is full brightness
@@ -24,16 +21,16 @@ public class SpecialMagmaCubeRenderer extends MagmaCubeRenderer {
     }
     
     @Override
-    public ResourceLocation getTextureLocation( MagmaCubeEntity entity ) {
+    public ResourceLocation getTextureLocation( MagmaCube entity ) {
         return ((ISpecialMob<?>) entity).getSpecialData().getTexture();
     }
     
     @Override
-    protected void scale( MagmaCubeEntity entity, MatrixStack matrixStack, float partialTick ) {
-        super.scale( entity, matrixStack, partialTick );
+    protected void scale(MagmaCube entity, PoseStack poseStack, float partialTick ) {
+        super.scale( entity, poseStack, partialTick );
         
         final float scale = ((ISpecialMob<?>) entity).getSpecialData().getRenderScale();
         shadowRadius = baseShadowRadius * scale * entity.getSize(); // Factor slime size into shadow
-        matrixStack.scale( scale, scale, scale );
+        poseStack.scale( scale, scale, scale );
     }
 }

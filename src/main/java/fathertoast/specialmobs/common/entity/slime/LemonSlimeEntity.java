@@ -6,17 +6,17 @@ import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.util.ExplosionHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.entity.effect.LightningBoltEntity;
-import net.minecraft.item.Items;
-import net.minecraft.particles.IParticleData;
-import net.minecraft.particles.ItemParticleData;
-import net.minecraft.particles.ParticleTypes;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.core.particles.ItemParticleOption;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LightningBolt;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 
 @SpecialMob
 public class LemonSlimeEntity extends _SpecialSlimeEntity {
@@ -48,7 +48,7 @@ public class LemonSlimeEntity extends _SpecialSlimeEntity {
     }
     
     @SpecialMob.Factory
-    public static EntityType.IFactory<LemonSlimeEntity> getVariantFactory() { return LemonSlimeEntity::new; }
+    public static EntityType.EntityFactory<LemonSlimeEntity> getVariantFactory() { return LemonSlimeEntity::new; }
     
     /** @return This entity's mob species. */
     @SpecialMob.SpeciesSupplier
@@ -58,7 +58,7 @@ public class LemonSlimeEntity extends _SpecialSlimeEntity {
     
     //--------------- Variant-Specific Implementations ----------------
     
-    public LemonSlimeEntity( EntityType<? extends _SpecialSlimeEntity> entityType, World world ) { super( entityType, world ); }
+    public LemonSlimeEntity( EntityType<? extends _SpecialSlimeEntity> entityType, Level level ) { super( entityType, level ); }
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override
@@ -68,18 +68,18 @@ public class LemonSlimeEntity extends _SpecialSlimeEntity {
         // Knock self back
         final float forwardPower = 1.1F;
         final float upwardPower = 1.0F;
-        final Vector3d vKnockback = new Vector3d( target.getX() - getX(), 0.0, target.getZ() - getZ() )
+        final Vec3 vKnockback = new Vec3( target.getX() - getX(), 0.0, target.getZ() - getZ() )
                 .normalize().scale( -forwardPower ).add( getDeltaMovement().scale( 0.2F ) );
         setDeltaMovement( vKnockback.x, 0.4 * upwardPower, vKnockback.z );
     }
     
     /** Called when this entity is struck by lightning. */
     @Override
-    public void thunderHit( ServerWorld world, LightningBoltEntity lightningBolt ) { }
+    public void thunderHit( ServerLevel level, LightningBolt lightningBolt ) { }
     
-    private static final IParticleData JUMP_PARTICLE = new ItemParticleData( ParticleTypes.ITEM, Items.YELLOW_DYE.getDefaultInstance() );
+    private static final ParticleOptions JUMP_PARTICLE = new ItemParticleOption( ParticleTypes.ITEM, Items.YELLOW_DYE.getDefaultInstance() );
     
     /** @return This slime's particle type for jump effects. */
     @Override
-    protected IParticleData getParticleType() { return JUMP_PARTICLE; }
+    protected ParticleOptions getParticleType() { return JUMP_PARTICLE; }
 }

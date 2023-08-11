@@ -7,22 +7,21 @@ import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.event.NaturalSpawnManager;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.SpawnReason;
-import net.minecraft.entity.ai.attributes.AttributeModifierMap;
-import net.minecraft.entity.monster.StrayEntity;
-import net.minecraft.entity.projectile.AbstractArrowEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.potion.Effects;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.SoundEvent;
-import net.minecraft.util.SoundEvents;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IServerWorld;
-import net.minecraft.world.World;
-
-import java.util.Random;
+import net.minecraft.core.BlockPos;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
+import net.minecraft.world.entity.monster.Stray;
+import net.minecraft.world.entity.projectile.AbstractArrow;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.ServerLevelAccessor;
 
 @SpecialMob
 public class StraySkeletonEntity extends _SpecialSkeletonEntity {
@@ -40,7 +39,7 @@ public class StraySkeletonEntity extends _SpecialSkeletonEntity {
     }
     
     @SpecialMob.AttributeSupplier
-    public static AttributeModifierMap.MutableAttribute createAttributes() { return StrayEntity.createAttributes(); }
+    public static AttributeSupplier.Builder createAttributes() { return Stray.createAttributes(); }
     
     @SpecialMob.SpawnPlacementRegistrar
     public static void registerSpeciesSpawnPlacement( MobFamily.Species<? extends StraySkeletonEntity> species ) {
@@ -50,12 +49,12 @@ public class StraySkeletonEntity extends _SpecialSkeletonEntity {
     /**
      * We cannot call the actual stray method because our stray variant does not extend the vanilla stray.
      *
-     * @see net.minecraft.entity.monster.StrayEntity#checkStraySpawnRules(EntityType, IServerWorld, SpawnReason, BlockPos, Random)
+     * @see net.minecraft.world.entity.monster.Stray#checkStraySpawnRules(EntityType, ServerLevelAccessor, MobSpawnType, BlockPos, RandomSource)
      */
-    public static boolean checkSpeciesSpawnRules( EntityType<? extends StraySkeletonEntity> type, IServerWorld world,
-                                                  SpawnReason reason, BlockPos pos, Random random ) {
-        return NaturalSpawnManager.checkSpawnRulesDefault( type, world, reason, pos, random ) &&
-                (reason == SpawnReason.SPAWNER || world.canSeeSky( pos ));
+    public static boolean checkSpeciesSpawnRules(EntityType<? extends StraySkeletonEntity> type, ServerLevelAccessor level,
+                                                 MobSpawnType spawnType, BlockPos pos, RandomSource random ) {
+        return NaturalSpawnManager.checkSpawnRulesDefault( type, level, spawnType, pos, random ) &&
+                (spawnType == MobSpawnType.SPAWNER || level.canSeeSky( pos ));
     }
     
     @SpecialMob.LanguageProvider
@@ -70,7 +69,7 @@ public class StraySkeletonEntity extends _SpecialSkeletonEntity {
     }
     
     @SpecialMob.Factory
-    public static EntityType.IFactory<StraySkeletonEntity> getVariantFactory() { return StraySkeletonEntity::new; }
+    public static EntityType.EntityFactory<StraySkeletonEntity> getVariantFactory() { return StraySkeletonEntity::new; }
     
     /** @return This entity's mob species. */
     @SpecialMob.SpeciesSupplier
@@ -80,18 +79,18 @@ public class StraySkeletonEntity extends _SpecialSkeletonEntity {
     
     //--------------- Variant-Specific Implementations ----------------
     
-    public StraySkeletonEntity( EntityType<? extends _SpecialSkeletonEntity> entityType, World world ) { super( entityType, world ); }
+    public StraySkeletonEntity( EntityType<? extends _SpecialSkeletonEntity> entityType, Level level ) { super( entityType, level ); }
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override
     protected void onVariantAttack( LivingEntity target ) {
-        MobHelper.applyEffect( target, Effects.MOVEMENT_SLOWDOWN, 2.0F );
+        MobHelper.applyEffect( target, MobEffects.MOVEMENT_SLOWDOWN, 2.0F );
     }
     
     /** Override to modify this entity's ranged attack projectile. */
     @Override
-    protected AbstractArrowEntity getVariantArrow( AbstractArrowEntity arrow, ItemStack arrowItem, float damageMulti ) {
-        return MobHelper.tipArrow( arrow, Effects.MOVEMENT_SLOWDOWN, 2.0F );
+    protected AbstractArrow getVariantArrow( AbstractArrow arrow, ItemStack arrowItem, float damageMulti ) {
+        return MobHelper.tipArrow( arrow, MobEffects.MOVEMENT_SLOWDOWN, 2.0F );
     }
     
     

@@ -8,17 +8,17 @@ import fathertoast.specialmobs.common.entity.ai.AIHelper;
 import fathertoast.specialmobs.common.entity.ai.FluidPathNavigator;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.item.Items;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.particles.IParticleData;
-import net.minecraft.particles.ParticleTypes;
-import net.minecraft.pathfinding.PathNavigator;
-import net.minecraft.pathfinding.PathNodeType;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.tags.FluidTags;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.navigation.PathNavigation;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.level.pathfinder.BlockPathTypes;
 
 @SpecialMob
 public class StrawberrySlimeEntity extends _SpecialSlimeEntity {
@@ -49,7 +49,7 @@ public class StrawberrySlimeEntity extends _SpecialSlimeEntity {
     }
     
     @SpecialMob.Factory
-    public static EntityType.IFactory<StrawberrySlimeEntity> getVariantFactory() { return StrawberrySlimeEntity::new; }
+    public static EntityType.EntityFactory<StrawberrySlimeEntity> getVariantFactory() { return StrawberrySlimeEntity::new; }
     
     /** @return This entity's mob species. */
     @SpecialMob.SpeciesSupplier
@@ -59,9 +59,9 @@ public class StrawberrySlimeEntity extends _SpecialSlimeEntity {
     
     //--------------- Variant-Specific Implementations ----------------
     
-    public StrawberrySlimeEntity( EntityType<? extends _SpecialSlimeEntity> entityType, World world ) {
-        super( entityType, world );
-        setPathfindingMalus( PathNodeType.LAVA, PathNodeType.WALKABLE.getMalus() );
+    public StrawberrySlimeEntity( EntityType<? extends _SpecialSlimeEntity> entityType, Level level ) {
+        super( entityType, level );
+        setPathfindingMalus( BlockPathTypes.LAVA, BlockPathTypes.WALKABLE.getMalus() );
     }
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
@@ -77,13 +77,13 @@ public class StrawberrySlimeEntity extends _SpecialSlimeEntity {
     
     /** @return A new path navigator for this entity to use. */
     @Override
-    protected PathNavigator createNavigation( World world ) {
-        return new FluidPathNavigator( this, world, false, true );
+    protected PathNavigation createNavigation( Level level ) {
+        return new FluidPathNavigator( this, level, false, true );
     }
     
     /** @return Whether this entity can stand on a particular type of fluid. */
     @Override
-    public boolean canStandOnFluid( Fluid fluid ) { return fluid.is( FluidTags.LAVA ); }
+    public boolean canStandOnFluid( FluidState fluid ) { return fluid.is( FluidTags.LAVA ); }
     
     /** Called each tick to update this entity. */
     @Override
@@ -94,11 +94,11 @@ public class StrawberrySlimeEntity extends _SpecialSlimeEntity {
     
     /** Override to load data from this entity's NBT data. */
     @Override
-    public void readVariantSaveData( CompoundNBT saveTag ) {
-        setPathfindingMalus( PathNodeType.LAVA, PathNodeType.WALKABLE.getMalus() );
+    public void readVariantSaveData( CompoundTag saveTag ) {
+        setPathfindingMalus( BlockPathTypes.LAVA, BlockPathTypes.WALKABLE.getMalus() );
     }
     
     /** @return This slime's particle type for jump effects. */
     @Override
-    protected IParticleData getParticleType() { return ParticleTypes.FLAME; }
+    protected ParticleOptions getParticleType() { return ParticleTypes.FLAME; }
 }

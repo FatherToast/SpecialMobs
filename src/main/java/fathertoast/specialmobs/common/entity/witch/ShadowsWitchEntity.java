@@ -6,15 +6,15 @@ import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.potion.EffectInstance;
-import net.minecraft.potion.Effects;
-import net.minecraft.potion.PotionUtils;
-import net.minecraft.potion.Potions;
-import net.minecraft.world.World;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.alchemy.PotionUtils;
+import net.minecraft.world.item.alchemy.Potions;
+import net.minecraft.world.level.Level;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -31,7 +31,7 @@ public class ShadowsWitchEntity extends _SpecialWitchEntity {
     public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
         bestiaryInfo.color( 0x000000 ).theme( BestiaryInfo.Theme.FOREST )
                 .uniqueTextureWithEyes()
-                .addExperience( 2 ).effectImmune( Effects.BLINDNESS, Effects.WITHER );
+                .addExperience( 2 ).effectImmune( MobEffects.BLINDNESS, MobEffects.WITHER );
     }
     
     @SpecialMob.LanguageProvider
@@ -48,7 +48,7 @@ public class ShadowsWitchEntity extends _SpecialWitchEntity {
     }
     
     @SpecialMob.Factory
-    public static EntityType.IFactory<ShadowsWitchEntity> getVariantFactory() { return ShadowsWitchEntity::new; }
+    public static EntityType.EntityFactory<ShadowsWitchEntity> getVariantFactory() { return ShadowsWitchEntity::new; }
     
     /** @return This entity's mob species. */
     @SpecialMob.SpeciesSupplier
@@ -58,17 +58,17 @@ public class ShadowsWitchEntity extends _SpecialWitchEntity {
     
     //--------------- Variant-Specific Implementations ----------------
     
-    private static final Collection<EffectInstance> POTION_SHADOWS = Arrays.asList(
-            new EffectInstance( Effects.BLINDNESS, 300, 0 ),
-            new EffectInstance( Effects.WITHER, 200, 0 )
+    private static final Collection<MobEffectInstance> POTION_SHADOWS = Arrays.asList(
+            new MobEffectInstance( MobEffects.BLINDNESS, 300, 0 ),
+            new MobEffectInstance( MobEffects.WITHER, 200, 0 )
     );
     
-    public ShadowsWitchEntity( EntityType<? extends _SpecialWitchEntity> entityType, World world ) { super( entityType, world ); }
+    public ShadowsWitchEntity( EntityType<? extends _SpecialWitchEntity> entityType, Level level ) { super( entityType, level ); }
     
     /** Override to modify potion attacks. Return an empty item stack to cancel the potion throw. */
     @Override
     protected ItemStack pickVariantThrownPotion( ItemStack originalPotion, LivingEntity target, float damageMulti, float distance ) {
-        if( target.getHealth() >= 4.0F && (!target.hasEffect( Effects.BLINDNESS ) || !target.hasEffect( Effects.WITHER )) ) {
+        if( target.getHealth() >= 4.0F && (!target.hasEffect( MobEffects.BLINDNESS ) || !target.hasEffect( MobEffects.WITHER )) ) {
             return makeSplashPotion( POTION_SHADOWS );
         }
         return originalPotion;
@@ -78,7 +78,7 @@ public class ShadowsWitchEntity extends _SpecialWitchEntity {
     @Override
     public void aiStep() {
         final LivingEntity target = getTarget();
-        if( !level.isClientSide() && isAlive() && target != null && target.hasEffect( Effects.BLINDNESS ) && random.nextInt( 10 ) == 0 ) {
+        if( !level.isClientSide() && isAlive() && target != null && target.hasEffect( MobEffects.BLINDNESS ) && random.nextInt( 10 ) == 0 ) {
             MobHelper.removeNightVision( target );
         }
         super.aiStep();

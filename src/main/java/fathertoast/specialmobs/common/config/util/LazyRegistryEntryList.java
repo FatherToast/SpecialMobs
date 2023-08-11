@@ -7,7 +7,6 @@ import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.RegistryObject;
 
 import javax.annotation.Nullable;
-import java.lang.reflect.ParameterizedType;
 import java.util.List;
 import java.util.Set;
 
@@ -32,7 +31,7 @@ public class LazyRegistryEntryList<T> extends RegistryEntryList<T> {
      * @param vanilla If true, assume all entries are from vanilla (already loaded)
      */
     @SuppressWarnings("unchecked")
-    public LazyRegistryEntryList( IForgeRegistry<T> registry, boolean vanilla, Object... entries ) {
+    public LazyRegistryEntryList( IForgeRegistry<T> registry, boolean vanilla, T[] entries ) {
         super( registry );
         FIELD = null;
 
@@ -40,12 +39,10 @@ public class LazyRegistryEntryList<T> extends RegistryEntryList<T> {
             populated = true;
         }
         else {
-            Class<T> type = (Class<T>) ((ParameterizedType) getClass().getGenericSuperclass())
-                    .getActualTypeArguments()[0];
 
-            for (Object entry : entries) {
-                if (type.isInstance(entry) && registry.containsValue((T) entry)) {
-                    final ResourceLocation regKey = registry.getKey((T) entry);
+            for (T entry : entries) {
+                if (registry.containsValue(entry)) {
+                    final ResourceLocation regKey = registry.getKey(entry);
                     if (regKey == null) {
                         throw new IllegalArgumentException("Invalid default lazy registry list entry! " + entry);
                     }

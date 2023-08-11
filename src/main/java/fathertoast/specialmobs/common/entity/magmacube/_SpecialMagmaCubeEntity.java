@@ -9,32 +9,32 @@ import fathertoast.specialmobs.common.entity.SpecialMobData;
 import fathertoast.specialmobs.common.event.NaturalSpawnManager;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.*;
-import net.minecraft.entity.ai.attributes.AttributeModifierManager;
-import net.minecraft.entity.ai.attributes.AttributeModifierMap;
-import net.minecraft.entity.monster.MagmaCubeEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.projectile.SnowballEntity;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.ListNBT;
-import net.minecraft.network.datasync.DataParameter;
-import net.minecraft.network.datasync.DataSerializers;
-import net.minecraft.network.datasync.EntityDataManager;
-import net.minecraft.pathfinding.PathNodeType;
-import net.minecraft.potion.EffectInstance;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.DifficultyInstance;
-import net.minecraft.world.IServerWorld;
-import net.minecraft.world.World;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.ai.attributes.AttributeMap;
+import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
+import net.minecraft.world.entity.monster.MagmaCube;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.Snowball;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.ServerLevelAccessor;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.pathfinder.BlockPathTypes;
+import net.minecraft.world.phys.Vec3;
 
 import javax.annotation.Nullable;
-import java.util.Random;
 
 @SpecialMob
-public class _SpecialMagmaCubeEntity extends MagmaCubeEntity implements ISpecialMob<_SpecialMagmaCubeEntity> {
+public class _SpecialMagmaCubeEntity extends MagmaCube implements ISpecialMob<_SpecialMagmaCubeEntity> {
     
     //--------------- Static Special Mob Hooks ----------------
     
@@ -49,8 +49,8 @@ public class _SpecialMagmaCubeEntity extends MagmaCubeEntity implements ISpecial
     }
     
     @SpecialMob.AttributeSupplier
-    public static AttributeModifierMap.MutableAttribute createAttributes() {
-        return MagmaCubeEntity.createAttributes(); // Slimes define their attributes elsewhere based on size
+    public static AttributeSupplier.Builder createAttributes() {
+        return MagmaCube.createAttributes(); // Slimes define their attributes elsewhere based on size
     }
     
     @SpecialMob.SpawnPlacementRegistrar
@@ -58,11 +58,11 @@ public class _SpecialMagmaCubeEntity extends MagmaCubeEntity implements ISpecial
         NaturalSpawnManager.registerSpawnPlacement( species, _SpecialMagmaCubeEntity::checkFamilySpawnRules );
     }
     
-    public static boolean checkFamilySpawnRules( EntityType<? extends MagmaCubeEntity> type, IServerWorld world,
-                                                 SpawnReason reason, BlockPos pos, Random random ) {
+    public static boolean checkFamilySpawnRules(EntityType<? extends MagmaCube> type, ServerLevelAccessor level,
+                                                MobSpawnType spawnType, BlockPos pos, RandomSource random ) {
         //noinspection unchecked
-        return MagmaCubeEntity.checkMagmaCubeSpawnRules( (EntityType<MagmaCubeEntity>) type, world, reason, pos, random ) &&
-                NaturalSpawnManager.checkSpawnRulesConfigured( type, world, reason, pos, random );
+        return MagmaCube.checkMagmaCubeSpawnRules( (EntityType<MagmaCube>) type, level, spawnType, pos, random ) &&
+                NaturalSpawnManager.checkSpawnRulesConfigured( type, level, spawnType, pos, random );
     }
     
     @SpecialMob.LanguageProvider
@@ -79,7 +79,7 @@ public class _SpecialMagmaCubeEntity extends MagmaCubeEntity implements ISpecial
     }
     
     @SpecialMob.Factory
-    public static EntityType.IFactory<_SpecialMagmaCubeEntity> getFactory() { return _SpecialMagmaCubeEntity::new; }
+    public static EntityType.EntityFactory<_SpecialMagmaCubeEntity> getFactory() { return _SpecialMagmaCubeEntity::new; }
     
     
     //--------------- Variant-Specific Breakouts ----------------
@@ -96,8 +96,8 @@ public class _SpecialMagmaCubeEntity extends MagmaCubeEntity implements ISpecial
     
     /** Override to change starting equipment or stats. */
     @SuppressWarnings( "unused" )
-    public void finalizeVariantSpawn( IServerWorld world, DifficultyInstance difficulty, @Nullable SpawnReason spawnReason,
-                                      @Nullable ILivingEntityData groupData ) { }
+    public void finalizeVariantSpawn( ServerLevelAccessor level, DifficultyInstance difficulty, @Nullable MobSpawnType spawnType,
+                                     @Nullable SpawnGroupData groupData ) { }
     
     /** Called when this entity successfully damages a target to apply on-hit effects. */
     @Override
@@ -110,30 +110,30 @@ public class _SpecialMagmaCubeEntity extends MagmaCubeEntity implements ISpecial
     protected void onVariantAttack( LivingEntity target ) { }
     
     /** Override to save data to this entity's NBT data. */
-    public void addVariantSaveData( CompoundNBT saveTag ) { }
+    public void addVariantSaveData( CompoundTag saveTag ) { }
     
     /** Override to load data from this entity's NBT data. */
-    public void readVariantSaveData( CompoundNBT saveTag ) { }
+    public void readVariantSaveData( CompoundTag saveTag ) { }
     
     
     //--------------- Family-Specific Implementations ----------------
     
     /** The parameter for special mob render scale. */
-    private static final DataParameter<Float> SCALE = EntityDataManager.defineId( _SpecialMagmaCubeEntity.class, DataSerializers.FLOAT );
+    private static final EntityDataAccessor<Float> SCALE = SynchedEntityData.defineId( _SpecialMagmaCubeEntity.class, EntityDataSerializers.FLOAT );
     
     /** Used to reset slimes' attributes to their freshly spawned state so attribute adjustments may be reapplied on size change. */
-    private static ListNBT magmaCubeAttributeSnapshot;
+    private static ListTag magmaCubeAttributeSnapshot;
     
-    private static ListNBT getAttributeSnapshot() {
+    private static ListTag getAttributeSnapshot() {
         if( magmaCubeAttributeSnapshot == null )
-            magmaCubeAttributeSnapshot = new AttributeModifierManager( createAttributes().build() ).save();
+            magmaCubeAttributeSnapshot = new AttributeMap( createAttributes( ).build( ) ).save( );
         return magmaCubeAttributeSnapshot;
     }
     
     private int slimeExperienceValue = 0;
     
-    public _SpecialMagmaCubeEntity( EntityType<? extends _SpecialMagmaCubeEntity> entityType, World world ) {
-        super( entityType, world );
+    public _SpecialMagmaCubeEntity( EntityType<? extends _SpecialMagmaCubeEntity> entityType, Level level ) {
+        super( entityType, level );
         getSpecialData().initialize();
     }
     
@@ -146,7 +146,7 @@ public class _SpecialMagmaCubeEntity extends MagmaCubeEntity implements ISpecial
     
     /** Sets this slime's size, optionally resetting its health to max. */
     @Override
-    protected void setSize( int size, boolean resetHealth ) {
+    public void setSize( int size, boolean resetHealth ) {
         // We must reset all attributes and reapply changes since slimes set attribute base values on size change
         getAttributes().load( getAttributeSnapshot() );
         super.setSize( size, resetHealth );
@@ -184,11 +184,11 @@ public class _SpecialMagmaCubeEntity extends MagmaCubeEntity implements ISpecial
     /** Converts this entity to one of another type. */
     @Nullable
     @Override
-    public <T extends MobEntity> T convertTo( EntityType<T> entityType, boolean keepEquipment ) {
+    public <T extends Mob> T convertTo( EntityType<T> entityType, boolean keepEquipment ) {
         final T replacement = super.convertTo( entityType, keepEquipment );
-        if( replacement instanceof ISpecialMob && level instanceof IServerWorld ) {
-            MobHelper.finalizeSpawn( replacement, (IServerWorld) level, level.getCurrentDifficultyAt( blockPosition() ),
-                    SpawnReason.CONVERSION, null );
+        if( replacement instanceof ISpecialMob && level instanceof ServerLevelAccessor serverLevel ) {
+            MobHelper.finalizeSpawn( replacement, serverLevel, level.getCurrentDifficultyAt( blockPosition() ),
+                    MobSpawnType.CONVERSION, null );
         }
         return replacement;
     }
@@ -196,26 +196,26 @@ public class _SpecialMagmaCubeEntity extends MagmaCubeEntity implements ISpecial
     /** Called on spawn to initialize properties based on the world, difficulty, and the group it spawns with. */
     @Nullable
     @Override
-    public final ILivingEntityData finalizeSpawn( IServerWorld world, DifficultyInstance difficulty, SpawnReason spawnReason,
-                                                  @Nullable ILivingEntityData groupData, @Nullable CompoundNBT eggTag ) {
-        return MobHelper.finalizeSpawn( this, world, difficulty, spawnReason,
-                super.finalizeSpawn( world, difficulty, spawnReason, groupData, eggTag ) );
+    public final SpawnGroupData finalizeSpawn( ServerLevelAccessor level, DifficultyInstance difficulty, MobSpawnType spawnType,
+                                                  @Nullable SpawnGroupData groupData, @Nullable CompoundTag eggTag ) {
+        return MobHelper.finalizeSpawn( this, level, difficulty, spawnType,
+                super.finalizeSpawn( level, difficulty, spawnType, groupData, eggTag ) );
     }
     
     @Override
-    public void setSpecialPathfindingMalus( PathNodeType nodeType, float malus ) {
-        this.setPathfindingMalus( nodeType, malus );
+    public void setSpecialPathfindingMalus( BlockPathTypes types, float malus ) {
+        this.setPathfindingMalus( types, malus );
     }
     
     /** Called on spawn to set starting equipment. */
     @Override // Seal method to force spawn equipment changes through ISpecialMob
-    protected final void populateDefaultEquipmentSlots( DifficultyInstance difficulty ) { super.populateDefaultEquipmentSlots( difficulty ); }
+    protected final void populateDefaultEquipmentSlots( RandomSource random, DifficultyInstance difficulty ) { super.populateDefaultEquipmentSlots( random, difficulty ); }
     
     /** Called on spawn to initialize properties based on the world, difficulty, and the group it spawns with. */
     @Override
-    public void finalizeSpecialSpawn( IServerWorld world, DifficultyInstance difficulty, @Nullable SpawnReason spawnReason,
-                                      @Nullable ILivingEntityData groupData ) {
-        finalizeVariantSpawn( world, difficulty, spawnReason, groupData );
+    public void finalizeSpecialSpawn( ServerLevelAccessor level, DifficultyInstance difficulty, @Nullable MobSpawnType spawnReason,
+                                      @Nullable SpawnGroupData groupData ) {
+        finalizeVariantSpawn( level, difficulty, spawnReason, groupData );
     }
     
     
@@ -246,18 +246,18 @@ public class _SpecialMagmaCubeEntity extends MagmaCubeEntity implements ISpecial
     
     /** @return True if this entity can be leashed. */
     @Override
-    public boolean canBeLeashed( PlayerEntity player ) { return !isLeashed() && getSpecialData().allowLeashing(); }
+    public boolean canBeLeashed( Player player ) { return !isLeashed() && getSpecialData().allowLeashing(); }
     
     /** Sets this entity 'stuck' inside a block, such as a cobweb or sweet berry bush. Mod blocks could use this as a speed boost. */
     @Override
-    public void makeStuckInBlock( BlockState block, Vector3d speedMulti ) {
+    public void makeStuckInBlock( BlockState block, Vec3 speedMulti ) {
         if( getSpecialData().canBeStuckIn( block ) ) super.makeStuckInBlock( block, speedMulti );
     }
     
     /** @return Called when this mob falls. Calculates and applies fall damage. Returns false if canceled. */
     @Override
-    public boolean causeFallDamage( float distance, float damageMultiplier ) {
-        return super.causeFallDamage( distance, damageMultiplier * getSpecialData().getFallDamageMultiplier() );
+    public boolean causeFallDamage(float distance, float damageMultiplier, DamageSource damageSource ) {
+        return super.causeFallDamage( distance, damageMultiplier * getSpecialData().getFallDamageMultiplier(), damageSource );
     }
     
     /** @return True if this entity should NOT trigger pressure plates or tripwires. */
@@ -279,7 +279,7 @@ public class _SpecialMagmaCubeEntity extends MagmaCubeEntity implements ISpecial
     /** @return Attempts to damage this entity; returns true if the hit was successful. */
     @Override
     public boolean hurt( DamageSource source, float amount ) {
-        if( isSensitiveToWater() && source.getDirectEntity() instanceof SnowballEntity ) {
+        if( isSensitiveToWater() && source.getDirectEntity() instanceof Snowball ) {
             amount = Math.max( 3.0F, amount );
         }
         return super.hurt( source, amount );
@@ -287,14 +287,14 @@ public class _SpecialMagmaCubeEntity extends MagmaCubeEntity implements ISpecial
     
     /** @return True if the effect can be applied to this entity. */
     @Override
-    public boolean canBeAffected( EffectInstance effect ) { return getSpecialData().isPotionApplicable( effect ); }
+    public boolean canBeAffected( MobEffectInstance effect ) { return getSpecialData().isPotionApplicable( effect ); }
     
     /** Saves data to this entity's base NBT compound that is specific to its subclass. */
     @Override
-    public void addAdditionalSaveData( CompoundNBT tag ) {
+    public void addAdditionalSaveData( CompoundTag tag ) {
         super.addAdditionalSaveData( tag );
         
-        final CompoundNBT saveTag = SpecialMobData.getSaveLocation( tag );
+        final CompoundTag saveTag = SpecialMobData.getSaveLocation( tag );
         
         getSpecialData().writeToNBT( saveTag );
         addVariantSaveData( saveTag );
@@ -302,10 +302,10 @@ public class _SpecialMagmaCubeEntity extends MagmaCubeEntity implements ISpecial
     
     /** Loads data from this entity's base NBT compound that is specific to its subclass. */
     @Override
-    public void readAdditionalSaveData( CompoundNBT tag ) {
+    public void readAdditionalSaveData( CompoundTag tag ) {
         super.readAdditionalSaveData( tag );
         
-        final CompoundNBT saveTag = SpecialMobData.getSaveLocation( tag );
+        final CompoundTag saveTag = SpecialMobData.getSaveLocation( tag );
         
         getSpecialData().readFromNBT( saveTag );
         readVariantSaveData( saveTag );

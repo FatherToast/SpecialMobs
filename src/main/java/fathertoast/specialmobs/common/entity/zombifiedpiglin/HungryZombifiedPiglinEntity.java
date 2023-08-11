@@ -6,19 +6,19 @@ import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.ILivingEntityData;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.SpawnReason;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Food;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.util.SoundEvents;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.DifficultyInstance;
-import net.minecraft.world.IServerWorld;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.SpawnGroupData;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.food.FoodProperties;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraftforge.event.ForgeEventFactory;
 
 import javax.annotation.Nullable;
@@ -54,7 +54,7 @@ public class HungryZombifiedPiglinEntity extends _SpecialZombifiedPiglinEntity {
     }
     
     @SpecialMob.Factory
-    public static EntityType.IFactory<HungryZombifiedPiglinEntity> getVariantFactory() { return HungryZombifiedPiglinEntity::new; }
+    public static EntityType.EntityFactory<HungryZombifiedPiglinEntity> getVariantFactory() { return HungryZombifiedPiglinEntity::new; }
     
     /** @return This entity's mob species. */
     @SpecialMob.SpeciesSupplier
@@ -64,12 +64,12 @@ public class HungryZombifiedPiglinEntity extends _SpecialZombifiedPiglinEntity {
     
     //--------------- Variant-Specific Implementations ----------------
     
-    public HungryZombifiedPiglinEntity( EntityType<? extends _SpecialZombifiedPiglinEntity> entityType, World world ) { super( entityType, world ); }
+    public HungryZombifiedPiglinEntity( EntityType<? extends _SpecialZombifiedPiglinEntity> entityType, Level level ) { super( entityType, level ); }
     
     /** Override to change starting equipment or stats. */
     @Override
-    public void finalizeVariantSpawn( IServerWorld world, DifficultyInstance difficulty, @Nullable SpawnReason spawnReason,
-                                      @Nullable ILivingEntityData groupData ) {
+    public void finalizeVariantSpawn( ServerLevelAccessor level, DifficultyInstance difficulty, @Nullable MobSpawnType spawnType,
+                                     @Nullable SpawnGroupData groupData ) {
         setCanPickUpLoot( false );
     }
     
@@ -78,10 +78,10 @@ public class HungryZombifiedPiglinEntity extends _SpecialZombifiedPiglinEntity {
     protected void onVariantAttack( LivingEntity target ) {
         if( level.isClientSide() ) return;
         
-        if( target instanceof PlayerEntity && ForgeEventFactory.getMobGriefingEvent( level, this ) ) {
-            final ItemStack food = MobHelper.stealRandomFood( (PlayerEntity) target );
+        if( target instanceof Player player && ForgeEventFactory.getMobGriefingEvent( level, this ) ) {
+            final ItemStack food = MobHelper.stealRandomFood( player );
             if( !food.isEmpty() ) {
-                final Food foodStats = food.getItem().getFoodProperties();
+                final FoodProperties foodStats = food.getItem().getFoodProperties( food, this );
                 heal( Math.max( foodStats == null ? 0.0F : foodStats.getNutrition(), 1.0F ) );
                 playSound( SoundEvents.PLAYER_BURP, 0.5F, random.nextFloat() * 0.1F + 0.9F );
                 return;

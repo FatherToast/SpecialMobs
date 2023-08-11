@@ -9,11 +9,20 @@ import fathertoast.specialmobs.common.core.register.SMItems;
 import fathertoast.specialmobs.common.entity.projectile.IncorporealFireballEntity;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.Mth;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 
 @SpecialMob
 public class CorporealShiftGhastEntity extends _SpecialGhastEntity {
@@ -66,7 +75,7 @@ public class CorporealShiftGhastEntity extends _SpecialGhastEntity {
     
     private int shiftTime;
     
-    public CorporealShiftGhastEntity( EntityType<? extends _SpecialGhastEntity> entityType, World world ) { super( entityType, world ); }
+    public CorporealShiftGhastEntity( EntityType<? extends _SpecialGhastEntity> entityType, Level level ) { super( entityType, level ); }
     
     @Override
     protected void defineSynchedData() {
@@ -82,12 +91,12 @@ public class CorporealShiftGhastEntity extends _SpecialGhastEntity {
         if( --shiftTime <= 0 ) {
             if( !level.isClientSide() ) {
                 setCorporeal( !isCorporeal() );
-                spawnShiftSmoke( (ServerWorld) level );
+                spawnShiftSmoke( (ServerLevel) level );
             }
         }
     }
     
-    private void spawnShiftSmoke( ServerWorld world ) {
+    private void spawnShiftSmoke( ServerLevel world ) {
         world.sendParticles( ParticleTypes.CLOUD, this.getX(), this.getY(), this.getZ(),
                 25, 0.0, 0.0, 0.0, 0.4 );
     }
@@ -119,8 +128,8 @@ public class CorporealShiftGhastEntity extends _SpecialGhastEntity {
         
         References.LevelEvent.GHAST_SHOOT.play( this );
         
-        final float accelVariance = MathHelper.sqrt( distanceTo( target ) ) * 0.5F * getSpecialData().getRangedAttackSpread();
-        final Vector3d lookVec = getViewVector( 1.0F ).scale( getBbWidth() );
+        final float accelVariance = Mth.sqrt( distanceTo( target ) ) * 0.5F * getSpecialData().getRangedAttackSpread();
+        final Vec3 lookVec = getViewVector( 1.0F ).scale( getBbWidth() );
         double dX = target.getX() - (getX() + lookVec.x) + getRandom().nextGaussian() * accelVariance;
         double dY = target.getY( 0.5 ) - (0.5 + getY( 0.5 ));
         double dZ = target.getZ() - (getZ() + lookVec.z) + getRandom().nextGaussian() * accelVariance;
@@ -136,14 +145,14 @@ public class CorporealShiftGhastEntity extends _SpecialGhastEntity {
     
     /** Override to save data to this entity's NBT data. */
     @Override
-    public void addVariantSaveData( CompoundNBT saveTag ) {
+    public void addVariantSaveData( CompoundTag saveTag ) {
         saveTag.putBoolean( References.TAG_IS_SHIFTED, isCorporeal() );
         saveTag.putShort( References.TAG_SHIFT_TIME, (short) shiftTime );
     }
     
     /** Override to load data from this entity's NBT data. */
     @Override
-    public void readVariantSaveData( CompoundNBT saveTag ) {
+    public void readVariantSaveData( CompoundTag saveTag ) {
         if( saveTag.contains( References.TAG_IS_SHIFTED, References.NBT_TYPE_NUMERICAL ) )
             setCorporeal( saveTag.getBoolean( References.TAG_IS_SHIFTED ) );
         if( saveTag.contains( References.TAG_SHIFT_TIME, References.NBT_TYPE_NUMERICAL ) )

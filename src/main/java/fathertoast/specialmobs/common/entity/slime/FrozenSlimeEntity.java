@@ -8,20 +8,21 @@ import fathertoast.specialmobs.common.entity.ai.AIHelper;
 import fathertoast.specialmobs.common.entity.ai.FluidPathNavigator;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
-import net.minecraft.block.Blocks;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.particles.IParticleData;
-import net.minecraft.particles.ParticleTypes;
-import net.minecraft.pathfinding.PathNavigator;
-import net.minecraft.pathfinding.PathNodeType;
-import net.minecraft.potion.Effects;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.tags.FluidTags;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.ai.navigation.PathNavigation;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.level.pathfinder.BlockPathTypes;
+
 
 @SpecialMob
 public class FrozenSlimeEntity extends _SpecialSlimeEntity {
@@ -35,7 +36,7 @@ public class FrozenSlimeEntity extends _SpecialSlimeEntity {
     public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
         bestiaryInfo.color( 0x766BBC ).theme( BestiaryInfo.Theme.ICE )
                 .uniqueTextureBaseOnly()
-                .addExperience( 1 ).effectImmune( Effects.MOVEMENT_SLOWDOWN )
+                .addExperience( 1 ).effectImmune( MobEffects.MOVEMENT_SLOWDOWN )
                 .addToAttribute( Attributes.ARMOR, 10.0 );
     }
     
@@ -53,7 +54,7 @@ public class FrozenSlimeEntity extends _SpecialSlimeEntity {
     }
     
     @SpecialMob.Factory
-    public static EntityType.IFactory<FrozenSlimeEntity> getVariantFactory() { return FrozenSlimeEntity::new; }
+    public static EntityType.EntityFactory<FrozenSlimeEntity> getVariantFactory() { return FrozenSlimeEntity::new; }
     
     /** @return This entity's mob species. */
     @SpecialMob.SpeciesSupplier
@@ -65,14 +66,14 @@ public class FrozenSlimeEntity extends _SpecialSlimeEntity {
     
     private byte frostWalking;
     
-    public FrozenSlimeEntity( EntityType<? extends _SpecialSlimeEntity> entityType, World world ) {
-        super( entityType, world );
-        setPathfindingMalus( PathNodeType.WATER, PathNodeType.WALKABLE.getMalus() );
+    public FrozenSlimeEntity( EntityType<? extends _SpecialSlimeEntity> entityType, Level level ) {
+        super( entityType, level );
+        setPathfindingMalus( BlockPathTypes.WATER, BlockPathTypes.WALKABLE.getMalus() );
     }
     
     /** Sets this slime's size, optionally resetting its health to max. */
     @Override
-    protected void setSize( int size, boolean resetHealth ) {
+    public void setSize( int size, boolean resetHealth ) {
         super.setSize( size, resetHealth );
         
         // Set frost walker level to -1 plus log base 2 of size (typically 0, 1, or 2)
@@ -91,13 +92,13 @@ public class FrozenSlimeEntity extends _SpecialSlimeEntity {
     
     /** @return A new path navigator for this entity to use. */
     @Override
-    protected PathNavigator createNavigation( World world ) {
-        return new FluidPathNavigator( this, world, true, false );
+    protected PathNavigation createNavigation(Level level ) {
+        return new FluidPathNavigator( this, level, true, false );
     }
     
     /** @return Whether this entity can stand on a particular type of fluid. */
     @Override
-    public boolean canStandOnFluid( Fluid fluid ) { return fluid.is( FluidTags.WATER ); }
+    public boolean canStandOnFluid( FluidState fluid ) { return fluid.is( FluidTags.WATER ); }
     
     /** Called each tick to update this entity. */
     @Override
@@ -117,16 +118,16 @@ public class FrozenSlimeEntity extends _SpecialSlimeEntity {
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override
     protected void onVariantAttack( LivingEntity target ) {
-        MobHelper.applyEffect( target, Effects.MOVEMENT_SLOWDOWN, 4, 0.5F );
+        MobHelper.applyEffect( target, MobEffects.MOVEMENT_SLOWDOWN, 4, 0.5F );
     }
     
     /** Override to load data from this entity's NBT data. */
     @Override
-    public void readVariantSaveData( CompoundNBT saveTag ) {
-        setPathfindingMalus( PathNodeType.WATER, PathNodeType.WALKABLE.getMalus() );
+    public void readVariantSaveData( CompoundTag saveTag ) {
+        setPathfindingMalus( BlockPathTypes.WATER, BlockPathTypes.WALKABLE.getMalus() );
     }
     
     /** @return This slime's particle type for jump effects. */
     @Override
-    protected IParticleData getParticleType() { return ParticleTypes.ITEM_SNOWBALL; }
+    protected ParticleOptions getParticleType() { return ParticleTypes.ITEM_SNOWBALL; }
 }

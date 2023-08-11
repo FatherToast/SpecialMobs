@@ -5,10 +5,10 @@ import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.item.Items;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
 
 @SpecialMob
 public class ToughSilverfishEntity extends _SpecialSilverfishEntity {
@@ -43,7 +43,7 @@ public class ToughSilverfishEntity extends _SpecialSilverfishEntity {
     }
     
     @SpecialMob.Factory
-    public static EntityType.IFactory<ToughSilverfishEntity> getVariantFactory() { return ToughSilverfishEntity::new; }
+    public static EntityType.EntityFactory<ToughSilverfishEntity> getVariantFactory() { return ToughSilverfishEntity::new; }
     
     /** @return This entity's mob species. */
     @SpecialMob.SpeciesSupplier
@@ -53,7 +53,7 @@ public class ToughSilverfishEntity extends _SpecialSilverfishEntity {
     
     //--------------- Variant-Specific Implementations ----------------
     
-    public ToughSilverfishEntity( EntityType<? extends _SpecialSilverfishEntity> entityType, World world ) { super( entityType, world ); }
+    public ToughSilverfishEntity( EntityType<? extends _SpecialSilverfishEntity> entityType, Level level ) { super( entityType, level ); }
     
     /** Override to change the color of this entity's spit attack. */
     @Override

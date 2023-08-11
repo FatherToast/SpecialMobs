@@ -12,18 +12,14 @@ import fathertoast.specialmobs.common.entity.ai.IAmmoUser;
 import fathertoast.specialmobs.common.entity.ai.goal.ChargeCreeperGoal;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.ILivingEntityData;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.SpawnReason;
-import net.minecraft.entity.monster.CreeperEntity;
-import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.potion.Effects;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.DifficultyInstance;
-import net.minecraft.world.IServerWorld;
-import net.minecraft.world.World;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.monster.Creeper;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.ServerLevelAccessor;
 
 import javax.annotation.Nullable;
 import java.util.function.BiPredicate;
@@ -65,7 +61,7 @@ public class MadScientistZombieEntity extends _SpecialZombieEntity implements IA
     }
     
     @SpecialMob.Factory
-    public static EntityType.IFactory<MadScientistZombieEntity> getVariantFactory() { return MadScientistZombieEntity::new; }
+    public static EntityType.EntityFactory<MadScientistZombieEntity> getVariantFactory() { return MadScientistZombieEntity::new; }
     
     /** @return This entity's mob species. */
     @SpecialMob.SpeciesSupplier
@@ -75,14 +71,14 @@ public class MadScientistZombieEntity extends _SpecialZombieEntity implements IA
     
     //--------------- Variant-Specific Implementations ----------------
     
-    private static final BiPredicate<MadScientistZombieEntity, ? super CreeperEntity> CHARGE_CREEPER_TARGET = ( madman, creeper ) ->
-            creeper.isAlive() && !creeper.isPowered() && madman.getSensing().canSee( creeper );
+    private static final BiPredicate<MadScientistZombieEntity, ? super Creeper> CHARGE_CREEPER_TARGET = (madman, creeper ) ->
+            creeper.isAlive() && !creeper.isPowered() && madman.getSensing().hasLineOfSight( creeper );
     
     /** The number of creepers this madman can charge. */
     private int chargeCount;
     
-    public MadScientistZombieEntity( EntityType<? extends _SpecialZombieEntity> entityType, World world ) {
-        super( entityType, world );
+    public MadScientistZombieEntity( EntityType<? extends _SpecialZombieEntity> entityType, Level level ) {
+        super( entityType, level );
         chargeCount = getConfig().MAD_SCIENTIST.chargeCount.next( random );
     }
     
@@ -98,17 +94,17 @@ public class MadScientistZombieEntity extends _SpecialZombieEntity implements IA
     
     /** Override to change starting equipment or stats. */
     @Override
-    public void finalizeVariantSpawn( IServerWorld world, DifficultyInstance difficulty, @Nullable SpawnReason spawnReason,
-                                      @Nullable ILivingEntityData groupData ) {
-        setItemSlot( EquipmentSlotType.MAINHAND, new ItemStack( SMItems.SYRINGE.get() ) );
-        setDropChance( EquipmentSlotType.MAINHAND, 0.0F );
+    public void finalizeVariantSpawn( ServerLevelAccessor level, DifficultyInstance difficulty, @Nullable MobSpawnType spawnType,
+                                     @Nullable SpawnGroupData groupData ) {
+        setItemSlot( EquipmentSlot.MAINHAND, new ItemStack( SMItems.SYRINGE.get() ) );
+        setDropChance( EquipmentSlot.MAINHAND, 0.0F );
     }
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override
     protected void onVariantAttack( LivingEntity target ) {
         if( hasAmmo() ) {
-            MobHelper.applyEffect( target, Effects.POISON );
+            MobHelper.applyEffect( target, MobEffects.POISON );
         }
     }
     
@@ -118,9 +114,9 @@ public class MadScientistZombieEntity extends _SpecialZombieEntity implements IA
         super.aiStep();
         
         // We can't do this when the last charge is used, since it would change the AI during the AI loop
-        if( chargeCount <= 0 && getItemBySlot( EquipmentSlotType.MAINHAND ).getItem() == SMItems.SYRINGE.get() ) {
-            broadcastBreakEvent( EquipmentSlotType.MAINHAND );
-            setItemSlot( EquipmentSlotType.MAINHAND, ItemStack.EMPTY );
+        if( chargeCount <= 0 && getItemBySlot( EquipmentSlot.MAINHAND ).getItem() == SMItems.SYRINGE.get() ) {
+            broadcastBreakEvent( EquipmentSlot.MAINHAND );
+            setItemSlot( EquipmentSlot.MAINHAND, ItemStack.EMPTY );
         }
     }
     
@@ -134,13 +130,13 @@ public class MadScientistZombieEntity extends _SpecialZombieEntity implements IA
     
     /** Override to save data to this entity's NBT data. */
     @Override
-    public void addVariantSaveData( CompoundNBT saveTag ) {
+    public void addVariantSaveData( CompoundTag saveTag ) {
         saveTag.putByte( References.TAG_AMMO, (byte) chargeCount );
     }
     
     /** Override to load data from this entity's NBT data. */
     @Override
-    public void readVariantSaveData( CompoundNBT saveTag ) {
+    public void readVariantSaveData( CompoundTag saveTag ) {
         if( saveTag.contains( References.TAG_AMMO, References.NBT_TYPE_NUMERICAL ) )
             chargeCount = saveTag.getByte( References.TAG_AMMO );
     }

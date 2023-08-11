@@ -7,10 +7,10 @@ import fathertoast.specialmobs.common.config.species.SkeletonSpeciesConfig;
 import fathertoast.specialmobs.common.config.species.SpeciesConfig;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.item.Items;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
 
 @SpecialMob
 public class GatlingWitherSkeletonEntity extends _SpecialWitherSkeletonEntity {
@@ -49,7 +49,7 @@ public class GatlingWitherSkeletonEntity extends _SpecialWitherSkeletonEntity {
     }
     
     @SpecialMob.Factory
-    public static EntityType.IFactory<GatlingWitherSkeletonEntity> getVariantFactory() { return GatlingWitherSkeletonEntity::new; }
+    public static EntityType.EntityFactory<GatlingWitherSkeletonEntity> getVariantFactory() { return GatlingWitherSkeletonEntity::new; }
     
     /** @return This entity's mob species. */
     @SpecialMob.SpeciesSupplier
@@ -59,5 +59,5 @@ public class GatlingWitherSkeletonEntity extends _SpecialWitherSkeletonEntity {
     
     //--------------- Variant-Specific Implementations ----------------
     
-    public GatlingWitherSkeletonEntity( EntityType<? extends _SpecialWitherSkeletonEntity> entityType, World world ) { super( entityType, world ); }
+    public GatlingWitherSkeletonEntity( EntityType<? extends _SpecialWitherSkeletonEntity> entityType, Level level ) { super( entityType, level ); }
 }

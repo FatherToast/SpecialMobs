@@ -1,11 +1,10 @@
 package fathertoast.specialmobs.client.renderer.entity.family;
-
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import fathertoast.specialmobs.common.entity.ISpecialMob;
 import net.minecraft.client.renderer.entity.BlazeRenderer;
-import net.minecraft.client.renderer.entity.EntityRendererManager;
-import net.minecraft.entity.monster.BlazeEntity;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.monster.Blaze;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -14,8 +13,8 @@ public class SpecialBlazeRenderer extends BlazeRenderer {
     
     private final float baseShadowRadius;
     
-    public SpecialBlazeRenderer( EntityRendererManager rendererManager ) {
-        super( rendererManager );
+    public SpecialBlazeRenderer( EntityRendererProvider.Context context ) {
+        super( context );
         baseShadowRadius = shadowRadius;
         // Unneeded, the whole model is full brightness
         //addLayer( new SpecialMobEyesLayer<>( this ) );
@@ -24,12 +23,12 @@ public class SpecialBlazeRenderer extends BlazeRenderer {
     }
     
     @Override
-    public ResourceLocation getTextureLocation( BlazeEntity entity ) {
+    public ResourceLocation getTextureLocation( Blaze entity ) {
         return ((ISpecialMob<?>) entity).getSpecialData().getTexture();
     }
     
     @Override
-    protected void scale( BlazeEntity entity, MatrixStack matrixStack, float partialTick ) {
+    protected void scale(Blaze entity, PoseStack matrixStack, float partialTick ) {
         super.scale( entity, matrixStack, partialTick );
         
         final float scale = ((ISpecialMob<?>) entity).getSpecialData().getRenderScale();

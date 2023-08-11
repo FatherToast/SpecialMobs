@@ -8,19 +8,15 @@ import fathertoast.specialmobs.common.config.species.SpeciesConfig;
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.ILivingEntityData;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.SpawnReason;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.entity.projectile.AbstractArrowEntity;
-import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.potion.Effects;
 import net.minecraft.world.DifficultyInstance;
-import net.minecraft.world.IServerWorld;
-import net.minecraft.world.World;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.projectile.AbstractArrow;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.ServerLevelAccessor;
 
 import javax.annotation.Nullable;
 
@@ -58,7 +54,7 @@ public class WeatheredSkeletonEntity extends _SpecialSkeletonEntity {
     }
     
     @SpecialMob.Factory
-    public static EntityType.IFactory<WeatheredSkeletonEntity> getVariantFactory() { return WeatheredSkeletonEntity::new; }
+    public static EntityType.EntityFactory<WeatheredSkeletonEntity> getVariantFactory() { return WeatheredSkeletonEntity::new; }
     
     /** @return This entity's mob species. */
     @SpecialMob.SpeciesSupplier
@@ -68,16 +64,16 @@ public class WeatheredSkeletonEntity extends _SpecialSkeletonEntity {
     
     //--------------- Variant-Specific Implementations ----------------
     
-    public WeatheredSkeletonEntity( EntityType<? extends _SpecialSkeletonEntity> entityType, World world ) { super( entityType, world ); }
+    public WeatheredSkeletonEntity( EntityType<? extends _SpecialSkeletonEntity> entityType, Level level ) { super( entityType, level ); }
     
     /** Override to change starting equipment or stats. */
-    public void finalizeVariantSpawn( IServerWorld world, DifficultyInstance difficulty, @Nullable SpawnReason spawnReason,
-                                      @Nullable ILivingEntityData groupData ) {
-        if( getItemBySlot( EquipmentSlotType.MAINHAND ).getItem() == Items.IRON_SWORD ) {
-            setItemSlot( EquipmentSlotType.MAINHAND, new ItemStack( Items.GOLDEN_SWORD ) );
+    public void finalizeVariantSpawn( ServerLevelAccessor level, DifficultyInstance difficulty, @Nullable MobSpawnType spawnType,
+                                     @Nullable SpawnGroupData groupData ) {
+        if( getItemBySlot( EquipmentSlot.MAINHAND ).getItem() == Items.IRON_SWORD ) {
+            setItemSlot( EquipmentSlot.MAINHAND, new ItemStack( Items.GOLDEN_SWORD ) );
             
-            if( getItemBySlot( EquipmentSlotType.OFFHAND ).isEmpty() ) {
-                setItemSlot( EquipmentSlotType.OFFHAND, new ItemStack( Items.GOLDEN_SWORD ) );
+            if( getItemBySlot( EquipmentSlot.OFFHAND ).isEmpty() ) {
+                setItemSlot( EquipmentSlot.OFFHAND, new ItemStack( Items.GOLDEN_SWORD ) );
             }
         }
         
@@ -86,13 +82,13 @@ public class WeatheredSkeletonEntity extends _SpecialSkeletonEntity {
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override
     protected void onVariantAttack( LivingEntity target ) {
-        MobHelper.applyEffect( target, Effects.HUNGER );
+        MobHelper.applyEffect( target, MobEffects.HUNGER );
     }
     
     /** Override to modify this entity's ranged attack projectile. */
     @Override
-    protected AbstractArrowEntity getVariantArrow( AbstractArrowEntity arrow, ItemStack arrowItem, float damageMulti ) {
-        return MobHelper.tipArrow( arrow, Effects.HUNGER );
+    protected AbstractArrow getVariantArrow( AbstractArrow arrow, ItemStack arrowItem, float damageMulti ) {
+        return MobHelper.tipArrow( arrow, MobEffects.HUNGER );
     }
     
     /** @return Called each tick to check if the sun should set this entity on fire. */

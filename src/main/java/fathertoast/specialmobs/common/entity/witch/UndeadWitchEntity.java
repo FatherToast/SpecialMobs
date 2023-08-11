@@ -8,19 +8,15 @@ import fathertoast.specialmobs.common.config.species.UndeadWitchSpeciesConfig;
 import fathertoast.specialmobs.common.entity.skeleton._SpecialSkeletonEntity;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
-import net.minecraft.entity.CreatureAttribute;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.SpawnReason;
-import net.minecraft.entity.monster.AbstractSkeletonEntity;
-import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.potion.Potions;
-import net.minecraft.util.SoundEvents;
-import net.minecraft.world.IServerWorld;
-import net.minecraft.world.World;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.monster.AbstractSkeleton;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.alchemy.Potions;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.ServerLevelAccessor;
 
 @SpecialMob
 public class UndeadWitchEntity extends _SpecialWitchEntity {
@@ -59,7 +55,7 @@ public class UndeadWitchEntity extends _SpecialWitchEntity {
     }
     
     @SpecialMob.Factory
-    public static EntityType.IFactory<UndeadWitchEntity> getVariantFactory() { return UndeadWitchEntity::new; }
+    public static EntityType.EntityFactory<UndeadWitchEntity> getVariantFactory() { return UndeadWitchEntity::new; }
     
     /** @return This entity's mob species. */
     @SpecialMob.SpeciesSupplier
@@ -72,8 +68,8 @@ public class UndeadWitchEntity extends _SpecialWitchEntity {
     /** The number of skeletons this witch can spawn. */
     private int summons;
     
-    public UndeadWitchEntity( EntityType<? extends _SpecialWitchEntity> entityType, World world ) {
-        super( entityType, world );
+    public UndeadWitchEntity( EntityType<? extends _SpecialWitchEntity> entityType, Level level ) {
+        super( entityType, level );
         summons = getConfig().UNDEAD.summons.next( random );
     }
     
@@ -86,12 +82,12 @@ public class UndeadWitchEntity extends _SpecialWitchEntity {
             final _SpecialSkeletonEntity skeleton = _SpecialSkeletonEntity.SPECIES.entityType.get().create( level );
             if( skeleton != null ) {
                 skeleton.copyPosition( this );
-                skeleton.yHeadRot = yRot;
-                skeleton.yBodyRot = yRot;
-                skeleton.finalizeSpawn( (IServerWorld) level, level.getCurrentDifficultyAt( blockPosition() ),
-                        SpawnReason.MOB_SUMMONED, null, null );
-                skeleton.setItemSlot( EquipmentSlotType.MAINHAND, new ItemStack( Items.IRON_SWORD ) );
-                skeleton.setItemSlot( EquipmentSlotType.HEAD, new ItemStack( Items.CHAINMAIL_HELMET ) );
+                skeleton.yHeadRot = getYRot();
+                skeleton.yBodyRot = getYRot();
+                skeleton.finalizeSpawn( (ServerLevelAccessor) level, level.getCurrentDifficultyAt( blockPosition() ),
+                        MobSpawnType.MOB_SUMMONED, null, null );
+                skeleton.setItemSlot( EquipmentSlot.MAINHAND, new ItemStack( Items.IRON_SWORD ) );
+                skeleton.setItemSlot( EquipmentSlot.HEAD, new ItemStack( Items.CHAINMAIL_HELMET ) );
                 skeleton.setTarget( getTarget() );
                 
                 final double vX = target.getX() - getX();
@@ -117,22 +113,22 @@ public class UndeadWitchEntity extends _SpecialWitchEntity {
     
     /** @return True if there are any skeletons near this entity. */
     private boolean isNearSkeletons() {
-        return level.getEntitiesOfClass( AbstractSkeletonEntity.class, getBoundingBox().inflate( 11.0 ) ).size() > 0;
+        return level.getEntitiesOfClass( AbstractSkeleton.class, getBoundingBox().inflate( 11.0 ) ).size() > 0;
     }
     
     /** @return This entity's creature type. */
     @Override
-    public CreatureAttribute getMobType() { return CreatureAttribute.UNDEAD; }
+    public MobType getMobType() { return MobType.UNDEAD; }
     
     /** Override to save data to this entity's NBT data. */
     @Override
-    public void addVariantSaveData( CompoundNBT saveTag ) {
+    public void addVariantSaveData( CompoundTag saveTag ) {
         saveTag.putByte( References.TAG_SUMMONS, (byte) summons );
     }
     
     /** Override to load data from this entity's NBT data. */
     @Override
-    public void readVariantSaveData( CompoundNBT saveTag ) {
+    public void readVariantSaveData( CompoundTag saveTag ) {
         if( saveTag.contains( References.TAG_SUMMONS, References.NBT_TYPE_NUMERICAL ) )
             summons = saveTag.getByte( References.TAG_SUMMONS );
     }

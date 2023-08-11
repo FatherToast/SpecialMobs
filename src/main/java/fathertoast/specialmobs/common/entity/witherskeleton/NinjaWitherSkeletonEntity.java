@@ -10,27 +10,27 @@ import fathertoast.specialmobs.common.entity.ai.INinja;
 import fathertoast.specialmobs.common.entity.ai.goal.NinjaGoal;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.ILivingEntityData;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.SpawnReason;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.network.datasync.DataParameter;
-import net.minecraft.network.datasync.DataSerializers;
-import net.minecraft.network.datasync.EntityDataManager;
-import net.minecraft.potion.Effects;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.Hand;
-import net.minecraft.util.SoundEvent;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.DifficultyInstance;
-import net.minecraft.world.IServerWorld;
-import net.minecraft.world.World;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.SpawnGroupData;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.ServerLevelAccessor;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 
 import javax.annotation.Nullable;
 import java.util.Optional;
@@ -71,7 +71,7 @@ public class NinjaWitherSkeletonEntity extends _SpecialWitherSkeletonEntity impl
     }
     
     @SpecialMob.Factory
-    public static EntityType.IFactory<NinjaWitherSkeletonEntity> getVariantFactory() { return NinjaWitherSkeletonEntity::new; }
+    public static EntityType.EntityFactory<NinjaWitherSkeletonEntity> getVariantFactory() { return NinjaWitherSkeletonEntity::new; }
     
     /** @return This entity's mob species. */
     @SpecialMob.SpeciesSupplier
@@ -81,7 +81,7 @@ public class NinjaWitherSkeletonEntity extends _SpecialWitherSkeletonEntity impl
     
     //--------------- Variant-Specific Implementations ----------------
     
-    public NinjaWitherSkeletonEntity( EntityType<? extends _SpecialWitherSkeletonEntity> entityType, World world ) { super( entityType, world ); }
+    public NinjaWitherSkeletonEntity( EntityType<? extends _SpecialWitherSkeletonEntity> entityType, Level level ) { super( entityType, level ); }
     
     /** Override to change this entity's AI goals. */
     @Override
@@ -91,8 +91,8 @@ public class NinjaWitherSkeletonEntity extends _SpecialWitherSkeletonEntity impl
     
     /** Override to change starting equipment or stats. */
     @Override
-    public void finalizeVariantSpawn( IServerWorld world, DifficultyInstance difficulty, @Nullable SpawnReason spawnReason,
-                                      @Nullable ILivingEntityData groupData ) {
+    public void finalizeVariantSpawn( ServerLevelAccessor level, DifficultyInstance difficulty, @Nullable MobSpawnType spawnType,
+                                     @Nullable SpawnGroupData groupData ) {
         setCanPickUpLoot( true );
     }
     
@@ -112,7 +112,7 @@ public class NinjaWitherSkeletonEntity extends _SpecialWitherSkeletonEntity impl
     
     /** @return Interacts (right click) with this entity and returns the result. */
     @Override
-    public ActionResultType mobInteract( PlayerEntity player, Hand hand ) {
+    public InteractionResult mobInteract(Player player, InteractionHand hand ) {
         // Attack if the player tries to right click the "block"
         if( !level.isClientSide() && getHiddenDragon() != null ) revealTo( player, true );
         return super.mobInteract( player, hand );
@@ -120,7 +120,7 @@ public class NinjaWitherSkeletonEntity extends _SpecialWitherSkeletonEntity impl
     
     /** Called by the player when it touches this entity. */
     @Override
-    public void playerTouch( PlayerEntity player ) {
+    public void playerTouch( Player player ) {
         if( !level.isClientSide() && getHiddenDragon() != null && !player.isCreative() ) revealTo( player, true );
         super.playerTouch( player );
     }
@@ -133,7 +133,7 @@ public class NinjaWitherSkeletonEntity extends _SpecialWitherSkeletonEntity impl
                 setHiddenDragon( NinjaGoal.pickDisguise( this ) );
             }
             else if( onGround && getHiddenDragon() == null &&
-                    (getTarget() == null || getTarget() instanceof PlayerEntity && ((PlayerEntity) getTarget()).isCreative()) ) {
+                    (getTarget() == null || getTarget() instanceof Player player && player.isCreative()) ) {
                 canHide = true;
             }
         }
@@ -156,7 +156,7 @@ public class NinjaWitherSkeletonEntity extends _SpecialWitherSkeletonEntity impl
     
     /** Sets this entity's movement. */
     @Override
-    public void setDeltaMovement( Vector3d vec ) {
+    public void setDeltaMovement( Vec3 vec ) {
         if( !isCrouchingTiger() ) super.setDeltaMovement( vec );
     }
     
@@ -177,13 +177,13 @@ public class NinjaWitherSkeletonEntity extends _SpecialWitherSkeletonEntity impl
         if( getHiddenDragon() == null ) return;
         setHiddenDragon( null );
         
-        if( !(target instanceof PlayerEntity && ((PlayerEntity) target).isCreative()) ) {
+        if( !(target instanceof Player player && player.isCreative()) ) {
             setTarget( target );
             
             if( ambush ) {
-                MobHelper.applyEffect( target, Effects.POISON );
-                MobHelper.applyEffect( target, Effects.MOVEMENT_SLOWDOWN );
-                MobHelper.applyEffect( target, Effects.BLINDNESS );
+                MobHelper.applyEffect( target, MobEffects.POISON );
+                MobHelper.applyEffect( target, MobEffects.MOVEMENT_SLOWDOWN );
+                MobHelper.applyEffect( target, MobEffects.BLINDNESS );
                 MobHelper.removeNightVision( target );
             }
         }
@@ -193,9 +193,9 @@ public class NinjaWitherSkeletonEntity extends _SpecialWitherSkeletonEntity impl
     //--------------- INinja Implementations ----------------
     
     /** The parameter for the ninja immobile state. */
-    private static final DataParameter<Boolean> IS_HIDING = EntityDataManager.defineId( NinjaWitherSkeletonEntity.class, DataSerializers.BOOLEAN );
+    private static final EntityDataAccessor<Boolean> IS_HIDING = SynchedEntityData.defineId( NinjaWitherSkeletonEntity.class, EntityDataSerializers.BOOLEAN );
     /** The parameter for the ninja disguise block. */
-    private static final DataParameter<Optional<BlockState>> HIDING_BLOCK = EntityDataManager.defineId( NinjaWitherSkeletonEntity.class, DataSerializers.BLOCK_STATE );
+    private static final EntityDataAccessor<Optional<BlockState>> HIDING_BLOCK = SynchedEntityData.defineId( NinjaWitherSkeletonEntity.class, EntityDataSerializers.BLOCK_STATE );
     
     private boolean canHide = true;
     

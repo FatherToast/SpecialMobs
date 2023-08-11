@@ -8,27 +8,27 @@ import fathertoast.specialmobs.common.entity.ai.AIHelper;
 import fathertoast.specialmobs.common.entity.ai.FluidPathNavigator;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.item.Items;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.pathfinding.PathNavigator;
-import net.minecraft.pathfinding.PathNodeType;
-import net.minecraft.potion.Effects;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.FluidTags;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.Direction;
-import net.minecraft.util.IndirectEntityDamageSource;
-import net.minecraft.util.SoundEvents;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.World;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.damagesource.IndirectEntityDamageSource;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.ai.navigation.PathNavigation;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.level.pathfinder.BlockPathTypes;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.ForgeEventFactory;
-import net.minecraftforge.event.entity.living.EntityTeleportEvent;
+import net.minecraftforge.event.entity.EntityTeleportEvent;
 
 @SpecialMob
 public class WindWitchEntity extends _SpecialWitchEntity {
@@ -60,7 +60,7 @@ public class WindWitchEntity extends _SpecialWitchEntity {
     }
     
     @SpecialMob.Factory
-    public static EntityType.IFactory<WindWitchEntity> getVariantFactory() { return WindWitchEntity::new; }
+    public static EntityType.EntityFactory<WindWitchEntity> getVariantFactory() { return WindWitchEntity::new; }
     
     /** @return This entity's mob species. */
     @SpecialMob.SpeciesSupplier
@@ -73,9 +73,9 @@ public class WindWitchEntity extends _SpecialWitchEntity {
     /** Ticks before this witch can teleport. */
     private int teleportDelay;
     
-    public WindWitchEntity( EntityType<? extends _SpecialWitchEntity> entityType, World world ) {
-        super( entityType, world );
-        setPathfindingMalus( PathNodeType.WATER, PathNodeType.WALKABLE.getMalus() );
+    public WindWitchEntity( EntityType<? extends _SpecialWitchEntity> entityType, Level level ) {
+        super( entityType, level );
+        setPathfindingMalus( BlockPathTypes.WATER, BlockPathTypes.WALKABLE.getMalus() );
     }
     
     /** Override to change this entity's AI goals. */
@@ -85,13 +85,13 @@ public class WindWitchEntity extends _SpecialWitchEntity {
     
     /** @return A new path navigator for this entity to use. */
     @Override
-    protected PathNavigator createNavigation( World world ) {
-        return new FluidPathNavigator( this, world, true, false );
+    protected PathNavigation createNavigation(Level level ) {
+        return new FluidPathNavigator( this, level, true, false );
     }
     
     /** @return Whether this entity can stand on a particular type of fluid. */
     @Override
-    public boolean canStandOnFluid( Fluid fluid ) { return fluid.is( FluidTags.WATER ); }
+    public boolean canStandOnFluid( FluidState fluid ) { return fluid.is( FluidTags.WATER ); }
     
     /** Called each tick to update this entity. */
     @Override
@@ -108,13 +108,13 @@ public class WindWitchEntity extends _SpecialWitchEntity {
                 for( int i = 0; i < 16; i++ ) {
                     if( teleportTowards( getTarget() ) ) {
                         teleportDelay = 60;
-                        removeEffect( Effects.INVISIBILITY );
+                        removeEffect( MobEffects.INVISIBILITY );
                         break;
                     }
                 }
             }
             else {
-                MobHelper.applyDurationEffect( this, Effects.INVISIBILITY, 30 );
+                MobHelper.applyDurationEffect( this, MobEffects.INVISIBILITY, 30 );
                 for( int i = 0; i < 16; i++ ) {
                     if( teleport() ) {
                         teleportDelay = 30;
@@ -131,7 +131,7 @@ public class WindWitchEntity extends _SpecialWitchEntity {
     public boolean hurt( DamageSource source, float amount ) {
         if( isInvulnerableTo( source ) || fireImmune() && source.isFire() ) return false;
         
-        if( source instanceof IndirectEntityDamageSource ) {
+        if( source instanceof IndirectEntityDamageSource) {
             for( int i = 0; i < 64; i++ ) {
                 if( teleport() ) return true;
             }
@@ -140,7 +140,7 @@ public class WindWitchEntity extends _SpecialWitchEntity {
         
         final boolean success = super.hurt( source, amount );
         if( !level.isClientSide() && getHealth() > 0.0F ) {
-            if( source.getEntity() instanceof LivingEntity ) {
+            if( source.getEntity() instanceof LivingEntity) {
                 teleportDelay -= 15;
                 if( teleportDelay <= 0 && random.nextFloat() < 0.5F ) {
                     for( int i = 0; i < 16; i++ ) {
@@ -148,7 +148,7 @@ public class WindWitchEntity extends _SpecialWitchEntity {
                     }
                 }
                 else {
-                    removeEffect( Effects.INVISIBILITY );
+                    removeEffect( MobEffects.INVISIBILITY );
                 }
             }
             else if( random.nextInt( 10 ) != 0 ) {
@@ -170,7 +170,7 @@ public class WindWitchEntity extends _SpecialWitchEntity {
     
     /** @return Teleports this "enderman" towards another entity; returns true if successful. */
     protected boolean teleportTowards( Entity target ) {
-        final Vector3d directionFromTarget = new Vector3d(
+        final Vec3 directionFromTarget = new Vec3(
                 getX() - target.getX(),
                 getY( 0.5 ) - target.getEyeY(),
                 getZ() - target.getZ() )
@@ -184,7 +184,7 @@ public class WindWitchEntity extends _SpecialWitchEntity {
     
     /** @return Teleports this "enderman" to a new position; returns true if successful. */
     protected boolean teleport( double x, double y, double z ) {
-        final BlockPos.Mutable pos = new BlockPos.Mutable( x, y, z );
+        final BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos( x, y, z );
         
         while( pos.getY() > 0 ) {
             // Allow wind witch to teleport on top of water
@@ -233,7 +233,7 @@ public class WindWitchEntity extends _SpecialWitchEntity {
     
     /** Override to load data from this entity's NBT data. */
     @Override
-    public void readVariantSaveData( CompoundNBT saveTag ) {
-        setPathfindingMalus( PathNodeType.WATER, PathNodeType.WALKABLE.getMalus() );
+    public void readVariantSaveData( CompoundTag saveTag ) {
+        setPathfindingMalus( BlockPathTypes.WATER, BlockPathTypes.WALKABLE.getMalus() );
     }
 }

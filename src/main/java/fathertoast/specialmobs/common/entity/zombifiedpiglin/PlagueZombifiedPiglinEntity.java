@@ -6,14 +6,15 @@ import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
-import net.minecraft.block.Blocks;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.entity.projectile.AbstractArrowEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.projectile.AbstractArrow;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
+
 
 @SpecialMob
 public class PlagueZombifiedPiglinEntity extends _SpecialZombifiedPiglinEntity {
@@ -45,7 +46,7 @@ public class PlagueZombifiedPiglinEntity extends _SpecialZombifiedPiglinEntity {
     }
     
     @SpecialMob.Factory
-    public static EntityType.IFactory<PlagueZombifiedPiglinEntity> getVariantFactory() { return PlagueZombifiedPiglinEntity::new; }
+    public static EntityType.EntityFactory<PlagueZombifiedPiglinEntity> getVariantFactory() { return PlagueZombifiedPiglinEntity::new; }
     
     /** @return This entity's mob species. */
     @SpecialMob.SpeciesSupplier
@@ -55,7 +56,7 @@ public class PlagueZombifiedPiglinEntity extends _SpecialZombifiedPiglinEntity {
     
     //--------------- Variant-Specific Implementations ----------------
     
-    public PlagueZombifiedPiglinEntity( EntityType<? extends _SpecialZombifiedPiglinEntity> entityType, World world ) { super( entityType, world ); }
+    public PlagueZombifiedPiglinEntity( EntityType<? extends _SpecialZombifiedPiglinEntity> entityType, Level level ) { super( entityType, level ); }
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override
@@ -65,7 +66,7 @@ public class PlagueZombifiedPiglinEntity extends _SpecialZombifiedPiglinEntity {
     
     /** Override to modify this entity's ranged attack projectile. */
     @Override
-    protected AbstractArrowEntity getVariantArrow( AbstractArrowEntity arrow, ItemStack arrowItem, float damageMulti ) {
+    protected AbstractArrow getVariantArrow( AbstractArrow arrow, ItemStack arrowItem, float damageMulti ) {
         return MobHelper.tipPlagueArrow( arrow, random );
     }
 }

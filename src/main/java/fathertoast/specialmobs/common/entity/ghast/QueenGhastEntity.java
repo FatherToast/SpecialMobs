@@ -7,15 +7,15 @@ import fathertoast.specialmobs.common.config.species.QueenGhastSpeciesConfig;
 import fathertoast.specialmobs.common.config.species.SpeciesConfig;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.ILivingEntityData;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.SpawnReason;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.item.Items;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.world.IServerWorld;
-import net.minecraft.world.World;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.SpawnGroupData;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.ServerLevelAccessor;
 
 import javax.annotation.Nullable;
 
@@ -60,7 +60,7 @@ public class QueenGhastEntity extends _SpecialGhastEntity {
     }
     
     @SpecialMob.Factory
-    public static EntityType.IFactory<QueenGhastEntity> getVariantFactory() { return QueenGhastEntity::new; }
+    public static EntityType.EntityFactory<QueenGhastEntity> getVariantFactory() { return QueenGhastEntity::new; }
     
     /** @return This entity's mob species. */
     @SpecialMob.SpeciesSupplier
@@ -75,8 +75,8 @@ public class QueenGhastEntity extends _SpecialGhastEntity {
     /** The number of extra babies that can be spawned by attacks. */
     private int summons;
     
-    public QueenGhastEntity( EntityType<? extends _SpecialGhastEntity> entityType, World world ) {
-        super( entityType, world );
+    public QueenGhastEntity( EntityType<? extends _SpecialGhastEntity> entityType, Level level ) {
+        super( entityType, level );
         babies = getConfig().QUEEN.babies.next( random );
         summons = getConfig().QUEEN.summons.next( random );
     }
@@ -105,31 +105,31 @@ public class QueenGhastEntity extends _SpecialGhastEntity {
     
     /** Called to remove this entity from the world. Includes death, unloading, interdimensional travel, etc. */
     @Override
-    public void remove( boolean keepData ) {
+    public void remove( RemovalReason reason ) {
         //noinspection deprecation
-        if( isDeadOrDying() && !removed && level instanceof IServerWorld ) { // Same conditions as slime splitting
+        if( isDeadOrDying() && !isRemoved() && level instanceof ServerLevelAccessor ) { // Same conditions as slime splitting
             // Spawn babies on death
-            ILivingEntityData groupData = null;
+            SpawnGroupData groupData = null;
             for( int i = 0; i < babies; i++ ) {
                 groupData = spawnBaby( (random.nextDouble() - 0.5) * 0.3, (random.nextDouble() - 0.5) * 0.3, groupData );
             }
             spawnAnim();
             References.LevelEvent.BLAZE_SHOOT.play( this );
         }
-        super.remove( keepData );
+        super.remove( reason );
     }
     
     /** Helper method to simplify spawning babies. */
     @Nullable
-    private ILivingEntityData spawnBaby( double vX, double vZ, @Nullable ILivingEntityData groupData ) {
+    private SpawnGroupData spawnBaby( double vX, double vZ, @Nullable SpawnGroupData groupData ) {
         final BabyGhastEntity baby = BabyGhastEntity.SPECIES.entityType.get().create( level );
         if( baby == null ) return groupData;
         
         baby.copyPosition( this );
-        baby.yHeadRot = yRot;
-        baby.yBodyRot = yRot;
-        groupData = baby.finalizeSpawn( (IServerWorld) level, level.getCurrentDifficultyAt( blockPosition() ),
-                SpawnReason.MOB_SUMMONED, groupData, null );
+        baby.yHeadRot = getYRot();
+        baby.yBodyRot = getYRot();
+        groupData = baby.finalizeSpawn( (ServerLevelAccessor) level, level.getCurrentDifficultyAt( blockPosition() ),
+                MobSpawnType.MOB_SUMMONED, groupData, null );
         baby.setTarget( getTarget() );
         
         baby.setDeltaMovement( vX, 0.0, vZ );
@@ -141,14 +141,14 @@ public class QueenGhastEntity extends _SpecialGhastEntity {
     
     /** Override to save data to this entity's NBT data. */
     @Override
-    public void addVariantSaveData( CompoundNBT saveTag ) {
+    public void addVariantSaveData( CompoundTag saveTag ) {
         saveTag.putByte( References.TAG_BABIES, (byte) babies );
         saveTag.putByte( References.TAG_SUMMONS, (byte) summons );
     }
     
     /** Override to load data from this entity's NBT data. */
     @Override
-    public void readVariantSaveData( CompoundNBT saveTag ) {
+    public void readVariantSaveData( CompoundTag saveTag ) {
         if( saveTag.contains( References.TAG_BABIES, References.NBT_TYPE_NUMERICAL ) )
             babies = saveTag.getByte( References.TAG_BABIES );
         if( saveTag.contains( References.TAG_SUMMONS, References.NBT_TYPE_NUMERICAL ) )

@@ -1,22 +1,19 @@
 package fathertoast.specialmobs.client.renderer.entity.family;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import fathertoast.specialmobs.common.entity.ISpecialMob;
 import fathertoast.specialmobs.common.entity.SpecialMobData;
-import net.minecraft.client.renderer.entity.EntityRendererManager;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.GhastRenderer;
-import net.minecraft.entity.monster.GhastEntity;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.monster.Ghast;
 
-@OnlyIn( Dist.CLIENT )
 public class SpecialGhastRenderer extends GhastRenderer {
     
     private final float baseShadowRadius;
     
-    public SpecialGhastRenderer( EntityRendererManager rendererManager ) {
-        super( rendererManager );
+    public SpecialGhastRenderer( EntityRendererProvider.Context context ) {
+        super( context );
         baseShadowRadius = shadowRadius;
         // Would require some big changes to make glowing eyes animate with the base texture
         //addLayer( new SpecialMobEyesLayer<>( this ) );
@@ -25,17 +22,17 @@ public class SpecialGhastRenderer extends GhastRenderer {
     }
     
     @Override
-    public ResourceLocation getTextureLocation( GhastEntity entity ) {
+    public ResourceLocation getTextureLocation( Ghast entity ) {
         final SpecialMobData<?> data = ((ISpecialMob<?>) entity).getSpecialData();
         return entity.isCharging() && data.getTextureOverlay() != null ? data.getTextureOverlay() : data.getTexture();
     }
     
     @Override
-    protected void scale( GhastEntity entity, MatrixStack matrixStack, float partialTick ) {
-        super.scale( entity, matrixStack, partialTick );
+    protected void scale(Ghast entity, PoseStack poseStack, float partialTick ) {
+        super.scale( entity, poseStack, partialTick );
         
         final float scale = ((ISpecialMob<?>) entity).getSpecialData().getRenderScale();
         shadowRadius = baseShadowRadius * scale;
-        matrixStack.scale( scale, scale, scale );
+        poseStack.scale( scale, scale, scale );
     }
 }

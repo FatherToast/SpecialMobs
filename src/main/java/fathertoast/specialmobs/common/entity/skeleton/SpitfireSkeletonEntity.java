@@ -7,13 +7,13 @@ import fathertoast.specialmobs.common.config.species.SkeletonSpeciesConfig;
 import fathertoast.specialmobs.common.config.species.SpeciesConfig;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.entity.projectile.SmallFireballEntity;
-import net.minecraft.item.Items;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.World;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.projectile.SmallFireball;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
 
 @SpecialMob
 public class SpitfireSkeletonEntity extends _SpecialSkeletonEntity {
@@ -51,7 +51,7 @@ public class SpitfireSkeletonEntity extends _SpecialSkeletonEntity {
     }
     
     @SpecialMob.Factory
-    public static EntityType.IFactory<SpitfireSkeletonEntity> getVariantFactory() { return SpitfireSkeletonEntity::new; }
+    public static EntityType.EntityFactory<SpitfireSkeletonEntity> getVariantFactory() { return SpitfireSkeletonEntity::new; }
     
     /** @return This entity's mob species. */
     @SpecialMob.SpeciesSupplier
@@ -61,8 +61,8 @@ public class SpitfireSkeletonEntity extends _SpecialSkeletonEntity {
     
     //--------------- Variant-Specific Implementations ----------------
     
-    public SpitfireSkeletonEntity( EntityType<? extends _SpecialSkeletonEntity> entityType, World world ) {
-        super( entityType, world );
+    public SpitfireSkeletonEntity( EntityType<? extends _SpecialSkeletonEntity> entityType, Level level ) {
+        super( entityType, level );
         maxUpStep = 1.0F;
     }
     
@@ -77,14 +77,14 @@ public class SpitfireSkeletonEntity extends _SpecialSkeletonEntity {
     public void performRangedAttack( LivingEntity target, float damageMulti ) {
         References.LevelEvent.BLAZE_SHOOT.play( this );
         
-        final float accelVariance = MathHelper.sqrt( distanceTo( target ) ) * 0.5F * getSpecialData().getRangedAttackSpread();
+        final float accelVariance = Mth.sqrt( distanceTo( target ) ) * 0.5F * getSpecialData().getRangedAttackSpread();
         
         for( int i = 0; i < 3; i++ ) {
             final double dX = target.getX() - getX() + getRandom().nextGaussian() * accelVariance;
             final double dY = target.getEyeY() - getEyeY();
             final double dZ = target.getZ() - getZ() + getRandom().nextGaussian() * accelVariance;
             
-            final SmallFireballEntity fireball = new SmallFireballEntity( level, this, dX, dY, dZ );
+            final SmallFireball fireball = new SmallFireball( level, this, dX, dY, dZ );
             fireball.setPos( fireball.getX(), getEyeY() - 0.1, fireball.getZ() );
             level.addFreshEntity( fireball );
         }

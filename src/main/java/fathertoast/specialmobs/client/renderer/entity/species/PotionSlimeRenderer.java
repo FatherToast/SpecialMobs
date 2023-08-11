@@ -3,25 +3,22 @@ package fathertoast.specialmobs.client.renderer.entity.species;
 import fathertoast.specialmobs.client.renderer.entity.family.SpecialSlimeRenderer;
 import fathertoast.specialmobs.client.renderer.entity.layers.SpecialMobTintedLayer;
 import fathertoast.specialmobs.common.entity.slime.PotionSlimeEntity;
-import net.minecraft.client.renderer.entity.EntityRendererManager;
-import net.minecraft.client.renderer.entity.IEntityRenderer;
-import net.minecraft.client.renderer.entity.model.SlimeModel;
-import net.minecraft.entity.monster.SlimeEntity;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraft.client.model.SlimeModel;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
+import net.minecraft.client.renderer.entity.RenderLayerParent;
+import net.minecraft.world.entity.monster.Slime;
 
-@OnlyIn( Dist.CLIENT )
 public class PotionSlimeRenderer extends SpecialSlimeRenderer {
     
-    public PotionSlimeRenderer( EntityRendererManager rendererManager ) {
-        super( rendererManager );
+    public PotionSlimeRenderer( EntityRendererProvider.Context context ) {
+        super( context );
         addLayer( new PotionSlimeLayer( this ) );
     }
     
-    private static class PotionSlimeLayer extends SpecialMobTintedLayer<SlimeEntity, SlimeModel<SlimeEntity>> {
-        public PotionSlimeLayer( IEntityRenderer<SlimeEntity, SlimeModel<SlimeEntity>> renderer ) { super( renderer ); }
-        
+    private static class PotionSlimeLayer extends SpecialMobTintedLayer<Slime, SlimeModel<Slime>> {
+        public PotionSlimeLayer( RenderLayerParent<Slime, SlimeModel<Slime>> renderer ) { super( renderer ); }
+
         @Override
-        protected int getColor( SlimeEntity entity ) { return ((PotionSlimeEntity) entity).getPotionColor(); }
+        protected int getColor( Slime entity ) { return ((PotionSlimeEntity) entity).getPotionColor(); }
     }
 }

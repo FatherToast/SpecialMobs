@@ -6,19 +6,15 @@ import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.ILivingEntityData;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.SpawnReason;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.entity.projectile.AbstractArrowEntity;
-import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.potion.Effects;
 import net.minecraft.world.DifficultyInstance;
-import net.minecraft.world.IServerWorld;
-import net.minecraft.world.World;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.projectile.AbstractArrow;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.ServerLevelAccessor;
 
 import javax.annotation.Nullable;
 
@@ -53,7 +49,7 @@ public class BruteZombifiedPiglinEntity extends _SpecialZombifiedPiglinEntity {
     }
     
     @SpecialMob.Factory
-    public static EntityType.IFactory<BruteZombifiedPiglinEntity> getVariantFactory() { return BruteZombifiedPiglinEntity::new; }
+    public static EntityType.EntityFactory<BruteZombifiedPiglinEntity> getVariantFactory() { return BruteZombifiedPiglinEntity::new; }
     
     /** @return This entity's mob species. */
     @SpecialMob.SpeciesSupplier
@@ -63,15 +59,15 @@ public class BruteZombifiedPiglinEntity extends _SpecialZombifiedPiglinEntity {
     
     //--------------- Variant-Specific Implementations ----------------
     
-    public BruteZombifiedPiglinEntity( EntityType<? extends _SpecialZombifiedPiglinEntity> entityType, World world ) { super( entityType, world ); }
+    public BruteZombifiedPiglinEntity( EntityType<? extends _SpecialZombifiedPiglinEntity> entityType, Level level ) { super( entityType, level ); }
     
     /** Override to change starting equipment or stats. */
     @Override
-    public void finalizeVariantSpawn( IServerWorld world, DifficultyInstance difficulty, @Nullable SpawnReason spawnReason,
-                                      @Nullable ILivingEntityData groupData ) {
+    public void finalizeVariantSpawn( ServerLevelAccessor level, DifficultyInstance difficulty, @Nullable MobSpawnType spawnType,
+                                     @Nullable SpawnGroupData groupData ) {
         // A reference to the vanilla piglin brutes
-        if( getItemBySlot( EquipmentSlotType.MAINHAND ).getItem() == Items.GOLDEN_SWORD ) {
-            setItemSlot( EquipmentSlotType.MAINHAND, new ItemStack( Items.GOLDEN_AXE ) );
+        if( getItemBySlot( EquipmentSlot.MAINHAND ).getItem() == Items.GOLDEN_SWORD ) {
+            setItemSlot( EquipmentSlot.MAINHAND, new ItemStack( Items.GOLDEN_AXE ) );
         }
     }
     
@@ -84,7 +80,7 @@ public class BruteZombifiedPiglinEntity extends _SpecialZombifiedPiglinEntity {
     
     /** Override to modify this entity's ranged attack projectile. */
     @Override
-    protected AbstractArrowEntity getVariantArrow( AbstractArrowEntity arrow, ItemStack arrowItem, float damageMulti ) {
-        return MobHelper.tipArrow( arrow, Effects.HARM );
+    protected AbstractArrow getVariantArrow( AbstractArrow arrow, ItemStack arrowItem, float damageMulti ) {
+        return MobHelper.tipArrow( arrow, MobEffects.HARM );
     }
 }

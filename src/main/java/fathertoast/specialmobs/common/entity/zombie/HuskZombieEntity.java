@@ -9,23 +9,23 @@ import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.event.NaturalSpawnManager;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.SpawnReason;
-import net.minecraft.entity.ai.attributes.AttributeModifierMap;
-import net.minecraft.entity.monster.HuskEntity;
-import net.minecraft.entity.monster.ZombieEntity;
-import net.minecraft.entity.projectile.AbstractArrowEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.potion.Effects;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.SoundEvent;
-import net.minecraft.util.SoundEvents;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IServerWorld;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
+import net.minecraft.world.entity.monster.Husk;
+import net.minecraft.world.entity.monster.Zombie;
+import net.minecraft.world.entity.projectile.AbstractArrow;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.ServerLevelAccessor;
 
-import java.util.Random;
 import java.util.function.Predicate;
 
 @SpecialMob
@@ -54,7 +54,7 @@ public class HuskZombieEntity extends _SpecialZombieEntity {
     public HuskZombieSpeciesConfig getConfig() { return (HuskZombieSpeciesConfig) getSpecies().config; }
     
     @SpecialMob.AttributeSupplier
-    public static AttributeModifierMap.MutableAttribute createAttributes() { return HuskEntity.createAttributes(); }
+    public static AttributeSupplier.Builder createAttributes() { return Husk.createAttributes(); }
     
     @SpecialMob.SpawnPlacementRegistrar
     public static void registerSpeciesSpawnPlacement( MobFamily.Species<? extends HuskZombieEntity> species ) {
@@ -64,12 +64,12 @@ public class HuskZombieEntity extends _SpecialZombieEntity {
     /**
      * We cannot call the actual husk method because our husk variant does not extend the vanilla husk.
      *
-     * @see net.minecraft.entity.monster.HuskEntity#checkHuskSpawnRules(EntityType, IServerWorld, SpawnReason, BlockPos, Random)
+     * @see net.minecraft.world.entity.monster.Husk#checkHuskSpawnRules(EntityType, ServerLevelAccessor, MobSpawnType, BlockPos, RandomSource) 
      */
-    public static boolean checkSpeciesSpawnRules( EntityType<? extends HuskZombieEntity> type, IServerWorld world,
-                                                  SpawnReason reason, BlockPos pos, Random random ) {
-        return NaturalSpawnManager.checkSpawnRulesDefault( type, world, reason, pos, random ) &&
-                (reason == SpawnReason.SPAWNER || world.canSeeSky( pos ));
+    public static boolean checkSpeciesSpawnRules( EntityType<? extends HuskZombieEntity> type, ServerLevelAccessor world,
+                                                  MobSpawnType spawnType, BlockPos pos, RandomSource random ) {
+        return NaturalSpawnManager.checkSpawnRulesDefault( type, world, spawnType, pos, random ) &&
+                (spawnType == MobSpawnType.SPAWNER || world.canSeeSky( pos ));
     }
     
     @SpecialMob.LanguageProvider
@@ -84,7 +84,7 @@ public class HuskZombieEntity extends _SpecialZombieEntity {
     }
     
     @SpecialMob.Factory
-    public static EntityType.IFactory<HuskZombieEntity> getVariantFactory() { return HuskZombieEntity::new; }
+    public static EntityType.EntityFactory<HuskZombieEntity> getVariantFactory() { return HuskZombieEntity::new; }
     
     /** @return This entity's mob species. */
     @SpecialMob.SpeciesSupplier
@@ -94,18 +94,18 @@ public class HuskZombieEntity extends _SpecialZombieEntity {
     
     //--------------- Variant-Specific Implementations ----------------
     
-    public HuskZombieEntity( EntityType<? extends _SpecialZombieEntity> entityType, World world ) { super( entityType, world ); }
+    public HuskZombieEntity( EntityType<? extends _SpecialZombieEntity> entityType, Level level ) { super( entityType, level ); }
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override
     protected void onVariantAttack( LivingEntity target ) {
-        MobHelper.applyEffect( target, Effects.HUNGER );
+        MobHelper.applyEffect( target, MobEffects.HUNGER );
     }
     
     /** Override to modify this entity's ranged attack projectile. */
     @Override
-    protected AbstractArrowEntity getVariantArrow( AbstractArrowEntity arrow, ItemStack arrowItem, float damageMulti ) {
-        return MobHelper.tipArrow( arrow, Effects.HUNGER );
+    protected AbstractArrow getVariantArrow( AbstractArrow arrow, ItemStack arrowItem, float damageMulti ) {
+        return MobHelper.tipArrow( arrow, MobEffects.HUNGER );
     }
     
     /** Returns true if the species is not a husk and not damaged by water. */
@@ -121,7 +121,7 @@ public class HuskZombieEntity extends _SpecialZombieEntity {
     
     /** Override to change the entity this converts to when drowned. */
     @Override
-    protected EntityType<? extends ZombieEntity> getVariantConversionType() {
+    protected EntityType<? extends Zombie> getVariantConversionType() {
         // Select a random non-husk, non-water-sensitive zombie; defaults to a normal zombie
         return getConfig().HUSK.convertVariantChance.rollChance( random, level, blockPosition() ) ?
                 MobFamily.ZOMBIE.nextVariant( level, blockPosition(), HUSK_CONVERSION_SELECTOR, _SpecialZombieEntity.SPECIES ).entityType.get() :

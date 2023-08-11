@@ -6,11 +6,12 @@ import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.item.Items;
-import net.minecraft.potion.Effects;
-import net.minecraft.world.World;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
+
 
 @SpecialMob
 public class BlindingEndermanEntity extends _SpecialEndermanEntity {
@@ -24,7 +25,7 @@ public class BlindingEndermanEntity extends _SpecialEndermanEntity {
     public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
         bestiaryInfo.color( 0xFFFFFF ).theme( BestiaryInfo.Theme.FOREST )
                 .uniqueTextureWithEyes()
-                .addExperience( 1 ).effectImmune( Effects.BLINDNESS );
+                .addExperience( 1 ).effectImmune( MobEffects.BLINDNESS );
     }
     
     @SpecialMob.LanguageProvider
@@ -40,7 +41,7 @@ public class BlindingEndermanEntity extends _SpecialEndermanEntity {
     }
     
     @SpecialMob.Factory
-    public static EntityType.IFactory<BlindingEndermanEntity> getVariantFactory() { return BlindingEndermanEntity::new; }
+    public static EntityType.EntityFactory<BlindingEndermanEntity> getVariantFactory() { return BlindingEndermanEntity::new; }
     
     /** @return This entity's mob species. */
     @SpecialMob.SpeciesSupplier
@@ -50,7 +51,7 @@ public class BlindingEndermanEntity extends _SpecialEndermanEntity {
     
     //--------------- Variant-Specific Implementations ----------------
     
-    public BlindingEndermanEntity( EntityType<? extends _SpecialEndermanEntity> entityType, World world ) { super( entityType, world ); }
+    public BlindingEndermanEntity( EntityType<? extends _SpecialEndermanEntity> entityType, Level level ) { super( entityType, level ); }
     
     /** Called each tick to update this entity's movement. */
     @Override
@@ -60,7 +61,7 @@ public class BlindingEndermanEntity extends _SpecialEndermanEntity {
         // Apply blinding effect while near target
         final LivingEntity target = getTarget();
         if( target != null && distanceToSqr( target ) < 100.0 ) {
-            MobHelper.applyDurationEffect( target, Effects.BLINDNESS, 50 );
+            MobHelper.applyDurationEffect( target, MobEffects.BLINDNESS, 50 );
             MobHelper.removeNightVision( target );
         }
     }

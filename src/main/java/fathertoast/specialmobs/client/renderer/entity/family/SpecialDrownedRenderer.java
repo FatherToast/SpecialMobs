@@ -1,44 +1,42 @@
 package fathertoast.specialmobs.client.renderer.entity.family;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import fathertoast.specialmobs.client.renderer.entity.layers.SpecialMobEyesLayer;
 import fathertoast.specialmobs.client.renderer.entity.layers.SpecialMobOverlayLayer;
 import fathertoast.specialmobs.common.entity.ISpecialMob;
+import net.minecraft.client.model.DrownedModel;
+import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.renderer.entity.DrownedRenderer;
-import net.minecraft.client.renderer.entity.EntityRendererManager;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.layers.DrownedOuterLayer;
-import net.minecraft.client.renderer.entity.model.DrownedModel;
-import net.minecraft.entity.monster.DrownedEntity;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.monster.Drowned;
 
-@OnlyIn( Dist.CLIENT )
 public class SpecialDrownedRenderer extends DrownedRenderer {
     
     private final float baseShadowRadius;
     
-    public SpecialDrownedRenderer( EntityRendererManager rendererManager ) {
-        super( rendererManager );
+    public SpecialDrownedRenderer( EntityRendererProvider.Context context ) {
+        super( context );
         baseShadowRadius = shadowRadius;
         // Get rid of this one since we have our own implementation
         layers.removeIf( ( layer ) -> layer instanceof DrownedOuterLayer );
         
         addLayer( new SpecialMobEyesLayer<>( this ) );
-        addLayer( new SpecialMobOverlayLayer<>( this, new DrownedModel<>( 0.25F, 0.0F, 64, 64 ) ) );
+        addLayer( new SpecialMobOverlayLayer<>( this, new DrownedModel<>( context.bakeLayer( ModelLayers.DROWNED_OUTER_LAYER ) ) ) );
     }
     
     @Override
-    public ResourceLocation getTextureLocation( DrownedEntity entity ) {
+    public ResourceLocation getTextureLocation( Drowned entity ) {
         return ((ISpecialMob<?>) entity).getSpecialData().getTexture();
     }
     
     @Override
-    protected void scale( DrownedEntity entity, MatrixStack matrixStack, float partialTick ) {
-        super.scale( entity, matrixStack, partialTick );
+    protected void scale(Drowned entity, PoseStack poseStack, float partialTick ) {
+        super.scale( entity, poseStack, partialTick );
         
         final float scale = ((ISpecialMob<?>) entity).getSpecialData().getRenderScale();
         shadowRadius = baseShadowRadius * scale;
-        matrixStack.scale( scale, scale, scale );
+        poseStack.scale( scale, scale, scale );
     }
 }

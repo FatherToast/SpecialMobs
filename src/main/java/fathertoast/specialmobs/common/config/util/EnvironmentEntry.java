@@ -210,7 +210,9 @@ public class EnvironmentEntry {
         
         private Builder isTemperature( ComparisonOperator op, float value ) { return in( new TemperatureEnvironment( op, value ) ); }
 
-        public Builder inAnyBiomeTag( TagKey<Biome>... tags ) { return in( new BiomeTagKeyEnvironment( tags, false ) ); }
+        public Builder inAnyBiomeTag( ResourceLocation... tags ) {
+            return in( new BiomeTagKeyEnvironment( tags, false ) );
+        }
 
         /** Check if the biome belongs to a specific category. */
         public Builder inBiomeTag( TagKey<Biome> tag ) { return in( new BiomeTagKeyEnvironment( tag.location(), false ) ); }

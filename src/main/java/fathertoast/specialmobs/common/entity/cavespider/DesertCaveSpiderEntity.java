@@ -28,7 +28,7 @@ public class DesertCaveSpiderEntity extends _SpecialCaveSpiderEntity {
         bestiaryInfo.color( 0xE6DDAC ).theme( BestiaryInfo.Theme.DESERT )
                 .uniqueTextureWithEyes()
                 .size( 0.6F, 0.7F, 0.5F )
-                .addExperience( 2 ).effectImmune( MobEffects.MOVEMENT_SLOWDOWN, SMEffects.VULNERABILITY )
+                .addExperience( 2 ).effectImmune( MobEffects.MOVEMENT_SLOWDOWN, SMEffects.VULNERABILITY.get() )
                 .addToAttribute( Attributes.MAX_HEALTH, 4.0 );
     }
     

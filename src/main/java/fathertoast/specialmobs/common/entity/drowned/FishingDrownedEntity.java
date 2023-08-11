@@ -13,20 +13,20 @@ import fathertoast.specialmobs.datagen.loot.LootEntryItemBuilder;
 import fathertoast.specialmobs.datagen.loot.LootHelper;
 import fathertoast.specialmobs.datagen.loot.LootPoolBuilder;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.ILivingEntityData;
-import net.minecraft.entity.SpawnReason;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.item.IDyeableArmorItem;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.datasync.DataParameter;
-import net.minecraft.network.datasync.DataSerializers;
-import net.minecraft.network.datasync.EntityDataManager;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.world.DifficultyInstance;
-import net.minecraft.world.IServerWorld;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.SpawnGroupData;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.item.DyeableArmorItem;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.ServerLevelAccessor;
 
 import javax.annotation.Nullable;
 
@@ -72,7 +72,7 @@ public class FishingDrownedEntity extends _SpecialDrownedEntity implements IAngl
     }
     
     @SpecialMob.Factory
-    public static EntityType.IFactory<FishingDrownedEntity> getVariantFactory() { return FishingDrownedEntity::new; }
+    public static EntityType.EntityFactory<FishingDrownedEntity> getVariantFactory() { return FishingDrownedEntity::new; }
     
     /** @return This entity's mob species. */
     @SpecialMob.SpeciesSupplier
@@ -82,7 +82,7 @@ public class FishingDrownedEntity extends _SpecialDrownedEntity implements IAngl
     
     //--------------- Variant-Specific Implementations ----------------
     
-    public FishingDrownedEntity( EntityType<? extends _SpecialDrownedEntity> entityType, World world ) { super( entityType, world ); }
+    public FishingDrownedEntity( EntityType<? extends _SpecialDrownedEntity> entityType, Level level ) { super( entityType, level ); }
     
     /** Override to change this entity's AI goals. */
     @Override
@@ -93,13 +93,13 @@ public class FishingDrownedEntity extends _SpecialDrownedEntity implements IAngl
     
     /** Override to change starting equipment or stats. */
     @Override
-    public void finalizeVariantSpawn( IServerWorld world, DifficultyInstance difficulty, @Nullable SpawnReason spawnReason,
-                                      @Nullable ILivingEntityData groupData ) {
-        setItemSlot( EquipmentSlotType.MAINHAND, new ItemStack( Items.FISHING_ROD ) );
-        if( getItemBySlot( EquipmentSlotType.FEET ).isEmpty() ) {
+    public void finalizeVariantSpawn( ServerLevelAccessor level, DifficultyInstance difficulty, @Nullable MobSpawnType spawnType,
+                                     @Nullable SpawnGroupData groupData ) {
+        setItemSlot( EquipmentSlot.MAINHAND, new ItemStack( Items.FISHING_ROD ) );
+        if( getItemBySlot( EquipmentSlot.FEET ).isEmpty() ) {
             ItemStack booties = new ItemStack( Items.LEATHER_BOOTS );
-            ((IDyeableArmorItem) booties.getItem()).setColor( booties, 0xFFFF00 );
-            setItemSlot( EquipmentSlotType.FEET, booties );
+            ((DyeableArmorItem) booties.getItem()).setColor( booties, 0xFFFF00 );
+            setItemSlot( EquipmentSlot.FEET, booties );
         }
         setCanPickUpLoot( false );
     }
@@ -108,7 +108,7 @@ public class FishingDrownedEntity extends _SpecialDrownedEntity implements IAngl
     //--------------- IAngler Implementations ----------------
     
     /** The parameter for baby status. */
-    private static final DataParameter<Boolean> IS_LINE_OUT = EntityDataManager.defineId( FishingDrownedEntity.class, DataSerializers.BOOLEAN );
+    private static final EntityDataAccessor<Boolean> IS_LINE_OUT = SynchedEntityData.defineId( FishingDrownedEntity.class, EntityDataSerializers.BOOLEAN );
     
     /** Called from the Entity.class constructor to define data watcher variables. */
     @Override
@@ -127,9 +127,9 @@ public class FishingDrownedEntity extends _SpecialDrownedEntity implements IAngl
     
     /** @return The item equipped in a particular slot. */
     @Override
-    public ItemStack getItemBySlot( EquipmentSlotType slot ) {
+    public ItemStack getItemBySlot( EquipmentSlot slot ) {
         // Display a stick in place of the "cast fishing rod" when the fancy render is disabled
-        if( level.isClientSide() && !Config.MAIN.GENERAL.fancyFishingMobs.get() && EquipmentSlotType.MAINHAND.equals( slot ) ) {
+        if( level.isClientSide() && !Config.MAIN.GENERAL.fancyFishingMobs.get() && EquipmentSlot.MAINHAND.equals( slot ) ) {
             final ItemStack held = super.getItemBySlot( slot );
             if( held.getItem() == Items.FISHING_ROD && isLineOut() ) {
                 return new ItemStack( Items.STICK );

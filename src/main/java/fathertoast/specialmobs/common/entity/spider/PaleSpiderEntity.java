@@ -6,12 +6,13 @@ import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.item.Items;
-import net.minecraft.potion.Effects;
-import net.minecraft.world.World;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
+
 
 @SpecialMob
 public class PaleSpiderEntity extends _SpecialSpiderEntity {
@@ -25,7 +26,7 @@ public class PaleSpiderEntity extends _SpecialSpiderEntity {
     public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
         bestiaryInfo.color( 0xDED4C6 ).theme( BestiaryInfo.Theme.ICE )
                 .uniqueTextureWithEyes()
-                .addExperience( 1 ).effectImmune( Effects.WEAKNESS )
+                .addExperience( 1 ).effectImmune( MobEffects.WEAKNESS )
                 .addToAttribute( Attributes.ARMOR, 15.0 );
     }
     
@@ -42,7 +43,7 @@ public class PaleSpiderEntity extends _SpecialSpiderEntity {
     }
     
     @SpecialMob.Factory
-    public static EntityType.IFactory<PaleSpiderEntity> getVariantFactory() { return PaleSpiderEntity::new; }
+    public static EntityType.EntityFactory<PaleSpiderEntity> getVariantFactory() { return PaleSpiderEntity::new; }
     
     /** @return This entity's mob species. */
     @SpecialMob.SpeciesSupplier
@@ -52,16 +53,16 @@ public class PaleSpiderEntity extends _SpecialSpiderEntity {
     
     //--------------- Variant-Specific Implementations ----------------
     
-    public PaleSpiderEntity( EntityType<? extends _SpecialSpiderEntity> entityType, World world ) { super( entityType, world ); }
+    public PaleSpiderEntity( EntityType<? extends _SpecialSpiderEntity> entityType, Level level ) { super( entityType, level ); }
     
     /** Override to change the color of this entity's spit attack. */
     @Override
-    protected int getVariantSpitColor() { return Effects.WEAKNESS.getColor(); }
+    protected int getVariantSpitColor() { return MobEffects.WEAKNESS.getColor(); }
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override
     protected void onVariantAttack( LivingEntity target ) {
-        MobHelper.applyEffect( target, Effects.WEAKNESS );
-        MobHelper.applyEffect( target, Effects.DIG_SLOWDOWN, 3 );
+        MobHelper.applyEffect( target, MobEffects.WEAKNESS );
+        MobHelper.applyEffect( target, MobEffects.DIG_SLOWDOWN, 3 );
     }
 }

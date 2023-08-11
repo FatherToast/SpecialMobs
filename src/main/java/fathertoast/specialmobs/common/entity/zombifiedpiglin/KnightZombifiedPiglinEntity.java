@@ -7,16 +7,16 @@ import fathertoast.specialmobs.common.config.species.SpeciesConfig;
 import fathertoast.specialmobs.common.config.species.ZombieSpeciesConfig;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.ILivingEntityData;
-import net.minecraft.entity.SpawnReason;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.world.DifficultyInstance;
-import net.minecraft.world.IServerWorld;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.SpawnGroupData;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.ServerLevelAccessor;
 
 import javax.annotation.Nullable;
 
@@ -56,7 +56,7 @@ public class KnightZombifiedPiglinEntity extends _SpecialZombifiedPiglinEntity {
     }
     
     @SpecialMob.Factory
-    public static EntityType.IFactory<KnightZombifiedPiglinEntity> getVariantFactory() { return KnightZombifiedPiglinEntity::new; }
+    public static EntityType.EntityFactory<KnightZombifiedPiglinEntity> getVariantFactory() { return KnightZombifiedPiglinEntity::new; }
     
     /** @return This entity's mob species. */
     @SpecialMob.SpeciesSupplier
@@ -66,15 +66,15 @@ public class KnightZombifiedPiglinEntity extends _SpecialZombifiedPiglinEntity {
     
     //--------------- Variant-Specific Implementations ----------------
     
-    public KnightZombifiedPiglinEntity( EntityType<? extends _SpecialZombifiedPiglinEntity> entityType, World world ) { super( entityType, world ); }
+    public KnightZombifiedPiglinEntity( EntityType<? extends _SpecialZombifiedPiglinEntity> entityType, Level level ) { super( entityType, level ); }
     
     /** Override to change starting equipment or stats. */
     @Override
-    public void finalizeVariantSpawn( IServerWorld world, DifficultyInstance difficulty, @Nullable SpawnReason spawnReason,
-                                      @Nullable ILivingEntityData groupData ) {
-        setItemSlot( EquipmentSlotType.HEAD, new ItemStack( Items.GOLDEN_HELMET ) );
-        setItemSlot( EquipmentSlotType.CHEST, new ItemStack( Items.GOLDEN_CHESTPLATE ) );
-        setItemSlot( EquipmentSlotType.LEGS, new ItemStack( Items.GOLDEN_LEGGINGS ) );
-        setItemSlot( EquipmentSlotType.FEET, new ItemStack( Items.GOLDEN_BOOTS ) );
+    public void finalizeVariantSpawn( ServerLevelAccessor level, DifficultyInstance difficulty, @Nullable MobSpawnType spawnType,
+                                     @Nullable SpawnGroupData groupData ) {
+        setItemSlot( EquipmentSlot.HEAD, new ItemStack( Items.GOLDEN_HELMET ) );
+        setItemSlot( EquipmentSlot.CHEST, new ItemStack( Items.GOLDEN_CHESTPLATE ) );
+        setItemSlot( EquipmentSlot.LEGS, new ItemStack( Items.GOLDEN_LEGGINGS ) );
+        setItemSlot( EquipmentSlot.FEET, new ItemStack( Items.GOLDEN_BOOTS ) );
     }
 }

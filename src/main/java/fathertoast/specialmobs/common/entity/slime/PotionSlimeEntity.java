@@ -10,21 +10,26 @@ import fathertoast.specialmobs.common.core.SpecialMobs;
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.datasync.DataParameter;
-import net.minecraft.network.datasync.DataSerializers;
-import net.minecraft.network.datasync.EntityDataManager;
-import net.minecraft.particles.IParticleData;
-import net.minecraft.particles.ParticleTypes;
-import net.minecraft.potion.*;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.World;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffectCategory;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.alchemy.PotionUtils;
+import net.minecraft.world.item.alchemy.Potions;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import javax.annotation.Nullable;
@@ -83,7 +88,7 @@ public class PotionSlimeEntity extends _SpecialSlimeEntity {
     }
     
     @SpecialMob.Factory
-    public static EntityType.IFactory<PotionSlimeEntity> getVariantFactory() { return PotionSlimeEntity::new; }
+    public static EntityType.EntityFactory<PotionSlimeEntity> getVariantFactory() { return PotionSlimeEntity::new; }
     
     /** @return This entity's mob species. */
     @SpecialMob.SpeciesSupplier
@@ -94,14 +99,14 @@ public class PotionSlimeEntity extends _SpecialSlimeEntity {
     //--------------- Variant-Specific Implementations ----------------
     
     /** The parameter for potion color. */
-    private static final DataParameter<Integer> COLOR = EntityDataManager.defineId( PotionSlimeEntity.class, DataSerializers.INT );
+    private static final EntityDataAccessor<Integer> COLOR = SynchedEntityData.defineId( PotionSlimeEntity.class, EntityDataSerializers.INT );
     /** The color of an empty potion. */
     private static final int EMPTY_POTION_COLOR = 0x385DC6;
     
-    private Effect potionEffect;
+    private MobEffect potionEffect;
     
-    public PotionSlimeEntity( EntityType<? extends _SpecialSlimeEntity> entityType, World world ) {
-        super( entityType, world );
+    public PotionSlimeEntity( EntityType<? extends _SpecialSlimeEntity> entityType, Level level ) {
+        super( entityType, level );
         setRandomPotionFill();
     }
     
@@ -114,10 +119,10 @@ public class PotionSlimeEntity extends _SpecialSlimeEntity {
     
     /** Sets the potion fill of this slime to a random effect based on config settings. */
     private void setRandomPotionFill() {
-        final Set<Effect> allowedPotions = getConfig().POTION.allowedPotions.get().getEntries();
+        final Set<MobEffect> allowedPotions = getConfig().POTION.allowedPotions.get().getEntries();
         if( allowedPotions.size() > 0 ) {
-            final ArrayList<Effect> effects = new ArrayList<>( allowedPotions );
-            if( !Config.MAIN.GENERAL.enableNausea.get() ) effects.remove( Effects.CONFUSION );
+            final ArrayList<MobEffect> effects = new ArrayList<>( allowedPotions );
+            if( !Config.MAIN.GENERAL.enableNausea.get() ) effects.remove( MobEffects.CONFUSION );
             
             if( effects.size() > 0 ) {
                 setPotionFill( effects.get( random.nextInt( effects.size() ) ) );
@@ -128,7 +133,7 @@ public class PotionSlimeEntity extends _SpecialSlimeEntity {
     }
     
     /** Sets the potion fill of this slime. */
-    private void setPotionFill( @Nullable Effect effect ) {
+    private void setPotionFill( @Nullable MobEffect effect ) {
         potionEffect = effect;
         entityData.set( COLOR, effect == null ? EMPTY_POTION_COLOR : effect.getColor() );
     }
@@ -159,9 +164,9 @@ public class PotionSlimeEntity extends _SpecialSlimeEntity {
             final float angle = random.nextFloat() * 2.0F * (float) Math.PI;
             final float distance = (random.nextFloat() * 0.25F + 0.25F) * size;
             level.addParticle( getParticleType(),
-                    getX() + MathHelper.sin( angle ) * distance,
+                    getX() + Mth.sin( angle ) * distance,
                     getY(),
-                    getZ() + MathHelper.cos( angle ) * distance,
+                    getZ() + Mth.cos( angle ) * distance,
                     r, g, b );
         }
         return true;
@@ -169,25 +174,25 @@ public class PotionSlimeEntity extends _SpecialSlimeEntity {
     
     /** @return This slime's particle type for jump effects. */
     @Override
-    protected IParticleData getParticleType() { return ParticleTypes.ENTITY_EFFECT; }
+    protected ParticleOptions getParticleType() { return ParticleTypes.ENTITY_EFFECT; }
     
     /** @return True if the effect can be applied to this entity. */
     @Override
-    public boolean canBeAffected( EffectInstance effect ) {
+    public boolean canBeAffected( MobEffectInstance effect ) {
         // Immune to debuffs
-        return effect.getEffect().getCategory() != EffectType.HARMFUL && super.canBeAffected( effect );
+        return effect.getEffect().getCategory() != MobEffectCategory.HARMFUL && super.canBeAffected( effect );
     }
     
     /** Override to save data to this entity's NBT data. */
     @Override
-    public void addVariantSaveData( CompoundNBT saveTag ) {
-        saveTag.putString( TAG_AMMO, SpecialMobs.toString( ForgeRegistries.POTIONS.getKey( potionEffect ) ) );
+    public void addVariantSaveData( CompoundTag saveTag ) {
+        saveTag.putString( TAG_AMMO, SpecialMobs.toString( ForgeRegistries.MOB_EFFECTS.getKey( potionEffect ) ) );
     }
     
     /** Override to load data from this entity's NBT data. */
     @Override
-    public void readVariantSaveData( CompoundNBT saveTag ) {
+    public void readVariantSaveData( CompoundTag saveTag ) {
         if( saveTag.contains( TAG_AMMO, NBT_TYPE_STRING ) )
-            setPotionFill( ForgeRegistries.POTIONS.getValue( new ResourceLocation( saveTag.getString( TAG_AMMO ) ) ) );
+            setPotionFill( ForgeRegistries.MOB_EFFECTS.getValue( new ResourceLocation( saveTag.getString( TAG_AMMO ) ) ) );
     }
 }

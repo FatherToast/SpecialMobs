@@ -6,16 +6,16 @@ import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.potion.EffectInstance;
-import net.minecraft.potion.Effects;
-import net.minecraft.potion.Potions;
-import net.minecraft.util.SoundEvents;
-import net.minecraft.world.World;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.alchemy.Potions;
+import net.minecraft.world.level.Level;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -49,7 +49,7 @@ public class DominationWitchEntity extends _SpecialWitchEntity {
     }
     
     @SpecialMob.Factory
-    public static EntityType.IFactory<DominationWitchEntity> getVariantFactory() { return DominationWitchEntity::new; }
+    public static EntityType.EntityFactory<DominationWitchEntity> getVariantFactory() { return DominationWitchEntity::new; }
     
     /** @return This entity's mob species. */
     @SpecialMob.SpeciesSupplier
@@ -59,21 +59,21 @@ public class DominationWitchEntity extends _SpecialWitchEntity {
     
     //--------------- Variant-Specific Implementations ----------------
     
-    private static final Collection<EffectInstance> LEVITATION_EFFECTS = Collections.singletonList(
-            new EffectInstance( Effects.LEVITATION, 140, 0 ) );
+    private static final Collection<MobEffectInstance> LEVITATION_EFFECTS = Collections.singletonList(
+            new MobEffectInstance( MobEffects.LEVITATION, 140, 0 ) );
     
     /** Ticks before this witch can use its pull ability. */
     private int pullDelay;
     
-    public DominationWitchEntity( EntityType<? extends _SpecialWitchEntity> entityType, World world ) { super( entityType, world ); }
+    public DominationWitchEntity( EntityType<? extends _SpecialWitchEntity> entityType, Level level ) { super( entityType, level ); }
     
     /** Override to modify potion attacks. Return an empty item stack to cancel the potion throw. */
     @Override
     protected ItemStack pickVariantThrownPotion( ItemStack originalPotion, LivingEntity target, float damageMulti, float distance ) {
-        if( !target.hasEffect( Effects.WEAKNESS ) ) {
+        if( !target.hasEffect( MobEffects.WEAKNESS ) ) {
             return makeSplashPotion( Potions.WEAKNESS );
         }
-        else if( distance > 5.0F && !target.hasEffect( Effects.LEVITATION ) && random.nextFloat() < 0.5F ) {
+        else if( distance > 5.0F && !target.hasEffect( MobEffects.LEVITATION ) && random.nextFloat() < 0.5F ) {
             return makeSplashPotion( LEVITATION_EFFECTS );
         }
         return originalPotion;
@@ -88,7 +88,7 @@ public class DominationWitchEntity extends _SpecialWitchEntity {
             // Pull the player toward this entity if they are vulnerable
             final double distanceSq = target.distanceToSqr( this );
             if( distanceSq > 100.0 && distanceSq < 196.0 &&
-                    (target.hasEffect( Effects.WEAKNESS ) || target.hasEffect( Effects.LEVITATION )) && canSee( target ) ) {
+                    (target.hasEffect( MobEffects.WEAKNESS ) || target.hasEffect( MobEffects.LEVITATION )) && hasLineOfSight( target ) ) {
                 pullDelay = 100;
                 
                 playSound( SoundEvents.FISHING_BOBBER_RETRIEVE, 1.0F, 0.4F / (random.nextFloat() * 0.4F + 0.8F) );

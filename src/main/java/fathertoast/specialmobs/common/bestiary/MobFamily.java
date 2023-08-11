@@ -338,7 +338,7 @@ public class MobFamily<T extends Mob, V extends FamilyConfig> {
         }
         
         /** Registers this species's spawn placement and links the (now loaded) entity type to this species. */
-        public void registerSpawnPlacement() {
+        public void registerSpawnPlacement( ) {
             TYPE_TO_SPECIES_MAP.put( entityType.get(), this );
             AnnotationHelper.registerSpawnPlacement( this );
         }

@@ -5,17 +5,17 @@ import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.entity.ai.AmphibiousMovementController;
 import fathertoast.specialmobs.common.entity.ai.IAmphibiousMob;
 import fathertoast.specialmobs.common.event.NaturalSpawnManager;
-import net.minecraft.entity.EntitySpawnPlacementRegistry;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.MoverType;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.pathfinding.GroundPathNavigator;
-import net.minecraft.pathfinding.PathNodeType;
-import net.minecraft.pathfinding.SwimmerPathNavigator;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.IWorldReader;
-import net.minecraft.world.World;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.MoverType;
+import net.minecraft.world.entity.SpawnPlacements;
+import net.minecraft.world.entity.ai.navigation.GroundPathNavigation;
+import net.minecraft.world.entity.ai.navigation.WaterBoundPathNavigation;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.pathfinder.BlockPathTypes;
+import net.minecraft.world.phys.Vec3;
 
 /**
  * A bare-bones implementation of an amphibious silverfish. Just fix the AI and it's good to go.
@@ -24,34 +24,34 @@ public abstract class AmphibiousSilverfishEntity extends _SpecialSilverfishEntit
     
     @SpecialMob.SpawnPlacementRegistrar
     public static void registerSpeciesSpawnPlacement( MobFamily.Species<? extends AmphibiousSilverfishEntity> species ) {
-        NaturalSpawnManager.registerSpawnPlacement( species, EntitySpawnPlacementRegistry.PlacementType.IN_WATER,
+        NaturalSpawnManager.registerSpawnPlacement( species, SpawnPlacements.Type.IN_WATER,
                 _SpecialSilverfishEntity::checkFamilySpawnRules );
     }
     
     /** @return True if this entity's position is currently obstructed. */
     @Override
-    public boolean checkSpawnObstruction( IWorldReader world ) { return world.isUnobstructed( this ); }
+    public boolean checkSpawnObstruction( LevelReader level ) { return level.isUnobstructed( this ); }
     
     
-    private final SwimmerPathNavigator waterNavigation;
-    private final GroundPathNavigator groundNavigation;
+    private final WaterBoundPathNavigation waterNavigation;
+    private final GroundPathNavigation groundNavigation;
     
     private boolean swimmingUp;
     
-    public AmphibiousSilverfishEntity( EntityType<? extends _SpecialSilverfishEntity> entityType, World world ) {
-        super( entityType, world );
+    public AmphibiousSilverfishEntity( EntityType<? extends _SpecialSilverfishEntity> entityType, Level level ) {
+        super( entityType, level );
         moveControl = new AmphibiousMovementController<>( this );
-        waterNavigation = new SwimmerPathNavigator( this, world );
-        groundNavigation = new GroundPathNavigator( this, world );
+        waterNavigation = new WaterBoundPathNavigation( this, level );
+        groundNavigation = new GroundPathNavigation( this, level );
         maxUpStep = 1.0F;
-        setPathfindingMalus( PathNodeType.WATER, PathNodeType.WALKABLE.getMalus() );
+        setPathfindingMalus( BlockPathTypes.WATER, BlockPathTypes.WALKABLE.getMalus() );
     }
     
     /** Loads data from this entity's base NBT compound that is specific to its subclass. */
     @Override
-    public void readAdditionalSaveData( CompoundNBT tag ) {
+    public void readAdditionalSaveData( CompoundTag tag ) {
         super.readAdditionalSaveData( tag );
-        setPathfindingMalus( PathNodeType.WATER, PathNodeType.WALKABLE.getMalus() );
+        setPathfindingMalus( BlockPathTypes.WATER, BlockPathTypes.WALKABLE.getMalus() );
     }
     
     
@@ -74,7 +74,7 @@ public abstract class AmphibiousSilverfishEntity extends _SpecialSilverfishEntit
     
     /** Moves this entity in the desired direction. Input magnitude of < 1 scales down movement speed. */
     @Override
-    public void travel( Vector3d input ) {
+    public void travel( Vec3 input ) {
         if( isEffectiveAi() && isUnderWater() && shouldSwim() ) {
             moveRelative( 0.01F, input );
             move( MoverType.SELF, getDeltaMovement() );

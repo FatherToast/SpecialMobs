@@ -8,6 +8,7 @@ import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
@@ -52,7 +53,7 @@ public final class AnnotationHelper {
     }
     
     /** Gets bestiary info from a special mob species. Throws an exception if anything goes wrong. */
-    public static <T extends LivingEntity> BestiaryInfo.Builder getBestiaryInfo(MobFamily.Species<T> species, BestiaryInfo.Builder bestiaryInfo ) {
+    public static <T extends Mob> BestiaryInfo.Builder getBestiaryInfo(MobFamily.Species<T> species, BestiaryInfo.Builder bestiaryInfo ) {
         try {
             getMethod( species.entityClass, SpecialMob.BestiaryInfoSupplier.class ).invoke( null, bestiaryInfo );
             return bestiaryInfo;
@@ -158,7 +159,7 @@ public final class AnnotationHelper {
     }
     
     /** Creates an entity factory from a special mob species. Throws an exception if anything goes wrong. */
-    public static <T extends LivingEntity> EntityType.EntityFactory<T> getEntityFactory( MobFamily.Species<T> species ) {
+    public static <T extends Mob> EntityType.EntityFactory<T> getEntityFactory( MobFamily.Species<T> species ) {
         try {
             //noinspection unchecked
             return (EntityType.EntityFactory<T>) getMethod( species.entityClass, SpecialMob.Factory.class ).invoke( null );

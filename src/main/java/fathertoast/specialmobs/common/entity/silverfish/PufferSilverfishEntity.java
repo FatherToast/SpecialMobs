@@ -8,12 +8,12 @@ import fathertoast.specialmobs.common.entity.ai.AIHelper;
 import fathertoast.specialmobs.common.entity.ai.goal.AmphibiousGoToWaterGoal;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.goal.SwimGoal;
-import net.minecraft.item.Items;
-import net.minecraft.potion.Effects;
-import net.minecraft.world.World;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.goal.FloatGoal;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
 
 @SpecialMob
 public class PufferSilverfishEntity extends AmphibiousSilverfishEntity {
@@ -27,7 +27,7 @@ public class PufferSilverfishEntity extends AmphibiousSilverfishEntity {
     public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
         bestiaryInfo.color( 0xE6E861 ).weight( BestiaryInfo.DefaultWeight.LOW ).theme( BestiaryInfo.Theme.WATER )
                 .uniqueTextureBaseOnly()
-                .addExperience( 1 ).drownImmune().effectImmune( Effects.POISON );
+                .addExperience( 1 ).drownImmune().effectImmune( MobEffects.POISON );
     }
     
     @SpecialMob.LanguageProvider
@@ -43,7 +43,7 @@ public class PufferSilverfishEntity extends AmphibiousSilverfishEntity {
     }
     
     @SpecialMob.Factory
-    public static EntityType.IFactory<PufferSilverfishEntity> getVariantFactory() { return PufferSilverfishEntity::new; }
+    public static EntityType.EntityFactory<PufferSilverfishEntity> getVariantFactory() { return PufferSilverfishEntity::new; }
     
     /** @return This entity's mob species. */
     @SpecialMob.SpeciesSupplier
@@ -53,12 +53,12 @@ public class PufferSilverfishEntity extends AmphibiousSilverfishEntity {
     
     //--------------- Variant-Specific Implementations ----------------
     
-    public PufferSilverfishEntity( EntityType<? extends _SpecialSilverfishEntity> entityType, World world ) { super( entityType, world ); }
+    public PufferSilverfishEntity( EntityType<? extends _SpecialSilverfishEntity> entityType, Level level ) { super( entityType, level ); }
     
     /** Override to change this entity's AI goals. */
     @Override
     protected void registerVariantGoals() {
-        AIHelper.removeGoals( goalSelector, SwimGoal.class );
+        AIHelper.removeGoals( goalSelector, FloatGoal.class );
         AIHelper.insertGoal( goalSelector, 5, new AmphibiousGoToWaterGoal( this, 1.0 ).alwaysEnabled() );
     }
     
@@ -69,7 +69,7 @@ public class PufferSilverfishEntity extends AmphibiousSilverfishEntity {
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override
     protected void onVariantAttack( LivingEntity target ) {
-        MobHelper.applyEffect( target, Effects.POISON );
+        MobHelper.applyEffect( target, MobEffects.POISON );
     }
     
     /** @return Water drag coefficient. */

@@ -8,18 +8,18 @@ import fathertoast.specialmobs.common.config.species.SpeciesConfig;
 import fathertoast.specialmobs.common.event.PlayerVelocityWatcher;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.entity.projectile.AbstractArrowEntity;
-import net.minecraft.entity.projectile.ProjectileHelper;
-import net.minecraft.item.BowItem;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.util.SoundEvents;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.World;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.projectile.AbstractArrow;
+import net.minecraft.world.entity.projectile.ProjectileUtil;
+import net.minecraft.world.item.BowItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 
 @SpecialMob
 public class SniperSkeletonEntity extends _SpecialSkeletonEntity {
@@ -58,7 +58,7 @@ public class SniperSkeletonEntity extends _SpecialSkeletonEntity {
     }
     
     @SpecialMob.Factory
-    public static EntityType.IFactory<SniperSkeletonEntity> getVariantFactory() { return SniperSkeletonEntity::new; }
+    public static EntityType.EntityFactory<SniperSkeletonEntity> getVariantFactory() { return SniperSkeletonEntity::new; }
     
     /** @return This entity's mob species. */
     @SpecialMob.SpeciesSupplier
@@ -68,11 +68,11 @@ public class SniperSkeletonEntity extends _SpecialSkeletonEntity {
     
     //--------------- Variant-Specific Implementations ----------------
     
-    public SniperSkeletonEntity( EntityType<? extends _SpecialSkeletonEntity> entityType, World world ) { super( entityType, world ); }
+    public SniperSkeletonEntity( EntityType<? extends _SpecialSkeletonEntity> entityType, Level level ) { super( entityType, level ); }
     
     /** Called to attack the target with a ranged attack. */
     @Override
-    public void performRangedAttack( LivingEntity target, float damageMulti ) {
+    public void performRangedAttack(LivingEntity target, float damageMulti ) {
         final double g = 0.05; // Gravitational acceleration for AbstractArrowEntity
         final float v = 1.6F;
         
@@ -80,12 +80,12 @@ public class SniperSkeletonEntity extends _SpecialSkeletonEntity {
         final double dist = distanceTo( target );
         final double arcFactor = dist * 0.012;
         final float ticksToTarget = (float) (dist / v * (1.0 + arcFactor * arcFactor * arcFactor));
-        final Vector3d targetV = PlayerVelocityWatcher.getVelocity( target );
+        final Vec3 targetV = PlayerVelocityWatcher.getVelocity( target );
         
         final double dX = target.getX() + targetV.x * ticksToTarget - getX();
         final double dY = target.getY( 0.5 ) - getEyeY() + 0.1;
         final double dZ = target.getZ() + targetV.z * ticksToTarget - getZ();
-        final double dH = MathHelper.sqrt( dX * dX + dZ * dZ );
+        final double dH = Mth.sqrt( (float) (dX * dX + dZ * dZ) );
         
         final double radical = v * v * v * v - g * (g * dH * dH + 2 * dY * v * v);
         if( radical < 0.0 ) {
@@ -97,9 +97,9 @@ public class SniperSkeletonEntity extends _SpecialSkeletonEntity {
         final double vY = Math.sin( angle );
         final double vH = Math.cos( angle );
         
-        final ItemStack arrowItem = getProjectile( getItemInHand( ProjectileHelper.getWeaponHoldingHand(
-                this, item -> item instanceof BowItem ) ) );
-        AbstractArrowEntity arrow = getArrow( arrowItem, damageMulti );
+        final ItemStack arrowItem = getProjectile( getItemInHand( ProjectileUtil.getWeaponHoldingHand(
+                this, item -> item instanceof BowItem) ) );
+        AbstractArrow arrow = getArrow( arrowItem, damageMulti );
         if( getMainHandItem().getItem() instanceof BowItem )
             arrow = ((BowItem) getMainHandItem().getItem()).customArrow( arrow );
         
@@ -112,8 +112,8 @@ public class SniperSkeletonEntity extends _SpecialSkeletonEntity {
     
     /** Override to modify this entity's ranged attack projectile. */
     @Override
-    protected AbstractArrowEntity getVariantArrow( AbstractArrowEntity arrow, ItemStack arrowItem, float damageMulti ) {
-        arrow.setKnockback( arrow.knockback + 2 );
+    protected AbstractArrow getVariantArrow( AbstractArrow arrow, ItemStack arrowItem, float damageMulti ) {
+        arrow.setKnockback( arrow.getKnockback() + 2 );
         return arrow;
     }
 }

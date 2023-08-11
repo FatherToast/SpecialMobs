@@ -8,21 +8,25 @@ import fathertoast.specialmobs.common.config.species.SpeciesConfig;
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
-import net.minecraft.block.*;
-import net.minecraft.block.material.Material;
-import net.minecraft.entity.CreatureAttribute;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.fluid.Fluids;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.potion.Effects;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.tags.FluidTags;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
 import net.minecraft.util.Tuple;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.MobType;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.BucketPickup;
+import net.minecraft.world.level.block.LiquidBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Material;
 
 import java.util.ArrayDeque;
 import java.util.Queue;
@@ -65,7 +69,7 @@ public class DesiccatedSilverfishEntity extends _SpecialSilverfishEntity {
     }
     
     @SpecialMob.Factory
-    public static EntityType.IFactory<DesiccatedSilverfishEntity> getVariantFactory() { return DesiccatedSilverfishEntity::new; }
+    public static EntityType.EntityFactory<DesiccatedSilverfishEntity> getVariantFactory() { return DesiccatedSilverfishEntity::new; }
     
     /** @return This entity's mob species. */
     @SpecialMob.SpeciesSupplier
@@ -77,8 +81,8 @@ public class DesiccatedSilverfishEntity extends _SpecialSilverfishEntity {
     
     private int absorbCount;
     
-    public DesiccatedSilverfishEntity( EntityType<? extends _SpecialSilverfishEntity> entityType, World world ) {
-        super( entityType, world );
+    public DesiccatedSilverfishEntity( EntityType<? extends _SpecialSilverfishEntity> entityType, Level level ) {
+        super( entityType, level );
         absorbCount = getConfig().DESICCATED.absorbCount.next( random );
     }
     
@@ -91,17 +95,17 @@ public class DesiccatedSilverfishEntity extends _SpecialSilverfishEntity {
     
     /** Override to change the color of this entity's spit attack. */
     @Override
-    protected int getVariantSpitColor() { return Effects.HUNGER.getColor(); }
+    protected int getVariantSpitColor() { return MobEffects.HUNGER.getColor(); }
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override
     protected void onVariantAttack( LivingEntity target ) {
-        MobHelper.applyEffect( target, Effects.HUNGER );
+        MobHelper.applyEffect( target, MobEffects.HUNGER );
     }
     
     /** @return This entity's creature type. */
     @Override
-    public CreatureAttribute getMobType() { return CreatureAttribute.UNDEAD; }
+    public MobType getMobType() { return MobType.UNDEAD; }
     
     /** @return Copy of the sponge absorption method, adapted for use by this entity. Returns true if anything is absorbed. */
     private boolean spongebob() {
@@ -129,17 +133,17 @@ public class DesiccatedSilverfishEntity extends _SpecialSilverfishEntity {
         
         // Prioritize bucket handler, then empty water block, then water plants
         final BlockState block = level.getBlockState( pos );
-        if( block.getBlock() instanceof IBucketPickupHandler &&
-                ((IBucketPickupHandler) block.getBlock()).takeLiquid( level, pos, block ) != Fluids.EMPTY ) {
+        if( block.getBlock() instanceof BucketPickup &&
+                ((BucketPickup) block.getBlock()).pickupBlock( level, pos, block ) != ItemStack.EMPTY ) {
             onAbsorb( posToCheckAround, rootDistance, pos );
         }
-        else if( block.getBlock() instanceof FlowingFluidBlock ) {
+        else if( block.getBlock() instanceof LiquidBlock) {
             level.setBlock( pos, Blocks.AIR.defaultBlockState(), References.SetBlockFlags.DEFAULTS );
             onAbsorb( posToCheckAround, rootDistance, pos );
         }
         else if( block.getMaterial() == Material.WATER_PLANT || block.getMaterial() == Material.REPLACEABLE_WATER_PLANT ) {
-            final TileEntity tileEntity = block.hasTileEntity() ? level.getBlockEntity( pos ) : null;
-            Block.dropResources( block, level, pos, tileEntity );
+            final BlockEntity blockEntity = block.hasBlockEntity() ? level.getExistingBlockEntity( pos ) : null;
+            Block.dropResources( block, level, pos, blockEntity );
             level.setBlock( pos, Blocks.AIR.defaultBlockState(), References.SetBlockFlags.DEFAULTS );
             onAbsorb( posToCheckAround, rootDistance, pos );
         }
@@ -155,13 +159,13 @@ public class DesiccatedSilverfishEntity extends _SpecialSilverfishEntity {
     
     /** Override to save data to this entity's NBT data. */
     @Override
-    public void addVariantSaveData( CompoundNBT saveTag ) {
+    public void addVariantSaveData( CompoundTag saveTag ) {
         saveTag.putByte( References.TAG_AMMO, (byte) absorbCount );
     }
     
     /** Override to load data from this entity's NBT data. */
     @Override
-    public void readVariantSaveData( CompoundNBT saveTag ) {
+    public void readVariantSaveData( CompoundTag saveTag ) {
         if( saveTag.contains( References.TAG_AMMO, References.NBT_TYPE_NUMERICAL ) )
             absorbCount = saveTag.getByte( References.TAG_AMMO );
     }

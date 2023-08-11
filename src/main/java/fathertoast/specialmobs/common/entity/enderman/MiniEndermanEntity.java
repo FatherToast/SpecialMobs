@@ -5,9 +5,9 @@ import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.level.Level;
 
 @SpecialMob
 public class MiniEndermanEntity extends _SpecialEndermanEntity {
@@ -38,7 +38,7 @@ public class MiniEndermanEntity extends _SpecialEndermanEntity {
     }
     
     @SpecialMob.Factory
-    public static EntityType.IFactory<MiniEndermanEntity> getVariantFactory() { return MiniEndermanEntity::new; }
+    public static EntityType.EntityFactory<MiniEndermanEntity> getVariantFactory() { return MiniEndermanEntity::new; }
     
     /** @return This entity's mob species. */
     @SpecialMob.SpeciesSupplier
@@ -48,8 +48,8 @@ public class MiniEndermanEntity extends _SpecialEndermanEntity {
     
     //--------------- Variant-Specific Implementations ----------------
     
-    public MiniEndermanEntity( EntityType<? extends _SpecialEndermanEntity> entityType, World world ) {
-        super( entityType, world );
+    public MiniEndermanEntity( EntityType<? extends _SpecialEndermanEntity> entityType, Level level ) {
+        super( entityType, level );
         maxUpStep = 0.5F;
     }
 }

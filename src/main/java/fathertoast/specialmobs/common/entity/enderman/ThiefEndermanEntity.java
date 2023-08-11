@@ -5,15 +5,15 @@ import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.item.Items;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.SoundEvents;
-import net.minecraft.world.World;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.event.ForgeEventFactory;
-import net.minecraftforge.event.entity.living.EntityTeleportEvent;
+import net.minecraftforge.event.entity.EntityTeleportEvent;
 
 @SpecialMob
 public class ThiefEndermanEntity extends _SpecialEndermanEntity {
@@ -44,7 +44,7 @@ public class ThiefEndermanEntity extends _SpecialEndermanEntity {
     }
     
     @SpecialMob.Factory
-    public static EntityType.IFactory<ThiefEndermanEntity> getVariantFactory() { return ThiefEndermanEntity::new; }
+    public static EntityType.EntityFactory<ThiefEndermanEntity> getVariantFactory() { return ThiefEndermanEntity::new; }
     
     /** @return This entity's mob species. */
     @SpecialMob.SpeciesSupplier
@@ -56,7 +56,7 @@ public class ThiefEndermanEntity extends _SpecialEndermanEntity {
     
     private int teleportTargetDelay;
     
-    public ThiefEndermanEntity( EntityType<? extends _SpecialEndermanEntity> entityType, World world ) { super( entityType, world ); }
+    public ThiefEndermanEntity( EntityType<? extends _SpecialEndermanEntity> entityType, Level level ) { super( entityType, level ); }
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override
@@ -93,7 +93,7 @@ public class ThiefEndermanEntity extends _SpecialEndermanEntity {
         if( event.isCanceled() ) return false;
         
         if( target.randomTeleport( event.getTargetX(), event.getTargetY(), event.getTargetZ(), true ) ) {
-            level.playSound( null, xI, yI, zI, SoundEvents.CHORUS_FRUIT_TELEPORT, SoundCategory.PLAYERS,
+            level.playSound( null, xI, yI, zI, SoundEvents.CHORUS_FRUIT_TELEPORT, SoundSource.PLAYERS,
                     1.0F, 1.0F );
             target.playSound( SoundEvents.CHORUS_FRUIT_TELEPORT, 1.0F, 1.0F );
             return true;

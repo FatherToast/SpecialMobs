@@ -1,23 +1,20 @@
 package fathertoast.specialmobs.client.renderer.entity.family;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import fathertoast.specialmobs.client.renderer.entity.layers.SpecialMobEyesLayer;
 import fathertoast.specialmobs.common.entity.ISpecialMob;
-import net.minecraft.client.renderer.entity.EntityRendererManager;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.SpiderRenderer;
 import net.minecraft.client.renderer.entity.layers.SpiderEyesLayer;
-import net.minecraft.entity.monster.SpiderEntity;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.monster.Spider;
 
-@OnlyIn( Dist.CLIENT )
-public class SpecialSpiderRenderer extends SpiderRenderer<SpiderEntity> {
+public class SpecialSpiderRenderer extends SpiderRenderer<Spider> {
     
     private final float baseShadowRadius;
     
-    public SpecialSpiderRenderer( EntityRendererManager rendererManager ) {
-        super( rendererManager );
+    public SpecialSpiderRenderer( EntityRendererProvider.Context context ) {
+        super( context );
         // Get rid of this one since we have our own implementation
         layers.removeIf( ( layer ) -> layer instanceof SpiderEyesLayer );
         
@@ -28,16 +25,16 @@ public class SpecialSpiderRenderer extends SpiderRenderer<SpiderEntity> {
     }
     
     @Override
-    public ResourceLocation getTextureLocation( SpiderEntity entity ) {
+    public ResourceLocation getTextureLocation( Spider entity ) {
         return ((ISpecialMob<?>) entity).getSpecialData().getTexture();
     }
     
     @Override
-    protected void scale( SpiderEntity entity, MatrixStack matrixStack, float partialTick ) {
-        super.scale( entity, matrixStack, partialTick );
+    protected void scale(Spider entity, PoseStack poseStack, float partialTick ) {
+        super.scale( entity, poseStack, partialTick );
         
         final float scale = ((ISpecialMob<?>) entity).getSpecialData().getRenderScale();
         shadowRadius = baseShadowRadius * scale;
-        matrixStack.scale( scale, scale, scale );
+        poseStack.scale( scale, scale, scale );
     }
 }

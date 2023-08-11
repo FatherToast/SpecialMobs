@@ -5,16 +5,17 @@ import fathertoast.specialmobs.common.config.field.EnvironmentListField;
 import fathertoast.specialmobs.common.config.util.environment.TagKeyEnvironment;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.biome.Biome;
 
 import javax.annotation.Nullable;
-import java.util.stream.Collectors;
 
 public class BiomeTagKeyEnvironment extends TagKeyEnvironment {
     
     public BiomeTagKeyEnvironment( ResourceLocation value, boolean invert ) { super( value, invert ); }
+
+    public BiomeTagKeyEnvironment( ResourceLocation[] values, boolean invert ) {
+        super( values, invert );
+    }
 
     public BiomeTagKeyEnvironment( AbstractConfigField field, String line ) { super( field, line ); }
 
@@ -25,13 +26,12 @@ public class BiomeTagKeyEnvironment extends TagKeyEnvironment {
     /** @return Returns true if this environment matches the provided environment. */
     @Override
     public boolean matches( Level world, @Nullable BlockPos pos ) {
-        if (pos == null || VALUE == null)
+        if (pos == null || VALUES == null)
             return false;
 
-        for (TagKey<Biome> tagKey : world.getBiome(pos).tags().collect(Collectors.toList())) {
-            if (tagKey.location().equals(VALUE)) {
-                return !INVERT;
-            }
+        for (ResourceLocation tagId : VALUES) {
+            if (world.getBiome(pos).is(tagId))
+                return true;
         }
         return false;
     }
