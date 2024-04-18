@@ -8,7 +8,7 @@ import fathertoast.specialmobs.common.core.register.SMEntities;
 import fathertoast.specialmobs.common.core.register.SMItems;
 import fathertoast.specialmobs.common.util.AnnotationHelper;
 import fathertoast.specialmobs.common.util.References;
-import net.minecraft.data.DataGenerator;
+import net.minecraft.data.PackOutput;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
@@ -120,7 +120,7 @@ public class SMLanguageProvider extends LanguageProvider {
             final int k = key.ordinal() + 1;
             boolean missedAny = false;
             for( String[] translationArray : TRANSLATIONS ) {
-                if( translationArray[k] == null || translationArray[k].equals( "" ) ) {
+                if( translationArray[k] == null || translationArray[k].isEmpty()) {
                     SpecialMobs.LOG.error( "Translation key {} is missing a translation for lang key \"{}\"!",
                             key.name(), translationArray[0] );
                     missedAny = true;
@@ -151,8 +151,8 @@ public class SMLanguageProvider extends LanguageProvider {
     private final TranslationKey translationKey;
     
     /** Creates a language provider for a specific locale. This correlates to exactly one .json file. */
-    public SMLanguageProvider( DataGenerator gen, String locale, TranslationKey translateKey ) {
-        super( gen, SpecialMobs.MOD_ID, locale );
+    public SMLanguageProvider(PackOutput output, String locale, TranslationKey translateKey ) {
+        super( output, SpecialMobs.MOD_ID, locale );
         translationKey = translateKey;
     }
     

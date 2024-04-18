@@ -73,17 +73,17 @@ public class DarkCreeperEntity extends _SpecialCreeperEntity {
         
         // Add unaffected light sources to the explosion's affected area
         // Note that this does NOT simulate another explosion, instead just directly searches for and targets lights
-        final BlockPos center = new BlockPos( explosion.getPos() );
+        final BlockPos center = BlockPos.containing( explosion.getPos() );
         final int radius = explosionRadius * 4 * (isPowered() ? 2 : 1);
         for( int y = -radius; y <= radius; y++ ) {
             for( int x = -radius; x <= radius; x++ ) {
                 for( int z = -radius; z <= radius; z++ ) {
                     if( x * x + y * y + z * z <= radius * radius ) {
                         final BlockPos pos = center.offset( x, y, z );
-                        final BlockState block = level.getBlockState( pos );
+                        final BlockState block = level().getBlockState( pos );
                         
                         // Ignore the block if it is not a light or is already exploded
-                        if( block.getLightBlock( level, pos ) > 1 && !explosion.getHitBlocks().contains( pos ) &&
+                        if( block.getLightBlock( level(), pos ) > 1 && !explosion.getHitBlocks().contains( pos ) &&
                                 explosion.tryExplodeBlock( pos, block, radius ) ) {
                             explosion.getHitBlocks().add( pos );
                         }
@@ -95,7 +95,7 @@ public class DarkCreeperEntity extends _SpecialCreeperEntity {
         explosion.finalizeExplosion();
         
         // Move the time forward to next night if powered
-        if( isPowered() && level instanceof ServerLevel serverLevel ) {;
+        if( isPowered() && level() instanceof ServerLevel serverLevel ) {;
             
             // Days are 24k ticks long; find how far along we are in the current day (0-23,999)
             long time = serverLevel.getDayTime();

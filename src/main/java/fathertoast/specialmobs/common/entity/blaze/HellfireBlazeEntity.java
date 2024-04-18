@@ -78,9 +78,9 @@ public class HellfireBlazeEntity extends _SpecialBlazeEntity {
         final double dY = target.getY( 0.5 ) - getY( 0.5 );
         final double dZ = target.getZ() - getZ() + getRandom().nextGaussian() * accelVariance;
         
-        final Fireball fireball = new LargeFireball( level, this, dX, dY, dZ, explosionPower );
+        final Fireball fireball = new LargeFireball( level(), this, dX, dY, dZ, explosionPower );
         fireball.setPos( fireball.getX(), getY( 0.5 ) + 0.5, fireball.getZ() );
-        level.addFreshEntity( fireball );
+        level().addFreshEntity( fireball );
     }
     
     /** Override to save data to this entity's NBT data. */

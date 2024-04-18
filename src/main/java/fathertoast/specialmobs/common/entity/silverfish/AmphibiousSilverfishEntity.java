@@ -43,7 +43,7 @@ public abstract class AmphibiousSilverfishEntity extends _SpecialSilverfishEntit
         moveControl = new AmphibiousMovementController<>( this );
         waterNavigation = new WaterBoundPathNavigation( this, level );
         groundNavigation = new GroundPathNavigation( this, level );
-        maxUpStep = 1.0F;
+        setMaxUpStep( 1.0F );
         setPathfindingMalus( BlockPathTypes.WATER, BlockPathTypes.WALKABLE.getMalus() );
     }
     
@@ -60,7 +60,7 @@ public abstract class AmphibiousSilverfishEntity extends _SpecialSilverfishEntit
     /** Called each tick to update this entity's swimming state. */
     @Override
     public void updateSwimming() {
-        if( !level.isClientSide ) {
+        if( !level().isClientSide ) {
             if( isEffectiveAi() && isUnderWater() && shouldSwim() ) {
                 setNavigatorToSwim();
                 setSwimming( true );

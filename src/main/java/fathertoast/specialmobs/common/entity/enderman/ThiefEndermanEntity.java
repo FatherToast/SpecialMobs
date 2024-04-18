@@ -61,7 +61,7 @@ public class ThiefEndermanEntity extends _SpecialEndermanEntity {
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override
     protected void onVariantAttack( LivingEntity target ) {
-        if( !level.isClientSide() && target.isAlive() && teleportTargetDelay <= 0 ) {
+        if( !level().isClientSide() && target.isAlive() && teleportTargetDelay <= 0 ) {
             for( int i = 0; i < 64; i++ ) {
                 if( teleportTarget( target ) ) {
                     teleportTargetDelay = 160;
@@ -93,7 +93,7 @@ public class ThiefEndermanEntity extends _SpecialEndermanEntity {
         if( event.isCanceled() ) return false;
         
         if( target.randomTeleport( event.getTargetX(), event.getTargetY(), event.getTargetZ(), true ) ) {
-            level.playSound( null, xI, yI, zI, SoundEvents.CHORUS_FRUIT_TELEPORT, SoundSource.PLAYERS,
+            level().playSound( null, xI, yI, zI, SoundEvents.CHORUS_FRUIT_TELEPORT, SoundSource.PLAYERS,
                     1.0F, 1.0F );
             target.playSound( SoundEvents.CHORUS_FRUIT_TELEPORT, 1.0F, 1.0F );
             return true;
@@ -105,6 +105,6 @@ public class ThiefEndermanEntity extends _SpecialEndermanEntity {
     @Override
     public void aiStep() {
         super.aiStep();
-        if( !level.isClientSide() ) teleportTargetDelay--;
+        if( !level().isClientSide() ) teleportTargetDelay--;
     }
 }

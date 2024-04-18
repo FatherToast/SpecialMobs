@@ -81,7 +81,7 @@ public class FrozenDrownedEntity extends _SpecialDrownedEntity {
     /** Called each tick to update this entity's movement. */
     @Override
     public void aiStep() {
-        if( !level.isClientSide() ) {
+        if( !level().isClientSide() ) {
             if( iceSealPos != null ) {
                 // Currently creating ice seal
                 if( iceSealTimer++ % ICE_SEAL_TICKS == 0 ) {
@@ -99,7 +99,7 @@ public class FrozenDrownedEntity extends _SpecialDrownedEntity {
                 final LivingEntity target = getTarget();
                 if( target != null && target.isUnderWater() && distanceToSqr( target ) < 144.0 && random.nextInt( 20 ) == 0 ) {
                     final BlockPos pos = findIceSealPos( target.blockPosition(), Mth.ceil( target.getBbHeight() ) );
-                    if( pos != null && ExplosionHelper.getMode( this ) != Explosion.BlockInteraction.NONE ) {
+                    if( pos != null && ExplosionHelper.getMode( this ) != Explosion.BlockInteraction.KEEP ) {
                         iceSealTimer = 0;
                         iceSealPos = pos;
                     }
@@ -117,9 +117,9 @@ public class FrozenDrownedEntity extends _SpecialDrownedEntity {
         final BlockPos.MutableBlockPos pos = targetPos.mutable();
         for( int y = 0; y <= maxRange; y++ ) {
             pos.setY( targetPos.getY() + y );
-            if( pos.getY() >= level.getMaxBuildHeight() ) break; // Can't build here
+            if( pos.getY() >= level().getMaxBuildHeight() ) break; // Can't build here
             
-            final BlockState block = level.getBlockState( pos );
+            final BlockState block = level().getBlockState( pos );
             if( block.getBlock() != Blocks.WATER || block.getValue( LiquidBlock.LEVEL ) != 0 ) {
                 if( y - 1 <= targetHeight ) break; // Don't build inside the target entity
                 return pos.below();
@@ -131,7 +131,7 @@ public class FrozenDrownedEntity extends _SpecialDrownedEntity {
     /** Creates an ice seal centered at the position with a certain size. */
     private void makeIceSeal( BlockPos center, int radius ) {
         if( !isSilent() ) {
-            level.playSound( null, center.getX() + 0.5, center.getY() + 0.5, center.getZ() + 0.5,
+            level().playSound( null, center.getX() + 0.5, center.getY() + 0.5, center.getZ() + 0.5,
                     SoundEvents.GLASS_BREAK, getSoundSource(), 0.4F, 1.0F / (random.nextFloat() * 0.4F + 0.8F) );
         }
         
@@ -154,10 +154,10 @@ public class FrozenDrownedEntity extends _SpecialDrownedEntity {
     
     /** Attempts to place a single seal block. */
     private void placeSealBlock( BlockPos pos ) {
-        final BlockState block = MeltingIceBlock.getState( level, pos );
-        if( level.getBlockState( pos ).getMaterial().isReplaceable() && level.isUnobstructed( block, pos, CollisionContext.empty() ) &&
+        final BlockState block = MeltingIceBlock.getState( level(), pos );
+        if( level().getBlockState( pos ).canBeReplaced() && level().isUnobstructed( block, pos, CollisionContext.empty() ) &&
                 MobHelper.placeBlock( this, pos, block ) ) {
-            MeltingIceBlock.scheduleFirstTick( level, pos, random );
+            MeltingIceBlock.scheduleFirstTick( level(), pos, random );
         }
     }
 }

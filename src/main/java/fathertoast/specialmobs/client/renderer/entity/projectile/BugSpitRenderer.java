@@ -2,7 +2,7 @@ package fathertoast.specialmobs.client.renderer.entity.projectile;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.mojang.math.Vector3f;
+import com.mojang.math.Axis;
 import fathertoast.specialmobs.common.entity.projectile.BugSpitEntity;
 import fathertoast.specialmobs.common.util.References;
 import net.minecraft.client.model.LlamaSpitModel;
@@ -29,8 +29,8 @@ public class BugSpitRenderer extends EntityRenderer<BugSpitEntity> {
                        PoseStack poseStack, MultiBufferSource buffer, int packedLight ) {
         poseStack.pushPose();
         poseStack.translate( 0.0, 0.15, 0.0 );
-        poseStack.mulPose( Vector3f.YP.rotationDegrees( Mth.lerp( partialTicks, entity.yRotO, entity.getYRot() ) - 90.0F ) );
-        poseStack.mulPose( Vector3f.ZP.rotationDegrees( Mth.lerp( partialTicks, entity.xRotO, entity.getXRot() ) ) );
+        poseStack.mulPose( Axis.YP.rotationDegrees( Mth.lerp( partialTicks, entity.yRotO, entity.getYRot() ) - 90.0F ) );
+        poseStack.mulPose( Axis.ZP.rotationDegrees( Mth.lerp( partialTicks, entity.xRotO, entity.getXRot() ) ) );
         
         model.setupAnim( entity, partialTicks, 0.0F, -0.1F, 0.0F, 0.0F );
         final int color = entity.getColor();

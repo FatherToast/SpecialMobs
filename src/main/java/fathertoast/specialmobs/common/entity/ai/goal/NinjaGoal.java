@@ -41,7 +41,7 @@ public class NinjaGoal<T extends Mob & INinja> extends Goal {
         if( ninja.getHiddenDragon() == null || ninja.getHiddenDragon().getRenderShape() == RenderShape.INVISIBLE )
             return false;
         
-        final List<Player> players = new ArrayList<>( ninja.level.players() );
+        final List<Player> players = new ArrayList<>( ninja.level().players() );
         for( Player player : players ) {
             final float dX = (float) (ninja.getX() - player.getX());
             final float dZ = (float) (ninja.getZ() - player.getZ());
@@ -104,7 +104,7 @@ public class NinjaGoal<T extends Mob & INinja> extends Goal {
         }
         
         final BlockPos posUnderFeet = entity.blockPosition().below();
-        final BlockState blockUnderFeet = entity.level.getBlockState( posUnderFeet );
+        final BlockState blockUnderFeet = entity.level().getBlockState( posUnderFeet );
         if( !blockUnderFeet.isAir() ) {
             // Options available based on the block we are standing on
 
@@ -210,7 +210,7 @@ public class NinjaGoal<T extends Mob & INinja> extends Goal {
                     posUnderFeet.getY() + random.nextInt( 5 ) - 2,
                     posUnderFeet.getZ() + random.nextInt( 17 ) - 8 );
             
-            final BlockState randBlock = entity.level.getBlockState( randPos );
+            final BlockState randBlock = entity.level().getBlockState( randPos );
             if( randBlock.getRenderShape() == RenderShape.MODEL ) return randBlock;
         }
         

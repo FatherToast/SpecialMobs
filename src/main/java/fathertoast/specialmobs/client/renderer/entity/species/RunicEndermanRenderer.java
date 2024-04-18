@@ -2,9 +2,7 @@ package fathertoast.specialmobs.client.renderer.entity.species;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.mojang.math.Matrix3f;
-import com.mojang.math.Matrix4f;
-import com.mojang.math.Vector3f;
+import com.mojang.math.Axis;
 import fathertoast.specialmobs.client.renderer.entity.family.SpecialEndermanRenderer;
 import fathertoast.specialmobs.common.entity.enderman.RunicEndermanEntity;
 import net.minecraft.client.model.EndermanModel;
@@ -19,6 +17,8 @@ import net.minecraft.world.entity.monster.EnderMan;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
+import org.joml.Matrix3f;
+import org.joml.Matrix4f;
 
 public class RunicEndermanRenderer extends SpecialEndermanRenderer {
     public static final ResourceLocation BEAM_TEXTURE_LOCATION = new ResourceLocation( "textures/entity/end_crystal/end_crystal_beam.png" );
@@ -39,7 +39,7 @@ public class RunicEndermanRenderer extends SpecialEndermanRenderer {
             final Vec3 beamStartPos = entity.getEyePosition( partialTicks );
             final Vec3 beamEndPos = beamStartPos.add( beamVec );
             
-            final HitResult blockRayTrace = entity.level.clip(
+            final HitResult blockRayTrace = entity.level().clip(
                     new ClipContext( beamStartPos, beamEndPos,
                             ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, entity ) );
             if( blockRayTrace.getType() != HitResult.Type.MISS ) {
@@ -83,8 +83,8 @@ public class RunicEndermanRenderer extends SpecialEndermanRenderer {
         final float length = Mth.sqrt( dX * dX + dY * dY + dZ * dZ );
         
         poseStack.translate( 0.0, offsetY, 0.0 );
-        poseStack.mulPose( Vector3f.YP.rotation( (float) -Math.atan2( dZ, dX ) - (float) Math.PI / 2.0F ) );
-        poseStack.mulPose( Vector3f.XP.rotation( (float) -Math.atan2( dH, dY ) - (float) Math.PI / 2.0F ) );
+        poseStack.mulPose( Axis.YP.rotation( (float) -Math.atan2( dZ, dX ) - (float) Math.PI / 2.0F ) );
+        poseStack.mulPose( Axis.XP.rotation( (float) -Math.atan2( dH, dY ) - (float) Math.PI / 2.0F ) );
         
         final VertexConsumer vertexConsumer = buffer.getBuffer( BEAM );
         final PoseStack.Pose matrixEntry = poseStack.last();

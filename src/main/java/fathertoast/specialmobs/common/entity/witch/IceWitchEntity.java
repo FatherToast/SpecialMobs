@@ -74,7 +74,7 @@ public class IceWitchEntity extends _SpecialWitchEntity {
     @Override
     public void aiStep() {
         final LivingEntity target = getTarget();
-        if( !level.isClientSide() && isAlive() && wallDelay-- <= 0 && target != null && random.nextInt( 20 ) == 0 ) {
+        if( !level().isClientSide() && isAlive() && wallDelay-- <= 0 && target != null && random.nextInt( 20 ) == 0 ) {
             
             // Create an ice wall behind the target if they are vulnerable
             final double distanceSq = target.distanceToSqr( this );

@@ -63,14 +63,14 @@ public class LightningCreeperEntity extends _SpecialCreeperEntity {
         super.makeVariantExplosion( explosionPower );
         
         // Spawn lightning
-        if( !level.isClientSide() ) {
-            ExplosionHelper.spawnLightning( level, getX(), getY(), getZ() );
+        if( !level().isClientSide() ) {
+            ExplosionHelper.spawnLightning( level(), getX(), getY(), getZ() );
             if( explosionPower >= 2.0F ) {
                 final int radius = (int) Math.floor( explosionPower );
                 for( int x = -radius; x <= radius; x++ ) {
                     for( int z = -radius; z <= radius; z++ ) {
                         if( (x != 0 || z != 0) && x * x + z * z <= radius * radius && random.nextFloat() < 0.3F ) {
-                            ExplosionHelper.spawnLightning( level, getX() + x, getY(), getZ() + z );
+                            ExplosionHelper.spawnLightning( level(), getX() + x, getY(), getZ() + z );
                         }
                     }
                 }
@@ -78,7 +78,7 @@ public class LightningCreeperEntity extends _SpecialCreeperEntity {
         }
         
         // Start a thunderstorm
-        if( isPowered() && level.getLevelData() instanceof ServerLevelData serverData ) {
+        if( isPowered() && level().getLevelData() instanceof ServerLevelData serverData ) {
             int duration = random.nextInt( 12000 ) + 3600;
             if( !serverData.isThundering() || serverData.getThunderTime() < duration ) {
                 serverData.setThunderTime( duration );

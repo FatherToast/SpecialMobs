@@ -8,6 +8,7 @@ import fathertoast.specialmobs.common.util.References;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
@@ -38,13 +39,13 @@ public class SpecialFishingBobberEntity extends Projectile implements IEntityAdd
     public SpecialFishingBobberEntity( EntityType<? extends SpecialFishingBobberEntity> entityType, Level level ) { super( entityType, level ); }
     
     public SpecialFishingBobberEntity( LivingEntity angler, LivingEntity target ) {
-        super( SMEntities.FISHING_BOBBER.get(), angler.level );
+        super( SMEntities.FISHING_BOBBER.get(), angler.level() );
         setOwner( angler );
         
         final Vec3 lookVec = angler.getViewVector( 1.0F ).scale( angler.getBbWidth() );
         setPos( angler.getX() + lookVec.x, angler.getEyeY() - 0.1, angler.getZ() + lookVec.z );
         
-        float spread = 18 - 4 * level.getDifficulty().getId();
+        float spread = 18 - 4 * level().getDifficulty().getId();
         if(angler instanceof final ISpecialMob<?> specialShooter) {
 
             if( specialShooter.getSpecialData().getRangedAttackMaxRange() >= 0.0F ) {
@@ -75,7 +76,7 @@ public class SpecialFishingBobberEntity extends Projectile implements IEntityAdd
     protected void defineSynchedData() { }
     
     @Override
-    public Packet<?> getAddEntityPacket() { return NetworkHooks.getEntitySpawningPacket( this ); }
+    public Packet<ClientGamePacketListener> getAddEntityPacket() { return NetworkHooks.getEntitySpawningPacket( this ); }
     
     /**
      * Called by the server when constructing the spawn packet.
@@ -98,7 +99,7 @@ public class SpecialFishingBobberEntity extends Projectile implements IEntityAdd
     @Override
     public void readSpawnData( FriendlyByteBuf additionalData ) {
         final int ownerId = additionalData.readInt();
-        setOwner( level.getEntity( ownerId ) );
+        setOwner( level().getEntity( ownerId ) );
     }
     
     /** @return The bounding box to use for frustum culling. */
@@ -124,12 +125,12 @@ public class SpecialFishingBobberEntity extends Projectile implements IEntityAdd
         super.tick();
         
         final LivingEntity angler = getLivingOwner();
-        if( !level.isClientSide() && (angler == null || distanceToSqr( angler ) > maxRangeSq) ) {
+        if( !level().isClientSide() && (angler == null || distanceToSqr( angler ) > maxRangeSq) ) {
             discard();
             return;
         }
-        
-        final HitResult hitResult = ProjectileUtil.getHitResult( this, this::canHitEntity );
+
+        final HitResult hitResult = ProjectileUtil.getHitResultOnMoveVector( this, this::canHitEntity );
         if( hitResult.getType() != HitResult.Type.MISS && !ForgeEventFactory.onProjectileImpact( this, hitResult ) ) {
             onHit( hitResult );
         }
@@ -151,7 +152,7 @@ public class SpecialFishingBobberEntity extends Projectile implements IEntityAdd
     protected void onHit( HitResult hit ) {
         super.onHit( hit );
         
-        if( !level.isClientSide() ) discard();
+        if( !level().isClientSide() ) discard();
     }
     
     /** Called when this projectile hits an entity. */

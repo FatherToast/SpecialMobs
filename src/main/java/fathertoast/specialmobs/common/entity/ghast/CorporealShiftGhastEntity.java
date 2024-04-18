@@ -81,7 +81,7 @@ public class CorporealShiftGhastEntity extends _SpecialGhastEntity {
     protected void defineSynchedData() {
         super.defineSynchedData();
         entityData.define( CORPOREAL, false );
-        if( !level.isClientSide() ) setCorporeal( random.nextBoolean() );
+        if( !level().isClientSide() ) setCorporeal( random.nextBoolean() );
     }
     
     @Override
@@ -89,9 +89,9 @@ public class CorporealShiftGhastEntity extends _SpecialGhastEntity {
         super.tick();
         
         if( --shiftTime <= 0 ) {
-            if( !level.isClientSide() ) {
+            if( !level().isClientSide() ) {
                 setCorporeal( !isCorporeal() );
-                spawnShiftSmoke( (ServerLevel) level );
+                spawnShiftSmoke( (ServerLevel) level() );
             }
         }
     }
@@ -134,13 +134,13 @@ public class CorporealShiftGhastEntity extends _SpecialGhastEntity {
         double dY = target.getY( 0.5 ) - (0.5 + getY( 0.5 ));
         double dZ = target.getZ() - (getZ() + lookVec.z) + getRandom().nextGaussian() * accelVariance;
         
-        final IncorporealFireballEntity fireball = new IncorporealFireballEntity( level, this, dX, dY, dZ );
+        final IncorporealFireballEntity fireball = new IncorporealFireballEntity( level(), this, dX, dY, dZ );
         fireball.explosionPower = getVariantExplosionPower( getExplosionPower() );
         fireball.setPos(
                 getX() + lookVec.x,
                 getY( 0.5 ) + 0.5,
                 getZ() + lookVec.z );
-        level.addFreshEntity( fireball );
+        level().addFreshEntity( fireball );
     }
     
     /** Override to save data to this entity's NBT data. */

@@ -5,6 +5,7 @@ import fathertoast.specialmobs.common.config.field.EnvironmentListField;
 import fathertoast.specialmobs.common.config.util.environment.DynamicRegistryGroupEnvironment;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
@@ -27,7 +28,7 @@ public class DimensionTypeGroupEnvironment extends DynamicRegistryGroupEnvironme
     
     /** @return The registry used. */
     @Override
-    public ResourceKey<Registry<DimensionType>> getRegistry() { return Registry.DIMENSION_TYPE_REGISTRY; }
+    public ResourceKey<Registry<DimensionType>> getRegistry() { return Registries.DIMENSION_TYPE; }
     
     /** @return Returns true if this environment matches the provided environment. */
     @Override

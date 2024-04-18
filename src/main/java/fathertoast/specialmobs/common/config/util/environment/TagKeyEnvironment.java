@@ -4,6 +4,7 @@ import fathertoast.specialmobs.common.config.field.AbstractConfigField;
 import fathertoast.specialmobs.common.config.file.TomlHelper;
 import fathertoast.specialmobs.common.core.SpecialMobs;
 import net.minecraft.resources.ResourceLocation;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -54,5 +55,7 @@ public abstract class TagKeyEnvironment extends AbstractEnvironment {
 
     /** @return The string value of this environment, as it would appear in a config file. */
     @Override
-    public final String value() { return (INVERT ? "!" : "") + VALUES.toString().toLowerCase( Locale.ROOT ); }
+    public final String value() {
+        return (INVERT ? "!" : "") +  StringUtils.join(VALUES, ",").toLowerCase( Locale.ROOT );
+    }
 }

@@ -32,7 +32,7 @@ public class AmphibiousGoToShoreGoal<T extends PathfinderMob & IAmphibiousMob> e
     /** @return Returns true if this AI can be activated. */
     @Override
     public boolean canUse() {
-        return super.canUse() && !(disableAtDay && mob.level.isDay()) && mob.isInWater() && mob.getY() >= mob.level.getSeaLevel() - 3;
+        return super.canUse() && !(disableAtDay && mob.level().isDay()) && mob.isInWater() && mob.getY() >= mob.level().getSeaLevel() - 3;
     }
     
     /** @return True if the position is valid to move to. */

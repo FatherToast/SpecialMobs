@@ -10,7 +10,6 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.InfestedBlock;
-import net.minecraft.world.level.material.Material;
 
 import java.util.function.Function;
 
@@ -83,7 +82,7 @@ public class UnderwaterSilverfishBlock extends InfestedBlock {
     public static String[] getTranslations( String langKey ) { return Type.getTranslationsFor( langKey ); }
     
     public UnderwaterSilverfishBlock( Block block ) {
-        super( block, Properties.of( Material.CLAY ).strength( 0.0F, 0.75F ) );
+        super( block, Properties.copy( Blocks.CLAY ).strength( 0.0F, 0.75F ) );
     }
     
     @Override

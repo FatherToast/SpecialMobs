@@ -9,7 +9,7 @@ import net.minecraft.world.entity.ai.control.MoveControl;
 /**
  * The drowned movement controller repurposed for use on other mobs.
  * <p>
- * {@link net.minecraft.entity.monster.DrownedEntity.MoveHelperController}
+ * {@link net.minecraft.world.entity.monster.Drowned.DrownedMoveControl}
  */
 public class AmphibiousMovementController<T extends Mob & IAmphibiousMob> extends MoveControl {
     
@@ -48,7 +48,7 @@ public class AmphibiousMovementController<T extends Mob & IAmphibiousMob> extend
                     speed * dX * 0.005, speed * dY / distance * 0.1, speed * dZ * 0.005 ) );
         }
         else {
-            if( !owner.isOnGround() ) {
+            if( !owner.onGround() ) {
                 owner.setDeltaMovement( owner.getDeltaMovement().add( 0.0, -0.008, 0.0 ) );
             }
             super.tick();

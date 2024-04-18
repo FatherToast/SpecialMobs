@@ -111,7 +111,7 @@ public class MirageEndermanEntity extends _SpecialEndermanEntity {
     
     private void mirage() {
         if( !isFake && getTarget() != null ) {
-            final MirageEndermanEntity mirage = SPECIES.entityType.get().create( level );
+            final MirageEndermanEntity mirage = SPECIES.entityType.get().create( level() );
             if( mirage == null ) return;
             
             mirage.setFake();
@@ -127,7 +127,7 @@ public class MirageEndermanEntity extends _SpecialEndermanEntity {
             }
             
             mirage.setHealth( getHealth() );
-            level.addFreshEntity( mirage );
+            level().addFreshEntity( mirage );
         }
     }
     

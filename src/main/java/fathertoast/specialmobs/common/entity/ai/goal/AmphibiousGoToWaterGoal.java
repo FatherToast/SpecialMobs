@@ -42,7 +42,7 @@ public class AmphibiousGoToWaterGoal extends Goal {
     /** @return Returns true if this AI can be activated. */
     @Override
     public boolean canUse() {
-        if( disableAtNight && !mob.level.isDay() || mob.isInWater() ) return false;
+        if( disableAtNight && !mob.level().isDay() || mob.isInWater() ) return false;
         
         final Vec3 targetPos = findWaterPos();
         if( targetPos == null ) return false;
@@ -72,7 +72,7 @@ public class AmphibiousGoToWaterGoal extends Goal {
                     random.nextInt( 20 ) - 10,
                     2 - random.nextInt( 8 ),
                     random.nextInt( 20 ) - 10 );
-            if( mob.level.getBlockState( target ).is( Blocks.WATER ) ) {
+            if( mob.level().getBlockState( target ).is( Blocks.WATER ) ) {
                 return Vec3.atBottomCenterOf( target );
             }
         }

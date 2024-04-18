@@ -8,11 +8,11 @@ import fathertoast.specialmobs.common.util.References;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.util.Mth;
-import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -39,13 +39,13 @@ public class BugSpitEntity extends Projectile {
     public BugSpitEntity( EntityType<? extends BugSpitEntity> entityType, Level level ) { super( entityType, level ); }
     
     public BugSpitEntity( LivingEntity shooter, LivingEntity target ) {
-        super( SMEntities.BUG_SPIT.get(), shooter.level );
+        super( SMEntities.BUG_SPIT.get(), shooter.level() );
         setOwner( shooter );
         
         final Vec3 lookVec = shooter.getViewVector( 1.0F ).scale( shooter.getBbWidth() );
         setPos( shooter.getX() + lookVec.x, shooter.getEyeY() - 0.1, shooter.getZ() + lookVec.z );
-        
-        float spread = 14 - 4 * level.getDifficulty().getId();
+
+        float spread = 14 - 4 * level().getDifficulty().getId();
         if(shooter instanceof final ISpecialMob<?> specialShooter) {
             setDamage( specialShooter.getSpecialData().getRangedAttackDamage() );
             
@@ -73,7 +73,7 @@ public class BugSpitEntity extends Projectile {
     protected void defineSynchedData() { entityData.define( COLOR, 0xFFFFFF ); }
     
     @Override
-    public Packet<?> getAddEntityPacket() { return NetworkHooks.getEntitySpawningPacket( this ); }
+    public Packet<ClientGamePacketListener> getAddEntityPacket() { return NetworkHooks.getEntitySpawningPacket( this ); }
     
     /** Sets the RGB color of this spit attack. */
     public void setColor( int color ) {
@@ -88,11 +88,11 @@ public class BugSpitEntity extends Projectile {
     public void onAddedToWorld() {
         super.onAddedToWorld();
         
-        if( level != null && level.isClientSide() ) {
+        if( level() != null && level().isClientSide() ) {
             final Vec3 v = getDeltaMovement();
             for( int i = 0; i < 7; i++ ) {
                 final double multi = 0.4 + 0.1 * i;
-                level.addParticle( ParticleTypes.SPIT, getX(), getY(), getZ(),
+                level().addParticle( ParticleTypes.SPIT, getX(), getY(), getZ(),
                         v.x * multi, v.y * multi, v.z * multi );
             }
         }
@@ -117,7 +117,7 @@ public class BugSpitEntity extends Projectile {
         
         // Check collision
         final Vec3 v = getDeltaMovement();
-        final HitResult hitResult = ProjectileUtil.getHitResult( this, this::canHitEntity );
+        final HitResult hitResult = ProjectileUtil.getHitResultOnMoveVector( this, this::canHitEntity );
         if( hitResult.getType() != HitResult.Type.MISS && !ForgeEventFactory.onProjectileImpact( this, hitResult ) ) {
             onHit( hitResult );
         }
@@ -127,7 +127,7 @@ public class BugSpitEntity extends Projectile {
         final double nextY = getY() + v.y;
         final double nextZ = getZ() + v.z;
         updateRotation();
-        if( level.getBlockStates( getBoundingBox() ).noneMatch( BlockBehaviour.BlockStateBase::isAir ) || isInWaterOrBubble() ) {
+        if( level().getBlockStates( getBoundingBox() ).noneMatch( BlockBehaviour.BlockStateBase::isAir ) || isInWaterOrBubble() ) {
             // Oof ded (but not a hit)
             discard();
         }
@@ -143,7 +143,7 @@ public class BugSpitEntity extends Projectile {
     @Override
     protected void onHit( HitResult hit ) {
         super.onHit( hit );
-        if( !level.isClientSide() ) {
+        if( !level().isClientSide() ) {
             // Should we add any on-hit gfx?
             discard();
         }
@@ -156,7 +156,7 @@ public class BugSpitEntity extends Projectile {
         final Entity target = hit.getEntity();
         final Entity owner = getOwner();
         if( owner instanceof LivingEntity &&
-                target.hurt( DamageSource.indirectMobAttack( this, (LivingEntity) owner ).setProjectile(), getDamage() ) ) {
+                target.hurt( damageSources().mobProjectile( this, (LivingEntity) owner ), getDamage() ) ) {
             if( getKnockback() > 0 && target instanceof LivingEntity ) {
                 MobHelper.knockback( this, (LivingEntity) target, getKnockback(), 1.0F );
             }

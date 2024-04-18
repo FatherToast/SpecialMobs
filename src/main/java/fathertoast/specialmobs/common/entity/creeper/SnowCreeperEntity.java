@@ -129,14 +129,14 @@ public class SnowCreeperEntity extends _SpecialCreeperEntity {
     protected void makeVariantExplosion( float explosionPower ) {
         final Explosion.BlockInteraction explosionMode = ExplosionHelper.getMode( this );
         final ExplosionHelper explosion = new ExplosionHelper( this,
-                explosionMode == Explosion.BlockInteraction.NONE ? explosionPower : 2.0F, false, false );
+                explosionMode == Explosion.BlockInteraction.KEEP ? explosionPower : 2.0F, false, false );
         if( !explosion.initializeExplosion() ) return;
         explosion.finalizeExplosion();
         
         final int radius = (int) Math.floor( explosionPower );
-        final BlockPos center = new BlockPos( explosion.getPos() );
+        final BlockPos center = BlockPos.containing( explosion.getPos() );
         
-        if( explosionMode != Explosion.BlockInteraction.NONE ) {
+        if( explosionMode != Explosion.BlockInteraction.KEEP ) {
             final boolean snowGlobe = isUnderWater() || random.nextDouble() < getConfig().SNOW.snowGlobeChance.get();
             
             final int radiusSq = radius * radius;
@@ -151,21 +151,21 @@ public class SnowCreeperEntity extends _SpecialCreeperEntity {
                             final BlockPos pos = center.offset( x, y, z );
                             
                             // Freeze top layer of water sources and frosted ice within affected volume
-                            final BlockState block = level.getBlockState( pos );
+                            final BlockState block = level().getBlockState( pos );
                             if( block.is( Blocks.FROSTED_ICE ) || block.getBlock() == Blocks.WATER && block.getValue( LiquidBlock.LEVEL ) == 0 ) {
-                                final BlockState blockAbove = level.getBlockState( pos.above() );
-                                if( !blockAbove.getMaterial().blocksMotion() && !blockAbove.getFluidState().is( FluidTags.WATER ) &&
-                                        MobHelper.placeBlock( this, pos, MeltingIceBlock.getState( level, pos ) ) ) {
-                                    MeltingIceBlock.scheduleFirstTick( level, pos, random );
+                                final BlockState blockAbove = level().getBlockState( pos.above() );
+                                if( !blockAbove.blocksMotion() && !blockAbove.getFluidState().is( FluidTags.WATER ) &&
+                                        MobHelper.placeBlock( this, pos, MeltingIceBlock.getState( level(), pos ) ) ) {
+                                    MeltingIceBlock.scheduleFirstTick( level(), pos, random );
                                 }
                             }
                             
                             if( distSq > rMinusOneSq ) {
                                 if( snowGlobe ) {
                                     // Create spherical shell of ice
-                                    if( level.getBlockState( pos ).getMaterial().isReplaceable() &&
-                                            MobHelper.placeBlock( this, pos, MeltingIceBlock.getState( level, pos ) ) ) {
-                                        MeltingIceBlock.scheduleFirstTick( level, pos, random );
+                                    if( level().getBlockState( pos ).canBeReplaced() &&
+                                            MobHelper.placeBlock( this, pos, MeltingIceBlock.getState( level(), pos ) ) ) {
+                                        MeltingIceBlock.scheduleFirstTick( level(), pos, random );
                                     }
                                 }
                                 else if( y == 0 ) {
@@ -193,13 +193,13 @@ public class SnowCreeperEntity extends _SpecialCreeperEntity {
         if( shouldReplace( currentPos ) ) findGroundBelow( currentPos, radius );
         else if( findGroundAbove( currentPos, radius ) ) return;
         
-        final int maxY = Math.min( currentPos.getY() + 4, level.getMaxBuildHeight() - 2 );
+        final int maxY = Math.min( currentPos.getY() + 4, level().getMaxBuildHeight() - 2 );
         int height = -2; // This is minimum pillar height
         if( pos.getY() > currentPos.getY() ) height -= (pos.getY() - currentPos.getY()) / 2;
         
         while( currentPos.getY() < maxY && shouldReplace( currentPos ) ) {
-            if( MobHelper.placeBlock( this, currentPos, MeltingIceBlock.getState( level, currentPos ) ) ) {
-                MeltingIceBlock.scheduleFirstTick( level, currentPos, random );
+            if( MobHelper.placeBlock( this, currentPos, MeltingIceBlock.getState( level(), currentPos ) ) ) {
+                MeltingIceBlock.scheduleFirstTick( level(), currentPos, random );
             }
             currentPos.move( 0, 1, 0 );
             
@@ -227,7 +227,7 @@ public class SnowCreeperEntity extends _SpecialCreeperEntity {
     /** @return Attempts to find the ground. Returns true if the pillar should be canceled. */
     private boolean findGroundAbove( BlockPos.MutableBlockPos currentPos, int radius ) {
         final int yI = currentPos.getY();
-        final int maxY = Math.min( yI + radius, level.getMaxBuildHeight() - 2 );
+        final int maxY = Math.min( yI + radius, level().getMaxBuildHeight() - 2 );
         
         while( currentPos.getY() < maxY ) {
             currentPos.move( 0, 1, 0 );
@@ -240,15 +240,15 @@ public class SnowCreeperEntity extends _SpecialCreeperEntity {
     
     /** @return True if a generating pillar should replace the block at a particular position. */
     private boolean shouldReplace( BlockPos pos ) {
-        final BlockState stateAtPos = level.getBlockState( pos );
-        return (stateAtPos.getMaterial().isReplaceable() || stateAtPos.is( BlockTags.LEAVES )) &&
+        final BlockState stateAtPos = level().getBlockState( pos );
+        return (stateAtPos.canBeReplaced() || stateAtPos.is( BlockTags.LEAVES )) &&
                 !stateAtPos.getFluidState().is( FluidTags.WATER );
     }
     
     /** @return Helper method to simplify spawning strays. Returns true if it spawns one. */
     private boolean trySpawnStray( BlockPos center, int radius ) {
-        if( !(level instanceof ServerLevelAccessor) ) return false;
-        final StraySkeletonEntity stray = StraySkeletonEntity.SPECIES.entityType.get().create( level );
+        if( !(level() instanceof ServerLevelAccessor) ) return false;
+        final StraySkeletonEntity stray = StraySkeletonEntity.SPECIES.entityType.get().create( level() );
         if( stray == null ) return false;
         
         // Pick a random position within the ice prison, then cancel if we can't spawn at that position
@@ -265,7 +265,7 @@ public class SnowCreeperEntity extends _SpecialCreeperEntity {
             return false; // No floor found
         }
         stray.moveTo( currentPos, angle * 180.0F / (float) Math.PI + 180.0F, 0.0F );
-        while( !level.noCollision( stray.getBoundingBox() ) ) {
+        while( !level().noCollision( stray.getBoundingBox() ) ) {
             if( currentPos.getY() > center.getY() + radius ) {
                 stray.discard();
                 return false; // Too high
@@ -275,9 +275,9 @@ public class SnowCreeperEntity extends _SpecialCreeperEntity {
         }
         
         stray.setTarget( getTarget() );
-        stray.finalizeSpawn( (ServerLevelAccessor) level, level.getCurrentDifficultyAt( blockPosition() ),
+        stray.finalizeSpawn( (ServerLevelAccessor) level(), level().getCurrentDifficultyAt( blockPosition() ),
                 MobSpawnType.MOB_SUMMONED, null, null );
-        level.addFreshEntity( stray );
+        level().addFreshEntity( stray );
         stray.spawnAnim();
         return true;
     }

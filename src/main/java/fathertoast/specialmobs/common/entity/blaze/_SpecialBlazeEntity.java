@@ -127,9 +127,9 @@ public class _SpecialBlazeEntity extends Blaze implements RangedAttackMob, ISpec
         final double dY = target.getY( 0.5 ) - getY( 0.5 );
         final double dZ = target.getZ() - getZ() + getRandom().nextGaussian() * accelVariance;
         
-        final SmallFireball fireball = new SmallFireball( level, this, dX, dY, dZ );
+        final SmallFireball fireball = new SmallFireball( level(), this, dX, dY, dZ );
         fireball.setPos( getX(), getY( 0.5 ) + 0.5, getZ() );
-        level.addFreshEntity( fireball );
+        level().addFreshEntity( fireball );
     }
     
     /** Override to save data to this entity's NBT data. */
@@ -191,8 +191,8 @@ public class _SpecialBlazeEntity extends Blaze implements RangedAttackMob, ISpec
     @Override
     public <T extends Mob> T convertTo( EntityType<T> entityType, boolean keepEquipment ) {
         final T replacement = super.convertTo( entityType, keepEquipment );
-        if( replacement instanceof ISpecialMob && level instanceof ServerLevelAccessor serverLevel ) {
-            MobHelper.finalizeSpawn( replacement, serverLevel, level.getCurrentDifficultyAt( blockPosition() ),
+        if( replacement instanceof ISpecialMob && level() instanceof ServerLevelAccessor serverLevel ) {
+            MobHelper.finalizeSpawn( replacement, serverLevel, level().getCurrentDifficultyAt( blockPosition() ),
                     MobSpawnType.CONVERSION, null );
         }
         return replacement;

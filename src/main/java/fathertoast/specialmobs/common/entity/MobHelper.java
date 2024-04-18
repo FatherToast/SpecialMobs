@@ -7,6 +7,8 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.Mth;
@@ -19,13 +21,24 @@ import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
-import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.MobType;
+import net.minecraft.world.entity.SpawnGroupData;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.monster.Creeper;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.entity.projectile.Arrow;
-import net.minecraft.world.item.*;
+import net.minecraft.world.item.AxeItem;
+import net.minecraft.world.item.BowItem;
+import net.minecraft.world.item.CrossbowItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.TieredItem;
+import net.minecraft.world.item.Tiers;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.FrostWalkerEnchantment;
 import net.minecraft.world.level.ServerLevelAccessor;
@@ -35,7 +48,6 @@ import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
-import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraftforge.common.ForgeHooks;
@@ -122,7 +134,7 @@ public final class MobHelper {
     
     /** @return True if the damage source can deal normal damage to vampire-type mobs (e.g., wooden or smiting weapons). */
     public static boolean isDamageSourceIneffectiveAgainstVampires( DamageSource source ) {
-        if( source.isBypassMagic() || source.isBypassInvul() ) return false;
+        if( source.is( DamageTypeTags.BYPASSES_ARMOR ) || source.is( DamageTypeTags.BYPASSES_INVULNERABILITY ) ) return false;
         
         final Entity attacker = source.getEntity();
         if( attacker instanceof LivingEntity ) {
@@ -226,7 +238,7 @@ public final class MobHelper {
             final double vY = v.y + power * upwardMulti;
             target.setDeltaMovement(
                     v.x + vKB.x,
-                    target.isOnGround() ? Math.max( 0.2, vY ) : vY,
+                    target.onGround() ? Math.max( 0.2, vY ) : vY,
                     v.z + vKB.z );
             target.hurtMarked = true;
         }
@@ -288,7 +300,7 @@ public final class MobHelper {
      * @param target   The entity to steal an effect from.
      */
     public static void stealBuffEffect( LivingEntity attacker, LivingEntity target ) {
-        if( !attacker.level.isClientSide() ) {
+        if( !attacker.level().isClientSide() ) {
             for( MobEffectInstance potion : target.getActiveEffects() ) {
                 if( potion != null && potion.getEffect().getCategory() != MobEffectCategory.HARMFUL && potion.getAmplifier() >= 0 ) {
                     target.removeEffect( potion.getEffect() );
@@ -330,7 +342,7 @@ public final class MobHelper {
     /** Applies a potion effect to the target with default duration and a specified level (amplifier + 1). */
     public static void applyEffect( LivingEntity target, MobEffect effect, int level, float durationMulti ) {
         applyEffect( target, effect, level, effect.isInstantenous() ? 1 :
-                (int) (MobHelper.defaultEffectDuration( target.level.getDifficulty() ) * durationMulti) );
+                (int) (MobHelper.defaultEffectDuration( target.level().getDifficulty() ) * durationMulti) );
     }
     
     /** Applies a potion effect to the target with a specified level (amplifier + 1) and duration. */
@@ -345,7 +357,7 @@ public final class MobHelper {
     
     /** Applies a potion effect to the target based on a template effect. The template's duration is used as a multiplier. */
     public static void applyEffectFromTemplate( LivingEntity target, MobEffectInstance template ) {
-        applyEffectFromTemplate( target, template, MobHelper.defaultEffectDuration( target.level.getDifficulty() ) );
+        applyEffectFromTemplate( target, template, MobHelper.defaultEffectDuration( target.level().getDifficulty() ) );
     }
     
     /** Applies a potion effect to the target based on a template effect. The template's duration is used as a multiplier. */
@@ -383,7 +395,7 @@ public final class MobHelper {
     /** Applies a potion effect to the arrow with default duration and a specified level (amplifier + 1). */
     public static AbstractArrow tipArrow( AbstractArrow arrow, MobEffect effect, int level, float durationMulti ) {
         return tipArrow( arrow, effect, level, effect.isInstantenous() ? 1 :
-                (int) (MobHelper.defaultEffectDuration( arrow.level.getDifficulty() ) * durationMulti) );
+                (int) (MobHelper.defaultEffectDuration( arrow.level().getDifficulty() ) * durationMulti) );
     }
     
     /** Applies a potion effect to the arrow with a specified level (amplifier + 1) and duration. */
@@ -395,7 +407,7 @@ public final class MobHelper {
     
     /** Applies a potion effect to the arrow based on a template effect. The template's duration is used as a multiplier. */
     public static AbstractArrow tipArrowFromTemplate( AbstractArrow arrow, MobEffectInstance template ) {
-        return tipArrowFromTemplate( arrow, template, MobHelper.defaultEffectDuration( arrow.level.getDifficulty() ) );
+        return tipArrowFromTemplate( arrow, template, MobHelper.defaultEffectDuration( arrow.level().getDifficulty() ) );
     }
     
     /** Applies a potion effect to the arrow based on a template effect. The template's duration is used as a multiplier. */
@@ -425,7 +437,7 @@ public final class MobHelper {
      * @return True if the block was successful.
      */
     public static boolean tryBlockAttack( LivingEntity blocker, DamageSource source, boolean needsShield ) {
-        if( blocker.level.isClientSide() || blocker.isInvulnerableTo( source ) || source.isBypassArmor() ) return false;
+        if( blocker.level().isClientSide() || blocker.isInvulnerableTo( source ) || source.is( DamageTypeTags.BYPASSES_ARMOR ) ) return false;
         
         // Block everything coming from entities at least 6 blocks away, otherwise 33% block chance
         if( blocker.getRandom().nextFloat() >= 0.33F ) {
@@ -455,11 +467,11 @@ public final class MobHelper {
             Vec3 targetVec = sourcePos.vectorTo( blocker.position() ).normalize();
             targetVec = new Vec3( targetVec.x, 0.0, targetVec.z );
             if( targetVec.dot( lookVec ) < 0.0 ) {
-                blocker.level.playSound( null, blocker.getX() + 0.5D, blocker.getY(), blocker.getZ() + 0.5D, SoundEvents.SHIELD_BLOCK, SoundSource.NEUTRAL, 0.9F, 1.0F );
+                blocker.level().playSound( null, blocker.getX() + 0.5D, blocker.getY(), blocker.getZ() + 0.5D, SoundEvents.SHIELD_BLOCK, SoundSource.NEUTRAL, 0.9F, 1.0F );
                 if( needsShield && entity instanceof Player player ) {
                     maybeDestroyShield( blocker, shield, shieldHand, player.getMainHandItem() );
                 }
-                if( !source.isProjectile() && entity instanceof LivingEntity ) {
+                if( !source.is( DamageTypeTags.IS_PROJECTILE ) && entity instanceof LivingEntity ) {
                     // Because the vanilla shield knockback is mega-borked
                     ((LivingEntity) entity).knockback( 0.5F,
                             blocker.getX() - entity.getX(), blocker.getZ() - entity.getZ() );
@@ -475,7 +487,7 @@ public final class MobHelper {
     private static void maybeDestroyShield( LivingEntity blocker, ItemStack shield, InteractionHand shieldHand, ItemStack weapon ) {
         if( !weapon.isEmpty() && !shield.isEmpty() && weapon.getItem() instanceof AxeItem && shield.getItem() == Items.SHIELD &&
                 blocker.getRandom().nextFloat() < 0.25F - EnchantmentHelper.getBlockEfficiency( blocker ) * 0.05F ) {
-            blocker.level.playSound( null, blocker.getX() + 0.5D, blocker.getY(), blocker.getZ() + 0.5D, SoundEvents.SHIELD_BREAK, SoundSource.NEUTRAL, 0.9F, 1.0F );
+            blocker.level().playSound( null, blocker.getX() + 0.5D, blocker.getY(), blocker.getZ() + 0.5D, SoundEvents.SHIELD_BREAK, SoundSource.NEUTRAL, 0.9F, 1.0F );
             blocker.broadcastBreakEvent( shieldHand );
             blocker.setItemInHand( shieldHand, ItemStack.EMPTY );
         }
@@ -494,7 +506,7 @@ public final class MobHelper {
     public static void floatInFluid( Entity entity, double acceleration, TagKey<Fluid> fluid ) {
         if( entity.tickCount > 1 && entity.getFluidTypeHeight(ForgeMod.WATER_TYPE.get()) > 0.0 ) {
             if( CollisionContext.of( entity ).isAbove( LiquidBlock.STABLE_SHAPE, entity.blockPosition(), true ) &&
-                    !entity.level.getFluidState( entity.blockPosition().above() ).is( fluid ) ) {
+                    !entity.level().getFluidState( entity.blockPosition().above() ).is( fluid ) ) {
                 entity.setOnGround( true );
             }
             else {
@@ -523,9 +535,9 @@ public final class MobHelper {
      * @param level  The level of enchantment. Platform radius is 2 + level.
      */
     public static void updateFrostWalker( LivingEntity entity, BlockPos pos, int level ) {
-        final boolean actualOnGround = entity.isOnGround();
+        final boolean actualOnGround = entity.onGround();
         entity.setOnGround( true ); // Spoof the frost walker enchant requirement to be on the ground
-        FrostWalkerEnchantment.onEntityMoved( entity, entity.level, pos, level );
+        FrostWalkerEnchantment.onEntityMoved( entity, entity.level(), pos, level );
         entity.setOnGround( actualOnGround );
     }
     
@@ -537,15 +549,15 @@ public final class MobHelper {
      * @param entity The entity to pop.
      */
     public static void hopOnFluid( Entity entity ) {
-        if( entity.tickCount > 1 && entity.isOnGround() && entity.level.random.nextInt( 10 ) == 0 ) {
+        if( entity.tickCount > 1 && entity.onGround() && entity.level().random.nextInt( 10 ) == 0 ) {
             if( CollisionContext.of( entity ).isAbove( LiquidBlock.STABLE_SHAPE, entity.blockPosition(), true ) &&
-                    !entity.level.getFluidState( entity.blockPosition().above() ).is( FluidTags.WATER ) ) {
+                    !entity.level().getFluidState( entity.blockPosition().above() ).is( FluidTags.WATER ) ) {
                 // Break water plants, otherwise frost walker will not work
-                final BlockState block = entity.level.getBlockState( entity.blockPosition() );
-                if( block.getMaterial() == Material.WATER_PLANT || block.getMaterial() == Material.REPLACEABLE_WATER_PLANT ) {
-                    final BlockEntity blockEntity = block.hasBlockEntity() ? entity.level.getExistingBlockEntity( entity.blockPosition() ) : null;
-                    Block.dropResources( block, entity.level, entity.blockPosition(), blockEntity );
-                    entity.level.setBlock( entity.blockPosition(), Blocks.WATER.defaultBlockState(), References.SetBlockFlags.DEFAULTS );
+                final BlockState block = entity.level().getBlockState( entity.blockPosition() );
+                if( block.is( BlockTags.REPLACEABLE ) ) {
+                    final BlockEntity blockEntity = block.hasBlockEntity() ? entity.level().getExistingBlockEntity( entity.blockPosition() ) : null;
+                    Block.dropResources( block, entity.level(), entity.blockPosition(), blockEntity );
+                    entity.level().setBlock( entity.blockPosition(), Blocks.WATER.defaultBlockState(), References.SetBlockFlags.DEFAULTS );
                 }
                 
                 entity.setDeltaMovement( entity.getDeltaMovement().scale( 0.5 ).add( 0.0, 0.4, 0.0 ) );
@@ -571,7 +583,7 @@ public final class MobHelper {
     /** @return Attempts to place a block, firing the appropriate Forge event. Returns true if successful. */
     public static boolean placeBlock( Entity entity, BlockPos pos, Direction direction, BlockState block, int updateFlags ) {
         if( canPlaceBlock( entity, pos, direction ) ) {
-            entity.level.setBlock( pos, block, updateFlags );
+            entity.level().setBlock( pos, block, updateFlags );
             return true;
         }
         return false;
@@ -587,6 +599,6 @@ public final class MobHelper {
     
     /** @return Fires the Forge event to check if a block can be placed and returns the result. */
     public static boolean canPlaceBlock( Entity entity, BlockPos pos, Direction direction ) {
-        return !ForgeEventFactory.onBlockPlace( entity, BlockSnapshot.create( entity.level.dimension(), entity.level, pos ), direction );
+        return !ForgeEventFactory.onBlockPlace( entity, BlockSnapshot.create( entity.level().dimension(), entity.level(), pos ), direction );
     }
 }

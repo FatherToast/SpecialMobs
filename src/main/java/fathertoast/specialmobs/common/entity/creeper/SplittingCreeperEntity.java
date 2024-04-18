@@ -82,7 +82,7 @@ public class SplittingCreeperEntity extends _SpecialCreeperEntity {
     protected void makeVariantExplosion( float explosionPower ) {
         ExplosionHelper.explode( this, explosionPower, false, false );
         
-        if( !(level instanceof ServerLevelAccessor) ) return;
+        if( !(level() instanceof ServerLevelAccessor) ) return;
         
         final int babiesToSpawn = extraBabies + (int) (explosionPower * explosionPower) / 2;
         SpawnGroupData groupData = null;
@@ -96,13 +96,13 @@ public class SplittingCreeperEntity extends _SpecialCreeperEntity {
     /** Helper method to simplify spawning babies. */
     @Nullable
     private SpawnGroupData spawnBaby( float speed, @Nullable SpawnGroupData groupData ) {
-        final MiniCreeperEntity baby = MiniCreeperEntity.SPECIES.entityType.get().create( level );
+        final MiniCreeperEntity baby = MiniCreeperEntity.SPECIES.entityType.get().create( level() );
         if( baby == null ) return groupData;
         
         baby.copyPosition( this );
         baby.yHeadRot = getYRot();
         baby.yBodyRot = getYRot();
-        groupData = baby.finalizeSpawn( (ServerLevelAccessor) level, level.getCurrentDifficultyAt( blockPosition() ),
+        groupData = baby.finalizeSpawn( (ServerLevelAccessor) level(), level().getCurrentDifficultyAt( blockPosition() ),
                 MobSpawnType.MOB_SUMMONED, groupData, null );
         baby.copyChargedState( this );
         baby.setTarget( getTarget() );
@@ -112,8 +112,8 @@ public class SplittingCreeperEntity extends _SpecialCreeperEntity {
                 0.3 + 0.3 * random.nextDouble(), // Used to cause floor clip bug; remove if it happens again
                 (random.nextDouble() - 0.5) * speed );
         baby.setOnGround( false );
-        
-        level.addFreshEntity( baby );
+
+        level().addFreshEntity( baby );
         return groupData;
     }
     

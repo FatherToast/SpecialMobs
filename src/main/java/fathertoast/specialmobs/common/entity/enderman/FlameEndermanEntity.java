@@ -95,7 +95,7 @@ public class FlameEndermanEntity extends _SpecialEndermanEntity {
     
     /** Creates a ring of fire around the target position. */
     private void makeFireRing( BlockPos center ) {
-        if( ExplosionHelper.getMode( this ) == Explosion.BlockInteraction.NONE ) return;
+        if( ExplosionHelper.getMode( this ) == Explosion.BlockInteraction.KEEP ) return;
         
         final int radius = 5;
         final int rMinusOneSq = (radius - 1) * (radius - 1);
@@ -116,23 +116,23 @@ public class FlameEndermanEntity extends _SpecialEndermanEntity {
     private void placeFireWall( BlockPos pos, @SuppressWarnings( "SameParameterValue" ) int radius ) {
         final BlockPos.MutableBlockPos currentPos = pos.mutable();
         currentPos.setY( Math.max( pos.getY() - radius, 0 ) );
-        final int maxY = Math.min( pos.getY() + radius, level.getMaxBuildHeight() - 2 );
+        final int maxY = Math.min( pos.getY() + radius, level().getMaxBuildHeight() - 2 );
         
         while( currentPos.getY() < maxY ) {
             currentPos.move( 0, 1, 0 );
             
             if( shouldSetFire( currentPos ) ) {
-                MobHelper.placeBlock( this, currentPos, BaseFireBlock.getState( level, currentPos ) );
+                MobHelper.placeBlock( this, currentPos, BaseFireBlock.getState( level(), currentPos ) );
             }
         }
     }
     
     /** @return True if a fire block can be placed at the position. */
     private boolean shouldSetFire( BlockPos pos ) {
-        if( !level.getBlockState( pos ).getMaterial().isReplaceable() ) return false;
-        if( ((FireBlock) Blocks.FIRE).canCatchFire( level, pos, Direction.UP ) ) return true;
+        if( !level().getBlockState( pos ).canBeReplaced() ) return false;
+        if( ((FireBlock) Blocks.FIRE).canCatchFire( level(), pos, Direction.UP ) ) return true;
         
         final BlockPos posBelow = pos.below();
-        return level.getBlockState( posBelow ).isFaceSturdy( level, posBelow, Direction.UP );
+        return level().getBlockState( posBelow ).isFaceSturdy( level(), posBelow, Direction.UP );
     }
 }

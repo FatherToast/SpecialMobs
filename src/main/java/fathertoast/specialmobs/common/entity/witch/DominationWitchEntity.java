@@ -83,7 +83,7 @@ public class DominationWitchEntity extends _SpecialWitchEntity {
     @Override
     public void aiStep() {
         final LivingEntity target = getTarget();
-        if( !level.isClientSide() && isAlive() && pullDelay-- <= 0 && target != null && random.nextInt( 20 ) == 0 ) {
+        if( !level().isClientSide() && isAlive() && pullDelay-- <= 0 && target != null && random.nextInt( 20 ) == 0 ) {
             
             // Pull the player toward this entity if they are vulnerable
             final double distanceSq = target.distanceToSqr( this );

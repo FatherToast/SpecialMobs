@@ -11,6 +11,7 @@ import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.util.Tuple;
 import net.minecraft.world.effect.MobEffects;
@@ -26,7 +27,6 @@ import net.minecraft.world.level.block.BucketPickup;
 import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.Material;
 
 import java.util.ArrayDeque;
 import java.util.Queue;
@@ -89,7 +89,7 @@ public class DesiccatedSilverfishEntity extends _SpecialSilverfishEntity {
     /** Called each tick to update this entity's movement. */
     @Override
     public void aiStep() {
-        if( !level.isClientSide() && absorbCount > 0 && spongebob() ) spawnAnim();
+        if( !level().isClientSide() && absorbCount > 0 && spongebob() ) spawnAnim();
         super.aiStep();
     }
     
@@ -129,22 +129,22 @@ public class DesiccatedSilverfishEntity extends _SpecialSilverfishEntity {
     
     /** Attempts to absorb a single block position. If successful, marks the position to be checked around if it's in range. */
     private void tryAbsorb( Queue<Tuple<BlockPos, Integer>> posToCheckAround, int rootDistance, BlockPos pos ) {
-        if( !level.getFluidState( pos ).is( FluidTags.WATER ) ) return;
+        if( !level().getFluidState( pos ).is( FluidTags.WATER ) ) return;
         
         // Prioritize bucket handler, then empty water block, then water plants
-        final BlockState block = level.getBlockState( pos );
+        final BlockState block = level().getBlockState( pos );
         if( block.getBlock() instanceof BucketPickup &&
-                ((BucketPickup) block.getBlock()).pickupBlock( level, pos, block ) != ItemStack.EMPTY ) {
+                ((BucketPickup) block.getBlock()).pickupBlock( level(), pos, block ) != ItemStack.EMPTY ) {
             onAbsorb( posToCheckAround, rootDistance, pos );
         }
         else if( block.getBlock() instanceof LiquidBlock) {
-            level.setBlock( pos, Blocks.AIR.defaultBlockState(), References.SetBlockFlags.DEFAULTS );
+            level().setBlock( pos, Blocks.AIR.defaultBlockState(), References.SetBlockFlags.DEFAULTS );
             onAbsorb( posToCheckAround, rootDistance, pos );
         }
-        else if( block.getMaterial() == Material.WATER_PLANT || block.getMaterial() == Material.REPLACEABLE_WATER_PLANT ) {
-            final BlockEntity blockEntity = block.hasBlockEntity() ? level.getExistingBlockEntity( pos ) : null;
-            Block.dropResources( block, level, pos, blockEntity );
-            level.setBlock( pos, Blocks.AIR.defaultBlockState(), References.SetBlockFlags.DEFAULTS );
+        else if( block.is( BlockTags.REPLACEABLE ) ) {
+            final BlockEntity blockEntity = block.hasBlockEntity() ? level().getExistingBlockEntity( pos ) : null;
+            Block.dropResources( block, level(), pos, blockEntity );
+            level().setBlock( pos, Blocks.AIR.defaultBlockState(), References.SetBlockFlags.DEFAULTS );
             onAbsorb( posToCheckAround, rootDistance, pos );
         }
     }

@@ -132,7 +132,7 @@ public class DrowningCreeperEntity extends _SpecialCreeperEntity implements IAmp
         moveControl = new AmphibiousMovementController<>( this );
         waterNavigation = new WaterBoundPathNavigation( this, level );
         groundNavigation = new GroundPathNavigation( this, level );
-        maxUpStep = 1.0F;
+        setMaxUpStep( 1.0F );
         setPathfindingMalus( BlockPathTypes.WATER, BlockPathTypes.WALKABLE.getMalus() );
         
         pufferfish = getConfig().DROWNING.puffPuffs.next( random );
@@ -156,11 +156,11 @@ public class DrowningCreeperEntity extends _SpecialCreeperEntity implements IAmp
     protected void makeVariantExplosion( float explosionPower ) {
         final Explosion.BlockInteraction explosionMode = ExplosionHelper.getMode( this );
         final ExplosionHelper explosion = new ExplosionHelper( this,
-                explosionMode == Explosion.BlockInteraction.NONE ? explosionPower : 1.0F, explosionMode, false );
+                explosionMode == Explosion.BlockInteraction.KEEP ? explosionPower : 1.0F, explosionMode, false );
         if( !explosion.initializeExplosion() ) return;
         explosion.finalizeExplosion();
         
-        if( explosionMode == Explosion.BlockInteraction.NONE ) return;
+        if( explosionMode == Explosion.BlockInteraction.KEEP ) return;
         
         final UnderwaterSilverfishBlock.Type mainType = UnderwaterSilverfishBlock.Type.next( random );
         final UnderwaterSilverfishBlock.Type rareType = UnderwaterSilverfishBlock.Type.next( random );
@@ -175,7 +175,7 @@ public class DrowningCreeperEntity extends _SpecialCreeperEntity implements IAmp
         final int radius = (int) Math.floor( explosionPower );
         final int radiusSq = radius * radius;
         final int rMinusOneSq = (radius - 1) * (radius - 1);
-        final BlockPos center = new BlockPos( explosion.getPos() );
+        final BlockPos center = BlockPos.containing( explosion.getPos() );
         
         // Track how many pufferfish have been spawned so we don't spawn a bunch of them
         if( pufferfish > 0 ) spawnPufferfish( center.above( 1 ) );
@@ -188,17 +188,17 @@ public class DrowningCreeperEntity extends _SpecialCreeperEntity implements IAmp
                     
                     if( distSq <= radiusSq ) {
                         final BlockPos pos = center.offset( x, y, z );
-                        final BlockState stateAtPos = level.getBlockState( pos );
+                        final BlockState stateAtPos = level().getBlockState( pos );
                         
-                        if( stateAtPos.getMaterial().isReplaceable() || stateAtPos.is( BlockTags.LEAVES ) ) {
+                        if( stateAtPos.canBeReplaced() || stateAtPos.is( BlockTags.LEAVES ) ) {
                             if( distSq <= rMinusOneSq ) {
                                 // Water fill
                                 final float fillChoice = random.nextFloat();
                                 
-                                if( fillChoice < 0.1F && seaPickle.canSurvive( level, pos ) ) {
+                                if( fillChoice < 0.1F && seaPickle.canSurvive( level(), pos ) ) {
                                     MobHelper.placeBlock( this, pos, seaPickle );
                                 }
-                                else if( fillChoice < 0.3F && seaGrass.canSurvive( level, pos ) ) {
+                                else if( fillChoice < 0.3F && seaGrass.canSurvive( level(), pos ) ) {
                                     MobHelper.placeBlock( this, pos, seaGrass );
                                 }
                                 else {
@@ -227,11 +227,11 @@ public class DrowningCreeperEntity extends _SpecialCreeperEntity implements IAmp
     
     /** Helper method to simplify spawning pufferfish. */
     private void spawnPufferfish( BlockPos pos ) {
-        if( !(level instanceof ServerLevelAccessor) ) return;
-        final Pufferfish lePuffPuff = EntityType.PUFFERFISH.create( level );
+        if( !(level() instanceof ServerLevelAccessor) ) return;
+        final Pufferfish lePuffPuff = EntityType.PUFFERFISH.create( level() );
         if( lePuffPuff != null ) {
             lePuffPuff.setPos( pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5 );
-            level.addFreshEntity( lePuffPuff );
+            level().addFreshEntity( lePuffPuff );
         }
     }
     
@@ -290,7 +290,7 @@ public class DrowningCreeperEntity extends _SpecialCreeperEntity implements IAmp
     /** Called each tick to update this entity's swimming state. */
     @Override
     public void updateSwimming() {
-        if( !level.isClientSide ) {
+        if( !level().isClientSide ) {
             if( isEffectiveAi() && isUnderWater() && shouldSwim() ) {
                 setNavigatorToSwim();
                 setSwimming( true );

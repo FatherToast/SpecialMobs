@@ -9,7 +9,7 @@ import fathertoast.specialmobs.common.config.util.ConfigUtil;
 import fathertoast.specialmobs.common.config.util.EnvironmentEntry;
 import fathertoast.specialmobs.common.config.util.EnvironmentList;
 import fathertoast.specialmobs.common.config.util.RestartNote;
-import net.minecraft.data.worldgen.Structures;
+import net.minecraft.world.level.levelgen.structure.BuiltinStructures;
 
 import java.io.File;
 
@@ -117,7 +117,7 @@ public class MainConfig extends Config.AbstractConfig {
                             "The chance for added cave spider natural spawn attempts to succeed. Does not affect Mob Replacement." ) ),
                     SPEC.define( new EnvironmentListField( "cave_spider_chance.exceptions", new EnvironmentList(
                             EnvironmentEntry.builder( 1.0F ).belowDiamondLevel().build(),
-                            EnvironmentEntry.builder( 1.0F ).inStructure( Structures.MINESHAFT ).build(),
+                            EnvironmentEntry.builder( 1.0F ).inStructure( BuiltinStructures.MINESHAFT ).build(),
                             EnvironmentEntry.builder( 0.33F ).belowSeaFloor().build() )
                             .setRange( DoubleField.Range.PERCENT ),
                             "The chance for added cave spider natural spawn attempts to succeed when specific environmental conditions are met." ) )

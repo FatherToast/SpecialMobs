@@ -67,7 +67,7 @@ public class EntityList implements IStringArray {
         if( entity == null ) return false;
         final EntityEntry targetEntry = new EntityEntry( entity );
         for( EntityEntry currentEntry : ENTRIES ) {
-            currentEntry.checkClass( entity.level );
+            currentEntry.checkClass( entity.level() );
             if( currentEntry.contains( targetEntry ) )
                 return true;
         }
@@ -84,7 +84,7 @@ public class EntityList implements IStringArray {
         final EntityEntry targetEntry = new EntityEntry( entity );
         EntityEntry bestMatch = null;
         for( EntityEntry currentEntry : ENTRIES ) {
-            currentEntry.checkClass( entity.level );
+            currentEntry.checkClass( entity.level() );
             // Immediately return if we match the most stringent entry possible
             if( !currentEntry.EXTEND && currentEntry.entityClass == targetEntry.entityClass ) {
                 return currentEntry.VALUES;

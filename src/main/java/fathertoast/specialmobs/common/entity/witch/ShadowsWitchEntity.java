@@ -78,7 +78,7 @@ public class ShadowsWitchEntity extends _SpecialWitchEntity {
     @Override
     public void aiStep() {
         final LivingEntity target = getTarget();
-        if( !level.isClientSide() && isAlive() && target != null && target.hasEffect( MobEffects.BLINDNESS ) && random.nextInt( 10 ) == 0 ) {
+        if( !level().isClientSide() && isAlive() && target != null && target.hasEffect( MobEffects.BLINDNESS ) && random.nextInt( 10 ) == 0 ) {
             MobHelper.removeNightVision( target );
         }
         super.aiStep();

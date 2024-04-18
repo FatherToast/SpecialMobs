@@ -131,12 +131,12 @@ public class _SpecialGhastEntity extends Ghast implements RangedAttackMob, ISpec
         double dY = target.getY( 0.5 ) - (0.5 + getY( 0.5 ));
         double dZ = target.getZ() - (getZ() + lookVec.z) + getRandom().nextGaussian() * accelVariance;
         
-        final LargeFireball fireball = new LargeFireball( level, this, dX, dY, dZ, getVariantExplosionPower( getExplosionPower() ) );
+        final LargeFireball fireball = new LargeFireball( level(), this, dX, dY, dZ, getVariantExplosionPower( getExplosionPower() ) );
         fireball.setPos(
                 getX() + lookVec.x,
                 getY( 0.5 ) + 0.5,
                 getZ() + lookVec.z );
-        level.addFreshEntity( fireball );
+        level().addFreshEntity( fireball );
     }
     
     /** Override to change this ghast's explosion power multiplier. */
@@ -183,7 +183,7 @@ public class _SpecialGhastEntity extends Ghast implements RangedAttackMob, ISpec
     
     /** Called to set this entity's attack AI based on current equipment. */
     public void reassessAttackGoal() {
-        if( level != null && !level.isClientSide ) {
+        if( level() != null && !level().isClientSide ) {
             if( currentAttackAI != null ) goalSelector.removeGoal( currentAttackAI );
             
             currentAttackAI = getSpecialData().getRangedAttackMaxRange() > 0.0F ?
@@ -221,8 +221,8 @@ public class _SpecialGhastEntity extends Ghast implements RangedAttackMob, ISpec
     @Override
     public <T extends Mob> T convertTo( EntityType<T> entityType, boolean keepEquipment ) {
         final T replacement = super.convertTo( entityType, keepEquipment );
-        if( replacement instanceof ISpecialMob && level instanceof ServerLevelAccessor serverLevel ) {
-            MobHelper.finalizeSpawn( replacement, serverLevel, level.getCurrentDifficultyAt( blockPosition() ),
+        if( replacement instanceof ISpecialMob && level() instanceof ServerLevelAccessor serverLevel ) {
+            MobHelper.finalizeSpawn( replacement, serverLevel, level().getCurrentDifficultyAt( blockPosition() ),
                     MobSpawnType.CONVERSION, null );
         }
         return replacement;

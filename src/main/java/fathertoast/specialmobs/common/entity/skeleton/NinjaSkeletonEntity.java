@@ -114,25 +114,25 @@ public class NinjaSkeletonEntity extends _SpecialSkeletonEntity implements INinj
     @Override
     public InteractionResult mobInteract( Player player, InteractionHand hand ) {
         // Attack if the player tries to right click the "block"
-        if( !level.isClientSide() && getHiddenDragon() != null ) revealTo( player, true );
+        if( !level().isClientSide() && getHiddenDragon() != null ) revealTo( player, true );
         return super.mobInteract( player, hand );
     }
     
     /** Called by the player when it touches this entity. */
     @Override
     public void playerTouch( Player player ) {
-        if( !level.isClientSide() && getHiddenDragon() != null && !player.isCreative() ) revealTo( player, true );
+        if( !level().isClientSide() && getHiddenDragon() != null && !player.isCreative() ) revealTo( player, true );
         super.playerTouch( player );
     }
     
     /** Called each tick to update this entity. */
     @Override
     public void tick() {
-        if( !level.isClientSide() ) {
+        if( !level().isClientSide() ) {
             if( canHide ) {
                 setHiddenDragon( NinjaGoal.pickDisguise( this ) );
             }
-            else if( onGround && getHiddenDragon() == null &&
+            else if( onGround() && getHiddenDragon() == null &&
                     (getTarget() == null || getTarget() instanceof Player player && player.isCreative()) ) {
                 canHide = true;
             }
@@ -189,7 +189,7 @@ public class NinjaSkeletonEntity extends _SpecialSkeletonEntity implements INinj
     /** The parameter for the ninja immobile state. */
     private static final EntityDataAccessor<Boolean> IS_HIDING = SynchedEntityData.defineId( NinjaSkeletonEntity.class, EntityDataSerializers.BOOLEAN );
     /** The parameter for the ninja disguise block. */
-    private static final EntityDataAccessor<Optional<BlockState>> HIDING_BLOCK = SynchedEntityData.defineId( NinjaSkeletonEntity.class, EntityDataSerializers.BLOCK_STATE );
+    private static final EntityDataAccessor<Optional<BlockState>> HIDING_BLOCK = SynchedEntityData.defineId( NinjaSkeletonEntity.class, EntityDataSerializers.OPTIONAL_BLOCK_STATE );
     
     private boolean canHide = true;
     

@@ -166,7 +166,7 @@ public class _SpecialDrownedEntity extends Drowned implements ISpecialMob<_Speci
     
     /** Called to update this entity's attack AI based on NBT data. */
     public void recalculateAttackGoal() {
-        if( level != null && !level.isClientSide ) {
+        if( level() != null && !level().isClientSide ) {
             AIHelper.removeGoals( goalSelector, SpecialTridentAttackGoal.class );
             if( getSpecialData().getRangedAttackMaxRange() > 0.0F ) {
                 goalSelector.addGoal( 2, new SpecialTridentAttackGoal( this, getSpecialData().getRangedWalkSpeed(),
@@ -178,17 +178,17 @@ public class _SpecialDrownedEntity extends Drowned implements ISpecialMob<_Speci
     /** Called to attack the target with a ranged attack. */
     @Override
     public void performRangedAttack( LivingEntity target, float damageMulti ) {
-        final ThrownTrident trident = new ThrownTrident( level, this, new ItemStack( Items.TRIDENT ) );
+        final ThrownTrident trident = new ThrownTrident( level(), this, new ItemStack( Items.TRIDENT ) );
 
         final double dX = target.getX() - getX();
         final double dY = target.getY( 0.3333 ) - trident.getY();
         final double dZ = target.getZ() - getZ();
         final double dH = Mth.sqrt( (float) (dX * dX + dZ * dZ) );
         trident.shoot( dX, dY + dH * 0.2, dZ, 1.6F,
-                getSpecialData().getRangedAttackSpread() * (14 - level.getDifficulty().getId() * 4) );
+                getSpecialData().getRangedAttackSpread() * (14 - level().getDifficulty().getId() * 4) );
         
         playSound( SoundEvents.DROWNED_SHOOT, 1.0F, 1.0F / (getRandom().nextFloat() * 0.4F + 0.8F) );
-        level.addFreshEntity( trident );
+        level().addFreshEntity( trident );
     }
     
     /** For bug fix. Vanilla drowned movement logic breaks in 1-block-deep water. */
@@ -197,7 +197,7 @@ public class _SpecialDrownedEntity extends Drowned implements ISpecialMob<_Speci
     /** Called each tick to update this entity's swimming state. */
     @Override
     public void updateSwimming() {
-        if( !level.isClientSide && isEffectiveAi() ) needsToBeDeeper = true;
+        if( !level().isClientSide && isEffectiveAi() ) needsToBeDeeper = true;
         super.updateSwimming();
     }
     
@@ -254,8 +254,8 @@ public class _SpecialDrownedEntity extends Drowned implements ISpecialMob<_Speci
     @Override
     public <T extends Mob> T convertTo( EntityType<T> entityType, boolean keepEquipment ) {
         final T replacement = super.convertTo( entityType, keepEquipment );
-        if( replacement instanceof ISpecialMob && level instanceof ServerLevelAccessor serverLevel ) {
-            MobHelper.finalizeSpawn( replacement, serverLevel, level.getCurrentDifficultyAt( blockPosition() ),
+        if( replacement instanceof ISpecialMob && level() instanceof ServerLevelAccessor serverLevel ) {
+            MobHelper.finalizeSpawn( replacement, serverLevel, level().getCurrentDifficultyAt( blockPosition() ),
                     MobSpawnType.CONVERSION, null );
         }
         return replacement;

@@ -1,5 +1,5 @@
 modLoader = "javafml"
-loaderVersion = "[43,)"
+loaderVersion = "[47,)"
 license = "GNU General Public License v3.0"
 issueTrackerURL = "https://github.com/FatherToast/SpecialMobs/issues/"
 
@@ -27,21 +27,21 @@ Discussion: https://discord.gg/GFTzTdX
 [[dependencies.specialmobs]]
 modId = "forge"
 mandatory = true
-versionRange = "[43,)"
+versionRange = "[47,)"
 ordering = "NONE"
 side = "BOTH"
 
 [[dependencies.specialmobs]]
 modId = "minecraft"
 mandatory = true
-versionRange = "[1.19.2]"
+versionRange = "[1.20.1]"
 ordering = "NONE"
 side = "BOTH"
 
 [[dependencies.specialmobs]]
 modId = "theoneprobe"
 mandatory = false
-versionRange = "[1.19,)"
+versionRange = "[1.20,)"
 ordering = "BEFORE"
 side = "BOTH"
 

@@ -25,7 +25,14 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityDimensions;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.Pose;
+import net.minecraft.world.entity.SpawnGroupData;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
@@ -36,7 +43,7 @@ import net.minecraft.world.entity.projectile.Snowball;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.MaterialColor;
+import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.pathfinder.BlockPathTypes;
 import net.minecraft.world.phys.Vec3;
 
@@ -129,11 +136,11 @@ public class _SpecialSilverfishEntity extends Silverfish implements RangedAttack
         final BugSpitEntity spit = new BugSpitEntity( this, target );
         spit.setColor( getVariantSpitColor() );
         playSound( SoundEvents.SILVERFISH_HURT, 0.6F, random.nextFloat() * 0.4F + 1.6F );
-        level.addFreshEntity( spit );
+        level().addFreshEntity( spit );
     }
     
     /** Override to change the color of this entity's spit attack. */
-    protected int getVariantSpitColor() { return MaterialColor.STONE.col; }
+    protected int getVariantSpitColor() { return MapColor.STONE.col; }
     
     /** Called when this entity successfully damages a target to apply on-hit effects. */
     @Override
@@ -198,8 +205,8 @@ public class _SpecialSilverfishEntity extends Silverfish implements RangedAttack
     @Override
     public <T extends Mob> T convertTo( EntityType<T> entityType, boolean keepEquipment ) {
         final T replacement = super.convertTo( entityType, keepEquipment );
-        if( replacement instanceof ISpecialMob && level instanceof ServerLevelAccessor serverLevel ) {
-            MobHelper.finalizeSpawn( replacement, serverLevel, level.getCurrentDifficultyAt( blockPosition() ),
+        if( replacement instanceof ISpecialMob && level() instanceof ServerLevelAccessor serverLevel ) {
+            MobHelper.finalizeSpawn( replacement, serverLevel, level().getCurrentDifficultyAt( blockPosition() ),
                     MobSpawnType.CONVERSION, null );
         }
         return replacement;
@@ -246,7 +253,7 @@ public class _SpecialSilverfishEntity extends Silverfish implements RangedAttack
             }
             if( getTarget() != null ) {
                 // Triggers silverfish call for reinforcements
-                hurt( DamageSource.MAGIC, 0.0F );
+                hurt( damageSources().magic(), 0.0F );
             }
         }
         

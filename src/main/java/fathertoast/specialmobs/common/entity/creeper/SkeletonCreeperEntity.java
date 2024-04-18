@@ -77,7 +77,7 @@ public class SkeletonCreeperEntity extends _SpecialCreeperEntity {
     protected void makeVariantExplosion( float explosionPower ) {
         ExplosionHelper.explode( this, explosionPower, true, false );
         
-        if( level.isClientSide() ) return;
+        if( level().isClientSide() ) return;
         
         final float shootPower = explosionPower * 2.0F + 4.0F;
         final int count = (int) Math.ceil( shootPower * shootPower * 3.5F );
@@ -94,7 +94,7 @@ public class SkeletonCreeperEntity extends _SpecialCreeperEntity {
             shrapnel.shoot( velocity.x, velocity.y, velocity.z, (float) velocity.length(), 0.0F );
             
             shrapnel.life += pitch * 6.0F;
-            level.addFreshEntity( shrapnel );
+            level().addFreshEntity( shrapnel );
         }
         spawnAnim();
         playSound( SoundEvents.SKELETON_DEATH, 1.0F, 1.0F / (random.nextFloat() * 0.4F + 0.8F) );

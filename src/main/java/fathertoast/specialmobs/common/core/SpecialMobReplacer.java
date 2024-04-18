@@ -53,7 +53,7 @@ public final class SpecialMobReplacer {
         final MobFamily<?, ?> mobFamily = getReplacingMobFamily( entity );
         if( mobFamily != null ) {
             final Level level = event.getLevel();
-            final BlockPos entityPos = new BlockPos( entity.position() );
+            final BlockPos entityPos = BlockPos.containing( entity.position() );
             
             setInitFlag( entity ); // Do this regardless of replacement, should help prevent bizarre save glitches
             

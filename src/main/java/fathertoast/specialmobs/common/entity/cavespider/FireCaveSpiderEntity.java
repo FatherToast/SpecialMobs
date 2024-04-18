@@ -61,9 +61,9 @@ public class FireCaveSpiderEntity extends _SpecialCaveSpiderEntity {
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override
     protected void onVariantAttack( LivingEntity target ) {
-        if( !level.isClientSide() ) {
+        if( !level().isClientSide() ) {
             final BlockPos pos = target.blockPosition();
-            if( level.getBlockState( pos ).getMaterial().isReplaceable() ) {
+            if( level().getBlockState( pos ).canBeReplaced() ) {
                 MobHelper.placeBlock( this, pos, Blocks.FIRE.defaultBlockState() );
             }
         }

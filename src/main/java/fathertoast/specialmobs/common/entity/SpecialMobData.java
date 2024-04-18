@@ -169,7 +169,7 @@ public class SpecialMobData<T extends Mob & ISpecialMob<T>> {
     
     /** Called each tick for every living special mob. */
     public void tick() {
-        if( !theEntity.level.isClientSide && theEntity.isAlive() ) {
+        if( !theEntity.level().isClientSide && theEntity.isAlive() ) {
             // Send texture to client
             //            if( updateTextures && theEntity.tickCount > 1 ) {
             //                updateTextures = false;
@@ -269,7 +269,7 @@ public class SpecialMobData<T extends Mob & ISpecialMob<T>> {
     
     /** Sets the overall render scale for the entity. */
     public void setRenderScale( float scale ) {
-        if( !theEntity.level.isClientSide ) theEntity.getEntityData().set( renderScale, scale );
+        if( !theEntity.level().isClientSide ) theEntity.getEntityData().set( renderScale, scale );
     }
     
     //** @return The base render scale for the entity's mob family. */
@@ -294,7 +294,7 @@ public class SpecialMobData<T extends Mob & ISpecialMob<T>> {
     /** @return A random render scale based on config settings. */
     private float nextScale() {
         // Don't do random on client side stuff
-        if( theEntity.level == null || theEntity.level.isClientSide() ) return getBaseScale();
+        if( theEntity.level() == null || theEntity.level().isClientSide() ) return getBaseScale();
         
         // Prioritize most specific value available
         final MobFamily.Species<? extends T> species = theEntity.getSpecies();

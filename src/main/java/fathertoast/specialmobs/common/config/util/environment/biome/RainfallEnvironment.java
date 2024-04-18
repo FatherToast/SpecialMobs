@@ -25,15 +25,15 @@ public class RainfallEnvironment extends CompareFloatEnvironment {
     public boolean matches( Level level, @Nullable BlockPos pos ) {
         // Handle the special case of no rainfall
         if( COMPARATOR == ComparisonOperator.EQUAL_TO && VALUE == 0.0F )
-            return pos != null && level.getBiome( pos ).get().getPrecipitation() == Biome.Precipitation.NONE;
+            return pos != null && level.getBiome( pos ).get().getPrecipitationAt( pos ) == Biome.Precipitation.NONE;
         if( COMPARATOR == ComparisonOperator.NOT_EQUAL_TO && VALUE == 0.0F )
-            return pos != null && level.getBiome( pos ).get().getPrecipitation() != Biome.Precipitation.NONE;
+            return pos != null && level.getBiome( pos ).get().getPrecipitationAt( pos ) != Biome.Precipitation.NONE;
         return super.matches( level, pos );
     }
     
     /** @return Returns the actual value to compare, or Float.NaN if there isn't enough information. */
     @Override
     public float getActual( Level level, @Nullable BlockPos pos ) {
-        return pos == null ? Float.NaN : level.getBiome( pos ).get().getDownfall();
+        return pos == null ? Float.NaN : level.getBiome( pos ).get().getModifiedClimateSettings().downfall();
     }
 }

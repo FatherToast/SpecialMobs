@@ -4,7 +4,8 @@ import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.core.SpecialMobs;
 import fathertoast.specialmobs.common.core.register.SMEntities;
 import fathertoast.specialmobs.common.util.AnnotationHelper;
-import net.minecraft.data.DataGenerator;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.data.PackOutput;
 import net.minecraft.data.tags.EntityTypeTagsProvider;
 import net.minecraft.tags.EntityTypeTags;
 import net.minecraft.tags.TagKey;
@@ -13,15 +14,16 @@ import net.minecraftforge.common.data.ExistingFileHelper;
 
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 public class SMEntityTagProvider extends EntityTypeTagsProvider {
 
-    public SMEntityTagProvider(DataGenerator generator, @Nullable ExistingFileHelper fileHelper) {
-        super(generator, SpecialMobs.MOD_ID, fileHelper);
+    public SMEntityTagProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> completableFuture, @Nullable ExistingFileHelper fileHelper) {
+        super(output, completableFuture, SpecialMobs.MOD_ID, fileHelper);
     }
 
     @Override
-    protected void addTags() {
+    protected void addTags(HolderLookup.Provider provider) {
         for( MobFamily.Species<?> species : MobFamily.getAllSpecies( ) ) {
             List<TagKey<EntityType<?>>> tags = AnnotationHelper.getEntityTags( species.entityClass );
 

@@ -5,7 +5,6 @@ import fathertoast.specialmobs.common.item.IncorporealFireChargeItem;
 import fathertoast.specialmobs.common.item.SyringeItem;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
-import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.common.ForgeSpawnEggItem;
 import net.minecraftforge.registries.DeferredRegister;
@@ -31,7 +30,7 @@ public class SMItems {
             RegistryObject<EntityType<T>> entityType, int eggBaseColor, int eggSpotsColor ) {
         final String name = entityType.getId().getPath() + "_spawn_egg";
         return REGISTRY.register( name, () ->
-                new ForgeSpawnEggItem( entityType, eggBaseColor, eggSpotsColor, new Item.Properties().tab( CreativeModeTab.TAB_MISC ) )
+                new ForgeSpawnEggItem( entityType, eggBaseColor, eggSpotsColor, new Item.Properties() )
         );
     }
 
