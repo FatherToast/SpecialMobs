@@ -5,6 +5,7 @@ import fathertoast.specialmobs.common.config.field.EnvironmentListField;
 import fathertoast.specialmobs.common.config.util.environment.DynamicRegistryGroupEnvironment;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
@@ -24,7 +25,7 @@ public class StructureGroupEnvironment extends DynamicRegistryGroupEnvironment<S
 
     @Override
     public ResourceKey<Registry<Structure>> getRegistry() {
-        return Registry.STRUCTURE_REGISTRY;
+        return Registries.STRUCTURE;
     }
 
     /** @return The string name of this environment, as it would appear in a config file. */

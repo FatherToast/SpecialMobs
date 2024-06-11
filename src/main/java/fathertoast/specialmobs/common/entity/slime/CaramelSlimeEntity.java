@@ -3,12 +3,12 @@ package fathertoast.specialmobs.common.entity.slime;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
+import fathertoast.specialmobs.common.core.register.SMDamageTypes;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import net.minecraft.core.particles.ItemParticleOption;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -57,9 +57,7 @@ public class CaramelSlimeEntity extends _SpecialSlimeEntity {
     
     
     //--------------- Variant-Specific Implementations ----------------
-    
-    private final DamageSource grabDamageSource = DamageSource.mobAttack( this ).bypassArmor().bypassMagic();
-    
+
     private int grabTime;
     
     public CaramelSlimeEntity( EntityType<? extends _SpecialSlimeEntity> entityType, Level level ) { super( entityType, level ); }
@@ -82,7 +80,7 @@ public class CaramelSlimeEntity extends _SpecialSlimeEntity {
         if( grabTime <= 0 && !riders.isEmpty() ) {
             for( Entity rider : riders ) {
                 if( rider instanceof LivingEntity ) {
-                    rider.hurt( grabDamageSource, 1.0F );
+                    rider.hurt( damageSources().source( SMDamageTypes.GRAB, this ), 1.0F );
                     grabTime = 10;
                 }
             }

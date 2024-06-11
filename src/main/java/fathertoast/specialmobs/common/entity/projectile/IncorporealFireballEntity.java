@@ -10,7 +10,9 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
@@ -20,7 +22,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractHurtingProjectile;
 import net.minecraft.world.entity.projectile.ItemSupplier;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
@@ -86,7 +87,7 @@ public class IncorporealFireballEntity extends AbstractHurtingProjectile impleme
         if( target == null || !target.isAlive() ) {
             playSound( SoundEvents.FIRE_EXTINGUISH, 1.0F, 1.0F );
 
-            if ( !level.isClientSide ) discard();
+            if ( !level().isClientSide ) discard();
             return;
         }
         // Follow target
@@ -94,14 +95,14 @@ public class IncorporealFireballEntity extends AbstractHurtingProjectile impleme
         setDeltaMovement( vec3.normalize().scale( 0.5 ) );
 
         // Boof
-        if ( !level.isClientSide && shouldExplode ) explode();
+        if ( !level().isClientSide && shouldExplode ) explode();
     }
     
     private void explode() {
-        boolean mobGrief = ForgeEventFactory.getMobGriefingEvent( level, getOwner() );
-        Explosion.BlockInteraction mode = mobGrief ? Explosion.BlockInteraction.DESTROY : Explosion.BlockInteraction.NONE;
+        boolean mobGrief = ForgeEventFactory.getMobGriefingEvent( level(), getOwner() );
+        Level.ExplosionInteraction mode = mobGrief ? Level.ExplosionInteraction.MOB : Level.ExplosionInteraction.NONE;
 
-        level.explode( null, this.getX(), this.getY(), this.getZ(), (float) explosionPower, mobGrief, mode );
+        level().explode( null, this.getX(), this.getY(), this.getZ(), (float) explosionPower, mobGrief, mode );
         target = null;
         discard();
     }
@@ -120,7 +121,7 @@ public class IncorporealFireballEntity extends AbstractHurtingProjectile impleme
     protected void onHitEntity( EntityHitResult hitResult ) {
         super.onHitEntity( hitResult );
         
-        if( !this.level.isClientSide ) {
+        if( !this.level().isClientSide ) {
             Entity target = hitResult.getEntity();
 
             if( target instanceof Player player ) {
@@ -142,7 +143,7 @@ public class IncorporealFireballEntity extends AbstractHurtingProjectile impleme
     
     @Override
     public boolean hurt( DamageSource damageSource, float damage ) {
-        if( isInvulnerableTo( damageSource ) || damageSource.isFire() ) {
+        if( isInvulnerableTo( damageSource ) || damageSource.is( DamageTypeTags.IS_FIRE ) ) {
             return false;
         }
         shouldExplode = true;
@@ -169,7 +170,7 @@ public class IncorporealFireballEntity extends AbstractHurtingProjectile impleme
         }
         
         if( compoundTag.contains( "TargetId", Tag.TAG_ANY_NUMERIC ) ) {
-            Entity entity = level.getEntity( compoundTag.getInt( "TargetId" ) );
+            Entity entity = level().getEntity( compoundTag.getInt( "TargetId" ) );
             
             if( entity instanceof LivingEntity ) {
                 target = (LivingEntity) entity;
@@ -178,7 +179,7 @@ public class IncorporealFireballEntity extends AbstractHurtingProjectile impleme
     }
     
     @Override
-    public Packet<?> getAddEntityPacket() {
+    public Packet<ClientGamePacketListener> getAddEntityPacket() {
         return NetworkHooks.getEntitySpawningPacket( this );
     }
 
@@ -194,10 +195,10 @@ public class IncorporealFireballEntity extends AbstractHurtingProjectile impleme
         final int ownerId = additionalData.readInt();
         final int targetId = additionalData.readInt();
 
-        setOwner( level.getEntity( ownerId ) );
+        setOwner( level().getEntity( ownerId ) );
 
-        if ( level.getEntity( targetId ) instanceof LivingEntity ) {
-            target = (LivingEntity) level.getEntity( targetId );
+        if ( level().getEntity( targetId ) instanceof LivingEntity ) {
+            target = (LivingEntity) level().getEntity( targetId );
         }
     }
 }

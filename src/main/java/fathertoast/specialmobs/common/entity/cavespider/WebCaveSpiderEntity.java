@@ -83,7 +83,7 @@ public class WebCaveSpiderEntity extends _SpecialCaveSpiderEntity {
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override
     protected void onVariantAttack( LivingEntity target ) {
-        if( !level.isClientSide() && webCount > 0 && !(target instanceof Spider) ) {
+        if( !level().isClientSide() && webCount > 0 && !(target instanceof Spider) ) {
             final BlockPos pos = target.blockPosition();
             if( !tryPlaceWeb( pos ) && target.getBbHeight() > 1.0F ) {
                 tryPlaceWeb( pos.above() );
@@ -100,7 +100,7 @@ public class WebCaveSpiderEntity extends _SpecialCaveSpiderEntity {
     
     /** @return Attempts to place a cobweb at the given position and returns true if successful. */
     private boolean tryPlaceWeb( BlockPos pos ) {
-        if( level.getBlockState( pos ).getMaterial().isReplaceable() &&
+        if( level().getBlockState( pos ).canBeReplaced() &&
                 MobHelper.placeBlock( this, pos, Blocks.COBWEB.defaultBlockState() ) ) {
             webCount--;
             return true;

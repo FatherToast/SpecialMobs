@@ -59,7 +59,7 @@ public class ChargeCreeperGoal<T extends Mob & IAmmoUser> extends Goal {
     }
     
     private void findCreeper() {
-        Level level = madman.level;
+        Level level = madman.level();
         List<Creeper> nearbyCreepers = level.getEntitiesOfClass( Creeper.class, madman.getBoundingBox().inflate( targetRange ), null );
         
         if( !nearbyCreepers.isEmpty() ) {
@@ -100,7 +100,7 @@ public class ChargeCreeperGoal<T extends Mob & IAmmoUser> extends Goal {
             if( madman.hasAmmo() ) {
                 madman.consumeAmmo();
                 MobHelper.charge( creeper );
-                madman.level.playSound( null, creeper.getX(), creeper.getY(), creeper.getZ(),
+                madman.level().playSound( null, creeper.getX(), creeper.getY(), creeper.getZ(),
                         SoundEvents.BEE_STING, SoundSource.HOSTILE, 0.9F, 1.0F );
             }
             

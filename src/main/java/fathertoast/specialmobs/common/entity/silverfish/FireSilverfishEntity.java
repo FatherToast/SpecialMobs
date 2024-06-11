@@ -81,7 +81,7 @@ public class FireSilverfishEntity extends _SpecialSilverfishEntity {
     
     /** Applies this entity's aura effect. */
     private void pulseAura() {
-        final List<Silverfish> friends = level.getEntitiesOfClass( Silverfish.class, getBoundingBox().inflate( 7.0 ) );
+        final List<Silverfish> friends = level().getEntitiesOfClass( Silverfish.class, getBoundingBox().inflate( 7.0 ) );
         for( Silverfish cutie : friends ) {
             if( cutie.isAlive() && !cutie.fireImmune() ) {
                 cutie.addEffect( new MobEffectInstance( MobEffects.FIRE_RESISTANCE, 35 + random.nextInt( 16 ),

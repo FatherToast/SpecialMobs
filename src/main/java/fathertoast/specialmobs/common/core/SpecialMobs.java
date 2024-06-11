@@ -135,6 +135,7 @@ public class SpecialMobs {
         SMBiomeMods.REGISTRY.register( modEventBus );
 
         modEventBus.addListener( SMEntities::createAttributes );
+        modEventBus.addListener( SMCreativeTabs::buildCreativeContents );
         modEventBus.addListener( this::setup );
         modEventBus.addListener( this::sendIMCMessages );
         modEventBus.addListener( NaturalSpawnManager::registerSpawnPlacements );

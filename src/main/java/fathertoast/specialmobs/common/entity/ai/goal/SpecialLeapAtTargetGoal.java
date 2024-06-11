@@ -60,7 +60,7 @@ public class SpecialLeapAtTargetGoal extends Goal {
     /** @return Returns true if this AI can be activated. */
     @Override
     public boolean canUse() {
-        if( !mob.isOnGround() || mob.isPassenger() || !canUseWhileMounted && mob.isVehicle() ) return false;
+        if( !mob.onGround() || mob.isPassenger() || !canUseWhileMounted && mob.isVehicle() ) return false;
         
         target = mob.getTarget();
         if( target == null || mob.getRandom().nextInt( infrequency ) != 0 ) return false;
@@ -81,7 +81,7 @@ public class SpecialLeapAtTargetGoal extends Goal {
     /** @return Called each update while active and returns true if this AI can remain active. */
     @Override
     public boolean canContinueToUse() {
-        return !mob.isOnGround() && !mob.isPassenger() && !mob.isInWaterOrBubble() && !mob.isInLava();
+        return !mob.onGround() && !mob.isPassenger() && !mob.isInWaterOrBubble() && !mob.isInLava();
     }
     
     /** Called each tick while this AI is active. */

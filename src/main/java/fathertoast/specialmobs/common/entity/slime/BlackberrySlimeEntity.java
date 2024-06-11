@@ -83,7 +83,7 @@ public class BlackberrySlimeEntity extends _SpecialSlimeEntity implements IExplo
     /** Called each tick to update this entity. */
     @Override
     public void tick() {
-        if( isAlive() && !level.isClientSide() ) {
+        if( isAlive() && !level().isClientSide() ) {
             if( ignited ) setSwellDir( 1 );
             
             if( getSwellDir() > 0 ) {
@@ -119,7 +119,7 @@ public class BlackberrySlimeEntity extends _SpecialSlimeEntity implements IExplo
         final List<MobEffectInstance> effects = new ArrayList<>( getActiveEffects() );
         
         if( !effects.isEmpty() ) {
-            final AreaEffectCloud potionCloud = new AreaEffectCloud( level, getX(), getY(), getZ() );
+            final AreaEffectCloud potionCloud = new AreaEffectCloud( level(), getX(), getY(), getZ() );
             potionCloud.setRadius( getSize() + 0.5F );
             potionCloud.setRadiusOnUse( -0.5F );
             potionCloud.setWaitTime( 10 );
@@ -128,7 +128,7 @@ public class BlackberrySlimeEntity extends _SpecialSlimeEntity implements IExplo
             for( MobEffectInstance effect : effects ) {
                 potionCloud.addEffect( new MobEffectInstance( effect ) );
             }
-            level.addFreshEntity( potionCloud );
+            level().addFreshEntity( potionCloud );
         }
     }
     
@@ -153,13 +153,13 @@ public class BlackberrySlimeEntity extends _SpecialSlimeEntity implements IExplo
         final ItemStack item = player.getItemInHand( hand );
         if( item.getItem() == Items.FLINT_AND_STEEL ) {
             // Allow players to ignite blackberry slimes like creepers
-            level.playSound( player, getX(), getY(), getZ(), SoundEvents.FLINTANDSTEEL_USE, getSoundSource(),
+            level().playSound( player, getX(), getY(), getZ(), SoundEvents.FLINTANDSTEEL_USE, getSoundSource(),
                     1.0F, random.nextFloat() * 0.4F + 0.8F );
-            if( !level.isClientSide ) {
+            if( !level().isClientSide ) {
                 ignited = true;
                 item.hurtAndBreak( 1, player, ( entity ) -> entity.broadcastBreakEvent( hand ) );
             }
-            return InteractionResult.sidedSuccess( level.isClientSide );
+            return InteractionResult.sidedSuccess( level().isClientSide );
         }
         return super.mobInteract( player, hand );
     }

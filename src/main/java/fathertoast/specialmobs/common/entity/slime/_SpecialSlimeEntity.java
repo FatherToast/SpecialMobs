@@ -192,8 +192,8 @@ public class _SpecialSlimeEntity extends Slime implements ISpecialMob<_SpecialSl
     @Override
     public <T extends Mob> T convertTo( EntityType<T> entityType, boolean keepEquipment ) {
         final T replacement = super.convertTo( entityType, keepEquipment );
-        if( replacement instanceof ISpecialMob && level instanceof ServerLevelAccessor serverLevel ) {
-            MobHelper.finalizeSpawn( replacement, serverLevel, level.getCurrentDifficultyAt( blockPosition() ),
+        if( replacement instanceof ISpecialMob && level() instanceof ServerLevelAccessor serverLevel ) {
+            MobHelper.finalizeSpawn( replacement, serverLevel, level().getCurrentDifficultyAt( blockPosition() ),
                     MobSpawnType.CONVERSION, null );
         }
         return replacement;

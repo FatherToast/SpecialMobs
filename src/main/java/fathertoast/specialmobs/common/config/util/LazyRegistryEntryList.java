@@ -21,7 +21,7 @@ public class LazyRegistryEntryList<T> extends RegistryEntryList<T> {
     private final AbstractConfigField FIELD;
     /** True if the underlying set has been populated from the print list. */
     private boolean populated;
-    
+
     /**
      * Create a new registry entry list from an array of entries. Used for creating default configs.
      * <p>
@@ -31,7 +31,7 @@ public class LazyRegistryEntryList<T> extends RegistryEntryList<T> {
      * @param vanilla If true, assume all entries are from vanilla (already loaded)
      */
     @SuppressWarnings("unchecked")
-    public LazyRegistryEntryList( IForgeRegistry<T> registry, boolean vanilla, T[] entries ) {
+    public LazyRegistryEntryList( IForgeRegistry<T> registry, boolean vanilla, Object[] entries ) {
         super( registry );
         FIELD = null;
 
@@ -40,9 +40,9 @@ public class LazyRegistryEntryList<T> extends RegistryEntryList<T> {
         }
         else {
 
-            for (T entry : entries) {
-                if (registry.containsValue(entry)) {
-                    final ResourceLocation regKey = registry.getKey(entry);
+            for (Object entry : entries) {
+                if (registry.containsValue((T)entry)) {
+                    final ResourceLocation regKey = registry.getKey((T)entry);
                     if (regKey == null) {
                         throw new IllegalArgumentException("Invalid default lazy registry list entry! " + entry);
                     }
@@ -63,7 +63,7 @@ public class LazyRegistryEntryList<T> extends RegistryEntryList<T> {
             }
         }
     }
-    
+
     /**
      * Create a new registry entry list from a list of registry key strings.
      */
@@ -79,12 +79,12 @@ public class LazyRegistryEntryList<T> extends RegistryEntryList<T> {
             }
         }
     }
-    
+
     /** Fills out the registry entry set with the actual registry entries. */
     private void populateEntries() {
         if( populated ) return;
         populated = true;
-        
+
         for( String line : PRINT_LIST ) {
             if( line.endsWith( "*" ) ) {
                 // Handle special case; add all entries in namespace
@@ -103,18 +103,18 @@ public class LazyRegistryEntryList<T> extends RegistryEntryList<T> {
             }
         }
     }
-    
+
     /** @return The entries in this list. */
     @Override
     public Set<T> getEntries() {
         populateEntries();
         return super.getEntries();
     }
-    
+
     /** @return Returns true if there are no entries in this list. */
     @Override
     public boolean isEmpty() { return populated ? super.isEmpty() : PRINT_LIST.isEmpty(); }
-    
+
     /** @return Returns true if the entry is contained in this list. */
     @Override
     public boolean contains( @Nullable T entry ) {

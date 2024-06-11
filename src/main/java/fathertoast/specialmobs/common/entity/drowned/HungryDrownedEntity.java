@@ -76,9 +76,9 @@ public class HungryDrownedEntity extends _SpecialDrownedEntity {
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override
     protected void onVariantAttack( LivingEntity target ) {
-        if( level.isClientSide() ) return;
+        if( level().isClientSide() ) return;
         
-        if( target instanceof Player player && ForgeEventFactory.getMobGriefingEvent( level, this ) ) {
+        if( target instanceof Player player && ForgeEventFactory.getMobGriefingEvent( level(), this ) ) {
             final ItemStack food = MobHelper.stealRandomFood( player );
             if( !food.isEmpty() ) {
                 final FoodProperties foodStats = food.getItem().getFoodProperties( food, this );

@@ -3,10 +3,12 @@ package fathertoast.specialmobs.common.entity.blaze;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
+import fathertoast.specialmobs.common.core.register.SMTags;
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityType;
@@ -81,12 +83,12 @@ public class ConflagrationBlazeEntity extends _SpecialBlazeEntity {
     /** @return Attempts to damage this entity; returns true if the hit was successful. */
     @Override
     public boolean hurt( DamageSource source, float amount ) {
-        if( isInvulnerableTo( source ) || fireImmune() && source.isFire() ) return false;
+        if( isInvulnerableTo( source ) || fireImmune() && source.is(DamageTypeTags.IS_FIRE) ) return false;
         
-        if( !source.isExplosion() && !source.isMagic() && !DamageSource.DROWN.getMsgId().equals( source.getMsgId() ) &&
+        if( !source.is( DamageTypeTags.IS_EXPLOSION ) && !source.is( SMTags.IS_MAGIC ) && !source.is( DamageTypeTags.IS_DROWNING ) &&
                 !(source.getDirectEntity() instanceof Snowball ) ) {
             
-            if( !level.isClientSide() && growthLevel < 7 ) {
+            if( !level().isClientSide() && growthLevel < 7 ) {
                 growthLevel++;
                 updateFeedingLevels();
             }
@@ -97,7 +99,7 @@ public class ConflagrationBlazeEntity extends _SpecialBlazeEntity {
     
     /** Recalculates the modifiers associated with this entity's feeding level counters. */
     private void updateFeedingLevels() {
-        if( level != null && !level.isClientSide ) {
+        if( level() != null && !level().isClientSide ) {
             final int cooldownReduction = Mth.floor( getConfig().GENERAL.rangedAttackCooldown.get() * growthLevel * 0.1 );
             getSpecialData().setRangedAttackCooldown( getConfig().GENERAL.rangedAttackCooldown.get() - cooldownReduction );
             getSpecialData().setRangedAttackMaxCooldown( getConfig().GENERAL.rangedAttackMaxCooldown.get() - cooldownReduction );

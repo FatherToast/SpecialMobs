@@ -47,6 +47,6 @@ public class PacketHandler {
      * @param <MSG>   Packet type.
      */
     public static <MSG> void sendToClient( MSG message, ServerPlayer player ) {
-        CHANNEL.sendTo( message, player.connection.getConnection(), NetworkDirection.PLAY_TO_CLIENT );
+        CHANNEL.sendTo( message, player.connection.connection, NetworkDirection.PLAY_TO_CLIENT );
     }
 }

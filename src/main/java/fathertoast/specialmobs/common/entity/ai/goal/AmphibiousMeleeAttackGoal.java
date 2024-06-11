@@ -17,7 +17,7 @@ public class AmphibiousMeleeAttackGoal extends MeleeAttackGoal {
     
     /** @return True if the target is valid. */
     public static boolean isValidTarget( @Nullable LivingEntity target ) {
-        return target != null && (!target.level.isDay() || target.isInWater());
+        return target != null && (!target.level().isDay() || target.isInWater());
     }
     
     public AmphibiousMeleeAttackGoal( PathfinderMob entity, double speed, boolean longMemory ) { super( entity, speed, longMemory ); }

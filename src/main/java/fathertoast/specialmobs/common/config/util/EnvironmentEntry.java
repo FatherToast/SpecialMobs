@@ -15,7 +15,6 @@ import fathertoast.specialmobs.common.config.util.environment.position.YEnvironm
 import fathertoast.specialmobs.common.config.util.environment.position.YFromSeaEnvironment;
 import fathertoast.specialmobs.common.config.util.environment.time.*;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BiomeTags;
@@ -230,10 +229,10 @@ public class EnvironmentEntry {
         // Position-based
         
         /** Check if the position is inside a particular structure. See {@link Structure}. */
-        public Builder inStructure( Holder<Structure> structure ) { return in( new StructureEnvironment( structure, false ) ); }
+        public Builder inStructure( ResourceKey<Structure> structure ) { return in( new StructureEnvironment( structure, false ) ); }
         
         /** Check if the position is inside a particular structure. See {@link Structure}. */
-        public Builder notInStructure( Holder<Structure> structure ) { return in( new StructureEnvironment( structure, true ) ); }
+        public Builder notInStructure( ResourceKey<Structure> structure ) { return in( new StructureEnvironment( structure, true ) ); }
         
         /** Check if diamond/redstone ore can generate at the position. */
         public Builder belowDiamondLevel() { return belowY( 15 ); } // TODO update ore-based logic in 1.18

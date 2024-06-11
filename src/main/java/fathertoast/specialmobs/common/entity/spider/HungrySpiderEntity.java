@@ -81,9 +81,9 @@ public class HungrySpiderEntity extends _SpecialSpiderEntity {
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override
     protected void onVariantAttack( LivingEntity target ) {
-        if( level.isClientSide() ) return;
+        if( level().isClientSide() ) return;
         
-        if( target instanceof Player player && ForgeEventFactory.getMobGriefingEvent( level, this ) ) {
+        if( target instanceof Player player && ForgeEventFactory.getMobGriefingEvent( level(), this ) ) {
             final ItemStack food = MobHelper.stealRandomFood( player );
             if( !food.isEmpty() ) {
                 final float previousHealth = getMaxHealth();
@@ -104,7 +104,7 @@ public class HungrySpiderEntity extends _SpecialSpiderEntity {
     
     /** Recalculates the modifiers associated with this entity's feeding level counters. */
     private void updateFeedingLevels() {
-        if( level != null && !level.isClientSide ) {
+        if( level() != null && !level().isClientSide ) {
             final AttributeInstance health = getAttribute( Attributes.MAX_HEALTH );
             final AttributeInstance damage = getAttribute( Attributes.ATTACK_DAMAGE );
             //noinspection ConstantConditions

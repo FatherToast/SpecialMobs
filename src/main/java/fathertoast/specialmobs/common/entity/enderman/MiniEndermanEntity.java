@@ -50,6 +50,6 @@ public class MiniEndermanEntity extends _SpecialEndermanEntity {
     
     public MiniEndermanEntity( EntityType<? extends _SpecialEndermanEntity> entityType, Level level ) {
         super( entityType, level );
-        maxUpStep = 0.5F;
+        setMaxUpStep( 0.5F );
     }
 }

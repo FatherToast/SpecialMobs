@@ -67,18 +67,18 @@ public class DirtCreeperEntity extends _SpecialCreeperEntity {
         if( !explosion.initializeExplosion() ) return;
         explosion.finalizeExplosion();
         
-        if( explosionMode == Explosion.BlockInteraction.NONE ) return;
+        if( explosionMode == Explosion.BlockInteraction.KEEP ) return;
         
         final BlockState dirt = Blocks.DIRT.defaultBlockState();
         final int radius = (int) Math.floor( explosionPower );
-        final BlockPos center = new BlockPos( explosion.getPos() );
+        final BlockPos center = BlockPos.containing( explosion.getPos() );
         
         for( int y = -radius; y <= radius; y++ ) {
             for( int x = -radius; x <= radius; x++ ) {
                 for( int z = -radius; z <= radius; z++ ) {
                     if( x * x + y * y + z * z <= radius * radius ) {
                         final BlockPos pos = center.offset( x, y, z );
-                        if( level.getBlockState( pos ).getMaterial().isReplaceable() ) {
+                        if( level().getBlockState( pos ).canBeReplaced() ) {
                             MobHelper.placeBlock( this, pos, dirt );
                         }
                     }

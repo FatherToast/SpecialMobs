@@ -10,6 +10,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.item.FallingBlockEntity;
 import net.minecraft.world.item.Items;
@@ -69,13 +70,13 @@ public class GravelCreeperEntity extends _SpecialCreeperEntity {
         if( !explosion.initializeExplosion() ) return;
         explosion.finalizeExplosion();
         
-        if( explosionMode == Explosion.BlockInteraction.NONE || level.isClientSide() ) return;
+        if( explosionMode == Explosion.BlockInteraction.KEEP || level().isClientSide() ) return;
         
         final float throwPower = explosionPower + 4.0F;
         final int count = (int) Math.ceil( throwPower * throwPower * 3.5F );
         for( int i = 0; i < count; i++ ) {
-            final FallingBlockEntity gravel = FallingBlockEntity.fall( level,
-                    new BlockPos(getX(), getY() + getBbHeight() / 2.0F, getZ()), Blocks.GRAVEL.defaultBlockState() );
+            final FallingBlockEntity gravel = FallingBlockEntity.fall( level(),
+                    BlockPos.containing(getX(), getY() + getBbHeight() / 2.0F, getZ()), Blocks.GRAVEL.defaultBlockState() );
             gravel.time = 1; // Prevent the entity from instantly dying
             gravel.dropItem = false;
             gravel.fallDistance = 3.0F;
@@ -87,7 +88,7 @@ public class GravelCreeperEntity extends _SpecialCreeperEntity {
                     Mth.cos( yaw ) * speed,
                     Mth.sin( pitch ) * (throwPower + random.nextFloat() * throwPower) / 18.0F,
                     Mth.sin( yaw ) * speed );
-            level.addFreshEntity( gravel );
+            level().addFreshEntity( gravel );
         }
         spawnAnim();
         playSound( SoundEvents.GRAVEL_BREAK, 1.0F, 1.0F / (random.nextFloat() * 0.4F + 0.8F) );
@@ -96,8 +97,8 @@ public class GravelCreeperEntity extends _SpecialCreeperEntity {
     /** @return Attempts to damage this entity; returns true if the hit was successful. */
     @Override
     public boolean hurt( DamageSource source, float amount ) {
-        if( DamageSource.FALLING_BLOCK.getMsgId().equals( source.getMsgId() ) ||
-                DamageSource.ANVIL.getMsgId().equals( source.getMsgId() ) ) {
+        if( source.is( DamageTypes.FALLING_BLOCK ) ||
+                source.is( DamageTypes.FALLING_ANVIL ) ) {
             return true;
         }
         return super.hurt( source, amount );

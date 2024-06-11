@@ -90,9 +90,9 @@ public class SpitfireWitherSkeletonEntity extends _SpecialWitherSkeletonEntity {
             final double dY = target.getEyeY() - getEyeY();
             final double dZ = target.getZ() - getZ() + getRandom().nextGaussian() * accelVariance;
             
-            final SmallFireball fireball = new SmallFireball( level, this, dX, dY, dZ );
+            final SmallFireball fireball = new SmallFireball( level(), this, dX, dY, dZ );
             fireball.setPos( fireball.getX(), getEyeY() - 0.1, fireball.getZ() );
-            level.addFreshEntity( fireball );
+            level().addFreshEntity( fireball );
         }
     }
     

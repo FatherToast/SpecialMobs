@@ -12,6 +12,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffects;
@@ -99,7 +100,7 @@ public class IcyEndermanEntity extends _SpecialEndermanEntity {
     /** @return Attempts to damage this entity; returns true if the hit was successful. */
     @Override
     public boolean hurt( DamageSource source, float amount ) {
-        if( DamageSource.DROWN.equals( source ) ) {
+        if( source.is( DamageTypeTags.IS_DROWNING ) ) {
             for( int i = 0; i < 64; i++ ) {
                 if( teleport() ) return true;
             }
@@ -122,8 +123,8 @@ public class IcyEndermanEntity extends _SpecialEndermanEntity {
         
         while( pos.getY() > 0 ) {
             // Allow icy endermen to teleport on top of water
-            final BlockState block = level.getBlockState( pos );
-            if( block.getMaterial().blocksMotion() || block.getFluidState().is( FluidTags.WATER ) ) {
+            final BlockState block = level().getBlockState( pos );
+            if( block.blocksMotion() || block.getFluidState().is( FluidTags.WATER ) ) {
                 
                 final EntityTeleportEvent.EnderEntity event = ForgeEventFactory.onEnderTeleport( this, x, y + 1, z );
                 if( event.isCanceled() ) return false;
@@ -132,7 +133,7 @@ public class IcyEndermanEntity extends _SpecialEndermanEntity {
                 if( success ) {
                     updateFrostWalker( pos.immutable().above() );
                     if( !isSilent() ) {
-                        level.playSound( null, xo, yo, zo, SoundEvents.ENDERMAN_TELEPORT, getSoundSource(),
+                        level().playSound( null, xo, yo, zo, SoundEvents.ENDERMAN_TELEPORT, getSoundSource(),
                                 1.0F, 1.0F );
                         playSound( SoundEvents.ENDERMAN_TELEPORT, 1.0F, 1.0F );
                     }
@@ -155,10 +156,10 @@ public class IcyEndermanEntity extends _SpecialEndermanEntity {
         final double zI = getZ();
         
         //noinspection deprecation
-        if( level.hasChunkAt( new BlockPos( x, y, z ) ) ) {
+        if( level().hasChunkAt( BlockPos.containing( x, y, z ) ) ) {
             teleportTo( x, y, z );
             
-            if( level.noCollision( this ) && !level.containsAnyLiquid( getBoundingBox() ) ) {
+            if( level().noCollision( this ) && !level().containsAnyLiquid( getBoundingBox() ) ) {
                 if( spawnParticles ) References.EntityEvent.TELEPORT_TRAIL_PARTICLES.broadcast( this );
                 getNavigation().stop();
                 return true;
@@ -176,9 +177,9 @@ public class IcyEndermanEntity extends _SpecialEndermanEntity {
     
     /** Called to make the frost walker ice platform around this entity, as needed. */
     private void updateFrostWalker( BlockPos pos ) {
-        final boolean actualOnGround = onGround;
-        onGround = true; // Spoof the frost walker enchant requirement to be on the ground
-        FrostWalkerEnchantment.onEntityMoved( this, level, pos, 1 );
-        onGround = actualOnGround;
+        final boolean actualOnGround = onGround();
+        setOnGround( true ); // Spoof the frost walker enchant requirement to be on the ground
+        FrostWalkerEnchantment.onEntityMoved( this, level(), pos, 1 );
+        setOnGround( actualOnGround );
     }
 }

@@ -12,9 +12,9 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.damagesource.IndirectEntityDamageSource;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -103,7 +103,7 @@ public class WindWitchEntity extends _SpecialWitchEntity {
     /** Called each tick to update this entity's movement. */
     @Override
     public void aiStep() {
-        if( !level.isClientSide() && isAlive() && teleportDelay-- <= 0 && getTarget() != null && random.nextInt( 20 ) == 0 ) {
+        if( !level().isClientSide() && isAlive() && teleportDelay-- <= 0 && getTarget() != null && random.nextInt( 20 ) == 0 ) {
             if( getTarget().distanceToSqr( this ) > 64.0 ) {
                 for( int i = 0; i < 16; i++ ) {
                     if( teleportTowards( getTarget() ) ) {
@@ -129,9 +129,9 @@ public class WindWitchEntity extends _SpecialWitchEntity {
     /** @return Attempts to damage this entity; returns true if the hit was successful. */
     @Override
     public boolean hurt( DamageSource source, float amount ) {
-        if( isInvulnerableTo( source ) || fireImmune() && source.isFire() ) return false;
+        if( isInvulnerableTo( source ) || fireImmune() && source.is( DamageTypeTags.IS_FIRE ) ) return false;
         
-        if( source instanceof IndirectEntityDamageSource) {
+        if( source.is(DamageTypeTags.IS_PROJECTILE) ) {
             for( int i = 0; i < 64; i++ ) {
                 if( teleport() ) return true;
             }
@@ -139,7 +139,7 @@ public class WindWitchEntity extends _SpecialWitchEntity {
         }
         
         final boolean success = super.hurt( source, amount );
-        if( !level.isClientSide() && getHealth() > 0.0F ) {
+        if( !level().isClientSide() && getHealth() > 0.0F ) {
             if( source.getEntity() instanceof LivingEntity) {
                 teleportDelay -= 15;
                 if( teleportDelay <= 0 && random.nextFloat() < 0.5F ) {
@@ -160,7 +160,7 @@ public class WindWitchEntity extends _SpecialWitchEntity {
     
     /** @return Teleports this "enderman" to a random nearby position; returns true if successful. */
     protected boolean teleport() {
-        if( level.isClientSide() || !isAlive() ) return false;
+        if( level().isClientSide() || !isAlive() ) return false;
         
         final double x = getX() + (random.nextDouble() - 0.5) * 20.0;
         final double y = getY() + (double) (random.nextInt( 12 ) - 4);
@@ -188,15 +188,15 @@ public class WindWitchEntity extends _SpecialWitchEntity {
         
         while( pos.getY() > 0 ) {
             // Allow wind witch to teleport on top of water
-            final BlockState block = level.getBlockState( pos );
-            if( block.getMaterial().blocksMotion() || block.getFluidState().is( FluidTags.WATER ) ) {
+            final BlockState block = level().getBlockState( pos );
+            if( block.blocksMotion() || block.getFluidState().is( FluidTags.WATER ) ) {
                 
                 final EntityTeleportEvent.EnderEntity event = ForgeEventFactory.onEnderTeleport( this, x, y + 1, z );
                 if( event.isCanceled() ) return false;
                 
                 final boolean success = uncheckedTeleport( event.getTargetX(), event.getTargetY(), event.getTargetZ(), false );
                 if( success && !isSilent() ) {
-                    level.playSound( null, xo, yo, zo, SoundEvents.GHAST_SHOOT, getSoundSource(),
+                    level().playSound( null, xo, yo, zo, SoundEvents.GHAST_SHOOT, getSoundSource(),
                             1.0F, 1.0F );
                     playSound( SoundEvents.GHAST_SHOOT, 1.0F, 1.0F );
                 }
@@ -218,10 +218,10 @@ public class WindWitchEntity extends _SpecialWitchEntity {
         final double zI = getZ();
         
         //noinspection deprecation
-        if( level.hasChunkAt( new BlockPos( x, y, z ) ) ) {
+        if( level().hasChunkAt( BlockPos.containing( x, y, z ) ) ) {
             teleportTo( x, y, z );
             
-            if( level.noCollision( this ) && !level.containsAnyLiquid( getBoundingBox() ) ) {
+            if( level().noCollision( this ) && !level().containsAnyLiquid( getBoundingBox() ) ) {
                 if( spawnParticles ) References.EntityEvent.TELEPORT_TRAIL_PARTICLES.broadcast( this );
                 getNavigation().stop();
                 return true;

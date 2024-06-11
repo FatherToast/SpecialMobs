@@ -139,10 +139,10 @@ public class _SpecialWitherSkeletonEntity extends WitherSkeleton implements ISpe
         final double dZ = target.getZ() - getZ();
         final double dH = Mth.sqrt( (float) (dX * dX + dZ * dZ) );
         arrow.shoot( dX, dY + dH * 0.2, dZ, 1.6F,
-                getSpecialData().getRangedAttackSpread() * (14 - 4 * level.getDifficulty().getId()) );
+                getSpecialData().getRangedAttackSpread() * (14 - 4 * level().getDifficulty().getId()) );
         
         playSound( SoundEvents.SKELETON_SHOOT, 1.0F, 1.0F / (random.nextFloat() * 0.4F + 0.8F) );
-        level.addFreshEntity( arrow );
+        level().addFreshEntity( arrow );
     }
     
     /** @return The arrow for this skeleton to shoot. */
@@ -198,7 +198,7 @@ public class _SpecialWitherSkeletonEntity extends WitherSkeleton implements ISpe
     /** Called to set this entity's attack AI based on current equipment. */
     @Override
     public void reassessWeaponGoal() {
-        if( level != null && !level.isClientSide ) {
+        if( level() != null && !level().isClientSide ) {
             if( currentAttackAI != null ) goalSelector.removeGoal( currentAttackAI );
             
             final SpecialMobData<_SpecialWitherSkeletonEntity> data = getSpecialData();
@@ -225,7 +225,7 @@ public class _SpecialWitherSkeletonEntity extends WitherSkeleton implements ISpe
     @Override
     public void setBaby( boolean value ) {
         getEntityData().set( IS_BABY, value );
-        if( level != null && !level.isClientSide ) {
+        if( level() != null && !level().isClientSide ) {
             final AttributeInstance attributeInstance = getAttribute( Attributes.MOVEMENT_SPEED );
             //noinspection ConstantConditions
             attributeInstance.removeModifier( References.BABY_SPEED_BOOST );
@@ -288,8 +288,8 @@ public class _SpecialWitherSkeletonEntity extends WitherSkeleton implements ISpe
     @Override
     public <T extends Mob> T convertTo( EntityType<T> entityType, boolean keepEquipment ) {
         final T replacement = super.convertTo( entityType, keepEquipment );
-        if( replacement instanceof ISpecialMob && level instanceof ServerLevelAccessor serverLevel ) {
-            MobHelper.finalizeSpawn( replacement, serverLevel, level.getCurrentDifficultyAt( blockPosition() ),
+        if( replacement instanceof ISpecialMob && level() instanceof ServerLevelAccessor serverLevel ) {
+            MobHelper.finalizeSpawn( replacement, serverLevel, level().getCurrentDifficultyAt( blockPosition() ),
                     MobSpawnType.CONVERSION, null );
         }
         return replacement;

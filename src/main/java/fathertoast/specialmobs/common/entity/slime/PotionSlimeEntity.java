@@ -163,7 +163,7 @@ public class PotionSlimeEntity extends _SpecialSlimeEntity {
         for( int i = 0; i < size * 8; i++ ) {
             final float angle = random.nextFloat() * 2.0F * (float) Math.PI;
             final float distance = (random.nextFloat() * 0.25F + 0.25F) * size;
-            level.addParticle( getParticleType(),
+            level().addParticle( getParticleType(),
                     getX() + Mth.sin( angle ) * distance,
                     getY(),
                     getZ() + Mth.cos( angle ) * distance,

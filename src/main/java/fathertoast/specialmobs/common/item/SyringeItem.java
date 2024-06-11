@@ -13,7 +13,6 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.monster.Creeper;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
@@ -24,7 +23,7 @@ import java.util.function.Supplier;
 public class SyringeItem extends Item {
     
     public SyringeItem() {
-        super( new Item.Properties().stacksTo( 1 ).rarity( Rarity.UNCOMMON ).defaultDurability( 5 ).setNoRepair().tab( CreativeModeTab.TAB_MISC ) );
+        super( new Item.Properties().stacksTo( 1 ).rarity( Rarity.UNCOMMON ).defaultDurability( 5 ).setNoRepair() );
     }
     
     @SpecialMob.LanguageProvider
@@ -65,12 +64,12 @@ public class SyringeItem extends Item {
             }
             
             MobHelper.charge( creeper );
-            livingEntity.level.playSound( null, player.getX(), player.getY(), player.getZ(), SoundEvents.BEE_STING, SoundSource.PLAYERS, 0.9F, 1.0F );
+            livingEntity.level().playSound( null, player.getX(), player.getY(), player.getZ(), SoundEvents.BEE_STING, SoundSource.PLAYERS, 0.9F, 1.0F );
             itemStack.hurtAndBreak( 1, player, ( entity ) -> entity.broadcastBreakEvent( hand ) );
             if( !player.isCreative() ) {
                 player.getCooldowns().addCooldown( itemStack.getItem(), 1200 );
             }
-            return InteractionResult.sidedSuccess( player.level.isClientSide );
+            return InteractionResult.sidedSuccess( player.level().isClientSide );
         }
         return InteractionResult.PASS;
     }

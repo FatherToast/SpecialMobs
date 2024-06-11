@@ -27,7 +27,6 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.material.FlowingFluid;
-import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.HitResult;
 
 import javax.annotation.Nullable;
@@ -60,7 +59,7 @@ public class MeltingIceBlock extends IceBlock {
         int solidNeighbors = 0;
         final BlockPos.MutableBlockPos neighborPos = new BlockPos.MutableBlockPos();
         for( Direction direction : Direction.Plane.HORIZONTAL ) {
-            if( level.getBlockState( neighborPos.setWithOffset( pos, direction ) ).getMaterial().isSolid() ) {
+            if( level.getBlockState( neighborPos.setWithOffset( pos, direction ) ).isSolid() ) { //TODO: Check if this is correct
                 solidNeighbors++;
             }
         }
@@ -87,7 +86,7 @@ public class MeltingIceBlock extends IceBlock {
     public static final BooleanProperty HAS_WATER = BooleanProperty.create( "has_water" );
     
     public MeltingIceBlock() {
-        super( BlockBehaviour.Properties.of( Material.ICE ).sound( SoundType.GLASS ).noOcclusion()
+        super( BlockBehaviour.Properties.copy( Blocks.ICE ).sound( SoundType.GLASS ).noOcclusion()
                 .randomTicks().friction( 0.98F ).strength( 0.5F ) );
         registerDefaultState( stateDefinition.any().setValue( AGE, 0 ).setValue( HAS_WATER, true ) );
     }

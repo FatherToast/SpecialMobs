@@ -18,7 +18,7 @@ public class SpecialZombieVillagerRenderer extends HumanoidMobRenderer<Zombie, Z
 
     public SpecialZombieVillagerRenderer( EntityRendererProvider.Context context ) {
         super( context, new ZombieVillagerModel<>( context.bakeLayer(ModelLayers.ZOMBIE_VILLAGER )), 0.5F );
-        addLayer( new HumanoidArmorLayer<>(this, new ZombieVillagerModel<>( context.bakeLayer(ModelLayers.ZOMBIE_VILLAGER_INNER_ARMOR )), new ZombieVillagerModel<>(context.bakeLayer(ModelLayers.ZOMBIE_VILLAGER_OUTER_ARMOR ) )));
+        addLayer( new HumanoidArmorLayer<>(this, new ZombieVillagerModel<>( context.bakeLayer(ModelLayers.ZOMBIE_VILLAGER_INNER_ARMOR )), new ZombieVillagerModel<>(context.bakeLayer(ModelLayers.ZOMBIE_VILLAGER_OUTER_ARMOR ) ), context.getModelManager() ));
         
         baseShadowRadius = shadowRadius;
         addLayer( new SpecialMobEyesLayer<>( this ) );

@@ -87,7 +87,7 @@ public class MotherSpiderEntity extends _SpecialSpiderEntity {
     public boolean hurt( DamageSource source, float amount ) {
         if( super.hurt( source, amount ) ) {
             // Spawn babies when damaged
-            if( extraBabies > 0 && amount > 1.0F && level instanceof ServerLevelAccessor && random.nextFloat() < 0.33F ) {
+            if( extraBabies > 0 && amount > 1.0F && level() instanceof ServerLevelAccessor && random.nextFloat() < 0.33F ) {
                 extraBabies--;
                 spawnBaby( 0.66F, null );
                 spawnAnim();
@@ -102,7 +102,7 @@ public class MotherSpiderEntity extends _SpecialSpiderEntity {
     @Override
     public void remove( RemovalReason removalReason ) {
         //noinspection deprecation
-        if( isDeadOrDying() && !isRemoved() && level instanceof ServerLevelAccessor ) { // Same conditions as slime splitting
+        if( isDeadOrDying() && !isRemoved() && level() instanceof ServerLevelAccessor ) { // Same conditions as slime splitting
             // Spawn babies on death
             final int babiesToSpawn = babies + extraBabies;
             SpawnGroupData groupData = null;
@@ -118,13 +118,13 @@ public class MotherSpiderEntity extends _SpecialSpiderEntity {
     /** Helper method to simplify spawning babies. */
     @Nullable
     private SpawnGroupData spawnBaby( float speed, @Nullable SpawnGroupData groupData ) {
-        final BabySpiderEntity baby = BabySpiderEntity.SPECIES.entityType.get().create( level );
+        final BabySpiderEntity baby = BabySpiderEntity.SPECIES.entityType.get().create( level() );
         if( baby == null ) return groupData;
         
         baby.copyPosition( this );
         baby.yHeadRot = getYRot();
         baby.yBodyRot = getYRot();
-        groupData = baby.finalizeSpawn( (ServerLevelAccessor) level, level.getCurrentDifficultyAt( blockPosition() ),
+        groupData = baby.finalizeSpawn( (ServerLevelAccessor) level(), level().getCurrentDifficultyAt( blockPosition() ),
                 MobSpawnType.MOB_SUMMONED, groupData, null );
         baby.setTarget( getTarget() );
         
@@ -134,7 +134,7 @@ public class MotherSpiderEntity extends _SpecialSpiderEntity {
                 (random.nextDouble() - 0.5) * speed );
         baby.setOnGround( false );
         
-        level.addFreshEntity( baby );
+        level().addFreshEntity( baby );
         return groupData;
     }
     

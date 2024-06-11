@@ -49,7 +49,7 @@ public class ClientRegister {
     }
 
     @SubscribeEvent
-    private static void registerEntityRenderers( EntityRenderersEvent.RegisterRenderers event ) {
+    public static void registerEntityRenderers( EntityRenderersEvent.RegisterRenderers event ) {
         // Family-based renderers
         registerFamilyRenderers( event, MobFamily.CREEPER, SpecialCreeperRenderer::new );
         registerFamilyRenderers( event, MobFamily.ZOMBIE, SpecialZombieRenderer::new );

@@ -5,6 +5,7 @@ import fathertoast.specialmobs.common.config.field.EnvironmentListField;
 import fathertoast.specialmobs.common.config.util.environment.DynamicRegistryEnvironment;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.biome.Biome;
@@ -23,7 +24,7 @@ public class BiomeEnvironment extends DynamicRegistryEnvironment<Biome> {
     
     /** @return The registry used. */
     @Override
-    public ResourceKey<Registry<Biome>> getRegistry() { return Registry.BIOME_REGISTRY; }
+    public ResourceKey<Registry<Biome>> getRegistry() { return Registries.BIOME; }
     
     /** @return Returns true if this environment matches the provided environment. */
     @Override

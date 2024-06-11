@@ -114,7 +114,7 @@ public class _SpecialCreeperEntity extends Creeper implements IExplodingMob, ISp
     /** Called to perform this creeper's explosion 'attack'. */
     @Override
     protected void explodeCreeper() {
-        if( !level.isClientSide ) {
+        if( !level().isClientSide ) {
             dead = true;
             makeVariantExplosion( getVariantExplosionPower( explosionRadius ) );
             discard();
@@ -137,7 +137,7 @@ public class _SpecialCreeperEntity extends Creeper implements IExplodingMob, ISp
         modifyVariantLingeringCloudEffects( effects );
         
         if( !effects.isEmpty() ) {
-            final AreaEffectCloud potionCloud = new AreaEffectCloud( level, getX(), getY(), getZ() );
+            final AreaEffectCloud potionCloud = new AreaEffectCloud( level(), getX(), getY(), getZ() );
             potionCloud.setRadius( getVariantExplosionPower( explosionRadius - 0.5F ) );
             potionCloud.setRadiusOnUse( -0.5F );
             potionCloud.setWaitTime( 10 );
@@ -147,7 +147,7 @@ public class _SpecialCreeperEntity extends Creeper implements IExplodingMob, ISp
                 potionCloud.addEffect( new MobEffectInstance( effect ) );
             }
             modifyVariantLingeringCloud( potionCloud );
-            level.addFreshEntity( potionCloud );
+            level().addFreshEntity( potionCloud );
         }
     }
     
@@ -333,8 +333,8 @@ public class _SpecialCreeperEntity extends Creeper implements IExplodingMob, ISp
     @Override
     public <T extends Mob> T convertTo( EntityType<T> entityType, boolean keepEquipment ) {
         final T replacement = super.convertTo( entityType, keepEquipment );
-        if( replacement instanceof ISpecialMob && level instanceof ServerLevelAccessor serverLevel ) {
-            MobHelper.finalizeSpawn( replacement, serverLevel, level.getCurrentDifficultyAt( blockPosition() ),
+        if( replacement instanceof ISpecialMob && level() instanceof ServerLevelAccessor serverLevel ) {
+            MobHelper.finalizeSpawn( replacement, serverLevel, level().getCurrentDifficultyAt( blockPosition() ),
                     MobSpawnType.CONVERSION, null );
         }
         return replacement;

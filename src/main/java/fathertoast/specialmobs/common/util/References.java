@@ -143,7 +143,7 @@ public final class References {
         EntityEvent( int id ) { ID = (byte) id; }
         
         /** Sends this event from the given server entity to its client-sided counterpart. */
-        public void broadcast( LivingEntity entity ) { entity.level.broadcastEntityEvent( entity, ID ); }
+        public void broadcast( LivingEntity entity ) { entity.level().broadcastEntityEvent( entity, ID ); }
     }
     
     /**
@@ -182,7 +182,7 @@ public final class References {
         
         /** Plays this event at the entity's position, if the entity is not silenced. */
         public void play( Entity entity ) {
-            if( !entity.isSilent() ) play( entity.level, entity.blockPosition() );
+            if( !entity.isSilent() ) play( entity.level(), entity.blockPosition() );
         }
         
         /** Plays this event at a particular position. */

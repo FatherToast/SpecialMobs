@@ -27,19 +27,29 @@ public class ExplosionHelper {
     
     /** Gets the explosion mode to use as a result of appropriate Forge events. */
     public static Explosion.BlockInteraction getMode(Entity entity ) {
-        return ForgeEventFactory.getMobGriefingEvent( entity.level, entity ) ? Explosion.BlockInteraction.DESTROY : Explosion.BlockInteraction.NONE;
+        return ForgeEventFactory.getMobGriefingEvent( entity.level(), entity ) ? Explosion.BlockInteraction.DESTROY : Explosion.BlockInteraction.KEEP;
     }
-    
+
     /** Creates and fully executes an explosion for a source entity at that source's current position. */
     public static Explosion explode( Entity entity, float power, boolean damageBlocks, boolean fiery ) {
         return explode( entity, entity.getX(), entity.getY(), entity.getZ(), power, damageBlocks, fiery );
     }
-    
+
     /** Creates and fully executes an explosion for a source entity at a specified position. */
     public static Explosion explode( Entity entity, double x, double y, double z, float power, boolean damageBlocks, boolean fiery ) {
-        return entity.level.explode( entity, x, y, z, power, fiery, damageBlocks ? getMode( entity ) : Explosion.BlockInteraction.NONE );
+        Explosion.BlockInteraction explosionMode = damageBlocks ? getMode( entity ) : Explosion.BlockInteraction.KEEP;
+        Level.ExplosionInteraction interaction;
+        switch( explosionMode ) {
+            case KEEP:
+                interaction = Level.ExplosionInteraction.NONE;
+                break;
+            default:
+                interaction = Level.ExplosionInteraction.MOB;
+                break;
+        }
+        return entity.level().explode( entity, x, y, z, power, fiery, interaction);
     }
-    
+
     /** Helper method to simplify spawning lightning. */
     public static void spawnLightning( Level level, double x, double y, double z ) {
         final LightningBolt lightning = EntityType.LIGHTNING_BOLT.create( level );
@@ -48,15 +58,15 @@ public class ExplosionHelper {
             level.addFreshEntity( lightning );
         }
     }
-    
+
     public final Entity source;
     public final Level level;
     public final float radius;
-    
+
     public final Explosion.BlockInteraction mode;
     public final ExplosionDamageCalculator damageCalculator;
     public final Explosion explosion;
-    
+
     /**
      * Creates an explosion for a source entity at that source's current position. Instantiating this class allows a
      * little more control over the explosion (vs. the static explode methods), such as modifying affected blocks.
@@ -69,7 +79,7 @@ public class ExplosionHelper {
     public ExplosionHelper( Entity entity, float power, boolean damageBlocks, boolean fiery ) {
         this( entity, entity.getX(), entity.getY(), entity.getZ(), power, damageBlocks, fiery );
     }
-    
+
     /**
      * Creates an explosion for a source entity at that source's current position. Instantiating this class allows a
      * little more control over the explosion (vs. the static explode methods), such as modifying affected blocks.
@@ -82,7 +92,7 @@ public class ExplosionHelper {
     public ExplosionHelper( Entity entity, float power, Explosion.BlockInteraction explosionMode, boolean fiery ) {
         this( entity, entity.getX(), entity.getY(), entity.getZ(), power, explosionMode, fiery );
     }
-    
+
     /**
      * Creates an explosion for a source entity at a specified position. Instantiating this class allows a little more
      * control over the explosion (vs. the static explode methods), such as modifying affected blocks.
@@ -93,9 +103,9 @@ public class ExplosionHelper {
      * @see #finalizeExplosion()
      */
     public ExplosionHelper( Entity entity, double x, double y, double z, float power, boolean damageBlocks, boolean fiery ) {
-        this( entity, x, y, z, power, damageBlocks ? getMode( entity ) : Explosion.BlockInteraction.NONE, fiery );
+        this( entity, x, y, z, power, damageBlocks ? getMode( entity ) : Explosion.BlockInteraction.KEEP, fiery );
     }
-    
+
     /**
      * Creates an explosion for a source entity at a specified position. Instantiating this class allows a little more
      * control over the explosion (vs. the static explode methods), such as modifying affected blocks.
@@ -107,23 +117,23 @@ public class ExplosionHelper {
      */
     public ExplosionHelper( Entity entity, double x, double y, double z, float power, Explosion.BlockInteraction explosionMode, boolean fiery ) {
         source = entity;
-        level = entity.level;
+        level = entity.level();
         radius = power;
-        
+
         mode = explosionMode;
         damageCalculator = new ExplosionDamageCalculator( );
         explosion = new Explosion( level, entity, null, damageCalculator, x, y, z, power, fiery, explosionMode );
     }
-    
+
     /** @return This explosion's position vector. */
     public Vec3 getPos() { return explosion.getPosition(); }
-    
+
     /**
      * @return A list of all block positions hit by this explosion. This is populated after calling initializeExplosion()
      * and can be modified before calling finalizeExplosion().
      */
     public List<BlockPos> getHitBlocks() { return explosion.getToBlow(); }
-    
+
     /**
      * Does a quick check if the block can explode, firing all relevant Forge events.
      * The power value used here ignores distance and shielding.
@@ -131,36 +141,36 @@ public class ExplosionHelper {
     public boolean tryExplodeBlock(BlockPos pos, BlockState block, float power ) {
         return tryExplodeBlock( pos, block, level.getFluidState( pos ), power );
     }
-    
+
     /**
      * Does a quick check if the block can explode, firing all relevant Forge events.
      * The power value used here ignores distance and shielding.
      */
     public boolean tryExplodeBlock(BlockPos pos, BlockState block, FluidState fluid, float power ) {
         float blockDamage = power * (0.7F + level.random.nextFloat() * 0.6F);
-        
+
         final Optional<Float> optional = getBlockExplosionResistance( pos, block, fluid );
         if( optional.isPresent() ) blockDamage -= (optional.get() + 0.3F) * 0.3F;
-        
+
         return blockDamage > 0.0F && shouldBlockExplode( pos, block, blockDamage );
     }
-    
+
     /** @return The block's explosion resistance (helper method). */
     @SuppressWarnings( "unused" )
     public Optional<Float> getBlockExplosionResistance( BlockPos pos, BlockState block ) {
         return damageCalculator.getBlockExplosionResistance( explosion, level, pos, block, level.getFluidState( pos ) );
     }
-    
+
     /** @return The block's explosion resistance (helper method). */
     public Optional<Float> getBlockExplosionResistance( BlockPos pos, BlockState block, FluidState fluid ) {
         return damageCalculator.getBlockExplosionResistance( explosion, level, pos, block, fluid );
     }
-    
+
     /** @return True if the block should be destroyed from the given damage (helper method). */
     public boolean shouldBlockExplode( BlockPos pos, BlockState block, float blockDamage ) {
         return damageCalculator.shouldBlockExplode( explosion, level, pos, block, blockDamage );
     }
-    
+
     /**
      * Runs the first part of explosion logic. This step calculates all blocks/entities to hit with the explosion
      * and deals damage/knockback to all hit entities.
@@ -172,7 +182,7 @@ public class ExplosionHelper {
         explosion.explode();
         return true;
     }
-    
+
     /**
      * Runs the second and last part of explosion logic. This step breaks all hit blocks and places fire blocks
      * (if these capabilities are enabled) and notifies players that the explosion happened.
@@ -181,7 +191,7 @@ public class ExplosionHelper {
         if( level instanceof ServerLevel serverLevel ) {
             // Handle server-side explosion logic
             explosion.finalizeExplosion( false );
-            if( mode == Explosion.BlockInteraction.NONE ) {
+            if( mode == Explosion.BlockInteraction.KEEP ) {
                 explosion.clearToBlow();
             }
             final Vec3 pos = getPos();

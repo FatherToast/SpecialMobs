@@ -5,7 +5,6 @@ import fathertoast.specialmobs.common.entity.enderman.RunicEndermanEntity;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.damagesource.EntityDamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
@@ -33,7 +32,7 @@ public class RunicEndermanBeamAttackGoal extends Goal {
     
     public RunicEndermanBeamAttackGoal( RunicEndermanEntity entity ) {
         mob = entity;
-        beamDamageSource = new EntityDamageSource( DamageSource.MAGIC.getMsgId(), entity );
+        beamDamageSource = entity.damageSources().indirectMagic(entity, null); //TODO: Check as it used to be EntityDamageSource with Magic message ID
         setFlags( EnumSet.of( Goal.Flag.MOVE, Flag.LOOK ) );
     }
     
@@ -53,7 +52,7 @@ public class RunicEndermanBeamAttackGoal extends Goal {
             
             mob.setBeamState( RunicEndermanEntity.BeamState.CHARGING );
             if( !mob.isSilent() ) {
-                mob.level.playSound( null, mob.getX(), mob.getEyeY(), mob.getZ(),
+                mob.level().playSound( null, mob.getX(), mob.getEyeY(), mob.getZ(),
                         SoundEvents.ENDERMAN_SCREAM, mob.getSoundSource(),
                         1.0F, 1.0F / (mob.getRandom().nextFloat() * 0.2F + 1.8F) );
             }
@@ -102,7 +101,7 @@ public class RunicEndermanBeamAttackGoal extends Goal {
         if( targetEntity != null ) updateTargetPos();
         
         if( !mob.isSilent() && attackTime % 10 == 0 ) {
-            mob.level.playSound( null, mob.getX(), mob.getEyeY(), mob.getZ(),
+            mob.level().playSound( null, mob.getX(), mob.getEyeY(), mob.getZ(),
                     SoundEvents.ENDERMAN_SCREAM, mob.getSoundSource(),
                     1.0F, 1.0F / (mob.getRandom().nextFloat() * 0.4F + 1.0F) );
         }
@@ -113,7 +112,7 @@ public class RunicEndermanBeamAttackGoal extends Goal {
         final Vec3 beamStartPos = mob.getEyePosition( 1.0F );
         Vec3 beamEndPos = beamStartPos.add( viewVec );
         
-        final HitResult blockRayTrace = mob.level.clip(
+        final HitResult blockRayTrace = mob.level().clip(
                 new ClipContext( beamStartPos, beamEndPos,
                         ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, mob ) );
         if( blockRayTrace.getType() != HitResult.Type.MISS ) {
@@ -159,7 +158,7 @@ public class RunicEndermanBeamAttackGoal extends Goal {
     /** @return A list of all entities between the two vector positions and within the search area, in no particular order. */
     private List<Entity> rayTraceEntities( Vec3 from, Vec3 to, AABB searchArea ) {
         final List<Entity> entitiesHit = new ArrayList<>();
-        for( Entity entity : mob.level.getEntities( mob, searchArea, this::canBeamHitTarget ) ) {
+        for( Entity entity : mob.level().getEntities( mob, searchArea, this::canBeamHitTarget ) ) {
             final Optional<Vec3> hitPos = entity.getBoundingBox().inflate( 0.3 ).clip( from, to );
             if( hitPos.isPresent() ) {
                 entitiesHit.add( entity );

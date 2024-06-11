@@ -129,7 +129,7 @@ public class FishingDrownedEntity extends _SpecialDrownedEntity implements IAngl
     @Override
     public ItemStack getItemBySlot( EquipmentSlot slot ) {
         // Display a stick in place of the "cast fishing rod" when the fancy render is disabled
-        if( level.isClientSide() && !Config.MAIN.GENERAL.fancyFishingMobs.get() && EquipmentSlot.MAINHAND.equals( slot ) ) {
+        if( level().isClientSide() && !Config.MAIN.GENERAL.fancyFishingMobs.get() && EquipmentSlot.MAINHAND.equals( slot ) ) {
             final ItemStack held = super.getItemBySlot( slot );
             if( held.getItem() == Items.FISHING_ROD && isLineOut() ) {
                 return new ItemStack( Items.STICK );

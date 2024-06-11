@@ -84,7 +84,7 @@ public class QueenGhastEntity extends _SpecialGhastEntity {
     /** Called to attack the target with a ranged attack. */
     @Override
     public void performRangedAttack( LivingEntity target, float damageMulti ) {
-        if( !level.isClientSide() && summons > 0 && random.nextInt( 2 ) == 0 ) {
+        if( !level().isClientSide() && summons > 0 && random.nextInt( 2 ) == 0 ) {
             summons--;
             
             final double vX = target.getX() - getX();
@@ -107,7 +107,7 @@ public class QueenGhastEntity extends _SpecialGhastEntity {
     @Override
     public void remove( RemovalReason reason ) {
         //noinspection deprecation
-        if( isDeadOrDying() && !isRemoved() && level instanceof ServerLevelAccessor ) { // Same conditions as slime splitting
+        if( isDeadOrDying() && !isRemoved() && level() instanceof ServerLevelAccessor ) { // Same conditions as slime splitting
             // Spawn babies on death
             SpawnGroupData groupData = null;
             for( int i = 0; i < babies; i++ ) {
@@ -122,20 +122,20 @@ public class QueenGhastEntity extends _SpecialGhastEntity {
     /** Helper method to simplify spawning babies. */
     @Nullable
     private SpawnGroupData spawnBaby( double vX, double vZ, @Nullable SpawnGroupData groupData ) {
-        final BabyGhastEntity baby = BabyGhastEntity.SPECIES.entityType.get().create( level );
+        final BabyGhastEntity baby = BabyGhastEntity.SPECIES.entityType.get().create( level() );
         if( baby == null ) return groupData;
         
         baby.copyPosition( this );
         baby.yHeadRot = getYRot();
         baby.yBodyRot = getYRot();
-        groupData = baby.finalizeSpawn( (ServerLevelAccessor) level, level.getCurrentDifficultyAt( blockPosition() ),
+        groupData = baby.finalizeSpawn( (ServerLevelAccessor) level(), level().getCurrentDifficultyAt( blockPosition() ),
                 MobSpawnType.MOB_SUMMONED, groupData, null );
         baby.setTarget( getTarget() );
         
         baby.setDeltaMovement( vX, 0.0, vZ );
         baby.setOnGround( false );
-        
-        level.addFreshEntity( baby );
+
+        level().addFreshEntity( baby );
         return groupData;
     }
     

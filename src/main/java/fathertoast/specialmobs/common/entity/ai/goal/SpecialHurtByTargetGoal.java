@@ -39,7 +39,7 @@ public class SpecialHurtByTargetGoal extends HurtByTargetGoal {
         
         final double range = getFollowDistance();
         final AABB boundingBox = AABB.unitCubeFromLowerCorner( mob.position() ).inflate( range, 10.0, range );
-        final List<? extends Mob> nearbyEntities = mob.level.getEntitiesOfClass( parentClass, boundingBox ); // Insert parent class
+        final List<? extends Mob> nearbyEntities = mob.level().getEntitiesOfClass( parentClass, boundingBox ); // Insert parent class
         
         // This is the exact same logic as the vanilla super method, just a lot more understandable
         for( Mob entity : nearbyEntities ) {

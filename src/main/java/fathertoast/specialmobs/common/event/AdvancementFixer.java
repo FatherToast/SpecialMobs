@@ -49,7 +49,7 @@ public class AdvancementFixer {
         LivingEntity livingEntity = event.getEntity();
         DamageSource source = event.getSource();
 
-        if ( !livingEntity.level.isClientSide && source.getEntity() instanceof ServerPlayer player ) {
+        if ( !livingEntity.level().isClientSide && source.getEntity() instanceof ServerPlayer player ) {
             if ( livingEntity instanceof ISpecialMob<?> ) {
                 Advancement killAMob = getFromId( KILL_A_MOB_ADV );
                 if ( notCompleted( player, killAMob )) {
@@ -77,7 +77,7 @@ public class AdvancementFixer {
 
     /** Checks if a player has killed a Special Mobs mob, and grants the "Monster Hunter" advancement if so. */
     private <T extends LivingEntity & ISpecialMob<?>> void maybeGrantKillAMob( T dead, ServerPlayer player, DamageSource damageSource, Advancement advancement ) {
-        if ( damageSource.getEntity() instanceof Player && !dead.level.isClientSide ) {
+        if ( damageSource.getEntity() instanceof Player && !dead.level().isClientSide ) {
             // Second parameter doesn't matter, just has to be the reg name of an EntityType
             // that is one of the criteria for the advancement. If only it was EntityType tag based :(((
             player.getAdvancements().award( advancement, "minecraft:creeper");
@@ -85,7 +85,7 @@ public class AdvancementFixer {
     }
 
     private <T extends LivingEntity & ISpecialMob<?>> void maybeGrantKillAllMobs( T dead, ServerPlayer player, DamageSource damageSource, Advancement advancement ) {
-        if ( damageSource.getEntity() instanceof Player && !dead.level.isClientSide ) {
+        if ( damageSource.getEntity() instanceof Player && !dead.level().isClientSide ) {
             for (EntityType<?> type : dead.getSpecies().family.replaceableTypes) {
                 player.getAdvancements().award( advancement, Objects.requireNonNull(ForgeRegistries.ENTITY_TYPES.getKey(type)).toString() );
             }
@@ -111,7 +111,7 @@ public class AdvancementFixer {
     }
 
     private static <T extends LivingEntity & ISpecialMob<?>> void maybeGrantUneasyAlliance( T dead, ServerPlayer player, DamageSource damageSource, Advancement advancement ) {
-        if ( dead instanceof _SpecialGhastEntity && dead.level.dimension().equals( Level.OVERWORLD ) ) {
+        if ( dead instanceof _SpecialGhastEntity && dead.level().dimension().equals( Level.OVERWORLD ) ) {
             player.getAdvancements().award( advancement, "killed_ghast" );
         }
     }

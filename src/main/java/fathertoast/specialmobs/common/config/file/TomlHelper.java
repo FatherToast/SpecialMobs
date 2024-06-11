@@ -38,7 +38,7 @@ public final class TomlHelper {
     public static Object parseRaw( @Nullable String value ) {
         // Note: It is very important here that the returned value is NOT a string
         
-        if( value != null && !"".equals( value ) ) {
+        if( value != null && !value.isEmpty()) {
             // Try to parse as a numerical value
             try {
                 return Double.parseDouble( value );

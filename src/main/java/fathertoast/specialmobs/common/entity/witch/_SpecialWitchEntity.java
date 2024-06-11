@@ -16,6 +16,7 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.tags.EntityTypeTags;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.tags.TagKey;
@@ -25,7 +26,16 @@ import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
-import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityDimensions;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.MobType;
+import net.minecraft.world.entity.Pose;
+import net.minecraft.world.entity.SpawnGroupData;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
@@ -142,15 +152,15 @@ public class _SpecialWitchEntity extends Witch implements ISpecialMob<_SpecialWi
         final ItemStack potion = pickThrownPotion( target, damageMulti, dH );
         if( potion.isEmpty() ) return;
         
-        final ThrownPotion thrownPotion = new ThrownPotion( level, this );
+        final ThrownPotion thrownPotion = new ThrownPotion( level(), this );
         thrownPotion.setItem( potion );
         thrownPotion.setXRot(thrownPotion.getXRot() + 20.0F);
         thrownPotion.shoot( dX, dY + (double) (dH * 0.2F), dZ, 0.75F, 8.0F * getSpecialData().getRangedAttackSpread() );
         if( !isSilent() ) {
-            level.playSound( null, getX(), getY(), getZ(), SoundEvents.WITCH_THROW, getSoundSource(),
+            level().playSound( null, getX(), getY(), getZ(), SoundEvents.WITCH_THROW, getSoundSource(),
                     1.0F, 0.8F + random.nextFloat() * 0.4F );
         }
-        level.addFreshEntity( thrownPotion );
+        level().addFreshEntity( thrownPotion );
     }
     
     /** @return A throwable potion item depending on the situation. */
@@ -210,7 +220,7 @@ public class _SpecialWitchEntity extends Witch implements ISpecialMob<_SpecialWi
         if( random.nextFloat() < 0.15F && isEyeInFluid( FluidTags.WATER ) && !hasEffect( MobEffects.WATER_BREATHING ) ) {
             usePotion( makePotion( Potions.WATER_BREATHING ) );
         }
-        else if( random.nextFloat() < 0.15F && (isOnFire() || getLastDamageSource() != null && getLastDamageSource().isFire()) &&
+        else if( random.nextFloat() < 0.15F && (isOnFire() || getLastDamageSource() != null && getLastDamageSource().is( DamageTypeTags.IS_FIRE )) &&
                 !hasEffect( MobEffects.FIRE_RESISTANCE ) ) {
             usePotion( makePotion( Potions.FIRE_RESISTANCE ) );
         }
@@ -274,7 +284,7 @@ public class _SpecialWitchEntity extends Witch implements ISpecialMob<_SpecialWi
     
     /** Called to update this entity's attack AI based on NBT data. */
     public void recalculateAttackGoal() {
-        if( level != null && !level.isClientSide ) {
+        if( level() != null && !level().isClientSide ) {
             AIHelper.removeGoals( goalSelector, RangedAttackGoal.class );
             goalSelector.addGoal( 2, new RangedAttackGoal( this, getSpecialData().getRangedWalkSpeed(),
                     getSpecialData().getRangedAttackCooldown(), getSpecialData().getRangedAttackMaxRange() ) );
@@ -331,7 +341,7 @@ public class _SpecialWitchEntity extends Witch implements ISpecialMob<_SpecialWi
             potionDrinkTimer = getMainHandItem().getUseDuration();
             
             if( !isSilent() ) {
-                level.playSound( null, getX(), getY(), getZ(), SoundEvents.WITCH_DRINK, getSoundSource(),
+                level().playSound( null, getX(), getY(), getZ(), SoundEvents.WITCH_DRINK, getSoundSource(),
                         1.0F, 0.8F + random.nextFloat() * 0.4F );
             }
             
@@ -345,15 +355,15 @@ public class _SpecialWitchEntity extends Witch implements ISpecialMob<_SpecialWi
             // It is a splash or lingering potion, throw it straight down to apply to self
             potionUseCooldownTimer = 40;
             
-            final ThrownPotion thrownPotion = new ThrownPotion( level, this );
+            final ThrownPotion thrownPotion = new ThrownPotion( level(), this );
             thrownPotion.setItem( potion );
             thrownPotion.setXRot(thrownPotion.getXRot() + 20.0F);
             thrownPotion.shoot( 0.0, -1.0, 0.0, 0.2F, 0.0F );
             if( !isSilent() ) {
-                level.playSound( null, getX(), getY(), getZ(), SoundEvents.WITCH_THROW, getSoundSource(),
+                level().playSound( null, getX(), getY(), getZ(), SoundEvents.WITCH_THROW, getSoundSource(),
                         1.0F, 0.8F + random.nextFloat() * 0.4F );
             }
-            level.addFreshEntity( thrownPotion );
+            level().addFreshEntity( thrownPotion );
         }
         else {
             SpecialMobs.LOG.warn( "Witch {} attempted to use '{}' as a potion! Gross!", getClass().getSimpleName(), potion );
@@ -417,8 +427,8 @@ public class _SpecialWitchEntity extends Witch implements ISpecialMob<_SpecialWi
     @Override
     public <T extends Mob> T convertTo( EntityType<T> entityType, boolean keepEquipment ) {
         final T replacement = super.convertTo( entityType, keepEquipment );
-        if( replacement instanceof ISpecialMob && level instanceof ServerLevelAccessor serverLevel ) {
-            MobHelper.finalizeSpawn( replacement, serverLevel, level.getCurrentDifficultyAt( blockPosition() ),
+        if( replacement instanceof ISpecialMob && level() instanceof ServerLevelAccessor serverLevel ) {
+            MobHelper.finalizeSpawn( replacement, serverLevel, level().getCurrentDifficultyAt( blockPosition() ),
                     MobSpawnType.CONVERSION, null );
         }
         return replacement;
@@ -455,7 +465,7 @@ public class _SpecialWitchEntity extends Witch implements ISpecialMob<_SpecialWi
     /** Called each tick to update this entity's movement. */
     @Override
     public void aiStep() {
-        if( !level.isClientSide() && isAlive() ) {
+        if( !level().isClientSide() && isAlive() ) {
             drinkPotionUpdate();
             fakeDrinkingPotion = true;
         }

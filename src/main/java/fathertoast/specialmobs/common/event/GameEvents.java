@@ -1,7 +1,7 @@
 package fathertoast.specialmobs.common.event;
 
 import fathertoast.specialmobs.common.core.register.SMEffects;
-import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraftforge.event.entity.living.LivingFallEvent;
@@ -15,7 +15,7 @@ public class GameEvents {
     public void onLivingHurt( LivingHurtEvent event ) {
         final LivingEntity entity = event.getEntity();
 
-        if( entity != null && event.getSource() != DamageSource.OUT_OF_WORLD && !event.getSource().isBypassMagic() &&
+        if( entity != null && event.getSource().is( DamageTypeTags.BYPASSES_INVULNERABILITY ) && !event.getSource().is( DamageTypeTags.BYPASSES_EFFECTS ) &&
                 entity.hasEffect( SMEffects.VULNERABILITY.get() ) ) {
 
             final MobEffectInstance vulnerability = entity.getEffect( SMEffects.VULNERABILITY.get() );

@@ -18,11 +18,11 @@ import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.util.TimeUtil;
 import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.damagesource.IndirectEntityDamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -108,8 +108,8 @@ public class EnderCreeperEntity extends _SpecialCreeperEntity implements Neutral
     
     /** Override to load data from this entity's NBT data. */
     public void readVariantSaveData( CompoundTag saveTag ) {
-        if( !level.isClientSide )
-            readPersistentAngerSaveData( level, saveTag );
+        if( !level().isClientSide )
+            readPersistentAngerSaveData( level(), saveTag );
     }
     
     
@@ -176,7 +176,7 @@ public class EnderCreeperEntity extends _SpecialCreeperEntity implements Neutral
         if( tickCount >= lastStareSound + 400 ) {
             lastStareSound = tickCount;
             if( !isSilent() ) {
-                level.playLocalSound( getX(), getEyeY(), getZ(), SoundEvents.ENDERMAN_STARE, getSoundSource(),
+                level().playLocalSound( getX(), getEyeY(), getZ(), SoundEvents.ENDERMAN_STARE, getSoundSource(),
                         2.5F, 1.0F, false );
             }
         }
@@ -185,7 +185,7 @@ public class EnderCreeperEntity extends _SpecialCreeperEntity implements Neutral
     /** Called when a data watcher parameter is changed. */
     @Override
     public void onSyncedDataUpdated( EntityDataAccessor<?> parameter ) {
-        if( DATA_CREEPY.equals( parameter ) && hasBeenStaredAt() && level.isClientSide ) {
+        if( DATA_CREEPY.equals( parameter ) && hasBeenStaredAt() && level().isClientSide ) {
             playStareSound();
         }
         super.onSyncedDataUpdated( parameter );
@@ -216,25 +216,25 @@ public class EnderCreeperEntity extends _SpecialCreeperEntity implements Neutral
     /** Called each tick to update this entity's movement. */
     @Override
     public void aiStep() {
-        if( level.isClientSide ) {
+        if( level().isClientSide ) {
             for( int i = 0; i < 2; ++i ) {
-                level.addParticle( ParticleTypes.PORTAL,
+                level().addParticle( ParticleTypes.PORTAL,
                         getRandomX( 0.5 ), getRandomY() - 0.25, getRandomZ( 0.5 ),
                         (random.nextDouble() - 0.5) * 2.0, -random.nextDouble(), (random.nextDouble() - 0.5) * 2.0 );
             }
         }
         //jumping = false;
-        if( !level.isClientSide ) {
-            updatePersistentAnger( (ServerLevel) level, true );
+        if( !level().isClientSide ) {
+            updatePersistentAnger( (ServerLevel) level(), true );
         }
         super.aiStep();
     }
     
     @Override
     protected void customServerAiStep() {
-        if( level.isDay() && tickCount >= targetChangeTime + 600 ) {
+        if( level().isDay() && tickCount >= targetChangeTime + 600 ) {
             final float brightness = getLightLevelDependentMagicValue();
-            if( brightness > 0.5F && level.canSeeSky( blockPosition() ) && random.nextFloat() * 30.0F < (brightness - 0.4F) * 2.0F ) {
+            if( brightness > 0.5F && level().canSeeSky( blockPosition() ) && random.nextFloat() * 30.0F < (brightness - 0.4F) * 2.0F ) {
                 setTarget( null );
                 teleport();
             }
@@ -246,8 +246,8 @@ public class EnderCreeperEntity extends _SpecialCreeperEntity implements Neutral
     @Override
     public boolean hurt( DamageSource source, float amount ) {
         if( isInvulnerableTo( source ) ) return false;
-        
-        if( source instanceof IndirectEntityDamageSource) {
+
+        if( source.is( DamageTypeTags.IS_PROJECTILE ) ) {
             for( int i = 0; i < 64; ++i ) {
                 if( teleport() ) return true;
             }
@@ -255,7 +255,7 @@ public class EnderCreeperEntity extends _SpecialCreeperEntity implements Neutral
         }
         
         boolean success = super.hurt( source, amount );
-        if( !level.isClientSide() && !(source.getEntity() instanceof LivingEntity) && random.nextInt( 10 ) != 0 ) {
+        if( !level().isClientSide() && !(source.getEntity() instanceof LivingEntity) && random.nextInt( 10 ) != 0 ) {
             teleport();
         }
         return success;
@@ -264,7 +264,7 @@ public class EnderCreeperEntity extends _SpecialCreeperEntity implements Neutral
     /** @return Teleports this "enderman" to a random nearby position; returns true if successful. */
     @SuppressWarnings( "UnusedReturnValue" ) // Keep return value to mirror enderman impl
     protected boolean teleport() {
-        if( level.isClientSide() || !isAlive() ) return false;
+        if( level().isClientSide() || !isAlive() ) return false;
         
         final double x = getX() + (random.nextDouble() - 0.5) * 64.0;
         final double y = getY() + (double) (random.nextInt( 64 ) - 32);
@@ -290,19 +290,19 @@ public class EnderCreeperEntity extends _SpecialCreeperEntity implements Neutral
     protected boolean teleport( double x, double y, double z ) {
         final BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos( x, y, z );
         
-        while( pos.getY() > 0 && !level.getBlockState( pos ).getMaterial().blocksMotion() ) {
+        while( pos.getY() > 0 && !level().getBlockState( pos ).blocksMotion() ) {
             pos.move( Direction.DOWN );
         }
         
-        final BlockState block = level.getBlockState( pos );
-        if( !block.getMaterial().blocksMotion() || block.getFluidState().is( FluidTags.WATER ) ) return false;
+        final BlockState block = level().getBlockState( pos );
+        if( !block.blocksMotion() || block.getFluidState().is( FluidTags.WATER ) ) return false;
         
         EntityTeleportEvent.EnderEntity event = ForgeEventFactory.onEnderTeleport( this, x, y, z );
         if( event.isCanceled() ) return false;
         
         final boolean success = randomTeleport( event.getTargetX(), event.getTargetY(), event.getTargetZ(), true );
         if( success && !isSilent() ) {
-            level.playSound( null, xo, yo, zo, SoundEvents.ENDERMAN_TELEPORT, getSoundSource(),
+            level().playSound( null, xo, yo, zo, SoundEvents.ENDERMAN_TELEPORT, getSoundSource(),
                     1.0F, 1.0F );
             playSound( SoundEvents.ENDERMAN_TELEPORT, 1.0F, 1.0F );
         }
@@ -361,7 +361,7 @@ public class EnderCreeperEntity extends _SpecialCreeperEntity implements Neutral
         /** @return Returns true if this AI can be activated. */
         @Override
         public boolean canUse() {
-            pendingTarget = creeper.level.getNearestPlayer( startAggroTargetConditions, creeper );
+            pendingTarget = creeper.level().getNearestPlayer( startAggroTargetConditions, creeper );
             return pendingTarget != null;
         }
         

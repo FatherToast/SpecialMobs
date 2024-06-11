@@ -132,7 +132,7 @@ public class BlueberrySlimeEntity extends _SpecialSlimeEntity {
         }
         if( tickCount > 1 && getFluidTypeHeight( ForgeMod.WATER_TYPE.get() ) > 0.0 ) {
             if( !CollisionContext.of( this ).isAbove( LiquidBlock.STABLE_SHAPE, blockPosition(), true ) ||
-                    level.getFluidState( blockPosition().above() ).is( FluidTags.WATER ) ) {
+                    level().getFluidState( blockPosition().above() ).is( FluidTags.WATER ) ) {
                 setDeltaMovement( getDeltaMovement().scale( 0.5 ).add( 0.0, floatAccel, 0.0 ) );
             }
         }

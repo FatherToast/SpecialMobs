@@ -113,7 +113,7 @@ public class _SpecialCaveSpiderEntity extends CaveSpider implements RangedAttack
         final BugSpitEntity spit = new BugSpitEntity( this, target );
         spit.setColor( getVariantSpitColor() );
         playSound( SoundEvents.SPIDER_HURT, 0.6F, random.nextFloat() * 0.4F + 1.6F );
-        level.addFreshEntity( spit );
+        level().addFreshEntity( spit );
     }
     
     /** Override to change the color of this entity's spit attack. */
@@ -182,8 +182,8 @@ public class _SpecialCaveSpiderEntity extends CaveSpider implements RangedAttack
     @Override
     public <T extends Mob> T convertTo( EntityType<T> entityType, boolean keepEquipment ) {
         final T replacement = super.convertTo( entityType, keepEquipment );
-        if( replacement instanceof ISpecialMob && level instanceof ServerLevelAccessor serverLevel ) {
-            MobHelper.finalizeSpawn( replacement, serverLevel, level.getCurrentDifficultyAt( blockPosition() ),
+        if( replacement instanceof ISpecialMob && level() instanceof ServerLevelAccessor serverLevel ) {
+            MobHelper.finalizeSpawn( replacement, serverLevel, level().getCurrentDifficultyAt( blockPosition() ),
                     MobSpawnType.CONVERSION, null );
         }
         return replacement;

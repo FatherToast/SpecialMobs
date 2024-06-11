@@ -104,10 +104,10 @@ public class SniperSkeletonEntity extends _SpecialSkeletonEntity {
             arrow = ((BowItem) getMainHandItem().getItem()).customArrow( arrow );
         
         arrow.shoot( dX / dH * vH, vY, dZ / dH * vH, v,
-                getSpecialData().getRangedAttackSpread() * (14 - 4 * level.getDifficulty().getId()) );
+                getSpecialData().getRangedAttackSpread() * (14 - 4 * level().getDifficulty().getId()) );
         
         playSound( SoundEvents.SKELETON_SHOOT, 1.0F, 1.0F / (random.nextFloat() * 0.4F + 0.8F) );
-        level.addFreshEntity( arrow );
+        level().addFreshEntity( arrow );
     }
     
     /** Override to modify this entity's ranged attack projectile. */

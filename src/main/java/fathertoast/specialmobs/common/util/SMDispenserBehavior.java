@@ -22,7 +22,7 @@ public class SMDispenserBehavior {
                 final double y = pos.y();
                 final double z = pos.z();
                 LivingEntity nearestEntity = level.getNearestEntity(LivingEntity.class, TargetingConditions.DEFAULT, null, x, y, z,
-                        new AABB(new BlockPos(x + 0.5D, y + 0.5D, z + 0.5D)).inflate(50.0F));
+                        new AABB(BlockPos.containing(x + 0.5D, y + 0.5D, z + 0.5D)).inflate(50.0F));
 
                 return new IncorporealFireballEntity(level, null, nearestEntity, x, y, z);
             }

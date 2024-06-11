@@ -79,12 +79,12 @@ public class UndeadWitchEntity extends _SpecialWitchEntity {
         if( summons > 0 && random.nextFloat() < (isNearSkeletons() ? 0.25F : 0.75F) ) {
             summons--;
             
-            final _SpecialSkeletonEntity skeleton = _SpecialSkeletonEntity.SPECIES.entityType.get().create( level );
+            final _SpecialSkeletonEntity skeleton = _SpecialSkeletonEntity.SPECIES.entityType.get().create( level() );
             if( skeleton != null ) {
                 skeleton.copyPosition( this );
                 skeleton.yHeadRot = getYRot();
                 skeleton.yBodyRot = getYRot();
-                skeleton.finalizeSpawn( (ServerLevelAccessor) level, level.getCurrentDifficultyAt( blockPosition() ),
+                skeleton.finalizeSpawn( (ServerLevelAccessor) level(), level().getCurrentDifficultyAt( blockPosition() ),
                         MobSpawnType.MOB_SUMMONED, null, null );
                 skeleton.setItemSlot( EquipmentSlot.MAINHAND, new ItemStack( Items.IRON_SWORD ) );
                 skeleton.setItemSlot( EquipmentSlot.HEAD, new ItemStack( Items.CHAINMAIL_HELMET ) );
@@ -98,8 +98,8 @@ public class UndeadWitchEntity extends _SpecialWitchEntity {
                         0.4, // Used to cause floor clip bug; remove if it happens again
                         vZ / vH * 0.7 + getDeltaMovement().z * 0.2 );
                 skeleton.setOnGround( false );
-                
-                level.addFreshEntity( skeleton );
+
+                level().addFreshEntity( skeleton );
                 playSound( SoundEvents.BLAZE_SHOOT, 1.0F, 2.0F / (random.nextFloat() * 0.4F + 0.8F) );
                 skeleton.spawnAnim();
                 
@@ -113,7 +113,7 @@ public class UndeadWitchEntity extends _SpecialWitchEntity {
     
     /** @return True if there are any skeletons near this entity. */
     private boolean isNearSkeletons() {
-        return level.getEntitiesOfClass( AbstractSkeleton.class, getBoundingBox().inflate( 11.0 ) ).size() > 0;
+        return level().getEntitiesOfClass( AbstractSkeleton.class, getBoundingBox().inflate( 11.0 ) ).size() > 0;
     }
     
     /** @return This entity's creature type. */

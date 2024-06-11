@@ -3,7 +3,7 @@ package fathertoast.specialmobs.datagen;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.core.SpecialMobs;
 import fathertoast.specialmobs.common.core.register.SMItems;
-import net.minecraft.data.DataGenerator;
+import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.client.model.generators.ItemModelProvider;
@@ -14,8 +14,8 @@ import java.util.Objects;
 
 public class SMItemModelProvider extends ItemModelProvider {
     
-    public SMItemModelProvider( DataGenerator gen, ExistingFileHelper existingFileHelper ) {
-        super( gen, SpecialMobs.MOD_ID, existingFileHelper );
+    public SMItemModelProvider(PackOutput output, ExistingFileHelper existingFileHelper ) {
+        super( output, SpecialMobs.MOD_ID, existingFileHelper );
     }
     
     @Override

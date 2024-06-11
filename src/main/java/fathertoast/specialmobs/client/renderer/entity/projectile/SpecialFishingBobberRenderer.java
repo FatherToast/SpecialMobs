@@ -2,9 +2,7 @@ package fathertoast.specialmobs.client.renderer.entity.projectile;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.mojang.math.Matrix3f;
-import com.mojang.math.Matrix4f;
-import com.mojang.math.Vector3f;
+import com.mojang.math.Axis;
 import fathertoast.specialmobs.common.entity.projectile.SpecialFishingBobberEntity;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
@@ -17,6 +15,8 @@ import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import org.joml.Matrix3f;
+import org.joml.Matrix4f;
 
 public class SpecialFishingBobberRenderer extends EntityRenderer<SpecialFishingBobberEntity> {
     private static final ResourceLocation TEXTURE_LOCATION = new ResourceLocation( "textures/entity/fishing_hook.png" );
@@ -36,7 +36,7 @@ public class SpecialFishingBobberRenderer extends EntityRenderer<SpecialFishingB
         poseStack.pushPose();
         poseStack.scale( 0.5F, 0.5F, 0.5F );
         poseStack.mulPose( entityRenderDispatcher.cameraOrientation() );
-        poseStack.mulPose( Vector3f.YP.rotationDegrees( 180.0F ) );
+        poseStack.mulPose( Axis.YP.rotationDegrees( 180.0F ) );
         final PoseStack.Pose matrixEntry = poseStack.last();
         drawQuad( buffer.getBuffer( RENDER_TYPE ), matrixEntry.pose(), matrixEntry.normal(), packedLight );
         poseStack.popPose();
@@ -74,7 +74,7 @@ public class SpecialFishingBobberRenderer extends EntityRenderer<SpecialFishingB
     }
     
     /** Creates the vertexes for a quad. */
-    private static void drawQuad( VertexConsumer vertexConsumer, Matrix4f pose, Matrix3f normal, int packedLight ) {
+    private static void drawQuad(VertexConsumer vertexConsumer, Matrix4f pose, Matrix3f normal, int packedLight ) {
         quadVertex( vertexConsumer, pose, normal, packedLight, 0.0F, 0.0F, 0, 1 );
         quadVertex( vertexConsumer, pose, normal, packedLight, 1.0F, 0.0F, 1, 1 );
         quadVertex( vertexConsumer, pose, normal, packedLight, 1.0F, 1.0F, 1, 0 );

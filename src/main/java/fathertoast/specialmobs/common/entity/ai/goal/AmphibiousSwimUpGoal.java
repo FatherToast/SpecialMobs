@@ -27,7 +27,7 @@ public class AmphibiousSwimUpGoal<T extends PathfinderMob & IAmphibiousMob> exte
     public AmphibiousSwimUpGoal( T entity, double speed ) {
         mob = entity;
         speedModifier = speed;
-        seaLevel = entity.level.getSeaLevel() - 1;
+        seaLevel = entity.level().getSeaLevel() - 1;
     }
     
     /** Builder that allows this goal to run during the day. */
@@ -38,7 +38,7 @@ public class AmphibiousSwimUpGoal<T extends PathfinderMob & IAmphibiousMob> exte
     
     /** @return Returns true if this AI can be activated. */
     @Override
-    public boolean canUse() { return !(disableAtDay && mob.level.isDay()) && mob.isInWater() && mob.getY() < seaLevel - 1; }
+    public boolean canUse() { return !(disableAtDay && mob.level().isDay()) && mob.isInWater() && mob.getY() < seaLevel - 1; }
     
     /** @return Called each update while active and returns true if this AI can remain active. */
     @Override

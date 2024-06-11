@@ -32,14 +32,14 @@ public class PotionSlimeSpeciesConfig extends SpeciesConfig {
                     "Options specific to " + speciesName + "." );
             
             allowedPotions = SPEC.define( new LazyRegistryEntryListField<>( "allowed_effects",
-                    new LazyRegistryEntryList<>( ForgeRegistries.MOB_EFFECTS, false, new MobEffect[] {
+                    new LazyRegistryEntryList<>( ForgeRegistries.MOB_EFFECTS, false, new Object[] {
                             MobEffects.MOVEMENT_SPEED, MobEffects.MOVEMENT_SLOWDOWN,
                             MobEffects.DIG_SPEED, MobEffects.DIG_SLOWDOWN,
                             MobEffects.DAMAGE_BOOST, MobEffects.WEAKNESS,
                             MobEffects.HEAL, MobEffects.HARM, MobEffects.HUNGER,
                             MobEffects.REGENERATION, MobEffects.POISON, MobEffects.WITHER,
-                            MobEffects.JUMP, MobEffects.LEVITATION, MobEffects.SLOW_FALLING, SMEffects.WEIGHT.get(),
-                            MobEffects.DAMAGE_RESISTANCE, SMEffects.VULNERABILITY.get(),
+                            MobEffects.JUMP, MobEffects.LEVITATION, MobEffects.SLOW_FALLING, SMEffects.WEIGHT,
+                            MobEffects.DAMAGE_RESISTANCE, SMEffects.VULNERABILITY,
                             MobEffects.FIRE_RESISTANCE, MobEffects.WATER_BREATHING,
                             MobEffects.BLINDNESS, MobEffects.NIGHT_VISION, MobEffects.CONFUSION,
                             MobEffects.HEALTH_BOOST, MobEffects.ABSORPTION,

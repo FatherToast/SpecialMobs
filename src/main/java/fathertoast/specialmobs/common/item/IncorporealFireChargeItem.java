@@ -11,7 +11,6 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.ProjectileUtil;
-import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -29,7 +28,7 @@ public class IncorporealFireChargeItem extends Item {
                 "", "", "", "", "", "" );//TODO
     }
     
-    public IncorporealFireChargeItem() { super( new Item.Properties().tab( CreativeModeTab.TAB_MISC ) ); }
+    public IncorporealFireChargeItem() { super( new Item.Properties() ); }
     
     @Override
     public InteractionResultHolder<ItemStack> use( Level level, Player player, InteractionHand hand ) {
@@ -61,7 +60,7 @@ public class IncorporealFireChargeItem extends Item {
         final Vec3 viewVec = player.getViewVector( 1.0F ).scale( range );
         
         final AABB box = player.getBoundingBox().expandTowards( viewVec ).inflate( 1.0 );
-        final EntityHitResult result = ProjectileUtil.getEntityHitResult( player.level, player, eyePos, eyePos.add( viewVec ), box,
+        final EntityHitResult result = ProjectileUtil.getEntityHitResult( player.level(), player, eyePos, eyePos.add( viewVec ), box,
                 ( entity ) -> !entity.isSpectator() && entity.isAlive() && entity.isPickable() && !player.isPassengerOfSameVehicle( entity ) );
         
         return result == null ? null : result.getEntity();

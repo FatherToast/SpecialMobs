@@ -36,7 +36,7 @@ public class NinjaSkeletonRenderer extends SpecialSkeletonRenderer {
         }
         else {
             shadowRadius = 0.0F;
-            renderBlockDisguise( disguiseBlock, entity.blockPosition(), entity.level, matrixStack, buffer, entity.getRandom() );
+            renderBlockDisguise( disguiseBlock, entity.blockPosition(), entity.level(), matrixStack, buffer, entity.getRandom() );
         }
     }
     

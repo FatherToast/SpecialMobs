@@ -171,7 +171,7 @@ public class BestiaryInfo {
     private BestiaryInfo( int eggColor, float scale, DefaultWeight weight, Theme spawnTheme, List<AttributeEntry> attributes,
                           ResourceLocation tex, ResourceLocation eyeTex, ResourceLocation ovrTex,
                           int xp, int regen, double fallDmg, boolean fireImm, boolean burnImm, boolean drownImm, boolean pushImm,
-                          boolean waterDmg, boolean leash, boolean plateImm, Block[] blockImm, MobEffect[] effectImm,
+                          boolean waterDmg, boolean leash, boolean plateImm, Block[] blockImm, Object[] effectImm,
                           double raDmg, double raVar, double raSpd, int raCD, int raMCD, double raRng ) {
         eggSpotsColor = eggColor;
         baseScale = scale;
@@ -235,7 +235,7 @@ public class BestiaryInfo {
         private boolean allowLeashing;
         private boolean ignorePressurePlates;
         private final ArrayList<Block> immuneToStickyBlocks = new ArrayList<>();
-        private final ArrayList<MobEffect> immuneToPotions = new ArrayList<>();
+        private final ArrayList<Object> immuneToPotions = new ArrayList<>();
         private double rangedAttackDamage = -1.0;
         private double rangedAttackSpread = -1.0;
         private double rangedWalkSpeed = -1.0;
@@ -287,7 +287,7 @@ public class BestiaryInfo {
             
             return new BestiaryInfo( eggSpotsColor, baseScale, defaultWeight, spawnTheme, attributes, texture, eyesTexture, overlayTexture,
                     experience, healTime, fallDamageMultiplier, isImmuneToFire, isImmuneToBurning, canBreatheInWater, ignoreWaterPush, isDamagedByWater,
-                    allowLeashing, ignorePressurePlates, immuneToStickyBlocks.toArray(new Block[0]), immuneToPotions.toArray(new MobEffect[0]),
+                    allowLeashing, ignorePressurePlates, immuneToStickyBlocks.toArray(new Block[0]), immuneToPotions.toArray(),
                     rangedAttackDamage, rangedAttackSpread, rangedWalkSpeed, rangedAttackCooldown, rangedAttackMaxCooldown, rangedAttackMaxRange );
         }
         
@@ -551,7 +551,7 @@ public class BestiaryInfo {
          * Sets the species as immune to a specific list of effects.
          * Acceptable argument types are {@code Effect}, {@code RegistryObject<Effect>}, {@code ResourceLocation}, or {@code String}.
          */
-        public Builder effectImmune( MobEffect... effects ) {
+        public Builder effectImmune( Object... effects ) {
             immuneToPotions.addAll( Arrays.asList( effects ) );
             return this;
         }

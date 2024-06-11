@@ -3,6 +3,7 @@ package fathertoast.specialmobs.common.entity.projectile;
 import fathertoast.specialmobs.common.core.register.SMEntities;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -21,10 +22,10 @@ public class BoneShrapnelEntity extends AbstractArrow {
     
     //public BoneShrapnelEntity( World world, double x, double y, double z ) { super( SMEntities.BONE_SHRAPNEL.get(), x, y, z, world ); }
     
-    public BoneShrapnelEntity( LivingEntity shooter ) { super( SMEntities.BONE_SHRAPNEL.get(), shooter, shooter.level ); }
+    public BoneShrapnelEntity( LivingEntity shooter ) { super( SMEntities.BONE_SHRAPNEL.get(), shooter, shooter.level() ); }
     
     @Override
-    public Packet<?> getAddEntityPacket() { return NetworkHooks.getEntitySpawningPacket( this ); }
+    public Packet<ClientGamePacketListener> getAddEntityPacket() { return NetworkHooks.getEntitySpawningPacket( this ); }
     
     /** Called each tick this arrow is in the ground. */
     @Override

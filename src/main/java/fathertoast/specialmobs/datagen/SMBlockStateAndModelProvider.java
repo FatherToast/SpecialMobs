@@ -4,7 +4,7 @@ import fathertoast.specialmobs.common.block.MeltingIceBlock;
 import fathertoast.specialmobs.common.block.UnderwaterSilverfishBlock;
 import fathertoast.specialmobs.common.core.SpecialMobs;
 import fathertoast.specialmobs.common.core.register.SMBlocks;
-import net.minecraft.data.DataGenerator;
+import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -24,8 +24,8 @@ public class SMBlockStateAndModelProvider extends BlockStateProvider {
 
 
 
-    public SMBlockStateAndModelProvider( DataGenerator gen, ExistingFileHelper existingFileHelper ) {
-        super( gen, SpecialMobs.MOD_ID, existingFileHelper );
+    public SMBlockStateAndModelProvider(PackOutput output, ExistingFileHelper existingFileHelper ) {
+        super( output, SpecialMobs.MOD_ID, existingFileHelper );
     }
     
     @Override

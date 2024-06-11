@@ -101,7 +101,7 @@ public class FrozenZombieEntity extends _SpecialZombieEntity {
     /** Called each tick to update this entity's movement. */
     @Override
     public void aiStep() {
-        if( !level.isClientSide() && wasBurning != (getRemainingFireTicks() > 0) ) {
+        if( !level().isClientSide() && wasBurning != (getRemainingFireTicks() > 0) ) {
             wasBurning = !wasBurning;
             final AttributeInstance attributeInstance = getAttribute( Attributes.MOVEMENT_SPEED );
             //noinspection ConstantConditions

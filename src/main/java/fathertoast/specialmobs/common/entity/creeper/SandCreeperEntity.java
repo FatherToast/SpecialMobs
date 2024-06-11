@@ -7,6 +7,7 @@ import fathertoast.specialmobs.common.util.ExplosionHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import net.minecraft.core.BlockPos;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
@@ -23,7 +24,6 @@ import net.minecraft.world.level.block.BucketPickup;
 import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.Material;
 import net.minecraft.world.level.storage.ServerLevelData;
 
 import java.util.List;
@@ -78,9 +78,9 @@ public class SandCreeperEntity extends _SpecialCreeperEntity {
         final Explosion.BlockInteraction explosionMode = ExplosionHelper.getMode( this );
         
         // Clear water before running the explosion so it can't shield blocks from damage
-        if( explosionMode != Explosion.BlockInteraction.NONE ) {
+        if( explosionMode != Explosion.BlockInteraction.KEEP ) {
             final int radius = (int) Math.floor( explosionPower ) + 2;
-            final BlockPos center = new BlockPos( position() );
+            final BlockPos center = BlockPos.containing( position() );
             
             for( int y = -radius; y <= radius; y++ ) {
                 for( int x = -radius; x <= radius; x++ ) {
@@ -98,7 +98,7 @@ public class SandCreeperEntity extends _SpecialCreeperEntity {
         explosion.finalizeExplosion();
         
         // Clear weather
-        if( isPowered() && level.getLevelData() instanceof ServerLevelData serverData ) {
+        if( isPowered() && level().getLevelData() instanceof ServerLevelData serverData ) {
             serverData.setClearWeatherTime( random.nextInt( 12000 ) + 3600 );
             serverData.setRainTime( 0 );
             serverData.setRaining( false );
@@ -108,27 +108,26 @@ public class SandCreeperEntity extends _SpecialCreeperEntity {
     }
     
     private void clearWater( BlockPos pos ) {
-        if( !level.getFluidState( pos ).is( FluidTags.WATER ) ) return;
+        if( !level().getFluidState( pos ).is( FluidTags.WATER ) ) return;
         
-        final BlockState block = level.getBlockState( pos );
+        final BlockState block = level().getBlockState( pos );
         
         
         if( block.getBlock() instanceof BucketPickup bucketPickup &&
-                bucketPickup.pickupBlock( level, pos, block ) != ItemStack.EMPTY ) {
+                bucketPickup.pickupBlock( level(), pos, block ) != ItemStack.EMPTY ) {
             // Removed through bucket pickup handler
             return;
         }
         
         if( block.getBlock() instanceof LiquidBlock ) {
-            level.setBlock( pos, Blocks.AIR.defaultBlockState(), References.SetBlockFlags.DEFAULTS );
+            level().setBlock( pos, Blocks.AIR.defaultBlockState(), References.SetBlockFlags.DEFAULTS );
             return;
         }
         
-        final Material material = block.getMaterial();
-        if( material == Material.WATER_PLANT || material == Material.REPLACEABLE_WATER_PLANT ) {
-            final BlockEntity blockEntity = block.hasBlockEntity() ? level.getExistingBlockEntity( pos ) : null;
-            Block.dropResources( block, level, pos, blockEntity );
-            level.setBlock( pos, Blocks.AIR.defaultBlockState(), References.SetBlockFlags.DEFAULTS );
+        if( block.is(BlockTags.REPLACEABLE ) ) {
+            final BlockEntity blockEntity = block.hasBlockEntity() ? level().getExistingBlockEntity( pos ) : null;
+            Block.dropResources( block, level(), pos, blockEntity );
+            level().setBlock( pos, Blocks.AIR.defaultBlockState(), References.SetBlockFlags.DEFAULTS );
         }
     }
     

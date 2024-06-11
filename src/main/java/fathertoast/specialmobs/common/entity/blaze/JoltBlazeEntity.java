@@ -9,9 +9,9 @@ import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.damagesource.IndirectEntityDamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LightningBolt;
@@ -69,7 +69,7 @@ public class JoltBlazeEntity extends _SpecialBlazeEntity {
     /** Called each tick to update this entity's movement. */
     @Override
     public void aiStep() {
-        if( !level.isClientSide() && isAlive() && getTarget() != null && random.nextInt( 20 ) == 0 &&
+        if( !level().isClientSide() && isAlive() && getTarget() != null && random.nextInt( 20 ) == 0 &&
                 distanceToSqr( getTarget() ) > 256.0 ) {
             for( int i = 0; i < 16; i++ ) {
                 if( teleportTowards( getTarget() ) ) break;
@@ -81,9 +81,9 @@ public class JoltBlazeEntity extends _SpecialBlazeEntity {
     /** @return Attempts to damage this entity; returns true if the hit was successful. */
     @Override
     public boolean hurt(DamageSource source, float amount ) {
-        if( isInvulnerableTo( source ) || fireImmune() && source.isFire() ) return false;
+        if( isInvulnerableTo( source ) || fireImmune() && source.is( DamageTypeTags.IS_FIRE ) ) return false;
         
-        if( source instanceof IndirectEntityDamageSource) {
+        if( source.is( DamageTypeTags.IS_PROJECTILE ) ) {
             for( int i = 0; i < 64; i++ ) {
                 if( teleport() ) return true;
             }
@@ -91,7 +91,7 @@ public class JoltBlazeEntity extends _SpecialBlazeEntity {
         }
         
         final boolean success = super.hurt( source, amount );
-        if( !level.isClientSide() && getHealth() > 0.0F ) {
+        if( !level().isClientSide() && getHealth() > 0.0F ) {
             if( source.getEntity() instanceof LivingEntity) {
                 for( int i = 0; i < 16; i++ ) {
                     if( teleport() ) break;
@@ -110,7 +110,7 @@ public class JoltBlazeEntity extends _SpecialBlazeEntity {
     
     /** @return Teleports this "enderman" to a random nearby position; returns true if successful. */
     protected boolean teleport() {
-        if( level.isClientSide() || !isAlive() ) return false;
+        if( level().isClientSide() || !isAlive() ) return false;
         
         final double x = getX() + (random.nextDouble() - 0.5) * 32.0;
         final double y = getY() + (double) (random.nextInt( 16 ) - 8);
@@ -136,20 +136,20 @@ public class JoltBlazeEntity extends _SpecialBlazeEntity {
     protected boolean teleport( double x, double y, double z ) {
         final BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos( x, y, z );
         
-        while( pos.getY() > 0 && !level.getBlockState( pos ).getMaterial().blocksMotion() ) {
+        while( pos.getY() > 0 && !level().getBlockState( pos ).blocksMotion() ) {
             pos.move( Direction.DOWN );
         }
         
-        final BlockState block = level.getBlockState( pos );
-        if( !block.getMaterial().blocksMotion() || block.getFluidState().is( FluidTags.WATER ) ) return false;
+        final BlockState block = level().getBlockState( pos );
+        if( !block.blocksMotion() || block.getFluidState().is( FluidTags.WATER ) ) return false;
         
         EntityTeleportEvent.EnderEntity event = ForgeEventFactory.onEnderTeleport( this, x, y, z );
         if( event.isCanceled() ) return false;
         
         final boolean success = randomTeleport( event.getTargetX(), event.getTargetY(), event.getTargetZ(), false );
         if( success ) {
-            ExplosionHelper.spawnLightning( level, xo, yo, zo );
-            ExplosionHelper.spawnLightning( level, getX(), getY(), getZ() );
+            ExplosionHelper.spawnLightning( level(), xo, yo, zo );
+            ExplosionHelper.spawnLightning( level(), getX(), getY(), getZ() );
         }
         return success;
     }

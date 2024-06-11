@@ -66,7 +66,7 @@ public class AnglerGoal<T extends Mob & ISpecialMob<? super T> & IAngler> extend
                 
                 final SpecialFishingBobberEntity newBobber = new SpecialFishingBobberEntity( mob, target );
                 mob.playSound( SoundEvents.FISHING_BOBBER_THROW, 1.0F, 0.4F / (mob.getRandom().nextFloat() * 0.4F + 0.8F) );
-                mob.level.addFreshEntity( newBobber );
+                mob.level().addFreshEntity( newBobber );
                 setBobber( newBobber );
             }
         }

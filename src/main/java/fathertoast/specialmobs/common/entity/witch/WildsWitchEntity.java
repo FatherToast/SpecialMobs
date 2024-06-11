@@ -11,6 +11,7 @@ import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -116,13 +117,13 @@ public class WildsWitchEntity extends _SpecialWitchEntity {
     /** Helper method to simplify spawning babies. */
     @Nullable
     private SpawnGroupData spawnBaby( @Nullable SpawnGroupData groupData ) {
-        final BabySpiderEntity baby = BabySpiderEntity.SPECIES.entityType.get().create( level );
+        final BabySpiderEntity baby = BabySpiderEntity.SPECIES.entityType.get().create( level() );
         if( baby == null ) return groupData;
         
         baby.copyPosition( this );
         baby.yHeadRot = getYRot();
         baby.yBodyRot = getYRot();
-        groupData = baby.finalizeSpawn( (ServerLevelAccessor) level, level.getCurrentDifficultyAt( blockPosition() ),
+        groupData = baby.finalizeSpawn( (ServerLevelAccessor) level(), level().getCurrentDifficultyAt( blockPosition() ),
                 MobSpawnType.MOB_SUMMONED, groupData, null );
         baby.setTarget( getTarget() );
         
@@ -132,7 +133,7 @@ public class WildsWitchEntity extends _SpecialWitchEntity {
                 (random.nextDouble() - 0.5) * 0.33 );
         baby.setOnGround( false );
         
-        level.addFreshEntity( baby );
+        level().addFreshEntity( baby );
         return groupData;
     }
     
@@ -146,7 +147,7 @@ public class WildsWitchEntity extends _SpecialWitchEntity {
             usePotion( makeSplashPotion( Potions.WATER_BREATHING ) );
         }
         else if( mount != null && random.nextFloat() < 0.15F && (mount.isOnFire() || mount.getLastDamageSource() != null &&
-                mount.getLastDamageSource().isFire()) && !hasEffect( MobEffects.FIRE_RESISTANCE ) ) {
+                mount.getLastDamageSource().is( DamageTypeTags.IS_FIRE )) && !hasEffect( MobEffects.FIRE_RESISTANCE ) ) {
             usePotion( makeSplashPotion( Potions.FIRE_RESISTANCE ) );
         }
         else if( mount != null && random.nextFloat() < 0.05F && mount.getMobType() != MobType.UNDEAD &&
@@ -159,20 +160,20 @@ public class WildsWitchEntity extends _SpecialWitchEntity {
         }
         else if( spiderMounts > 0 && random.nextFloat() < 0.15F && getVehicle() == null && getTarget() != null &&
                 getTarget().distanceToSqr( this ) > 100.0 ) {
-            final _SpecialSpiderEntity spider = _SpecialSpiderEntity.SPECIES.entityType.get().create( level );
+            final _SpecialSpiderEntity spider = _SpecialSpiderEntity.SPECIES.entityType.get().create( level() );
             if( spider != null ) {
                 spider.copyPosition( this );
                 spider.yHeadRot = getYRot();
                 spider.yBodyRot = getYRot();
                 
-                if( level.noCollision( spider.getBoundingBox() ) ) {
+                if( level().noCollision( spider.getBoundingBox() ) ) {
                     spiderMounts--;
                     potionUseCooldownTimer = 40;
                     
                     spider.setTarget( getTarget() );
-                    spider.finalizeSpawn( (ServerLevelAccessor) level, level.getCurrentDifficultyAt( blockPosition() ),
+                    spider.finalizeSpawn( (ServerLevelAccessor) level(), level().getCurrentDifficultyAt( blockPosition() ),
                             MobSpawnType.MOB_SUMMONED, null, null );
-                    level.addFreshEntity( spider );
+                    level().addFreshEntity( spider );
                     spider.spawnAnim();
                     playSound( SoundEvents.BLAZE_SHOOT, 1.0F, 2.0F / (random.nextFloat() * 0.4F + 0.8F) );
                     

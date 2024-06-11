@@ -63,7 +63,7 @@ public class SpitfireSkeletonEntity extends _SpecialSkeletonEntity {
     
     public SpitfireSkeletonEntity( EntityType<? extends _SpecialSkeletonEntity> entityType, Level level ) {
         super( entityType, level );
-        maxUpStep = 1.0F;
+        setMaxUpStep( 1.0F );
     }
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
@@ -84,9 +84,9 @@ public class SpitfireSkeletonEntity extends _SpecialSkeletonEntity {
             final double dY = target.getEyeY() - getEyeY();
             final double dZ = target.getZ() - getZ() + getRandom().nextGaussian() * accelVariance;
             
-            final SmallFireball fireball = new SmallFireball( level, this, dX, dY, dZ );
+            final SmallFireball fireball = new SmallFireball( level(), this, dX, dY, dZ );
             fireball.setPos( fireball.getX(), getEyeY() - 0.1, fireball.getZ() );
-            level.addFreshEntity( fireball );
+            level().addFreshEntity( fireball );
         }
     }
     

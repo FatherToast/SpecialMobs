@@ -123,8 +123,8 @@ public class HuskZombieEntity extends _SpecialZombieEntity {
     @Override
     protected EntityType<? extends Zombie> getVariantConversionType() {
         // Select a random non-husk, non-water-sensitive zombie; defaults to a normal zombie
-        return getConfig().HUSK.convertVariantChance.rollChance( random, level, blockPosition() ) ?
-                MobFamily.ZOMBIE.nextVariant( level, blockPosition(), HUSK_CONVERSION_SELECTOR, _SpecialZombieEntity.SPECIES ).entityType.get() :
+        return getConfig().HUSK.convertVariantChance.rollChance( random, level(), blockPosition() ) ?
+                MobFamily.ZOMBIE.nextVariant( level(), blockPosition(), HUSK_CONVERSION_SELECTOR, _SpecialZombieEntity.SPECIES ).entityType.get() :
                 _SpecialZombieEntity.SPECIES.entityType.get();
     }
     
