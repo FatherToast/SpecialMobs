@@ -15,10 +15,7 @@ import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LightLayer;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.IceBlock;
-import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
@@ -26,7 +23,6 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
-import net.minecraft.world.level.material.FlowingFluid;
 import net.minecraft.world.phys.HitResult;
 
 import javax.annotation.Nullable;
@@ -44,7 +40,7 @@ public class MeltingIceBlock extends IceBlock {
         final BlockState currentBlock = level.getBlockState( pos );
         return SMBlocks.MELTING_ICE.get().defaultBlockState().setValue( HAS_WATER,
                 currentBlock.is( Blocks.FROSTED_ICE ) ||
-                        currentBlock.getBlock() == Blocks.WATER && currentBlock.getValue( FlowingFluid.LEVEL ) == 0 );
+                        currentBlock.getBlock() == Blocks.WATER && currentBlock.getValue( LiquidBlock.LEVEL ) == 0 );
     }
     
     /** Call this after placing a melting ice block to trigger its melting logic. */
