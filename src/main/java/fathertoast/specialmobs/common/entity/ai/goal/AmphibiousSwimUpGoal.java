@@ -70,7 +70,12 @@ public class AmphibiousSwimUpGoal<T extends PathfinderMob & IAmphibiousMob> exte
         }
         
     }
-    
+
+    @Override
+    public boolean requiresUpdateEveryTick() {
+        return true;
+    }
+
     /** @return True if the entity is within 2 blocks of its pathing target. */
     private boolean closeToNextPos() {
         final Path path = mob.getNavigation().getPath();

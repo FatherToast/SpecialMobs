@@ -68,7 +68,6 @@ public class SpecialGhastMeleeAttackGoal extends Goal {
             }
         }
         
-        
         // Attack the target when able
         final double rangeDiff = target.distanceToSqr( ghast ) -
                 ((ghast.getBbWidth() * ghast.getBbWidth() + target.getBbWidth() * target.getBbWidth()) / 4.0 + 5.0);
@@ -82,8 +81,13 @@ public class SpecialGhastMeleeAttackGoal extends Goal {
         
         ghast.setCharging( attackTimer < 6 && rangeDiff <= 10.0 );
     }
-    
-    private void setWantedPosition( LivingEntity target ) {
+
+    @Override
+    public boolean requiresUpdateEveryTick() {
+        return true;
+    }
+
+    private void setWantedPosition(LivingEntity target ) {
         ghast.getMoveControl().setWantedPosition( target.getX(), target.getY( 0.5 ), target.getZ(), 1.2 );
     }
     

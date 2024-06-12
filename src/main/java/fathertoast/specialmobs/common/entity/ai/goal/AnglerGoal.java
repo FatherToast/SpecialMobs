@@ -72,4 +72,9 @@ public class AnglerGoal<T extends Mob & ISpecialMob<? super T> & IAngler> extend
         }
         else if( castTime > 0 ) castTime--;
     }
+
+    @Override
+    public boolean requiresUpdateEveryTick() {
+        return true;
+    }
 }

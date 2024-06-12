@@ -30,11 +30,6 @@ public class SpecialGhastFireballAttackGoal extends Goal {
     @Override
     public void stop() { ghast.setCharging( false ); }
 
-    @Override
-    public boolean requiresUpdateEveryTick() {
-        return true;
-    }
-
     /** Called each tick while this AI is active. */
     @Override
     public void tick() {
@@ -58,4 +53,10 @@ public class SpecialGhastFireballAttackGoal extends Goal {
         }
         ghast.setCharging( chargeTime > (data.getRangedAttackCooldown() >> 1) );
     }
+
+    @Override
+    public boolean requiresUpdateEveryTick() {
+        return true;
+    }
+
 }

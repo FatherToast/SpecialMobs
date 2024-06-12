@@ -40,6 +40,11 @@ public class SpecialGhastLookAroundGoal extends Goal {
         // Allow move direction facing even if target exists out of attack range
         setFacing( ghast.getDeltaMovement().x, ghast.getDeltaMovement().z );
     }
+
+    @Override
+    public boolean requiresUpdateEveryTick() {
+        return true;
+    }
     
     private void setFacing( double x, double z ) {
         ghast.setYRot((float) Mth.atan2( x, z ) * -180.0F / (float) Math.PI);

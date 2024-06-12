@@ -95,8 +95,13 @@ public class SpecialBlazeAttackGoal extends Goal {
         
         super.tick();
     }
-    
-    protected double getAttackReachSqr( LivingEntity target ) {
+
+    @Override
+    public boolean requiresUpdateEveryTick() {
+        return true;
+    }
+
+    protected double getAttackReachSqr(LivingEntity target ) {
         return blaze.getBbWidth() * blaze.getBbWidth() * 4.0F + target.getBbWidth() + 2.0F;
     }
 }

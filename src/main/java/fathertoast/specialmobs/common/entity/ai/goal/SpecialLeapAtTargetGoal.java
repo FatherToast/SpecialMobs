@@ -89,4 +89,9 @@ public class SpecialLeapAtTargetGoal extends Goal {
     public void tick() {
         if( ignoreFallDamage ) mob.fallDistance = 0.0F;
     }
+
+    @Override
+    public boolean requiresUpdateEveryTick() {
+        return true;
+    }
 }

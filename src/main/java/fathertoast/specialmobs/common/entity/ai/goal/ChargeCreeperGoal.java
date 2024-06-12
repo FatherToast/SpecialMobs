@@ -107,4 +107,9 @@ public class ChargeCreeperGoal<T extends Mob & IAmmoUser> extends Goal {
             creeper = null;
         }
     }
+
+    @Override
+    public boolean requiresUpdateEveryTick() {
+        return true;
+    }
 }

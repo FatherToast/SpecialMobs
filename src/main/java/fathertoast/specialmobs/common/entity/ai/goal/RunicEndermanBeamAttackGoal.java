@@ -43,7 +43,7 @@ public class RunicEndermanBeamAttackGoal extends Goal {
         
         final LivingEntity target = mob.getTarget();
         if( target != null && target.isAlive() && mob.getSensing().hasLineOfSight( target ) &&
-                mob.tickCount % 8 == 0 && mob.getRandom().nextInt( 10 ) == 0 && target.distanceToSqr( mob ) <=
+                mob.tickCount % 10 == 0 && mob.getRandom().nextInt( 10 ) == 0 && target.distanceToSqr( mob ) <=
                 mob.getSpecialData().getRangedAttackMaxRange() * mob.getSpecialData().getRangedAttackMaxRange() ) {
             
             targetEntity = target;
@@ -85,11 +85,16 @@ public class RunicEndermanBeamAttackGoal extends Goal {
             case DAMAGING -> damagingTick();
         }
     }
-    
+
+    @Override
+    public boolean requiresUpdateEveryTick() {
+        return true;
+    }
+
     /** Called each tick while this AI is active and in the charging phase. */
     private void chargingTick() {
         mob.getLookControl().setLookAt( targetPos.x, targetPos.y, targetPos.z,
-                30.0F, mob.getMaxHeadXRot() );
+                10.0F, mob.getMaxHeadXRot() );
         
         if( attackTime >= mob.getSpecialData().getRangedAttackCooldown() ) {
             mob.setBeamState( RunicEndermanEntity.BeamState.DAMAGING );

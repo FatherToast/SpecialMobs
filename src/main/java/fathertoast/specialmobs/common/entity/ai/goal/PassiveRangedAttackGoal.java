@@ -56,4 +56,9 @@ public class PassiveRangedAttackGoal<T extends Mob & ISpecialMob<? super T> & Ra
         else if( attackTime < 0 ) attackTime++;
         else if( attackTime > 0 ) attackTime--;
     }
+
+    @Override
+    public boolean requiresUpdateEveryTick() {
+        return true;
+    }
 }

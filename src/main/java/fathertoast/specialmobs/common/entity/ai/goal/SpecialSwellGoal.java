@@ -54,4 +54,9 @@ public class SpecialSwellGoal<T extends Mob & IExplodingMob> extends Goal {
             mob.setSwellDir( 1 );
         }
     }
+
+    @Override
+    public boolean requiresUpdateEveryTick() {
+        return true;
+    }
 }
