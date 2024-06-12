@@ -29,7 +29,12 @@ public class SpecialGhastFireballAttackGoal extends Goal {
     /** Called when this AI is deactivated. */
     @Override
     public void stop() { ghast.setCharging( false ); }
-    
+
+    @Override
+    public boolean requiresUpdateEveryTick() {
+        return true;
+    }
+
     /** Called each tick while this AI is active. */
     @Override
     public void tick() {
