@@ -60,7 +60,7 @@ public class ChargeCreeperGoal<T extends Mob & IAmmoUser> extends Goal {
     
     private void findCreeper() {
         Level level = madman.level();
-        List<Creeper> nearbyCreepers = level.getEntitiesOfClass( Creeper.class, madman.getBoundingBox().inflate( targetRange ), null );
+        List<Creeper> nearbyCreepers = level.getEntitiesOfClass( Creeper.class, madman.getBoundingBox().inflate( targetRange ) );
         
         if( !nearbyCreepers.isEmpty() ) {
             for( Creeper creeper : nearbyCreepers ) {
