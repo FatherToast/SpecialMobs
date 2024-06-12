@@ -96,9 +96,7 @@ public class BlackberrySlimeEntity extends _SpecialSlimeEntity implements IExplo
                     discard();
                     spawnLingeringCloud();
                 }
-                else {
-                    changeFuse( +1 );
-                }
+                changeFuse( 1 );
             }
             else if( getSwellDir() < 0 && fuse > 0 ) {
                 changeFuse( -1 );
