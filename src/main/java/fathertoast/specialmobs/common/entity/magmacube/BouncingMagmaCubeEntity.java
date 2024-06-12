@@ -18,6 +18,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.pathfinder.BlockPathTypes;
+import net.minecraftforge.common.ForgeMod;
 
 @SpecialMob
 public class BouncingMagmaCubeEntity extends _SpecialMagmaCubeEntity {
@@ -86,7 +87,7 @@ public class BouncingMagmaCubeEntity extends _SpecialMagmaCubeEntity {
     @Override
     public void tick() {
         super.tick();
-        MobHelper.floatInFluid( this, 0.05, FluidTags.LAVA );
+        MobHelper.floatInFluid( this, 0.05, ForgeMod.LAVA_TYPE.get() );
     }
     
     /** Override to load data from this entity's NBT data. */

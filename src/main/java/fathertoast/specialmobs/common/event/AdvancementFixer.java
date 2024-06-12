@@ -28,6 +28,7 @@ import java.util.Objects;
  * Helper class for granting players various vanilla advancements that are
  * impossible to obtain normally because of SM replacing vanilla mobs.
  */
+// TODO - Once Crust has been ported, use AdvancementLoadEvent instead of this clunky stuff
 public class AdvancementFixer {
 
     private static final ResourceLocation KILL_A_MOB_ADV = new ResourceLocation( "adventure/kill_a_mob" );

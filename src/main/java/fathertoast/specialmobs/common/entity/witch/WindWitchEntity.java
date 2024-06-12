@@ -27,6 +27,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.pathfinder.BlockPathTypes;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.entity.EntityTeleportEvent;
 
@@ -97,7 +98,7 @@ public class WindWitchEntity extends _SpecialWitchEntity {
     @Override
     public void tick() {
         super.tick();
-        MobHelper.floatInFluid( this, 0.06, FluidTags.WATER );
+        MobHelper.floatInFluid( this, 0.06, ForgeMod.WATER_TYPE.get() );
     }
     
     /** Called each tick to update this entity's movement. */

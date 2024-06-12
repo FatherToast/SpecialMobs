@@ -22,6 +22,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.pathfinder.BlockPathTypes;
+import net.minecraftforge.common.ForgeMod;
 
 
 @SpecialMob
@@ -104,7 +105,7 @@ public class FrozenSlimeEntity extends _SpecialSlimeEntity {
     @Override
     public void tick() {
         super.tick();
-        MobHelper.floatInFluid( this, 0.06, FluidTags.WATER );
+        MobHelper.floatInFluid( this, 0.06, ForgeMod.WATER_TYPE.get() );
         MobHelper.hopOnFluid( this );
     }
     

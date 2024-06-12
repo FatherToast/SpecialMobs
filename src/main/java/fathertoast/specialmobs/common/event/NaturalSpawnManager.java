@@ -114,7 +114,8 @@ public final class NaturalSpawnManager {
         return Monster.checkMonsterSpawnRules( type, levelAccessor, spawnType, pos, random );
     }
     
-    
+
+    // TODO - Make this stuff into json biome modifiers
     //--------------- Added Natural Spawns ----------------
 
     /*

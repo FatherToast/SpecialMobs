@@ -10,7 +10,6 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.tags.FluidTags;
-import net.minecraft.tags.TagKey;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.Difficulty;
@@ -21,24 +20,13 @@ import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.MobSpawnType;
-import net.minecraft.world.entity.MobType;
-import net.minecraft.world.entity.SpawnGroupData;
+import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.monster.Creeper;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.entity.projectile.Arrow;
-import net.minecraft.world.item.AxeItem;
-import net.minecraft.world.item.BowItem;
-import net.minecraft.world.item.CrossbowItem;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.item.TieredItem;
-import net.minecraft.world.item.Tiers;
+import net.minecraft.world.item.*;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.FrostWalkerEnchantment;
 import net.minecraft.world.level.ServerLevelAccessor;
@@ -47,15 +35,14 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraftforge.common.ForgeHooks;
-import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.common.ToolActions;
 import net.minecraftforge.common.util.BlockSnapshot;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.entity.living.LivingKnockBackEvent;
+import net.minecraftforge.fluids.FluidType;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -501,12 +488,12 @@ public final class MobHelper {
      *
      * @param entity       The entity to float.
      * @param acceleration How fast the entity floats upward.
-     * @param fluid        The fluid to float in.
+     * @param fluidType    The FluidType of the fluid to float in.
      */
-    public static void floatInFluid( Entity entity, double acceleration, TagKey<Fluid> fluid ) {
-        if( entity.tickCount > 1 && entity.getFluidTypeHeight(ForgeMod.WATER_TYPE.get()) > 0.0 ) {
+    public static void floatInFluid( Entity entity, double acceleration, FluidType fluidType ) {
+        if( entity.tickCount > 1 && entity.getFluidTypeHeight(fluidType) > 0.0 ) {
             if( CollisionContext.of( entity ).isAbove( LiquidBlock.STABLE_SHAPE, entity.blockPosition(), true ) &&
-                    !entity.level().getFluidState( entity.blockPosition().above() ).is( fluid ) ) {
+                    entity.level().getFluidState( entity.blockPosition().above() ).getFluidType() == fluidType ) {
                 entity.setOnGround( true );
             }
             else {
