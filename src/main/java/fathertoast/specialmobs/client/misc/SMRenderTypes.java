@@ -11,7 +11,7 @@ public class SMRenderTypes {
     public static RenderType entityCutoutNoCullBlend(ResourceLocation resourceLocation) {
         RenderType.CompositeState state = RenderType.CompositeState.builder()
                 .setTextureState(new RenderStateShard.TextureStateShard(resourceLocation, false, false))
-                .setShaderState(RenderStateShard.ShaderStateShard.RENDERTYPE_ENTITY_ALPHA_SHADER)
+                .setTransparencyState(RenderStateShard.TransparencyStateShard.CRUMBLING_TRANSPARENCY)
                 .setLightmapState(RenderStateShard.LightmapStateShard.LIGHTMAP)
                 .setOverlayState(RenderStateShard.OverlayStateShard.OVERLAY)
                 .setShaderState(RenderStateShard.ShaderStateShard.RENDERTYPE_ENTITY_ALPHA_SHADER)
