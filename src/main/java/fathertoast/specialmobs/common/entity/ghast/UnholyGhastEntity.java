@@ -73,6 +73,7 @@ public class UnholyGhastEntity extends _SpecialGhastEntity {
         if( MobHelper.isDamageSourceIneffectiveAgainstVampires( source ) ) {
             amount = Math.min( 2.0F, amount );
         }
+        amount += MobHelper.getVampireDamageBonus( source );
         return super.hurt( source, amount );
     }
     

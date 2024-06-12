@@ -10,6 +10,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.registries.VanillaRegistries;
+import net.minecraftforge.common.data.BlockTagsProvider;
 import net.minecraftforge.common.data.DatapackBuiltinEntriesProvider;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import net.minecraftforge.data.event.GatherDataEvent;
@@ -39,9 +40,14 @@ public class DataGatherListener {
         }
         if( event.includeServer() ) {
             generator.addProvider( true, new SMLootTableProvider( packOutput ) );
+
+            BlockTagsProvider blockTagProvider = new SMBlockTagProvider( packOutput, lookupProvider, fileHelper );
+
+            generator.addProvider( true, blockTagProvider );
+            generator.addProvider(true, new SMItemTagProvider( packOutput, lookupProvider, blockTagProvider.contentsGetter(), fileHelper ) );
             generator.addProvider( true, new SMEntityTagProvider( packOutput, lookupProvider, fileHelper ) );
             generator.addProvider( true, new SMDamageTagProvider( packOutput, lookupProvider, fileHelper ) );
-            generator.addProvider(event.includeServer(), new DatapackBuiltinEntriesProvider(
+            generator.addProvider( event.includeServer(), new DatapackBuiltinEntriesProvider(
                     packOutput, lookupProvider, Set.of( SpecialMobs.MOD_ID )));
         }
     }

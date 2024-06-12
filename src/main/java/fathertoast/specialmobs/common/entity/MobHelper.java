@@ -1,6 +1,7 @@
 package fathertoast.specialmobs.common.entity;
 
 import fathertoast.specialmobs.common.config.Config;
+import fathertoast.specialmobs.common.core.register.SMTags;
 import fathertoast.specialmobs.common.entity.creeper._SpecialCreeperEntity;
 import fathertoast.specialmobs.common.util.References;
 import net.minecraft.core.BlockPos;
@@ -129,6 +130,17 @@ public final class MobHelper {
             return !isWoodenTool( weapon ) && !hasSmite( weapon );
         }
         return true;
+    }
+
+    /** @return The amount of extra damage to inflict on vampire-like mobs depending on the damage source. */
+    public static float getVampireDamageBonus( DamageSource source ) {
+        final Entity attacker = source.getEntity();
+
+        if( attacker instanceof LivingEntity ) {
+            final ItemStack weapon = ((LivingEntity) attacker).getMainHandItem();
+            return weapon.is(SMTags.GARLIC) ? 6.0F : 0.0F;
+        }
+        return 0.0F;
     }
     
     /** @return True if the given item is made of wood. */
