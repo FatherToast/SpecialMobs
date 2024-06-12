@@ -75,8 +75,8 @@ public class GravelCreeperEntity extends _SpecialCreeperEntity {
         final float throwPower = explosionPower + 4.0F;
         final int count = (int) Math.ceil( throwPower * throwPower * 3.5F );
         for( int i = 0; i < count; i++ ) {
-            final FallingBlockEntity gravel = FallingBlockEntity.fall( level(),
-                    BlockPos.containing(getX(), getY() + getBbHeight() / 2.0F, getZ()), Blocks.GRAVEL.defaultBlockState() );
+            BlockPos pos = BlockPos.containing(getX(), getY() + getBbHeight() / 2.0F, getZ());
+            FallingBlockEntity gravel = new FallingBlockEntity(level(), (double) pos.getX() + 0.5D, pos.getY(), (double) pos.getZ() + 0.5D, Blocks.GRAVEL.defaultBlockState());
             gravel.time = 1; // Prevent the entity from instantly dying
             gravel.dropItem = false;
             gravel.fallDistance = 3.0F;
