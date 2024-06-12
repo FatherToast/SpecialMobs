@@ -64,8 +64,8 @@ public class SpecialFishingBobberRenderer extends EntityRenderer<SpecialFishingB
         final double xBobber = Mth.lerp( partialTicks, entity.xo, entity.getX() );
         final double yBobber = Mth.lerp( partialTicks, entity.yo, entity.getY() ) + 0.25;
         final double zBobber = Mth.lerp( partialTicks, entity.zo, entity.getZ() );
-        
-        drawLine( buffer.getBuffer( RenderType.lines() ), poseStack.last().pose(), 16,
+
+        drawLine( buffer.getBuffer( RenderType.lineStrip() ), poseStack.last(), 16,
                 xBobber, yBobber, zBobber, xRod, yRod, zRod );
         
         poseStack.popPose();
@@ -90,7 +90,7 @@ public class SpecialFishingBobberRenderer extends EntityRenderer<SpecialFishingB
     }
     
     /** Creates the vertexes for the fishing line. A line from the bobber to the rod that hangs down a little in the y-axis. */
-    private static void drawLine( VertexConsumer vertexConsumer, Matrix4f pose, int resolution,
+    private static void drawLine( VertexConsumer vertexConsumer, PoseStack.Pose pose, int resolution,
                                   double x1, double y1, double z1, double x2, double y2, double z2 ) {
         final float dX = (float) (x2 - x1);
         final float dY = (float) (y2 - y1);
@@ -99,14 +99,31 @@ public class SpecialFishingBobberRenderer extends EntityRenderer<SpecialFishingB
         for( int segment = 0; segment < resolution; segment++ ) {
             // Each line segment is defined by 2 vertexes
             lineVertex( dX, dY, dZ, vertexConsumer, pose, segment, resolution );
-            lineVertex( dX, dY, dZ, vertexConsumer, pose, segment + 1, resolution );
         }
     }
-    
-    private static void lineVertex( float dX, float dY, float dZ, VertexConsumer vertexConsumer, Matrix4f pose, int segment, int totalSegments ) {
-        final float r = (float) segment / totalSegments;
-        vertexConsumer.vertex( pose, dX * r, dY * (r * r + r) * 0.5F + 0.25F, dZ * r )
-                .color( 0, 0, 0, 255 ) // RGBA - black
+
+    private static void lineVertex(float x, float y, float z, VertexConsumer vertexConsumer, PoseStack.Pose pose, float segment, float totalSegments) {
+        final float r = segment / totalSegments;
+        final float k = segment + 1 / totalSegments;
+
+        float vertX = x * r;
+        float vertY = y * (r * r + r) * 0.5F + 0.25F;
+        float vertZ = z * r;
+
+        float normalX = x * k - vertX;
+        float normalY = y * (k * k + k) * 0.5F + 0.25F - vertY;
+        float normalZ = z * k - vertZ;
+
+        float squared = Mth.sqrt(normalX * normalX + normalY * normalY + normalZ * normalZ);
+
+        normalX /= squared;
+        normalY /= squared;
+        normalZ /= squared;
+
+        vertexConsumer
+                .vertex(pose.pose(), vertX, vertY, vertZ)
+                .color(0, 0, 0, 255)
+                .normal(pose.normal(), normalX, normalY, normalZ)
                 .endVertex();
     }
     
