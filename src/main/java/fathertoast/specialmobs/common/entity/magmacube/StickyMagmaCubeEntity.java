@@ -76,7 +76,7 @@ public class StickyMagmaCubeEntity extends _SpecialMagmaCubeEntity {
         if( grabTime <= 0 && !riders.isEmpty() ) {
             for( Entity rider : riders ) {
                 if( rider instanceof LivingEntity ) {
-                    rider.hurt( damageSources().source( SMDamageTypes.GRAB, this ), 1.0F );
+                    rider.hurt( SMDamageTypes.of( level(), this, SMDamageTypes.GRAB ), 1.0F );
                     grabTime = 10;
                 }
             }
