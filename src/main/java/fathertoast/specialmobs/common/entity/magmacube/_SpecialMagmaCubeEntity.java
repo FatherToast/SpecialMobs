@@ -155,8 +155,7 @@ public class _SpecialMagmaCubeEntity extends MagmaCube implements ISpecialMob<_S
         if( resetHealth ) setHealth( getMaxHealth() );
         setExperience( getExperience() ); // Update for new size
     }
-    
-    
+
     //--------------- ISpecialMob Implementation ----------------
     
     private SpecialMobData<_SpecialMagmaCubeEntity> specialData;
@@ -257,7 +256,10 @@ public class _SpecialMagmaCubeEntity extends MagmaCube implements ISpecialMob<_S
     /** @return Called when this mob falls. Calculates and applies fall damage. Returns false if canceled. */
     @Override
     public boolean causeFallDamage(float distance, float damageMultiplier, DamageSource damageSource ) {
-        return super.causeFallDamage( distance, damageMultiplier * getSpecialData().getFallDamageMultiplier(), damageSource );
+        // Shrink the fall distance a bit depending on size to make sure the
+        // larger magma cubes doesn't take fall damage just from jumping.
+        float modifiedDistance = getSize() == 1 ? distance : Math.max( 0.0F, distance - getSize() );
+        return super.causeFallDamage( modifiedDistance, damageMultiplier * getSpecialData().getFallDamageMultiplier(), damageSource );
     }
     
     /** @return True if this entity should NOT trigger pressure plates or tripwires. */
