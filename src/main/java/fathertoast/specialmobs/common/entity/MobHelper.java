@@ -8,9 +8,9 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.tags.FluidTags;
+import net.minecraft.tags.TagKey;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.Difficulty;
@@ -36,6 +36,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraftforge.common.ForgeHooks;
@@ -504,7 +505,7 @@ public final class MobHelper {
      */
     public static void floatInFluid( Entity entity, double acceleration, FluidType fluidType ) {
         if( entity.tickCount > 1 && entity.getFluidTypeHeight(fluidType) > 0.0 ) {
-            if( CollisionContext.of( entity ).isAbove( LiquidBlock.STABLE_SHAPE, entity.blockPosition(), true ) &&
+            if( !entity.getEyeInFluidType().isAir() && CollisionContext.of( entity ).isAbove( LiquidBlock.STABLE_SHAPE, entity.blockPosition(), true ) &&
                     entity.level().getFluidState( entity.blockPosition().above() ).getFluidType() == fluidType ) {
                 entity.setOnGround( true );
             }
@@ -548,18 +549,41 @@ public final class MobHelper {
      * @param entity The entity to pop.
      */
     public static void hopOnFluid( Entity entity ) {
-        if( entity.tickCount > 1 && entity.onGround() && entity.level().random.nextInt( 10 ) == 0 ) {
+        if( entity.tickCount > 1 && entity.level().random.nextInt( 10 ) == 0 ) {
             if( CollisionContext.of( entity ).isAbove( LiquidBlock.STABLE_SHAPE, entity.blockPosition(), true ) &&
                     !entity.level().getFluidState( entity.blockPosition().above() ).is( FluidTags.WATER ) ) {
                 // Break water plants, otherwise frost walker will not work
                 final BlockState block = entity.level().getBlockState( entity.blockPosition() );
-                if( block.is( BlockTags.REPLACEABLE ) ) {
+                if( !block.isAir() && !block.isSolid() && !block.getFluidState().isEmpty() ) {
                     final BlockEntity blockEntity = block.hasBlockEntity() ? entity.level().getExistingBlockEntity( entity.blockPosition() ) : null;
                     Block.dropResources( block, entity.level(), entity.blockPosition(), blockEntity );
-                    entity.level().setBlock( entity.blockPosition(), Blocks.WATER.defaultBlockState(), References.SetBlockFlags.DEFAULTS );
+                    entity.level().setBlock( entity.blockPosition(), Blocks.WATER.defaultBlockState(), Block.UPDATE_ALL );
                 }
                 
                 entity.setDeltaMovement( entity.getDeltaMovement().scale( 0.5 ).add( 0.0, 0.4, 0.0 ) );
+            }
+        }
+    }
+
+    /**
+     * Pops the entity upward if they are right next to a solid block when floating in a fluid.
+     * <p>
+     * Should be called in the entity's {@link Entity#tick()} loop after both super and the call to floatInFluid.
+     *
+     * @param entity The entity to try and hop back on land
+     */
+    public static void hopOntoShore( Entity entity, TagKey<Fluid> fluidTag ) {
+        if( entity.tickCount > 1 && entity.level().random.nextInt( 10 ) == 0 ) {
+            if( CollisionContext.of( entity ).isAbove( LiquidBlock.STABLE_SHAPE, entity.blockPosition(), true ) &&
+                    !entity.level().getFluidState( entity.blockPosition().above() ).is( fluidTag ) ) {
+
+                for (Direction dir : Direction.Plane.HORIZONTAL) {
+                    BlockState neighborState = entity.level().getBlockState(entity.blockPosition().relative(dir));
+
+                    if (neighborState.isSolid() && entity.getDirection() == dir) {
+                        entity.setDeltaMovement( entity.getDeltaMovement().scale( 0.5 ).add( 0.0, 0.4, 0.0 ) );
+                    }
+                }
             }
         }
     }

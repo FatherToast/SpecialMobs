@@ -110,7 +110,7 @@ public class SnowCreeperEntity extends _SpecialCreeperEntity {
     @Override
     public void tick() {
         super.tick();
-        MobHelper.floatInFluid( this, 0.06, ForgeMod.WATER_TYPE.get() );
+        MobHelper.floatInFluid( this, 0.08, ForgeMod.WATER_TYPE.get() );
         MobHelper.hopOnFluid( this );
     }
     

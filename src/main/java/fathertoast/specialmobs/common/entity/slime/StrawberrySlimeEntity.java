@@ -91,6 +91,7 @@ public class StrawberrySlimeEntity extends _SpecialSlimeEntity {
     public void tick() {
         super.tick();
         MobHelper.floatInFluid( this, 0.05, ForgeMod.LAVA_TYPE.get() );
+        MobHelper.hopOntoShore( this, FluidTags.LAVA );
     }
     
     /** Override to load data from this entity's NBT data. */

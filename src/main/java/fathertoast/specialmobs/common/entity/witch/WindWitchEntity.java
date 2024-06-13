@@ -99,6 +99,7 @@ public class WindWitchEntity extends _SpecialWitchEntity {
     public void tick() {
         super.tick();
         MobHelper.floatInFluid( this, 0.06, ForgeMod.WATER_TYPE.get() );
+        MobHelper.hopOntoShore( this, FluidTags.WATER );
     }
     
     /** Called each tick to update this entity's movement. */
