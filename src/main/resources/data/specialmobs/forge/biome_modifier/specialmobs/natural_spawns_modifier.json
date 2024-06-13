@@ -1,0 +1,4 @@
+{
+  "type": "specialmobs:natural_add_spawn",
+  "comment": "This is not a modifier type intended for actual data pack usage. Override or remove this and all of SM's natural spawns will disappear. If you want to tweak anything, do so via the mod config"
+}
