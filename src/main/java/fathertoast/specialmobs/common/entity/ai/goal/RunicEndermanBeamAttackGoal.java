@@ -43,8 +43,7 @@ public class RunicEndermanBeamAttackGoal extends Goal {
         
         final LivingEntity target = mob.getTarget();
         if( target != null && target.isAlive() && mob.getSensing().hasLineOfSight( target ) &&
-                mob.tickCount % 10 == 0 && mob.getRandom().nextInt( 10 ) == 0 && target.distanceToSqr( mob ) <=
-                mob.getSpecialData().getRangedAttackMaxRange() * mob.getSpecialData().getRangedAttackMaxRange() ) {
+                mob.tickCount % 8 <= 1 && mob.getRandom().nextInt( 10 ) == 0 && isTargetWithinBeamRange( target ) ) {
             
             targetEntity = target;
             updateTargetPos();
@@ -59,6 +58,11 @@ public class RunicEndermanBeamAttackGoal extends Goal {
             return true;
         }
         return false;
+    }
+
+    private boolean isTargetWithinBeamRange( LivingEntity target ) {
+        return target.distanceToSqr( mob ) <=
+                mob.getSpecialData().getRangedAttackMaxRange() * mob.getSpecialData().getRangedAttackMaxRange();
     }
     
     /** @return Called each update while active and returns true if this AI can remain active. */
@@ -89,6 +93,11 @@ public class RunicEndermanBeamAttackGoal extends Goal {
     @Override
     public boolean requiresUpdateEveryTick() {
         return true;
+    }
+
+    @Override
+    public boolean isInterruptable() {
+        return false;
     }
 
     /** Called each tick while this AI is active and in the charging phase. */
