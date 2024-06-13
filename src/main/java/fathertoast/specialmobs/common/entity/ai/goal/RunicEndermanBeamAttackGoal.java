@@ -32,7 +32,7 @@ public class RunicEndermanBeamAttackGoal extends Goal {
     
     public RunicEndermanBeamAttackGoal( RunicEndermanEntity entity ) {
         mob = entity;
-        beamDamageSource = entity.damageSources().indirectMagic(entity, null); //TODO: Check as it used to be EntityDamageSource with Magic message ID
+        beamDamageSource = entity.damageSources().indirectMagic(entity, null);
         setFlags( EnumSet.of( Goal.Flag.MOVE, Flag.LOOK ) );
     }
     
