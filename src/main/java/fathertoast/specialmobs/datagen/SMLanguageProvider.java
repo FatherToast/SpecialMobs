@@ -171,5 +171,8 @@ public class SMLanguageProvider extends LanguageProvider {
 
         // Doing creative mode tabs manually for now since there is only one
         add("itemGroup.magical_relics.spawn_eggs", "Special Mobs - Spawn Eggs");
+
+        // Some other stuff
+        add("config.jade.plugin_specialmobs.display_ninja_disguises", "Display Ninja Disguises");
     }
 }

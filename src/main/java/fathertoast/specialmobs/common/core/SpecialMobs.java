@@ -1,6 +1,5 @@
 package fathertoast.specialmobs.common.core;
 
-import fathertoast.specialmobs.common.compat.top.SMTheOneProbe;
 import fathertoast.specialmobs.common.config.Config;
 import fathertoast.specialmobs.common.core.register.*;
 import fathertoast.specialmobs.common.event.AdvancementFixer;
@@ -11,8 +10,6 @@ import fathertoast.specialmobs.common.util.SMDispenserBehavior;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.fml.InterModComms;
-import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.InterModEnqueueEvent;
@@ -158,9 +155,7 @@ public class SpecialMobs {
     
     @SuppressWarnings( "SpellCheckingInspection" )
     public void sendIMCMessages( InterModEnqueueEvent event ) {
-        if( ModList.get().isLoaded( "theoneprobe" ) ) {
-            InterModComms.sendTo( "theoneprobe", "getTheOneProbe", SMTheOneProbe::new );
-        }
+
     }
     
     /** @return A ResourceLocation with the mod's namespace. */
