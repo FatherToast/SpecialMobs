@@ -137,17 +137,19 @@ public class BlackberrySlimeEntity extends _SpecialSlimeEntity implements IExplo
     /** @return Called when this mob falls. Calculates and applies fall damage. Returns false if canceled. */
     @Override
     public boolean causeFallDamage( float distance, float damageMultiplier, DamageSource damageSource ) {
-        final boolean success = super.causeFallDamage( distance, damageMultiplier, damageSource );
-        
-        // Speed up fuse from falling like creepers
-        changeFuse( (int) (distance * 1.5F) );
-        if( fuse > MAX_FUSE - 5 ) changeFuse( MAX_FUSE - 5 - fuse );
+        boolean success = super.causeFallDamage( distance, damageMultiplier, damageSource );
+
+        if ( calculateFallDamage( distance, damageMultiplier ) > 0 ) {
+            // Speed up fuse from falling like creepers
+            changeFuse((int) (distance * 1.5F));
+            if (fuse > MAX_FUSE - 5) changeFuse(MAX_FUSE - 5 - fuse);
+        }
         return success;
     }
     
     /** @return Interacts (right click) with this entity and returns the result. */
     @Override
-    public InteractionResult mobInteract(Player player, InteractionHand hand ) {
+    public InteractionResult mobInteract( Player player, InteractionHand hand ) {
         final ItemStack item = player.getItemInHand( hand );
         if( item.getItem() == Items.FLINT_AND_STEEL ) {
             // Allow players to ignite blackberry slimes like creepers
