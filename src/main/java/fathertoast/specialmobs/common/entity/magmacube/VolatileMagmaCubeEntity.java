@@ -95,9 +95,7 @@ public class VolatileMagmaCubeEntity extends _SpecialMagmaCubeEntity implements 
                     discard();
                     spawnLingeringCloud();
                 }
-                else {
-                    changeFuse( +1 );
-                }
+                changeFuse( +1 );
             }
             else if( getSwellDir() < 0 && fuse > 0 ) {
                 changeFuse( -1 );
@@ -138,11 +136,13 @@ public class VolatileMagmaCubeEntity extends _SpecialMagmaCubeEntity implements 
     /** @return Called when this mob falls. Calculates and applies fall damage. Returns false if canceled. */
     @Override
     public boolean causeFallDamage( float distance, float damageMultiplier, DamageSource damageSource ) {
-        final boolean success = super.causeFallDamage( distance, damageMultiplier, damageSource );
-        
-        // Speed up fuse from falling like creepers
-        changeFuse( (int) (distance * 1.5F) );
-        if( fuse > MAX_FUSE - 5 ) changeFuse( MAX_FUSE - 5 - fuse );
+        boolean success = super.causeFallDamage( distance, damageMultiplier, damageSource );
+
+        if ( calculateFallDamage( distance, damageMultiplier ) > 0 ) {
+            // Speed up fuse from falling like creepers
+            changeFuse((int) (distance * 1.5F));
+            if (fuse > MAX_FUSE - 5) changeFuse(MAX_FUSE - 5 - fuse);
+        }
         return success;
     }
 
@@ -151,7 +151,7 @@ public class VolatileMagmaCubeEntity extends _SpecialMagmaCubeEntity implements 
     public InteractionResult mobInteract( Player player, InteractionHand hand ) {
         final ItemStack item = player.getItemInHand( hand );
         if( item.getItem() == Items.FLINT_AND_STEEL ) {
-            // Allow players to ignite blackberry slimes like creepers
+            // Allow players to ignite volatile magma cubes like creepers
             level().playSound( player, getX(), getY(), getZ(), SoundEvents.FLINTANDSTEEL_USE, getSoundSource(),
                     1.0F, random.nextFloat() * 0.4F + 0.8F );
             if( !level().isClientSide ) {
