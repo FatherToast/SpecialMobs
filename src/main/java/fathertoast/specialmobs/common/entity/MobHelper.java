@@ -551,15 +551,17 @@ public final class MobHelper {
     public static void hopOnFluid( Entity entity ) {
         if( entity.tickCount > 1 && entity.level().random.nextInt( 10 ) == 0 ) {
             if( CollisionContext.of( entity ).isAbove( LiquidBlock.STABLE_SHAPE, entity.blockPosition(), true ) &&
-                    !entity.level().getFluidState( entity.blockPosition().above() ).is( FluidTags.WATER ) ) {
-                // Break water plants, otherwise frost walker will not work
+                    entity.level().getFluidState( entity.blockPosition() ).is( FluidTags.WATER )
+                    && !entity.level().getFluidState( entity.blockPosition().above() ).is( FluidTags.WATER ) ) {
+
+                // Break water plants and other waterlogged things, otherwise frost walker will not work
                 final BlockState block = entity.level().getBlockState( entity.blockPosition() );
+
                 if( !block.isAir() && !block.isSolid() && !block.getFluidState().isEmpty() ) {
                     final BlockEntity blockEntity = block.hasBlockEntity() ? entity.level().getExistingBlockEntity( entity.blockPosition() ) : null;
                     Block.dropResources( block, entity.level(), entity.blockPosition(), blockEntity );
                     entity.level().setBlock( entity.blockPosition(), Blocks.WATER.defaultBlockState(), Block.UPDATE_ALL );
                 }
-                
                 entity.setDeltaMovement( entity.getDeltaMovement().scale( 0.5 ).add( 0.0, 0.4, 0.0 ) );
             }
         }
@@ -577,10 +579,10 @@ public final class MobHelper {
             if( CollisionContext.of( entity ).isAbove( LiquidBlock.STABLE_SHAPE, entity.blockPosition(), true ) &&
                     !entity.level().getFluidState( entity.blockPosition().above() ).is( fluidTag ) ) {
 
-                for (Direction dir : Direction.Plane.HORIZONTAL) {
-                    BlockState neighborState = entity.level().getBlockState(entity.blockPosition().relative(dir));
+                for ( Direction dir : Direction.Plane.HORIZONTAL ) {
+                    BlockState neighborState = entity.level().getBlockState( entity.blockPosition().relative( dir ) );
 
-                    if (neighborState.isSolid() && entity.getDirection() == dir) {
+                    if ( neighborState.isSolid() && entity.getDirection() == dir ) {
                         entity.setDeltaMovement( entity.getDeltaMovement().scale( 0.5 ).add( 0.0, 0.4, 0.0 ) );
                     }
                 }
