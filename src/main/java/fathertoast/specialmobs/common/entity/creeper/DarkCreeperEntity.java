@@ -83,7 +83,7 @@ public class DarkCreeperEntity extends _SpecialCreeperEntity {
                         final BlockState block = level().getBlockState( pos );
                         
                         // Ignore the block if it is not a light or is already exploded
-                        if( block.getLightBlock( level(), pos ) > 1 && !explosion.getHitBlocks().contains( pos ) &&
+                        if( block.getLightEmission( level(), pos ) > 1 && !explosion.getHitBlocks().contains( pos ) &&
                                 explosion.tryExplodeBlock( pos, block, radius ) ) {
                             explosion.getHitBlocks().add( pos );
                         }
