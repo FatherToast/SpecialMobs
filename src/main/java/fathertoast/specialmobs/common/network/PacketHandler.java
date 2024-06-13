@@ -32,7 +32,7 @@ public class PacketHandler {
     }
     
     public final void registerMessages() {
-        //registerMessage( C2SSpawnIncorporealFireball.class, C2SSpawnIncorporealFireball::encode, C2SSpawnIncorporealFireball::decode, C2SSpawnIncorporealFireball::handle );
+
     }
     
     public <MSG> void registerMessage(Class<MSG> messageType, BiConsumer<MSG, FriendlyByteBuf> encoder, Function<FriendlyByteBuf, MSG> decoder, BiConsumer<MSG, Supplier<NetworkEvent.Context>> handler ) {
