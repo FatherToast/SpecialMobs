@@ -5,7 +5,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '[6.0,6.2)', changing: true
         classpath group: "org.spongepowered", name: "mixingradle", version: "0.7-SNAPSHOT"
     }
 }
@@ -33,69 +33,39 @@ minecraft {
     accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
 
     runs {
-        client {
+        configureEach {
             workingDirectory project.file('run')
 
             property 'forge.logging.markers', 'REGISTRIES'
             property 'forge.logging.console.level', 'debug'
-
-            property "mixin.debug.export", "true"
-            property 'mixin.env.disableRefMap', 'true'
-
-            arg "-mixin.config=specialmobs.mixins.json"
 
             mods {
                 specialmobs {
                     source sourceSets.main
                 }
             }
+        }
+
+        client {
+            property "mixin.debug.export", "true"
+            property 'mixin.env.disableRefMap', 'true'
+
+            arg "-mixin.config=specialmobs.mixins.json"
         }
 
         server {
-            workingDirectory project.file('run')
-
-            property 'forge.logging.markers', 'REGISTRIES'
-            property 'forge.logging.console.level', 'debug'
-
             property "mixin.debug.export", "true"
             property 'mixin.env.disableRefMap', 'true'
 
             arg "-mixin.config=specialmobs.mixins.json"
-
-            mods {
-                specialmobs {
-                    source sourceSets.main
-                }
-            }
         }
 
         gameTestServer {
-            workingDirectory project.file('run')
-
-            property 'forge.logging.markers', 'REGISTRIES'
-            property 'forge.logging.console.level', 'debug'
             property 'forge.enabledGameTestNamespaces', 'naturalabsorption'
-
-            mods {
-                specialmobs {
-                    source sourceSets.main
-                }
-            }
         }
 
         data {
-            workingDirectory project.file('run')
-
-            property 'forge.logging.markers', 'REGISTRIES'
-            property 'forge.logging.console.level', 'debug'
-
             args '--mod', 'specialmobs', '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
-
-            mods {
-                specialmobs {
-                    source sourceSets.main
-                }
-            }
         }
     }
 }
@@ -119,7 +89,7 @@ dependencies {
 
     // Add in JEI and TOP to assist debugging during development
     runtimeOnly fg.deobf("curse.maven:jei-238222:${jei_version}")
-    implementation fg.deobf("curse.maven:top-245211:${top_version}")
+    implementation fg.deobf("curse.maven:jade-324717:${jade_version}")
 
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 }
