@@ -505,8 +505,8 @@ public final class MobHelper {
      */
     public static void floatInFluid( Entity entity, double acceleration, FluidType fluidType ) {
         if( entity.tickCount > 1 && entity.getFluidTypeHeight(fluidType) > 0.0 ) {
-            if( !entity.getEyeInFluidType().isAir() && CollisionContext.of( entity ).isAbove( LiquidBlock.STABLE_SHAPE, entity.blockPosition(), true ) &&
-                    entity.level().getFluidState( entity.blockPosition().above() ).getFluidType() == fluidType ) {
+            if( CollisionContext.of( entity ).isAbove( LiquidBlock.STABLE_SHAPE, entity.blockPosition(), true ) &&
+                    entity.level().getFluidState( entity.blockPosition().above() ).getFluidType() != fluidType ) {
                 entity.setOnGround( true );
             }
             else {
