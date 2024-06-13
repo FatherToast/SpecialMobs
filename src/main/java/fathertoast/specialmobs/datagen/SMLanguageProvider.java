@@ -168,5 +168,8 @@ public class SMLanguageProvider extends LanguageProvider {
             if( translationArray[k] != null && !translationArray[k].isEmpty() )
                 add( translationArray[0], translationArray[k] );
         }
+
+        // Doing creative mode tabs manually for now since there is only one
+        add("itemGroup.magical_relics.spawn_eggs", "Special Mobs - Spawn Eggs");
     }
 }

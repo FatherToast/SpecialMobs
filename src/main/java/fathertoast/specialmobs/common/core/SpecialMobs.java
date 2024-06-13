@@ -130,6 +130,7 @@ public class SpecialMobs {
         
         SMBlocks.REGISTRY.register( modEventBus );
         SMItems.REGISTRY.register( modEventBus );
+        SMCreativeTabs.REGISTRY.register( modEventBus );
         SMEntities.REGISTRY.register( modEventBus );
         SMEffects.REGISTRY.register( modEventBus );
         SMBiomeMods.REGISTRY.register( modEventBus );
