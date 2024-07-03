@@ -41,7 +41,7 @@ side = "BOTH"
 [[dependencies.specialmobs]]
 modId = "crust"
 mandatory = true
-versionRange = "[2.2.2,)"
+versionRange = "[2.3,)"
 ordering = "NONE"
 side = "BOTH"
 
