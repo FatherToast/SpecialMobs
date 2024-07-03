@@ -1,10 +1,10 @@
 package fathertoast.specialmobs.common.config.family;
 
+import fathertoast.crust.api.config.common.AbstractConfigCategory;
+import fathertoast.crust.api.config.common.ConfigManager;
+import fathertoast.crust.api.config.common.ConfigUtil;
+import fathertoast.crust.api.config.common.field.BooleanField;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
-import fathertoast.specialmobs.common.config.Config;
-import fathertoast.specialmobs.common.config.field.BooleanField;
-import fathertoast.specialmobs.common.config.file.ToastConfigSpec;
-import fathertoast.specialmobs.common.config.util.ConfigUtil;
 
 /**
  * This is the family config for ghasts.
@@ -14,17 +14,17 @@ public class GhastFamilyConfig extends FamilyConfig {
     public final Ghasts GHASTS;
     
     /** Builds the config spec that should be used for this config. */
-    public GhastFamilyConfig( MobFamily<?, ?> family ) {
-        super( family );
+    public GhastFamilyConfig( ConfigManager manager, MobFamily<?, ?> family ) {
+        super( manager, family );
         
-        GHASTS = new Ghasts( SPEC, family );
+        GHASTS = new Ghasts( this, family );
     }
     
-    public static class Ghasts extends Config.AbstractCategory {
+    public static class Ghasts extends AbstractConfigCategory<GhastFamilyConfig> {
         
         public final BooleanField allowVerticalTargeting;
         
-        Ghasts( ToastConfigSpec parent, MobFamily<?, ?> family ) {
+        Ghasts( GhastFamilyConfig parent, MobFamily<?, ?> family ) {
             super( parent, ConfigUtil.noSpaces( family.configName ),
                     "Options specific to the family of " + family.configName + "." );
             

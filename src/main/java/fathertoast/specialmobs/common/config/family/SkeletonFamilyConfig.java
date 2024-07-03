@@ -1,10 +1,10 @@
 package fathertoast.specialmobs.common.config.family;
 
+import fathertoast.crust.api.config.common.AbstractConfigCategory;
+import fathertoast.crust.api.config.common.ConfigManager;
+import fathertoast.crust.api.config.common.ConfigUtil;
+import fathertoast.crust.api.config.common.field.DoubleField;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
-import fathertoast.specialmobs.common.config.Config;
-import fathertoast.specialmobs.common.config.field.DoubleField;
-import fathertoast.specialmobs.common.config.file.ToastConfigSpec;
-import fathertoast.specialmobs.common.config.util.ConfigUtil;
 
 /**
  * This is the family config for skeletons and wither skeletons.
@@ -14,17 +14,17 @@ public class SkeletonFamilyConfig extends FamilyConfig {
     public final Skeletons SKELETONS;
     
     /** Builds the config spec that should be used for this config. */
-    public SkeletonFamilyConfig( MobFamily<?, ?> family ) {
-        super( family );
+    public SkeletonFamilyConfig( ConfigManager manager, MobFamily<?, ?> family ) {
+        super( manager, family );
         
-        SKELETONS = new Skeletons( SPEC, family );
+        SKELETONS = new Skeletons( this, family );
     }
     
-    public static class Skeletons extends Config.AbstractCategory {
+    public static class Skeletons extends AbstractConfigCategory<SkeletonFamilyConfig> {
         
         public final DoubleField babyChance;
         
-        Skeletons( ToastConfigSpec parent, MobFamily<?, ?> family ) {
+        Skeletons( SkeletonFamilyConfig parent, MobFamily<?, ?> family ) {
             super( parent, ConfigUtil.noSpaces( family.configName ),
                     "Options specific to the family of " + family.configName + "." );
             

@@ -1,5 +1,6 @@
 package fathertoast.specialmobs.common.entity.skeleton;
 
+import fathertoast.crust.api.config.common.ConfigManager;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
@@ -71,8 +72,8 @@ public class _SpecialSkeletonEntity extends AbstractSkeleton implements ISpecial
     protected static final double DEFAULT_SHIELD_CHANCE = 0.05;
     
     @SpecialMob.ConfigSupplier
-    public static SpeciesConfig createConfig( MobFamily.Species<?> species ) {
-        return new SkeletonSpeciesConfig( species, DEFAULT_BOW_CHANCE, DEFAULT_SHIELD_CHANCE );
+    public static SpeciesConfig createConfig( ConfigManager manager, MobFamily.Species<?> species ) {
+        return new SkeletonSpeciesConfig( manager, species, DEFAULT_BOW_CHANCE, DEFAULT_SHIELD_CHANCE );
     }
     
     /** @return This entity's species config. */

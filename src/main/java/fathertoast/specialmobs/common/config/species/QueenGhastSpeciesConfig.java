@@ -1,29 +1,29 @@
 package fathertoast.specialmobs.common.config.species;
 
+import fathertoast.crust.api.config.common.AbstractConfigCategory;
+import fathertoast.crust.api.config.common.ConfigManager;
+import fathertoast.crust.api.config.common.ConfigUtil;
+import fathertoast.crust.api.config.common.field.IntField;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
-import fathertoast.specialmobs.common.config.Config;
-import fathertoast.specialmobs.common.config.field.IntField;
-import fathertoast.specialmobs.common.config.file.ToastConfigSpec;
-import fathertoast.specialmobs.common.config.util.ConfigUtil;
 
 public class QueenGhastSpeciesConfig extends SpeciesConfig {
     
     public final Queen QUEEN;
     
     /** Builds the config spec that should be used for this config. */
-    public QueenGhastSpeciesConfig( MobFamily.Species<?> species, int minBabies, int maxBabies, int minSummons, int maxSummons ) {
-        super( species );
+    public QueenGhastSpeciesConfig( ConfigManager manager, MobFamily.Species<?> species, int minBabies, int maxBabies, int minSummons, int maxSummons ) {
+        super( manager, species );
         
-        QUEEN = new Queen( SPEC, species, species.getConfigName(), minBabies, maxBabies, minSummons, maxSummons );
+        QUEEN = new Queen( this, species, species.getConfigName(), minBabies, maxBabies, minSummons, maxSummons );
     }
     
-    public static class Queen extends Config.AbstractCategory {
+    public static class Queen extends AbstractConfigCategory<QueenGhastSpeciesConfig> {
         
         public final IntField.RandomRange babies;
         
         public final IntField.RandomRange summons;
         
-        Queen( ToastConfigSpec parent, MobFamily.Species<?> species, String speciesName,
+        Queen( QueenGhastSpeciesConfig parent, MobFamily.Species<?> species, String speciesName,
                int minBabies, int maxBabies, int minSummons, int maxSummons ) {
             super( parent, ConfigUtil.camelCaseToLowerUnderscore( species.specialVariantName ),
                     "Options specific to " + speciesName + "." );

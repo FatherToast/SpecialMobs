@@ -1,7 +1,7 @@
 package fathertoast.specialmobs.common.core.register;
 
+import fathertoast.crust.api.config.common.value.ConfigDrivenAttributeModifierMap;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
-import fathertoast.specialmobs.common.config.util.ConfigDrivenAttributeModifierMap;
 import fathertoast.specialmobs.common.core.SpecialMobs;
 import fathertoast.specialmobs.common.entity.projectile.BoneShrapnelEntity;
 import fathertoast.specialmobs.common.entity.projectile.BugSpitEntity;

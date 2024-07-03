@@ -1,10 +1,10 @@
 package fathertoast.specialmobs.common.config.species;
 
+import fathertoast.crust.api.config.common.AbstractConfigCategory;
+import fathertoast.crust.api.config.common.ConfigManager;
+import fathertoast.crust.api.config.common.ConfigUtil;
+import fathertoast.crust.api.config.common.field.DoubleField;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
-import fathertoast.specialmobs.common.config.Config;
-import fathertoast.specialmobs.common.config.field.DoubleField;
-import fathertoast.specialmobs.common.config.file.ToastConfigSpec;
-import fathertoast.specialmobs.common.config.util.ConfigUtil;
 
 /**
  * This is the base species config for spiders and cave spiders.
@@ -14,17 +14,17 @@ public class SpiderSpeciesConfig extends SpeciesConfig {
     public final Spiders SPIDERS;
     
     /** Builds the config spec that should be used for this config. */
-    public SpiderSpeciesConfig( MobFamily.Species<?> species, double spitChance ) {
-        super( species );
+    public SpiderSpeciesConfig( ConfigManager manager, MobFamily.Species<?> species, double spitChance ) {
+        super( manager, species );
         
-        SPIDERS = new Spiders( SPEC, species, species.getConfigName(), spitChance );
+        SPIDERS = new Spiders( this, species, species.getConfigName(), spitChance );
     }
     
-    public static class Spiders extends Config.AbstractCategory {
+    public static class Spiders extends AbstractConfigCategory<SpiderSpeciesConfig> {
         
         public final DoubleField spitterChance;
         
-        Spiders( ToastConfigSpec parent, MobFamily.Species<?> species, String speciesName, double spitChance ) {
+        Spiders( SpiderSpeciesConfig parent, MobFamily.Species<?> species, String speciesName, double spitChance ) {
             super( parent, ConfigUtil.noSpaces( species.family.configName ),
                     "Options standard to all " + species.family.configName + "." );
             

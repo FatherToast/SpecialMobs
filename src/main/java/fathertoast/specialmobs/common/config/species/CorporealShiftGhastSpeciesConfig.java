@@ -1,28 +1,28 @@
 package fathertoast.specialmobs.common.config.species;
 
+import fathertoast.crust.api.config.common.AbstractConfigCategory;
+import fathertoast.crust.api.config.common.ConfigManager;
+import fathertoast.crust.api.config.common.ConfigUtil;
+import fathertoast.crust.api.config.common.field.IntField;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
-import fathertoast.specialmobs.common.config.Config;
-import fathertoast.specialmobs.common.config.field.IntField;
-import fathertoast.specialmobs.common.config.file.ToastConfigSpec;
-import fathertoast.specialmobs.common.config.util.ConfigUtil;
 
 public class CorporealShiftGhastSpeciesConfig extends SpeciesConfig {
     
     public final CorporealShift CORPOREAL_SHIFT;
     
     /** Builds the config spec that should be used for this config. */
-    public CorporealShiftGhastSpeciesConfig( MobFamily.Species<?> species, int corporealTime, int incorporealTime ) {
-        super( species );
+    public CorporealShiftGhastSpeciesConfig( ConfigManager manager, MobFamily.Species<?> species, int corporealTime, int incorporealTime ) {
+        super( manager, species );
         
-        CORPOREAL_SHIFT = new CorporealShift( SPEC, species, species.getConfigName(), corporealTime, incorporealTime );
+        CORPOREAL_SHIFT = new CorporealShift( this, species, species.getConfigName(), corporealTime, incorporealTime );
     }
     
-    public static class CorporealShift extends Config.AbstractCategory {
+    public static class CorporealShift extends AbstractConfigCategory<CorporealShiftGhastSpeciesConfig> {
         
         public final IntField corporealTicks;
         public final IntField incorporealTicks;
         
-        CorporealShift( ToastConfigSpec parent, MobFamily.Species<?> species, String speciesName,
+        CorporealShift( CorporealShiftGhastSpeciesConfig parent, MobFamily.Species<?> species, String speciesName,
                         int corporealTime, int incorporealTime ) {
             super( parent, ConfigUtil.camelCaseToLowerUnderscore( species.specialVariantName ),
                     "Options specific to " + speciesName + "." );

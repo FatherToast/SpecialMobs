@@ -1,11 +1,12 @@
 package fathertoast.specialmobs.common.entity.slime;
 
+import fathertoast.crust.api.config.common.ConfigManager;
+import fathertoast.crust.api.config.common.value.EnvironmentEntry;
+import fathertoast.crust.api.config.common.value.EnvironmentList;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.config.species.SpeciesConfig;
-import fathertoast.specialmobs.common.config.util.EnvironmentEntry;
-import fathertoast.specialmobs.common.config.util.EnvironmentList;
 import fathertoast.specialmobs.common.entity.ai.AIHelper;
 import fathertoast.specialmobs.common.event.NaturalSpawnManager;
 import fathertoast.specialmobs.common.util.References;
@@ -50,14 +51,14 @@ public class BlueberrySlimeEntity extends _SpecialSlimeEntity {
     }
     
     @SpecialMob.ConfigSupplier
-    public static SpeciesConfig createConfig( MobFamily.Species<?> species ) {
+    public static SpeciesConfig createConfig( ConfigManager manager, MobFamily.Species<?> species ) {
         SpeciesConfig.NEXT_NATURAL_SPAWN_CHANCE_EXCEPTIONS = new EnvironmentList(
-                EnvironmentEntry.builder( 0.0F ).atNoMoonLight().build(),
-                EnvironmentEntry.builder( 0.04F ).atMaxMoonLight().build(),
-                EnvironmentEntry.builder( 0.01F ).belowHalfMoonLight().build(),
-                EnvironmentEntry.builder( 0.02F ).atHalfMoonLight().build(),
-                EnvironmentEntry.builder( 0.03F ).aboveHalfMoonLight().build() );
-        return new SpeciesConfig( species );
+                EnvironmentEntry.builder( manager, 0.0F ).atNoMoonLight().build(),
+                EnvironmentEntry.builder( manager, 0.04F ).atMaxMoonLight().build(),
+                EnvironmentEntry.builder( manager, 0.01F ).belowHalfMoonLight().build(),
+                EnvironmentEntry.builder( manager, 0.02F ).atHalfMoonLight().build(),
+                EnvironmentEntry.builder( manager, 0.03F ).aboveHalfMoonLight().build() );
+        return new SpeciesConfig( manager, species );
     }
     
     @SpecialMob.SpawnPlacementRegistrar

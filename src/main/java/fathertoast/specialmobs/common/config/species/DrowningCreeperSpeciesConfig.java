@@ -1,32 +1,33 @@
 package fathertoast.specialmobs.common.config.species;
 
+import fathertoast.crust.api.config.common.AbstractConfigCategory;
+import fathertoast.crust.api.config.common.ConfigManager;
+import fathertoast.crust.api.config.common.ConfigUtil;
+import fathertoast.crust.api.config.common.field.DoubleField;
+import fathertoast.crust.api.config.common.field.IntField;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
-import fathertoast.specialmobs.common.config.Config;
-import fathertoast.specialmobs.common.config.field.DoubleField;
-import fathertoast.specialmobs.common.config.field.IntField;
-import fathertoast.specialmobs.common.config.file.ToastConfigSpec;
-import fathertoast.specialmobs.common.config.util.ConfigUtil;
+
 
 public class DrowningCreeperSpeciesConfig extends CreeperSpeciesConfig {
     
     public final Drowning DROWNING;
     
     /** Builds the config spec that should be used for this config. */
-    public DrowningCreeperSpeciesConfig( MobFamily.Species<?> species,
-                                         boolean cannotExplodeWhileWet, boolean explodeWhileBurning, boolean explodeWhenShot,
-                                         double infestedChance, int minPuffPuffs, int maxPuffPuffs ) {
-        super( species, cannotExplodeWhileWet, explodeWhileBurning, explodeWhenShot );
+    public DrowningCreeperSpeciesConfig( ConfigManager manager, MobFamily.Species<?> species,
+                                        boolean cannotExplodeWhileWet, boolean explodeWhileBurning, boolean explodeWhenShot,
+                                        double infestedChance, int minPuffPuffs, int maxPuffPuffs ) {
+        super( manager, species, cannotExplodeWhileWet, explodeWhileBurning, explodeWhenShot );
         
-        DROWNING = new Drowning( SPEC, species, species.getConfigName(), infestedChance, minPuffPuffs, maxPuffPuffs );
+        DROWNING = new Drowning( this, species, species.getConfigName(), infestedChance, minPuffPuffs, maxPuffPuffs );
     }
     
-    public static class Drowning extends Config.AbstractCategory {
+    public static class Drowning extends AbstractConfigCategory<DrowningCreeperSpeciesConfig> {
         
         public final DoubleField infestedBlockChance;
         
         public final IntField.RandomRange puffPuffs;
-        
-        Drowning( ToastConfigSpec parent, MobFamily.Species<?> species, String speciesName,
+
+        Drowning( DrowningCreeperSpeciesConfig parent, MobFamily.Species<?> species, String speciesName,
                   double infestedChance, int minPuffPuffs, int maxPuffPuffs ) {
             super( parent, ConfigUtil.camelCaseToLowerUnderscore( species.specialVariantName ),
                     "Options specific to " + speciesName + "." );

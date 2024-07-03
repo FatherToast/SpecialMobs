@@ -1,5 +1,6 @@
 package fathertoast.specialmobs.common.entity.witherskeleton;
 
+import fathertoast.crust.api.config.common.ConfigManager;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
@@ -35,8 +36,8 @@ public class SpitfireWitherSkeletonEntity extends _SpecialWitherSkeletonEntity {
     }
     
     @SpecialMob.ConfigSupplier
-    public static SpeciesConfig createConfig( MobFamily.Species<?> species ) {
-        return new SkeletonSpeciesConfig( species, 1.0F, DEFAULT_SHIELD_CHANCE );
+    public static SpeciesConfig createConfig( ConfigManager manager, MobFamily.Species<?> species ) {
+        return new SkeletonSpeciesConfig( manager, species, 1.0F, DEFAULT_SHIELD_CHANCE );
     }
     
     @SpecialMob.LanguageProvider

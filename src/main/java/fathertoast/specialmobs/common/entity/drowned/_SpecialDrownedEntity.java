@@ -1,5 +1,6 @@
 package fathertoast.specialmobs.common.entity.drowned;
 
+import fathertoast.crust.api.config.common.ConfigManager;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
@@ -64,8 +65,8 @@ public class _SpecialDrownedEntity extends Drowned implements ISpecialMob<_Speci
     protected static final double DEFAULT_SHIELD_CHANCE = 0.0625;
     
     @SpecialMob.ConfigSupplier
-    public static SpeciesConfig createConfig( MobFamily.Species<?> species ) {
-        return new DrownedSpeciesConfig( species, DEFAULT_TRIDENT_CHANCE, DEFAULT_SHIELD_CHANCE );
+    public static SpeciesConfig createConfig( ConfigManager manager, MobFamily.Species<?> species ) {
+        return new DrownedSpeciesConfig( manager, species, DEFAULT_TRIDENT_CHANCE, DEFAULT_SHIELD_CHANCE );
     }
     
     /** @return This entity's species config. */

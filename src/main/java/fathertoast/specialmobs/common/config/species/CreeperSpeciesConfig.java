@@ -1,11 +1,11 @@
 package fathertoast.specialmobs.common.config.species;
 
+import fathertoast.crust.api.config.common.AbstractConfigCategory;
+import fathertoast.crust.api.config.common.ConfigManager;
+import fathertoast.crust.api.config.common.ConfigUtil;
+import fathertoast.crust.api.config.common.field.BooleanField;
+import fathertoast.crust.api.config.common.field.DoubleField;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
-import fathertoast.specialmobs.common.config.Config;
-import fathertoast.specialmobs.common.config.field.BooleanField;
-import fathertoast.specialmobs.common.config.field.DoubleField;
-import fathertoast.specialmobs.common.config.file.ToastConfigSpec;
-import fathertoast.specialmobs.common.config.util.ConfigUtil;
 
 /**
  * This is the base species config for creepers.
@@ -15,14 +15,14 @@ public class CreeperSpeciesConfig extends SpeciesConfig {
     public final Creepers CREEPERS;
     
     /** Builds the config spec that should be used for this config. */
-    public CreeperSpeciesConfig( MobFamily.Species<?> species,
-                                 boolean cannotExplodeWhileWet, boolean explodeWhileBurning, boolean explodeWhenShot ) {
-        super( species );
+    public CreeperSpeciesConfig( ConfigManager manager, MobFamily.Species<?> species,
+                                boolean cannotExplodeWhileWet, boolean explodeWhileBurning, boolean explodeWhenShot ) {
+        super( manager, species );
         
-        CREEPERS = new Creepers( SPEC, species, species.getConfigName(), cannotExplodeWhileWet, explodeWhileBurning, explodeWhenShot );
+        CREEPERS = new Creepers( this, species, species.getConfigName(), cannotExplodeWhileWet, explodeWhileBurning, explodeWhenShot );
     }
     
-    public static class Creepers extends Config.AbstractCategory {
+    public static class Creepers extends AbstractConfigCategory<CreeperSpeciesConfig> {
         
         public final DoubleField stormChargeChance;
         
@@ -31,7 +31,7 @@ public class CreeperSpeciesConfig extends SpeciesConfig {
         public final BooleanField explodesWhileBurning;
         public final BooleanField explodesWhenShot;
         
-        Creepers( ToastConfigSpec parent, MobFamily.Species<?> species, String speciesName,
+        Creepers( CreeperSpeciesConfig parent, MobFamily.Species<?> species, String speciesName,
                   boolean cannotExplodeWhileWet, boolean explodeWhileBurning, boolean explodeWhenShot ) {
             super( parent, ConfigUtil.noSpaces( species.family.configName ),
                     "Options standard to all " + species.family.configName + "." );

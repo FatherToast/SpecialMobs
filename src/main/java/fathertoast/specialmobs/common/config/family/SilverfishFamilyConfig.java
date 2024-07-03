@@ -1,10 +1,10 @@
 package fathertoast.specialmobs.common.config.family;
 
+import fathertoast.crust.api.config.common.AbstractConfigCategory;
+import fathertoast.crust.api.config.common.ConfigManager;
+import fathertoast.crust.api.config.common.ConfigUtil;
+import fathertoast.crust.api.config.common.field.DoubleField;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
-import fathertoast.specialmobs.common.config.Config;
-import fathertoast.specialmobs.common.config.field.DoubleField;
-import fathertoast.specialmobs.common.config.file.ToastConfigSpec;
-import fathertoast.specialmobs.common.config.util.ConfigUtil;
 
 /**
  * This is the family config for silverfish.
@@ -14,17 +14,17 @@ public class SilverfishFamilyConfig extends FamilyConfig {
     public final Silverfish SILVERFISH;
     
     /** Builds the config spec that should be used for this config. */
-    public SilverfishFamilyConfig( MobFamily<?, ?> family ) {
-        super( family, VARIANT_CHANCE_LOW );
+    public SilverfishFamilyConfig( ConfigManager manager, MobFamily<?, ?> family ) {
+        super( manager, family, VARIANT_CHANCE_LOW );
         
-        SILVERFISH = new Silverfish( SPEC, family );
+        SILVERFISH = new Silverfish( this, family );
     }
     
-    public static class Silverfish extends Config.AbstractCategory {
+    public static class Silverfish extends AbstractConfigCategory<SilverfishFamilyConfig> {
         
         public final DoubleField familyAggressiveChance;
         
-        Silverfish( ToastConfigSpec parent, MobFamily<?, ?> family ) {
+        Silverfish( SilverfishFamilyConfig parent, MobFamily<?, ?> family ) {
             super( parent, ConfigUtil.noSpaces( family.configName ),
                     "Options specific to the family of " + family.configName + "." );
             

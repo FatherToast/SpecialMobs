@@ -1,10 +1,11 @@
 package fathertoast.specialmobs.common.config.species;
 
+import fathertoast.crust.api.config.common.AbstractConfigCategory;
+import fathertoast.crust.api.config.common.ConfigManager;
+import fathertoast.crust.api.config.common.ConfigUtil;
+import fathertoast.crust.api.config.common.field.DoubleField;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
-import fathertoast.specialmobs.common.config.Config;
-import fathertoast.specialmobs.common.config.field.DoubleField;
-import fathertoast.specialmobs.common.config.file.ToastConfigSpec;
-import fathertoast.specialmobs.common.config.util.ConfigUtil;
+
 
 /**
  * This is the base species config for silverfish.
@@ -14,19 +15,19 @@ public class SilverfishSpeciesConfig extends SpeciesConfig {
     public final Silverfish SILVERFISH;
     
     /** Builds the config spec that should be used for this config. */
-    public SilverfishSpeciesConfig( MobFamily.Species<?> species, double spitChance ) {
-        super( species );
+    public SilverfishSpeciesConfig( ConfigManager manager, MobFamily.Species<?> species, double spitChance ) {
+        super( manager, species );
         
-        SILVERFISH = new Silverfish( SPEC, species, species.getConfigName(), spitChance );
+        SILVERFISH = new Silverfish( this, species, species.getConfigName(), spitChance );
     }
     
-    public static class Silverfish extends Config.AbstractCategory {
+    public static class Silverfish extends AbstractConfigCategory<SilverfishSpeciesConfig> {
         
         public final DoubleField aggressiveChance;
         
         public final DoubleField spitterChance;
         
-        Silverfish( ToastConfigSpec parent, MobFamily.Species<?> species, String speciesName, double spitChance ) {
+        Silverfish( SilverfishSpeciesConfig parent, MobFamily.Species<?> species, String speciesName, double spitChance ) {
             super( parent, ConfigUtil.noSpaces( species.family.configName ),
                     "Options standard to all " + species.family.configName + "." );
             

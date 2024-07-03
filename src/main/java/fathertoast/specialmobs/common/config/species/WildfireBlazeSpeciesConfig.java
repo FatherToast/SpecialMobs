@@ -1,30 +1,31 @@
 package fathertoast.specialmobs.common.config.species;
 
+import fathertoast.crust.api.config.common.AbstractConfigCategory;
+import fathertoast.crust.api.config.common.ConfigManager;
+import fathertoast.crust.api.config.common.ConfigUtil;
+import fathertoast.crust.api.config.common.field.IntField;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
-import fathertoast.specialmobs.common.config.Config;
-import fathertoast.specialmobs.common.config.field.IntField;
-import fathertoast.specialmobs.common.config.file.ToastConfigSpec;
-import fathertoast.specialmobs.common.config.util.ConfigUtil;
+
 
 public class WildfireBlazeSpeciesConfig extends BlazeSpeciesConfig {
     
     public final Wildfire WILDFIRE;
     
     /** Builds the config spec that should be used for this config. */
-    public WildfireBlazeSpeciesConfig( MobFamily.Species<?> species, int fireballBurstCount, int fireballBurstDelay,
-                                       int minBabies, int maxBabies, int minSummons, int maxSummons ) {
-        super( species, fireballBurstCount, fireballBurstDelay );
+    public WildfireBlazeSpeciesConfig( ConfigManager manager, MobFamily.Species<?> species, int fireballBurstCount, int fireballBurstDelay,
+                                      int minBabies, int maxBabies, int minSummons, int maxSummons ) {
+        super( manager, species, fireballBurstCount, fireballBurstDelay );
         
-        WILDFIRE = new Wildfire( SPEC, species, species.getConfigName(), minBabies, maxBabies, minSummons, maxSummons );
+        WILDFIRE = new Wildfire( this, species, species.getConfigName(), minBabies, maxBabies, minSummons, maxSummons );
     }
     
-    public static class Wildfire extends Config.AbstractCategory {
+    public static class Wildfire extends AbstractConfigCategory<WildfireBlazeSpeciesConfig> {
         
         public final IntField.RandomRange babies;
         
         public final IntField.RandomRange summons;
         
-        Wildfire( ToastConfigSpec parent, MobFamily.Species<?> species, String speciesName,
+        Wildfire( WildfireBlazeSpeciesConfig parent, MobFamily.Species<?> species, String speciesName,
                   int minBabies, int maxBabies, int minSummons, int maxSummons ) {
             super( parent, ConfigUtil.camelCaseToLowerUnderscore( species.specialVariantName ),
                     "Options specific to " + speciesName + "." );

@@ -1,10 +1,10 @@
 package fathertoast.specialmobs.common.config.species;
 
+import fathertoast.crust.api.config.common.AbstractConfigCategory;
+import fathertoast.crust.api.config.common.ConfigManager;
+import fathertoast.crust.api.config.common.ConfigUtil;
+import fathertoast.crust.api.config.common.field.DoubleField;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
-import fathertoast.specialmobs.common.config.Config;
-import fathertoast.specialmobs.common.config.field.DoubleField;
-import fathertoast.specialmobs.common.config.file.ToastConfigSpec;
-import fathertoast.specialmobs.common.config.util.ConfigUtil;
 
 /**
  * This is the base species config for zombies, drowned, and zombified piglins.
@@ -14,19 +14,19 @@ public class DrownedSpeciesConfig extends SpeciesConfig {
     public final Drowned DROWNED;
     
     /** Builds the config spec that should be used for this config. */
-    public DrownedSpeciesConfig( MobFamily.Species<?> species, double tridentChance, double shieldChance ) {
-        super( species );
+    public DrownedSpeciesConfig( ConfigManager manager, MobFamily.Species<?> species, double tridentChance, double shieldChance ) {
+        super( manager, species );
         
-        DROWNED = new Drowned( SPEC, species, species.getConfigName(), tridentChance, shieldChance );
+        DROWNED = new Drowned( this, species, species.getConfigName(), tridentChance, shieldChance );
     }
     
-    public static class Drowned extends Config.AbstractCategory {
+    public static class Drowned extends AbstractConfigCategory<DrownedSpeciesConfig> {
         
         public final DoubleField tridentEquipChance;
         
         public final DoubleField shieldEquipChance;
         
-        Drowned( ToastConfigSpec parent, MobFamily.Species<?> species, String speciesName, double tridentChance, double shieldChance ) {
+        Drowned( DrownedSpeciesConfig parent, MobFamily.Species<?> species, String speciesName, double tridentChance, double shieldChance ) {
             super( parent, ConfigUtil.noSpaces( species.family.configName ),
                     "Options standard to all " + species.family.configName + "." );
             

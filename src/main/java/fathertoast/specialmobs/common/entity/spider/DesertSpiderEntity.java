@@ -1,10 +1,11 @@
 package fathertoast.specialmobs.common.entity.spider;
 
+import fathertoast.crust.api.ICrustApi;
+import fathertoast.crust.api.lib.CrustObjects;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.config.Config;
-import fathertoast.specialmobs.common.core.register.SMEffects;
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
@@ -28,7 +29,7 @@ public class DesertSpiderEntity extends _SpecialSpiderEntity {
         bestiaryInfo.color( 0xE6DDAC ).theme( BestiaryInfo.Theme.DESERT )
                 .uniqueTextureWithEyes()
                 .size( 0.8F, 0.95F, 0.7F )
-                .addExperience( 2 ).effectImmune( MobEffects.MOVEMENT_SLOWDOWN, SMEffects.VULNERABILITY )
+                .addExperience( 2 ).effectImmune( MobEffects.MOVEMENT_SLOWDOWN, ICrustApi.MOD_ID + ":" + CrustObjects.ID.VULNERABILITY )
                 .addToAttribute( Attributes.MAX_HEALTH, 4.0 );
     }
     
@@ -68,6 +69,6 @@ public class DesertSpiderEntity extends _SpecialSpiderEntity {
         MobHelper.applyEffect( target, MobEffects.BLINDNESS );
         MobHelper.removeNightVision( target );
         MobHelper.applyEffect( target, MobEffects.MOVEMENT_SLOWDOWN, 2 );
-        MobHelper.applyEffect( target, SMEffects.VULNERABILITY.get(), 2 );
+        MobHelper.applyEffect( target, CrustObjects.vulnerability(), 2 );
     }
 }

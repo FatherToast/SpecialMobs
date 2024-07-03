@@ -1,10 +1,10 @@
 package fathertoast.specialmobs.common.config.species;
 
+import fathertoast.crust.api.config.common.AbstractConfigCategory;
+import fathertoast.crust.api.config.common.ConfigManager;
+import fathertoast.crust.api.config.common.ConfigUtil;
+import fathertoast.crust.api.config.common.field.DoubleField;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
-import fathertoast.specialmobs.common.config.Config;
-import fathertoast.specialmobs.common.config.field.DoubleField;
-import fathertoast.specialmobs.common.config.file.ToastConfigSpec;
-import fathertoast.specialmobs.common.config.util.ConfigUtil;
 
 /**
  * This is the base species config for zombies, drowned, and zombified piglins.
@@ -14,19 +14,19 @@ public class ZombieSpeciesConfig extends SpeciesConfig {
     public final Zombies ZOMBIES;
     
     /** Builds the config spec that should be used for this config. */
-    public ZombieSpeciesConfig( MobFamily.Species<?> species, double bowChance, double shieldChance ) {
-        super( species );
+    public ZombieSpeciesConfig( ConfigManager manager, MobFamily.Species<?> species, double bowChance, double shieldChance ) {
+        super( manager, species );
         
-        ZOMBIES = new Zombies( SPEC, species, species.getConfigName(), bowChance, shieldChance );
+        ZOMBIES = new Zombies( this, species, species.getConfigName(), bowChance, shieldChance );
     }
     
-    public static class Zombies extends Config.AbstractCategory {
+    public static class Zombies extends AbstractConfigCategory<ZombieSpeciesConfig> {
         
         public final DoubleField bowEquipChance;
         
         public final DoubleField shieldEquipChance;
         
-        Zombies( ToastConfigSpec parent, MobFamily.Species<?> species, String speciesName, double bowChance, double shieldChance ) {
+        Zombies( ZombieSpeciesConfig parent, MobFamily.Species<?> species, String speciesName, double bowChance, double shieldChance ) {
             super( parent, ConfigUtil.noSpaces( species.family.configName ),
                     "Options standard to all " + species.family.configName + "." );
             

@@ -3,7 +3,6 @@ package fathertoast.specialmobs.datagen;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.core.SpecialMobs;
 import fathertoast.specialmobs.common.core.register.SMBlocks;
-import fathertoast.specialmobs.common.core.register.SMEffects;
 import fathertoast.specialmobs.common.core.register.SMEntities;
 import fathertoast.specialmobs.common.core.register.SMItems;
 import fathertoast.specialmobs.common.util.AnnotationHelper;
@@ -92,13 +91,6 @@ public class SMLanguageProvider extends LanguageProvider {
             
             translationList.add( AnnotationHelper.getTranslations( regObject.get() ) );
         }
-        
-        // Misc
-        translationList.add( References.translations( SMEffects.VULNERABILITY.get().getDescriptionId(), "Vulnerability",
-                "Vulnerabilidad", "Vulnerabilidade", "Vulnérabilité",
-                "Vulnerabilità", "Verletzlichkeit", "More Hurtin'" ) );
-        translationList.add( References.translations( SMEffects.WEIGHT.get().getDescriptionId(), "Weight",
-                "Pesando", "Peso", "Lester", "Peso", "Gewicht", "Anchor" ) );
         
         TRANSLATIONS = translationList.toArray( new String[0][0] );
         

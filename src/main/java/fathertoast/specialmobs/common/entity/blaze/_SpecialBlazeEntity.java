@@ -1,5 +1,6 @@
 package fathertoast.specialmobs.common.entity.blaze;
 
+import fathertoast.crust.api.config.common.ConfigManager;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
@@ -55,8 +56,8 @@ public class _SpecialBlazeEntity extends Blaze implements RangedAttackMob, ISpec
     }
     
     @SpecialMob.ConfigSupplier
-    public static SpeciesConfig createConfig( MobFamily.Species<?> species ) {
-        return new BlazeSpeciesConfig( species, 3, 6 );
+    public static SpeciesConfig createConfig( ConfigManager manager, MobFamily.Species<?> species ) {
+        return new BlazeSpeciesConfig( manager, species, 3, 6 );
     }
     
     /** @return This entity's species config. */

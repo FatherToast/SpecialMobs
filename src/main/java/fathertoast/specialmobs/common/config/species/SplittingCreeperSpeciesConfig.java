@@ -1,29 +1,30 @@
 package fathertoast.specialmobs.common.config.species;
 
+import fathertoast.crust.api.config.common.AbstractConfigCategory;
+import fathertoast.crust.api.config.common.ConfigManager;
+import fathertoast.crust.api.config.common.ConfigUtil;
+import fathertoast.crust.api.config.common.field.IntField;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
-import fathertoast.specialmobs.common.config.Config;
-import fathertoast.specialmobs.common.config.field.IntField;
-import fathertoast.specialmobs.common.config.file.ToastConfigSpec;
-import fathertoast.specialmobs.common.config.util.ConfigUtil;
+
 
 public class SplittingCreeperSpeciesConfig extends CreeperSpeciesConfig {
     
     public final Splitting SPLITTING;
     
     /** Builds the config spec that should be used for this config. */
-    public SplittingCreeperSpeciesConfig( MobFamily.Species<?> species,
-                                          boolean cannotExplodeWhileWet, boolean explodeWhileBurning, boolean explodeWhenShot,
-                                          int minExtraBabies, int maxExtraBabies ) {
-        super( species, cannotExplodeWhileWet, explodeWhileBurning, explodeWhenShot );
+    public SplittingCreeperSpeciesConfig( ConfigManager manager, MobFamily.Species<?> species,
+                                         boolean cannotExplodeWhileWet, boolean explodeWhileBurning, boolean explodeWhenShot,
+                                         int minExtraBabies, int maxExtraBabies ) {
+        super( manager, species, cannotExplodeWhileWet, explodeWhileBurning, explodeWhenShot );
         
-        SPLITTING = new Splitting( SPEC, species, species.getConfigName(), minExtraBabies, maxExtraBabies );
+        SPLITTING = new Splitting( this, species, species.getConfigName(), minExtraBabies, maxExtraBabies );
     }
     
-    public static class Splitting extends Config.AbstractCategory {
+    public static class Splitting extends AbstractConfigCategory<SplittingCreeperSpeciesConfig> {
         
         public final IntField.RandomRange extraBabies;
         
-        Splitting( ToastConfigSpec parent, MobFamily.Species<?> species, String speciesName, int minExtraBabies, int maxExtraBabies ) {
+        Splitting( SplittingCreeperSpeciesConfig parent, MobFamily.Species<?> species, String speciesName, int minExtraBabies, int maxExtraBabies ) {
             super( parent, ConfigUtil.camelCaseToLowerUnderscore( species.specialVariantName ),
                     "Options specific to " + speciesName + "." );
             

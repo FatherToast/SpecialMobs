@@ -1,5 +1,6 @@
 package fathertoast.specialmobs.common.entity.spider;
 
+import fathertoast.crust.api.config.common.ConfigManager;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
@@ -39,8 +40,8 @@ public class MotherSpiderEntity extends _SpecialSpiderEntity {
     }
     
     @SpecialMob.ConfigSupplier
-    public static SpeciesConfig createConfig( MobFamily.Species<?> species ) {
-        return new MotherSpiderSpeciesConfig( species, DEFAULT_SPIT_CHANCE,
+    public static SpeciesConfig createConfig( ConfigManager manager, MobFamily.Species<?> species ) {
+        return new MotherSpiderSpeciesConfig( manager, species, DEFAULT_SPIT_CHANCE,
                 2, 4, 3, 6 );
     }
     

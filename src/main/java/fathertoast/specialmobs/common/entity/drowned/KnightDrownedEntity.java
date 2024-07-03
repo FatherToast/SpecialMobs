@@ -1,5 +1,6 @@
 package fathertoast.specialmobs.common.entity.drowned;
 
+import fathertoast.crust.api.config.common.ConfigManager;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
@@ -38,8 +39,8 @@ public class KnightDrownedEntity extends _SpecialDrownedEntity {
     }
     
     @SpecialMob.ConfigSupplier
-    public static SpeciesConfig createConfig( MobFamily.Species<?> species ) {
-        return new DrownedSpeciesConfig( species, 0.9, 1.0 );
+    public static SpeciesConfig createConfig( ConfigManager manager, MobFamily.Species<?> species ) {
+        return new DrownedSpeciesConfig( manager, species, 0.9, 1.0 );
     }
     
     @SpecialMob.LanguageProvider

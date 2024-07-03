@@ -1,5 +1,6 @@
 package fathertoast.specialmobs.common.entity.ghast;
 
+import fathertoast.crust.api.config.common.ConfigManager;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
@@ -39,8 +40,8 @@ public class QueenGhastEntity extends _SpecialGhastEntity {
     }
     
     @SpecialMob.ConfigSupplier
-    public static SpeciesConfig createConfig( MobFamily.Species<?> species ) {
-        return new QueenGhastSpeciesConfig( species, 3, 6, 4, 10 );
+    public static SpeciesConfig createConfig( ConfigManager manager, MobFamily.Species<?> species ) {
+        return new QueenGhastSpeciesConfig( manager, species, 3, 6, 4, 10 );
     }
     
     /** @return This entity's species config. */

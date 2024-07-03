@@ -1,5 +1,6 @@
 package fathertoast.specialmobs.common.entity.creeper;
 
+import fathertoast.crust.api.config.common.ConfigManager;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
@@ -28,8 +29,8 @@ public class FireCreeperEntity extends _SpecialCreeperEntity {
     }
     
     @SpecialMob.ConfigSupplier
-    public static SpeciesConfig createConfig( MobFamily.Species<?> species ) {
-        return new CreeperSpeciesConfig( species, true, false, false );
+    public static SpeciesConfig createConfig( ConfigManager manager, MobFamily.Species<?> species ) {
+        return new CreeperSpeciesConfig( manager, species, true, false, false );
     }
     
     @SpecialMob.LanguageProvider

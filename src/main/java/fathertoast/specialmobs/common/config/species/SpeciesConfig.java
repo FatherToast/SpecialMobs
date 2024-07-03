@@ -1,13 +1,14 @@
 package fathertoast.specialmobs.common.config.species;
 
+import fathertoast.crust.api.config.common.AbstractConfigCategory;
+import fathertoast.crust.api.config.common.AbstractConfigFile;
+import fathertoast.crust.api.config.common.ConfigManager;
+import fathertoast.crust.api.config.common.ConfigUtil;
+import fathertoast.crust.api.config.common.field.*;
+import fathertoast.crust.api.config.common.value.EnvironmentList;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
-import fathertoast.specialmobs.common.config.Config;
 import fathertoast.specialmobs.common.config.family.FamilyConfig;
-import fathertoast.specialmobs.common.config.field.*;
-import fathertoast.specialmobs.common.config.file.ToastConfigSpec;
-import fathertoast.specialmobs.common.config.util.ConfigUtil;
-import fathertoast.specialmobs.common.config.util.EnvironmentList;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.level.block.Block;
 
@@ -15,7 +16,7 @@ import net.minecraft.world.level.block.Block;
  * This is the base config for mob species. This may be extended to add categories specific to the species, but all
  * options that are used by all species should be defined in this class.
  */
-public class SpeciesConfig extends Config.AbstractConfig {
+public class SpeciesConfig extends AbstractConfigFile {
     public static final String SPECIAL_DATA_SUBCAT = "special_data.";
     
     /** Set this field right before creating a new species config; this will then be set as a default value for that config. */
@@ -30,14 +31,14 @@ public class SpeciesConfig extends Config.AbstractConfig {
     public final General GENERAL;
     
     /** Builds the config spec that should be used for this config. */
-    public SpeciesConfig( MobFamily.Species<?> species ) {
-        super( FamilyConfig.dir( species.family ), fileName( species ),
+    public SpeciesConfig( ConfigManager manager, MobFamily.Species<?> species ) {
+        super( manager, FamilyConfig.dir( species.family ) + "/" + fileName( species ),
                 "This config contains options that apply only to the " + species.getConfigNameSingular() + " species." );
         
-        GENERAL = new General( SPEC, species, species.getConfigName() );
+        GENERAL = new General( this, species, species.getConfigName() );
     }
     
-    public static class General extends Config.AbstractCategory {
+    public static class General extends AbstractConfigCategory<SpeciesConfig> {
         
         public final DoubleField.EnvironmentSensitive naturalSpawnChance;
         
@@ -66,7 +67,7 @@ public class SpeciesConfig extends Config.AbstractConfig {
         public final IntField rangedAttackMaxCooldown;
         public final DoubleField rangedAttackMaxRange;
         
-        General( ToastConfigSpec parent, MobFamily.Species<?> species, String speciesName ) {
+        General( SpeciesConfig parent, MobFamily.Species<?> species, String speciesName ) {
             super( parent, "general",
                     "Options standard to all mob species (that is, not specific to any particular mob species)." );
             final BestiaryInfo info = species.bestiaryInfo;

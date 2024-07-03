@@ -1,5 +1,6 @@
 package fathertoast.specialmobs.common.entity.zombie;
 
+import fathertoast.crust.api.config.common.ConfigManager;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
@@ -67,8 +68,8 @@ public class _SpecialZombieEntity extends Zombie implements RangedAttackMob, ISp
     protected static final double DEFAULT_SHIELD_CHANCE = 0.02;
     
     @SpecialMob.ConfigSupplier
-    public static SpeciesConfig createConfig( MobFamily.Species<?> species ) {
-        return new ZombieSpeciesConfig( species, DEFAULT_BOW_CHANCE, DEFAULT_SHIELD_CHANCE );
+    public static SpeciesConfig createConfig( ConfigManager manager, MobFamily.Species<?> species ) {
+        return new ZombieSpeciesConfig( manager, species, DEFAULT_BOW_CHANCE, DEFAULT_SHIELD_CHANCE );
     }
     
     /** @return This entity's species config. */

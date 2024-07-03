@@ -1,5 +1,6 @@
 package fathertoast.specialmobs.common.entity.silverfish;
 
+import fathertoast.crust.api.config.common.ConfigManager;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
@@ -48,8 +49,8 @@ public class DesiccatedSilverfishEntity extends _SpecialSilverfishEntity {
     }
     
     @SpecialMob.ConfigSupplier
-    public static SpeciesConfig createConfig( MobFamily.Species<?> species ) {
-        return new DesiccatedSilverfishSpeciesConfig( species, DEFAULT_SPIT_CHANCE, 64, 64 );
+    public static SpeciesConfig createConfig( ConfigManager manager, MobFamily.Species<?> species ) {
+        return new DesiccatedSilverfishSpeciesConfig( manager, species, DEFAULT_SPIT_CHANCE, 64, 64 );
     }
     
     /** @return This entity's species config. */

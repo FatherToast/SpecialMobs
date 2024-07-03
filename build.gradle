@@ -82,12 +82,21 @@ repositories {
             includeGroup 'curse.maven'
         }
     }
+    // Apocalypse isn't hosted on any maven servers anymore, oh well
+    flatDir {
+        dir 'flat_deps'
+    }
 }
 
 dependencies {
     minecraft "net.minecraftforge:forge:${mc_version}-${forge_version}"
 
-    // Add in JEI and TOP to assist debugging during development
+
+    // Crust; only implement the api, but include the entire mod at runtime
+    implementation "curse.maven:crust-873570:${crust_api_version}"
+    runtimeOnly "curse.maven:crust-873570:${crust_src_version}"
+
+    // Add in JEI and Jade to assist debugging during development
     runtimeOnly fg.deobf("curse.maven:jei-238222:${jei_version}")
     implementation fg.deobf("curse.maven:jade-324717:${jade_version}")
 

@@ -1,5 +1,6 @@
 package fathertoast.specialmobs.common.util;
 
+import fathertoast.crust.api.config.common.ConfigManager;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
@@ -64,13 +65,13 @@ public final class AnnotationHelper {
     }
     
     /** Creates a species config from a special mob species. Throws an exception if anything goes wrong. */
-    public static SpeciesConfig createConfig( MobFamily.Species<?> species ) {
+    public static SpeciesConfig createConfig( ConfigManager manager, MobFamily.Species<?> species ) {
         try {
             final Method supplier = getMethodOrSuperOptional( species.entityClass, SpecialMob.ConfigSupplier.class );
             if( supplier == null ) {
-                return new SpeciesConfig( species );
+                return new SpeciesConfig( manager, species );
             }
-            return (SpeciesConfig) supplier.invoke( null, species );
+            return (SpeciesConfig) supplier.invoke( null, manager, species );
         }
         catch( InvocationTargetException | IllegalAccessException ex ) {
             throw new RuntimeException( "Entity class for " + species.name + " has invalid config creation method", ex );

@@ -1,34 +1,30 @@
 package fathertoast.specialmobs.common.config;
 
-import fathertoast.specialmobs.common.config.field.BooleanField;
-import fathertoast.specialmobs.common.config.field.DoubleField;
-import fathertoast.specialmobs.common.config.field.EnvironmentListField;
-import fathertoast.specialmobs.common.config.field.IntField;
-import fathertoast.specialmobs.common.config.file.ToastConfigSpec;
-import fathertoast.specialmobs.common.config.util.ConfigUtil;
-import fathertoast.specialmobs.common.config.util.EnvironmentEntry;
-import fathertoast.specialmobs.common.config.util.EnvironmentList;
-import fathertoast.specialmobs.common.config.util.RestartNote;
+import fathertoast.crust.api.config.common.AbstractConfigCategory;
+import fathertoast.crust.api.config.common.AbstractConfigFile;
+import fathertoast.crust.api.config.common.ConfigManager;
+import fathertoast.crust.api.config.common.ConfigUtil;
+import fathertoast.crust.api.config.common.field.*;
+import fathertoast.crust.api.config.common.value.EnvironmentEntry;
+import fathertoast.crust.api.config.common.value.EnvironmentList;
 import net.minecraft.world.level.levelgen.structure.BuiltinStructures;
 
-import java.io.File;
-
-public class MainConfig extends Config.AbstractConfig {
+public class MainConfig extends AbstractConfigFile {
     
     public final General GENERAL;
     public final NaturalSpawning NATURAL_SPAWNING;
     
     /** Builds the config spec that should be used for this config. */
-    MainConfig( File dir, String fileName ) {
-        super( dir, fileName,
+    MainConfig( ConfigManager manager, String fileName ) {
+        super( manager, fileName,
                 "This config contains options that apply to the mod as a whole, including some master settings",
                 "toggles for convenience." );
         
-        GENERAL = new General( SPEC );
-        NATURAL_SPAWNING = new NaturalSpawning( SPEC );
+        GENERAL = new General( this );
+        NATURAL_SPAWNING = new NaturalSpawning( this );
     }
     
-    public static class General extends Config.AbstractCategory {
+    public static class General extends AbstractConfigCategory<MainConfig> {
         
         public final BooleanField enableMobReplacement;
         public final BooleanField enableNaturalSpawning;
@@ -39,7 +35,7 @@ public class MainConfig extends Config.AbstractConfig {
         public final BooleanField enableNausea;
         public final BooleanField fancyFishingMobs;
         
-        General( ToastConfigSpec parent ) {
+        General( MainConfig parent ) {
             super( parent, "general",
                     "Options that apply to the Special Mobs mod as a whole.",
                     "Also includes several 'master toggles' for convenience." );
@@ -75,7 +71,7 @@ public class MainConfig extends Config.AbstractConfig {
         }
     }
     
-    public static class NaturalSpawning extends Config.AbstractCategory {
+    public static class NaturalSpawning extends AbstractConfigCategory<MainConfig> {
         
         public final DoubleField caveSpiderSpawnMultiplier;
         public final DoubleField.EnvironmentSensitive caveSpiderSpawnChance;
@@ -98,7 +94,7 @@ public class MainConfig extends Config.AbstractConfig {
         
         public final DoubleField enderCreeperSpawnMultiplier;
         
-        NaturalSpawning( ToastConfigSpec parent ) {
+        NaturalSpawning( MainConfig parent ) {
             super( parent, "natural_spawning",
                     "Options to customize the additional natural monster spawning from this mod.",
                     "Most changes to options in this category require the game to be restarted to take effect." );
@@ -116,9 +112,9 @@ public class MainConfig extends Config.AbstractConfig {
                     SPEC.define( new DoubleField( "cave_spider_chance.base", 0.0, DoubleField.Range.PERCENT,
                             "The chance for added cave spider natural spawn attempts to succeed. Does not affect Mob Replacement." ) ),
                     SPEC.define( new EnvironmentListField( "cave_spider_chance.exceptions", new EnvironmentList(
-                            EnvironmentEntry.builder( 1.0F ).belowDiamondLevel().build(),
-                            EnvironmentEntry.builder( 1.0F ).inStructure( BuiltinStructures.MINESHAFT ).build(),
-                            EnvironmentEntry.builder( 0.33F ).belowSeaFloor().build() )
+                            EnvironmentEntry.builder( SPEC, 1.0F ).belowDiamondLevel().build(),
+                            EnvironmentEntry.builder( SPEC, 1.0F ).inStructure( BuiltinStructures.MINESHAFT ).build(),
+                            EnvironmentEntry.builder( SPEC, 0.33F ).belowSeaFloor().build() )
                             .setRange( DoubleField.Range.PERCENT ),
                             "The chance for added cave spider natural spawn attempts to succeed when specific environmental conditions are met." ) )
             );

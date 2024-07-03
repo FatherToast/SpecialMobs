@@ -1,11 +1,10 @@
 package fathertoast.specialmobs.common.config.family;
 
+import fathertoast.crust.api.config.common.AbstractConfigCategory;
+import fathertoast.crust.api.config.common.ConfigManager;
+import fathertoast.crust.api.config.common.ConfigUtil;
+import fathertoast.crust.api.config.common.field.DoubleField;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
-import fathertoast.specialmobs.common.config.Config;
-import fathertoast.specialmobs.common.config.field.DoubleField;
-import fathertoast.specialmobs.common.config.file.ToastConfigSpec;
-import fathertoast.specialmobs.common.config.util.ConfigUtil;
-
 /**
  * This is the family config for creepers.
  */
@@ -14,19 +13,19 @@ public class CreeperFamilyConfig extends FamilyConfig {
     public final Creepers CREEPERS;
     
     /** Builds the config spec that should be used for this config. */
-    public CreeperFamilyConfig( MobFamily<?, ?> family ) {
-        super( family, VARIANT_CHANCE_HIGH );
+    public CreeperFamilyConfig( ConfigManager manager, MobFamily<?, ?> family ) {
+        super( manager, family, VARIANT_CHANCE_HIGH );
         
-        CREEPERS = new Creepers( SPEC, family );
+        CREEPERS = new Creepers( this, family );
     }
     
-    public static class Creepers extends Config.AbstractCategory {
+    public static class Creepers extends AbstractConfigCategory<CreeperFamilyConfig> {
         
         public final DoubleField familyStormChargeChance;
         
         public final DoubleField superchargeChance;
         
-        Creepers( ToastConfigSpec parent, MobFamily<?, ?> family ) {
+        Creepers( CreeperFamilyConfig parent, MobFamily<?, ?> family ) {
             super( parent, ConfigUtil.noSpaces( family.configName ),
                     "Options specific to the family of " + family.configName + "." );
             

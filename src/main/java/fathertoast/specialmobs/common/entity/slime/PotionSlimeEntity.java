@@ -1,5 +1,6 @@
 package fathertoast.specialmobs.common.entity.slime;
 
+import fathertoast.crust.api.config.common.ConfigManager;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
@@ -57,8 +58,8 @@ public class PotionSlimeEntity extends _SpecialSlimeEntity {
     }
     
     @SpecialMob.ConfigSupplier
-    public static SpeciesConfig createConfig( MobFamily.Species<?> species ) {
-        return new PotionSlimeSpeciesConfig( species );
+    public static SpeciesConfig createConfig( ConfigManager manager, MobFamily.Species<?> species ) {
+        return new PotionSlimeSpeciesConfig( manager, species );
     }
     
     /** @return This entity's species config. */

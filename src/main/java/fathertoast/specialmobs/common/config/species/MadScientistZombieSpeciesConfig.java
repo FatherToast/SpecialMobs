@@ -1,27 +1,27 @@
 package fathertoast.specialmobs.common.config.species;
 
+import fathertoast.crust.api.config.common.AbstractConfigCategory;
+import fathertoast.crust.api.config.common.ConfigManager;
+import fathertoast.crust.api.config.common.ConfigUtil;
+import fathertoast.crust.api.config.common.field.IntField;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
-import fathertoast.specialmobs.common.config.Config;
-import fathertoast.specialmobs.common.config.field.IntField;
-import fathertoast.specialmobs.common.config.file.ToastConfigSpec;
-import fathertoast.specialmobs.common.config.util.ConfigUtil;
 
 public class MadScientistZombieSpeciesConfig extends ZombieSpeciesConfig {
     
     public final MadScientist MAD_SCIENTIST;
     
     /** Builds the config spec that should be used for this config. */
-    public MadScientistZombieSpeciesConfig( MobFamily.Species<?> species, double bowChance, double shieldChance, int minCharges, int maxCharges ) {
-        super( species, bowChance, shieldChance );
+    public MadScientistZombieSpeciesConfig( ConfigManager manager, MobFamily.Species<?> species, double bowChance, double shieldChance, int minCharges, int maxCharges ) {
+        super( manager, species, bowChance, shieldChance );
         
-        MAD_SCIENTIST = new MadScientist( SPEC, species, species.getConfigName(), minCharges, maxCharges );
+        MAD_SCIENTIST = new MadScientist( this, species, species.getConfigName(), minCharges, maxCharges );
     }
     
-    public static class MadScientist extends Config.AbstractCategory {
+    public static class MadScientist extends AbstractConfigCategory<MadScientistZombieSpeciesConfig> {
         
         public final IntField.RandomRange chargeCount;
         
-        MadScientist( ToastConfigSpec parent, MobFamily.Species<?> species, String speciesName, int minCharges, int maxCharges ) {
+        MadScientist( MadScientistZombieSpeciesConfig parent, MobFamily.Species<?> species, String speciesName, int minCharges, int maxCharges ) {
             super( parent, ConfigUtil.camelCaseToLowerUnderscore( species.specialVariantName ),
                     "Options specific to " + speciesName + "." );
             

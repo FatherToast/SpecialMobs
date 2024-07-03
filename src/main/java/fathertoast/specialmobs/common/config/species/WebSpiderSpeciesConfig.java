@@ -1,27 +1,27 @@
 package fathertoast.specialmobs.common.config.species;
 
+import fathertoast.crust.api.config.common.AbstractConfigCategory;
+import fathertoast.crust.api.config.common.ConfigManager;
+import fathertoast.crust.api.config.common.ConfigUtil;
+import fathertoast.crust.api.config.common.field.IntField;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
-import fathertoast.specialmobs.common.config.Config;
-import fathertoast.specialmobs.common.config.field.IntField;
-import fathertoast.specialmobs.common.config.file.ToastConfigSpec;
-import fathertoast.specialmobs.common.config.util.ConfigUtil;
 
 public class WebSpiderSpeciesConfig extends SpiderSpeciesConfig {
     
     public final Web WEB;
     
     /** Builds the config spec that should be used for this config. */
-    public WebSpiderSpeciesConfig( MobFamily.Species<?> species, double spitChance, int minWebs, int maxWebs ) {
-        super( species, spitChance );
+    public WebSpiderSpeciesConfig( ConfigManager manager, MobFamily.Species<?> species, double spitChance, int minWebs, int maxWebs ) {
+        super( manager, species, spitChance );
         
-        WEB = new Web( SPEC, species, species.getConfigName(), minWebs, maxWebs );
+        WEB = new Web( this, species, species.getConfigName(), minWebs, maxWebs );
     }
     
-    public static class Web extends Config.AbstractCategory {
+    public static class Web extends AbstractConfigCategory<WebSpiderSpeciesConfig> {
         
         public final IntField.RandomRange webCount;
         
-        Web( ToastConfigSpec parent, MobFamily.Species<?> species, String speciesName, int minWebs, int maxWebs ) {
+        Web( WebSpiderSpeciesConfig parent, MobFamily.Species<?> species, String speciesName, int minWebs, int maxWebs ) {
             super( parent, ConfigUtil.camelCaseToLowerUnderscore( species.specialVariantName ),
                     "Options specific to " + speciesName + "." );
             

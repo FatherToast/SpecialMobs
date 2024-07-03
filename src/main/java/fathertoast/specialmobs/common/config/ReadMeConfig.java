@@ -1,16 +1,16 @@
 package fathertoast.specialmobs.common.config;
 
-import fathertoast.specialmobs.common.config.field.BooleanField;
+import fathertoast.crust.api.config.common.AbstractConfigFile;
+import fathertoast.crust.api.config.common.ConfigManager;
+import fathertoast.crust.api.config.common.field.BooleanField;
 
-import java.io.File;
-
-public class ReadMeConfig extends Config.AbstractConfig {
+public class ReadMeConfig extends AbstractConfigFile {
     @SuppressWarnings( "SameParameterValue" )
-    static void makeReadMe( File dir ) { new ReadMeConfig( dir ).SPEC.initialize(); }
+    static void makeReadMe( ConfigManager manager ) { new ReadMeConfig( manager ).SPEC.initialize(); }
     
     /** Builds the config spec that should be used for this config. */
-    private ReadMeConfig( File dir ) {
-        super( dir, "__README__", "This file contains helpful information about how to use the config files in this mod." );
+    private ReadMeConfig( ConfigManager manager ) {
+        super( manager, "README", "This file contains helpful information about how to use the config files in this mod." );
         SPEC.newLine( 2 );
         SPEC.comment(
                 "Terminology used in Special Mobs configs:",

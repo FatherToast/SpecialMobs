@@ -1,24 +1,25 @@
 package fathertoast.specialmobs.common.config.species;
 
+import fathertoast.crust.api.config.common.AbstractConfigCategory;
+import fathertoast.crust.api.config.common.ConfigManager;
+import fathertoast.crust.api.config.common.ConfigUtil;
+import fathertoast.crust.api.config.common.field.IntField;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
-import fathertoast.specialmobs.common.config.Config;
-import fathertoast.specialmobs.common.config.field.IntField;
-import fathertoast.specialmobs.common.config.file.ToastConfigSpec;
-import fathertoast.specialmobs.common.config.util.ConfigUtil;
+
 
 public class WildsWitchSpeciesConfig extends SpeciesConfig {
     
     public final Wilds WILDS;
     
     /** Builds the config spec that should be used for this config. */
-    public WildsWitchSpeciesConfig( MobFamily.Species<?> species, int minMounts, int maxMounts,
-                                    int minSwarms, int maxSwarms, int minSwarmSize, int maxSwarmSize ) {
-        super( species );
+    public WildsWitchSpeciesConfig( ConfigManager manager, MobFamily.Species<?> species, int minMounts, int maxMounts,
+                                   int minSwarms, int maxSwarms, int minSwarmSize, int maxSwarmSize ) {
+        super( manager, species );
         
-        WILDS = new Wilds( SPEC, species, species.getConfigName(), minMounts, maxMounts, minSwarms, maxSwarms, minSwarmSize, maxSwarmSize );
+        WILDS = new Wilds( this, species, species.getConfigName(), minMounts, maxMounts, minSwarms, maxSwarms, minSwarmSize, maxSwarmSize );
     }
     
-    public static class Wilds extends Config.AbstractCategory {
+    public static class Wilds extends AbstractConfigCategory<WildsWitchSpeciesConfig> {
         
         public final IntField.RandomRange mounts;
         
@@ -26,7 +27,7 @@ public class WildsWitchSpeciesConfig extends SpeciesConfig {
         
         public final IntField.RandomRange swarmSize;
         
-        Wilds( ToastConfigSpec parent, MobFamily.Species<?> species, String speciesName,
+        Wilds( WildsWitchSpeciesConfig parent, MobFamily.Species<?> species, String speciesName,
                int minMounts, int maxMounts, int minSwarms, int maxSwarms, int minSwarmSize, int maxSwarmSize ) {
             super( parent, ConfigUtil.camelCaseToLowerUnderscore( species.specialVariantName ),
                     "Options specific to " + speciesName + "." );

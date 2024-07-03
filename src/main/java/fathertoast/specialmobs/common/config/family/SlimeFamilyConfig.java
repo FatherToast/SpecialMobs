@@ -1,10 +1,10 @@
 package fathertoast.specialmobs.common.config.family;
 
+import fathertoast.crust.api.config.common.AbstractConfigCategory;
+import fathertoast.crust.api.config.common.ConfigManager;
+import fathertoast.crust.api.config.common.ConfigUtil;
+import fathertoast.crust.api.config.common.field.BooleanField;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
-import fathertoast.specialmobs.common.config.Config;
-import fathertoast.specialmobs.common.config.field.BooleanField;
-import fathertoast.specialmobs.common.config.file.ToastConfigSpec;
-import fathertoast.specialmobs.common.config.util.ConfigUtil;
 
 /**
  * This is the family config for slimes (NOT magma cubes).
@@ -14,17 +14,17 @@ public class SlimeFamilyConfig extends FamilyConfig {
     public final Slimes SLIMES;
     
     /** Builds the config spec that should be used for this config. */
-    public SlimeFamilyConfig( MobFamily<?, ?> family ) {
-        super( family, VARIANT_CHANCE_HIGH );
+    public SlimeFamilyConfig( ConfigManager manager, MobFamily<?, ?> family ) {
+        super( manager, family, VARIANT_CHANCE_HIGH );
         
-        SLIMES = new Slimes( SPEC, family );
+        SLIMES = new Slimes( this, family );
     }
     
-    public static class Slimes extends Config.AbstractCategory {
+    public static class Slimes extends AbstractConfigCategory<SlimeFamilyConfig> {
         
         public final BooleanField tinySlimesDealDamage;
         
-        Slimes( ToastConfigSpec parent, MobFamily<?, ?> family ) {
+        Slimes( SlimeFamilyConfig parent, MobFamily<?, ?> family ) {
             super( parent, ConfigUtil.noSpaces( family.configName ),
                     "Options specific to the family of " + family.configName + "." );
             

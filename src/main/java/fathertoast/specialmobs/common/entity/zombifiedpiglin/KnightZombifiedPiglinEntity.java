@@ -1,5 +1,6 @@
 package fathertoast.specialmobs.common.entity.zombifiedpiglin;
 
+import fathertoast.crust.api.config.common.ConfigManager;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
@@ -38,8 +39,8 @@ public class KnightZombifiedPiglinEntity extends _SpecialZombifiedPiglinEntity {
     }
     
     @SpecialMob.ConfigSupplier
-    public static SpeciesConfig createConfig( MobFamily.Species<?> species ) {
-        return new ZombieSpeciesConfig( species, 0.1, 1.0 );
+    public static SpeciesConfig createConfig( ConfigManager manager, MobFamily.Species<?> species ) {
+        return new ZombieSpeciesConfig( manager, species, 0.1, 1.0 );
     }
     
     @SpecialMob.LanguageProvider

@@ -1,5 +1,6 @@
 package fathertoast.specialmobs.common.entity.silverfish;
 
+import fathertoast.crust.api.config.common.ConfigManager;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
@@ -41,8 +42,8 @@ public class FishingSilverfishEntity extends AmphibiousSilverfishEntity implemen
     }
     
     @SpecialMob.ConfigSupplier
-    public static SpeciesConfig createConfig( MobFamily.Species<?> species ) {
-        return new SilverfishSpeciesConfig( species, 1.0 );
+    public static SpeciesConfig createConfig( ConfigManager manager, MobFamily.Species<?> species ) {
+        return new SilverfishSpeciesConfig( manager, species, 1.0 );
     }
     
     @SpecialMob.LanguageProvider

@@ -1,5 +1,6 @@
 package fathertoast.specialmobs.common.entity.zombie;
 
+import fathertoast.crust.api.config.common.ConfigManager;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
@@ -40,8 +41,8 @@ public class MadScientistZombieEntity extends _SpecialZombieEntity implements IA
     }
     
     @SpecialMob.ConfigSupplier
-    public static SpeciesConfig createConfig( MobFamily.Species<?> species ) {
-        return new MadScientistZombieSpeciesConfig( species, 0.0, 0.0, 1, 3 );
+    public static SpeciesConfig createConfig( ConfigManager manager, MobFamily.Species<?> species ) {
+        return new MadScientistZombieSpeciesConfig( manager, species, 0.0, 0.0, 1, 3 );
     }
     
     /** @return This entity's species config. */

@@ -1,5 +1,6 @@
 package fathertoast.specialmobs.common.entity.blaze;
 
+import fathertoast.crust.api.config.common.ConfigManager;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
@@ -38,8 +39,8 @@ public class WildfireBlazeEntity extends _SpecialBlazeEntity {
     }
     
     @SpecialMob.ConfigSupplier
-    public static SpeciesConfig createConfig( MobFamily.Species<?> species ) {
-        return new WildfireBlazeSpeciesConfig( species, 1, 0,
+    public static SpeciesConfig createConfig( ConfigManager manager, MobFamily.Species<?> species ) {
+        return new WildfireBlazeSpeciesConfig( manager, species, 1, 0,
                 3, 6, 4, 10 );
     }
     

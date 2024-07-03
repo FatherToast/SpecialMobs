@@ -1,5 +1,6 @@
 package fathertoast.specialmobs.common.entity.spider;
 
+import fathertoast.crust.api.config.common.ConfigManager;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
@@ -56,8 +57,8 @@ public class _SpecialSpiderEntity extends Spider implements RangedAttackMob, ISp
     protected static final double DEFAULT_SPIT_CHANCE = 0.1;
     
     @SpecialMob.ConfigSupplier
-    public static SpeciesConfig createConfig( MobFamily.Species<?> species ) {
-        return new SpiderSpeciesConfig( species, DEFAULT_SPIT_CHANCE );
+    public static SpeciesConfig createConfig( ConfigManager manager, MobFamily.Species<?> species ) {
+        return new SpiderSpeciesConfig( manager, species, DEFAULT_SPIT_CHANCE );
     }
     
     /** @return This entity's species config. */

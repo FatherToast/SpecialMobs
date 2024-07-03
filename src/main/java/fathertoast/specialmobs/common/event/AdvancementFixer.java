@@ -1,9 +1,13 @@
 package fathertoast.specialmobs.common.event;
 
+import fathertoast.crust.api.event.AdvancementLoadEvent;
+import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.entity.ISpecialMob;
 import fathertoast.specialmobs.common.entity.ghast._SpecialGhastEntity;
 import fathertoast.specialmobs.common.entity.skeleton._SpecialSkeletonEntity;
 import net.minecraft.advancements.Advancement;
+import net.minecraft.advancements.critereon.EntityPredicate;
+import net.minecraft.advancements.critereon.KilledTrigger;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.ServerAdvancementManager;
 import net.minecraft.server.level.ServerPlayer;
@@ -43,6 +47,20 @@ public class AdvancementFixer {
     @SubscribeEvent
     public void onServerStarting( ServerStartingEvent event ) {
         manager = event.getServer().getAdvancements();
+    }
+
+    @SubscribeEvent
+    public void onAdvancementLoad( AdvancementLoadEvent event ) {
+        ResourceLocation id = event.getId();
+
+        if ( id.equals( KILL_A_MOB_ADV ) ) {
+            for ( MobFamily.Species<?> species : MobFamily.getAllSpecies() ) {
+                EntityType<?> entityType = species.entityType.get();
+                String entityId = species.entityType.getId().toString();
+
+                event.getBuilder().addCriterion( entityId, KilledTrigger.TriggerInstance.playerKilledEntity(EntityPredicate.Builder.entity().of( entityType ) ) );
+            }
+        }
     }
 
     @SubscribeEvent( priority = EventPriority.LOWEST )

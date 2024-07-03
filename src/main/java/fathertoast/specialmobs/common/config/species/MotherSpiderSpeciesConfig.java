@@ -1,30 +1,31 @@
 package fathertoast.specialmobs.common.config.species;
 
+import fathertoast.crust.api.config.common.AbstractConfigCategory;
+import fathertoast.crust.api.config.common.ConfigManager;
+import fathertoast.crust.api.config.common.ConfigUtil;
+import fathertoast.crust.api.config.common.field.IntField;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
-import fathertoast.specialmobs.common.config.Config;
-import fathertoast.specialmobs.common.config.field.IntField;
-import fathertoast.specialmobs.common.config.file.ToastConfigSpec;
-import fathertoast.specialmobs.common.config.util.ConfigUtil;
+
 
 public class MotherSpiderSpeciesConfig extends SpiderSpeciesConfig {
     
     public final Mother MOTHER;
     
     /** Builds the config spec that should be used for this config. */
-    public MotherSpiderSpeciesConfig( MobFamily.Species<?> species, double spitChance,
-                                      int minBabies, int maxBabies, int minExtraBabies, int maxExtraBabies ) {
-        super( species, spitChance );
+    public MotherSpiderSpeciesConfig( ConfigManager manager, MobFamily.Species<?> species, double spitChance,
+                                     int minBabies, int maxBabies, int minExtraBabies, int maxExtraBabies ) {
+        super( manager, species, spitChance );
         
-        MOTHER = new Mother( SPEC, species, species.getConfigName(), minBabies, maxBabies, minExtraBabies, maxExtraBabies );
+        MOTHER = new Mother( this, species, species.getConfigName(), minBabies, maxBabies, minExtraBabies, maxExtraBabies );
     }
     
-    public static class Mother extends Config.AbstractCategory {
+    public static class Mother extends AbstractConfigCategory<MotherSpiderSpeciesConfig> {
         
         public final IntField.RandomRange babies;
         
         public final IntField.RandomRange extraBabies;
         
-        Mother( ToastConfigSpec parent, MobFamily.Species<?> species, String speciesName,
+        Mother( MotherSpiderSpeciesConfig parent, MobFamily.Species<?> species, String speciesName,
                 int minBabies, int maxBabies, int minExtraBabies, int maxExtraBabies ) {
             super( parent, ConfigUtil.camelCaseToLowerUnderscore( species.specialVariantName ),
                     "Options specific to " + speciesName + "." );

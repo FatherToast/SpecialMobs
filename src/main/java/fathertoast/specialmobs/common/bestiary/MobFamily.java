@@ -1,8 +1,10 @@
 package fathertoast.specialmobs.common.bestiary;
 
+import fathertoast.crust.api.config.common.ConfigManager;
+import fathertoast.crust.api.config.common.ConfigUtil;
 import fathertoast.specialmobs.common.config.family.*;
 import fathertoast.specialmobs.common.config.species.SpeciesConfig;
-import fathertoast.specialmobs.common.config.util.ConfigUtil;
+import fathertoast.specialmobs.common.core.SpecialMobs;
 import fathertoast.specialmobs.common.core.register.SMEntities;
 import fathertoast.specialmobs.common.core.register.SMItems;
 import fathertoast.specialmobs.common.util.AnnotationHelper;
@@ -20,7 +22,7 @@ import net.minecraftforge.registries.RegistryObject;
 
 import javax.annotation.Nullable;
 import java.util.*;
-import java.util.function.Function;
+import java.util.function.BiFunction;
 import java.util.function.Predicate;
 
 /**
@@ -174,7 +176,7 @@ public class MobFamily<T extends Mob, V extends FamilyConfig> {
     /** True if this family has any giant species. */
     private Boolean hasAnyGiants;
     
-    private MobFamily( Function<MobFamily<?, ?>, V> configSupplier,
+    private MobFamily( BiFunction<ConfigManager, MobFamily<?, ?>, V> configSupplier,
                        String familyName, String readableName, int eggColor, EntityType<?>[] replaceable,
                        String... variantNames ) {
         name = familyName;
@@ -193,7 +195,7 @@ public class MobFamily<T extends Mob, V extends FamilyConfig> {
             variants[i] = new Species<>( this, packageRoot, variantNames[i] );
         }
         
-        config = configSupplier.apply( this );
+        config = configSupplier.apply( ConfigManager.get(SpecialMobs.MOD_ID), this );
         config.SPEC.initialize();
         
         // We register here because otherwise there's no way to find all families
@@ -298,7 +300,8 @@ public class MobFamily<T extends Mob, V extends FamilyConfig> {
             spawnEgg = SMItems.registerSpawnEgg( entityType, parentFamily.eggBaseColor, bestiaryInfo.eggSpotsColor );
             
             // Config uses bestiary info for default values
-            config = AnnotationHelper.createConfig( this );
+            // noinspection ConstantConditions
+            config = AnnotationHelper.createConfig( ConfigManager.get(SpecialMobs.MOD_ID), this );
             config.SPEC.initialize();
             
             // Register this species with the entity class

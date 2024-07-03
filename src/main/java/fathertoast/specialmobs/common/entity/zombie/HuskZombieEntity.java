@@ -1,5 +1,6 @@
 package fathertoast.specialmobs.common.entity.zombie;
 
+import fathertoast.crust.api.config.common.ConfigManager;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
@@ -45,8 +46,8 @@ public class HuskZombieEntity extends _SpecialZombieEntity {
     }
     
     @SpecialMob.ConfigSupplier
-    public static SpeciesConfig createConfig( MobFamily.Species<?> species ) {
-        return new HuskZombieSpeciesConfig( species, DEFAULT_BOW_CHANCE, DEFAULT_SHIELD_CHANCE );
+    public static SpeciesConfig createConfig( ConfigManager manager, MobFamily.Species<?> species ) {
+        return new HuskZombieSpeciesConfig( manager, species, DEFAULT_BOW_CHANCE, DEFAULT_SHIELD_CHANCE );
     }
     
     /** @return This entity's species config. */

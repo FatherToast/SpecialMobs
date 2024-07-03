@@ -1,27 +1,27 @@
 package fathertoast.specialmobs.common.config.species;
 
+import fathertoast.crust.api.config.common.AbstractConfigCategory;
+import fathertoast.crust.api.config.common.ConfigManager;
+import fathertoast.crust.api.config.common.ConfigUtil;
+import fathertoast.crust.api.config.common.field.IntField;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
-import fathertoast.specialmobs.common.config.Config;
-import fathertoast.specialmobs.common.config.field.IntField;
-import fathertoast.specialmobs.common.config.file.ToastConfigSpec;
-import fathertoast.specialmobs.common.config.util.ConfigUtil;
 
 public class UndeadWitchSpeciesConfig extends SpeciesConfig {
     
     public final Undead UNDEAD;
     
     /** Builds the config spec that should be used for this config. */
-    public UndeadWitchSpeciesConfig( MobFamily.Species<?> species, int minSummons, int maxSummons ) {
-        super( species );
+    public UndeadWitchSpeciesConfig( ConfigManager manager, MobFamily.Species<?> species, int minSummons, int maxSummons ) {
+        super( manager, species );
         
-        UNDEAD = new Undead( SPEC, species, species.getConfigName(), minSummons, maxSummons );
+        UNDEAD = new Undead( this, species, species.getConfigName(), minSummons, maxSummons );
     }
     
-    public static class Undead extends Config.AbstractCategory {
+    public static class Undead extends AbstractConfigCategory<UndeadWitchSpeciesConfig> {
         
         public final IntField.RandomRange summons;
         
-        Undead( ToastConfigSpec parent, MobFamily.Species<?> species, String speciesName, int minSummons, int maxSummons ) {
+        Undead( UndeadWitchSpeciesConfig parent, MobFamily.Species<?> species, String speciesName, int minSummons, int maxSummons ) {
             super( parent, ConfigUtil.camelCaseToLowerUnderscore( species.specialVariantName ),
                     "Options specific to " + speciesName + "." );
             

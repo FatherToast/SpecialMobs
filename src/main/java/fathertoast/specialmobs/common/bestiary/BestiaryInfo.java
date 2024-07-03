@@ -1,10 +1,13 @@
 package fathertoast.specialmobs.common.bestiary;
 
-import fathertoast.specialmobs.common.config.field.DoubleField;
-import fathertoast.specialmobs.common.config.util.*;
+import fathertoast.crust.api.config.common.ConfigManager;
+import fathertoast.crust.api.config.common.ConfigUtil;
+import fathertoast.crust.api.config.common.field.DoubleField;
+import fathertoast.crust.api.config.common.value.*;
+import fathertoast.crust.api.config.common.value.environment.biome.BiomeCategory;
+import fathertoast.specialmobs.common.core.SpecialMobs;
 import fathertoast.specialmobs.common.util.References;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.BiomeTags;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EntityType;
@@ -19,6 +22,7 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Function;
 
 /**
  * This class serves solely to store data for mob species in an organized way, providing builder methods as applicable.
@@ -40,83 +44,94 @@ public class BestiaryInfo {
     }
     
     public enum Theme {
-        NONE( new EnvironmentList() ),
-        FIRE( new EnvironmentList(
-                EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).inUltraWarmDimension().build(),
-                EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).isHot().build(),
-                EnvironmentEntry.builder( DefaultWeight.HIGH.value ).isWarm().build(),
-                EnvironmentEntry.builder( DefaultWeight.LOWEST.value ).isFreezing().build(),
+        NONE( (cfgManager) -> new EnvironmentList() ),
+        FIRE( (cfgManager) -> new EnvironmentList(
+                EnvironmentEntry.builder( cfgManager, DefaultWeight.HIGHEST.value ).inUltraWarmDimension().build(),
+                EnvironmentEntry.builder( cfgManager, DefaultWeight.HIGHEST.value ).isHot().build(),
+                EnvironmentEntry.builder( cfgManager, DefaultWeight.HIGH.value ).isWarm().build(),
+                EnvironmentEntry.builder( cfgManager, DefaultWeight.LOWEST.value ).isFreezing().build(),
                 // Regular frozen ocean is actually freezing, so already covered
-                EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).inBiome( Biomes.WARM_OCEAN ).build(),
-                EnvironmentEntry.builder( DefaultWeight.HIGH.value ).inBiome( Biomes.LUKEWARM_OCEAN ).build(),
-                EnvironmentEntry.builder( DefaultWeight.HIGH.value ).inBiome( Biomes.DEEP_LUKEWARM_OCEAN ).build(),
-                EnvironmentEntry.builder( DefaultWeight.LOW.value ).inBiome( Biomes.COLD_OCEAN ).build(),
-                EnvironmentEntry.builder( DefaultWeight.LOW.value ).inBiome( Biomes.DEEP_COLD_OCEAN ).build(),
-                EnvironmentEntry.builder( DefaultWeight.LOWEST.value ).inBiome( Biomes.DEEP_FROZEN_OCEAN ).build()
+                EnvironmentEntry.builder( cfgManager, DefaultWeight.HIGHEST.value ).inBiome( Biomes.WARM_OCEAN ).build(),
+                EnvironmentEntry.builder( cfgManager, DefaultWeight.HIGH.value ).inBiome( Biomes.LUKEWARM_OCEAN ).build(),
+                EnvironmentEntry.builder( cfgManager, DefaultWeight.HIGH.value ).inBiome( Biomes.DEEP_LUKEWARM_OCEAN ).build(),
+                EnvironmentEntry.builder( cfgManager, DefaultWeight.LOW.value ).inBiome( Biomes.COLD_OCEAN ).build(),
+                EnvironmentEntry.builder( cfgManager, DefaultWeight.LOW.value ).inBiome( Biomes.DEEP_COLD_OCEAN ).build(),
+                EnvironmentEntry.builder( cfgManager, DefaultWeight.LOWEST.value ).inBiome( Biomes.DEEP_FROZEN_OCEAN ).build()
         ) ),
-        ICE( new EnvironmentList(
-                EnvironmentEntry.builder( DefaultWeight.LOWEST.value ).inUltraWarmDimension().build(),
-                EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).isFreezing().build(),
-                EnvironmentEntry.builder( DefaultWeight.LOW.value ).isWarm().build(),
-                EnvironmentEntry.builder( DefaultWeight.LOWEST.value ).isHot().build(),
+        ICE( (cfgManager) ->  new EnvironmentList(
+                EnvironmentEntry.builder( cfgManager, DefaultWeight.LOWEST.value ).inUltraWarmDimension().build(),
+                EnvironmentEntry.builder( cfgManager, DefaultWeight.HIGHEST.value ).isFreezing().build(),
+                EnvironmentEntry.builder( cfgManager, DefaultWeight.LOW.value ).isWarm().build(),
+                EnvironmentEntry.builder( cfgManager, DefaultWeight.LOWEST.value ).isHot().build(),
                 // Regular frozen ocean is actually freezing, so already covered
-                EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).inBiome( Biomes.DEEP_FROZEN_OCEAN ).build(),
-                EnvironmentEntry.builder( DefaultWeight.HIGH.value ).inBiome( Biomes.COLD_OCEAN ).build(),
-                EnvironmentEntry.builder( DefaultWeight.HIGH.value ).inBiome( Biomes.DEEP_COLD_OCEAN ).build(),
-                EnvironmentEntry.builder( DefaultWeight.LOW.value ).inBiome( Biomes.LUKEWARM_OCEAN ).build(),
-                EnvironmentEntry.builder( DefaultWeight.LOW.value ).inBiome( Biomes.DEEP_LUKEWARM_OCEAN ).build(),
-                EnvironmentEntry.builder( DefaultWeight.LOWEST.value ).inBiome( Biomes.WARM_OCEAN ).build()
+                EnvironmentEntry.builder( cfgManager, DefaultWeight.HIGHEST.value ).inBiome( Biomes.DEEP_FROZEN_OCEAN ).build(),
+                EnvironmentEntry.builder( cfgManager, DefaultWeight.HIGH.value ).inBiome( Biomes.COLD_OCEAN ).build(),
+                EnvironmentEntry.builder( cfgManager, DefaultWeight.HIGH.value ).inBiome( Biomes.DEEP_COLD_OCEAN ).build(),
+                EnvironmentEntry.builder( cfgManager, DefaultWeight.LOW.value ).inBiome( Biomes.LUKEWARM_OCEAN ).build(),
+                EnvironmentEntry.builder( cfgManager, DefaultWeight.LOW.value ).inBiome( Biomes.DEEP_LUKEWARM_OCEAN ).build(),
+                EnvironmentEntry.builder( cfgManager, DefaultWeight.LOWEST.value ).inBiome( Biomes.WARM_OCEAN ).build()
         ) ),
-        DESERT( new EnvironmentList(
-                EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).inUltraWarmDimension().build(),
-                EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).inNaturalDimension().inDryBiome().build(),
-                EnvironmentEntry.builder( DefaultWeight.LOWEST.value ).inWaterBiome().build(),
-                EnvironmentEntry.builder( DefaultWeight.LOWEST.value ).inHumidBiome().build(),
-                EnvironmentEntry.builder( DefaultWeight.LOWEST.value ).isRaining().canSeeSky().build(),
-                EnvironmentEntry.builder( DefaultWeight.HIGH.value ).belowHalfMoonLight().build()
+        DESERT( (cfgManager) -> new EnvironmentList(
+                EnvironmentEntry.builder( cfgManager, DefaultWeight.HIGHEST.value ).inUltraWarmDimension().build(),
+                EnvironmentEntry.builder( cfgManager, DefaultWeight.HIGHEST.value ).inNaturalDimension().inDryBiome().build(),
+                EnvironmentEntry.builder( cfgManager, DefaultWeight.LOWEST.value ).inWaterBiome().build(),
+                EnvironmentEntry.builder( cfgManager, DefaultWeight.LOWEST.value ).inHumidBiome().build(),
+                EnvironmentEntry.builder( cfgManager, DefaultWeight.LOWEST.value ).isRaining().canSeeSky().build(),
+                EnvironmentEntry.builder( cfgManager, DefaultWeight.HIGH.value ).belowHalfMoonLight().build()
         ) ),
-        WATER( new EnvironmentList(
-                EnvironmentEntry.builder( DefaultWeight.LOWEST.value ).inUltraWarmDimension().build(),
-                EnvironmentEntry.builder( DefaultWeight.LOWEST.value ).inNaturalDimension().inDryBiome().build(),
-                EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).inWaterBiome().build(),
-                EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).inHumidBiome().build(),
-                EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).isRaining().canSeeSky().build(),
-                EnvironmentEntry.builder( DefaultWeight.HIGH.value ).aboveHalfMoonLight().build()
+        WATER( (cfgManager) -> new EnvironmentList(
+                EnvironmentEntry.builder( cfgManager, DefaultWeight.LOWEST.value ).inUltraWarmDimension().build(),
+                EnvironmentEntry.builder( cfgManager, DefaultWeight.LOWEST.value ).inNaturalDimension().inDryBiome().build(),
+                EnvironmentEntry.builder( cfgManager, DefaultWeight.HIGHEST.value ).inWaterBiome().build(),
+                EnvironmentEntry.builder( cfgManager, DefaultWeight.HIGHEST.value ).inHumidBiome().build(),
+                EnvironmentEntry.builder( cfgManager, DefaultWeight.HIGHEST.value ).isRaining().canSeeSky().build(),
+                EnvironmentEntry.builder( cfgManager, DefaultWeight.HIGH.value ).aboveHalfMoonLight().build()
         ) ),
-        FOREST( new EnvironmentList(
-                EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).inBiomeTag( BiomeTags.IS_TAIGA ).build(),
-                EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).inBiomeTag( BiomeTags.IS_JUNGLE ).build(),
-                EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).inBiomeTag( BiomeTags.IS_FOREST ).build(),
+        FOREST( (cfgManager) -> new EnvironmentList(
+                EnvironmentEntry.builder( cfgManager, DefaultWeight.HIGHEST.value ).inBiomeCategory( BiomeCategory.TAIGA ).build(),
+                EnvironmentEntry.builder( cfgManager, DefaultWeight.HIGHEST.value ).inBiomeCategory( BiomeCategory.JUNGLE ).build(),
+                EnvironmentEntry.builder( cfgManager, DefaultWeight.HIGHEST.value ).inBiomeCategory( BiomeCategory.FOREST ).build(),
                 //EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).inBiomeTag( BiomeTags.IS_SWAMP ).build(),
-                EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).inBiome( Biomes.CRIMSON_FOREST ).build(),
-                EnvironmentEntry.builder( DefaultWeight.HIGH.value ).atMaxMoonLight().build()
+                EnvironmentEntry.builder( cfgManager, DefaultWeight.HIGHEST.value ).inBiome( Biomes.CRIMSON_FOREST ).build(),
+                EnvironmentEntry.builder( cfgManager, DefaultWeight.HIGH.value ).atMaxMoonLight().build()
         ) ),
-        MOUNTAIN( new EnvironmentList(
-                EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).inMountainBiome().build(),
-                EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).aboveMountainLevel().build(),
-                EnvironmentEntry.builder( DefaultWeight.HIGH.value ).atNoMoonLight().build(),
-                EnvironmentEntry.builder( DefaultWeight.LOW.value ).belowSeaLevel().build()
+        MOUNTAIN( (cfgManager) -> new EnvironmentList(
+                EnvironmentEntry.builder( cfgManager, DefaultWeight.HIGHEST.value ).inMountainBiome().build(),
+                EnvironmentEntry.builder( cfgManager, DefaultWeight.HIGHEST.value ).aboveMountainLevel().build(),
+                EnvironmentEntry.builder( cfgManager, DefaultWeight.HIGH.value ).atNoMoonLight().build(),
+                EnvironmentEntry.builder( cfgManager, DefaultWeight.LOW.value ).belowSeaLevel().build()
         ) ),
-        STORM( new EnvironmentList(
-                EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).isThundering().build(),
-                EnvironmentEntry.builder( DefaultWeight.HIGH.value ).isRaining().build(),
-                EnvironmentEntry.builder( DefaultWeight.LOW.value ).cannotSeeSky().build()
+        STORM( (cfgManager) -> new EnvironmentList(
+                EnvironmentEntry.builder( cfgManager, DefaultWeight.HIGHEST.value ).isThundering().build(),
+                EnvironmentEntry.builder( cfgManager, DefaultWeight.HIGH.value ).isRaining().build(),
+                EnvironmentEntry.builder( cfgManager, DefaultWeight.LOW.value ).cannotSeeSky().build()
         ) ),
-        TROPICAL( new EnvironmentList(
+        TROPICAL( (cfgManager) -> new EnvironmentList(
                 // All ocean biomes (except regular frozen ocean) have the same temp of 0.5, so we must call out specific biomes
-                EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).inBiome( Biomes.WARM_OCEAN ).build(),
-                EnvironmentEntry.builder( DefaultWeight.DISABLED.value ).isFreezing().build(),
-                EnvironmentEntry.builder( DefaultWeight.DISABLED.value ).inBiome( Biomes.DEEP_FROZEN_OCEAN ).build()
+                EnvironmentEntry.builder( cfgManager, DefaultWeight.HIGHEST.value ).inBiome( Biomes.WARM_OCEAN ).build(),
+                EnvironmentEntry.builder( cfgManager, DefaultWeight.DISABLED.value ).isFreezing().build(),
+                EnvironmentEntry.builder( cfgManager, DefaultWeight.DISABLED.value ).inBiome( Biomes.DEEP_FROZEN_OCEAN ).build()
         ) ),
-        FISHING( new EnvironmentList(
-                EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).inWaterBiome().build(),
-                EnvironmentEntry.builder( DefaultWeight.HIGH.value ).atMaxMoonLight().build(),
-                EnvironmentEntry.builder( DefaultWeight.HIGH.value ).isRaining().notInDryBiome().build()
+        FISHING( (cfgManager) -> new EnvironmentList(
+                EnvironmentEntry.builder( cfgManager, DefaultWeight.HIGHEST.value ).inWaterBiome().build(),
+                EnvironmentEntry.builder( cfgManager, DefaultWeight.HIGH.value ).atMaxMoonLight().build(),
+                EnvironmentEntry.builder( cfgManager, DefaultWeight.HIGH.value ).isRaining().notInDryBiome().build()
         ) );
+
+        private final Function<ConfigManager, EnvironmentList> func;
+        private EnvironmentList value;
         
-        public final EnvironmentList value;
-        
-        Theme( EnvironmentList v ) { value = v.setRange( DoubleField.Range.NON_NEGATIVE ); }
+        Theme( Function<ConfigManager, EnvironmentList> func ) {
+            this.func = func;
+        }
+
+        public EnvironmentList getValue() {
+            if ( value == null ) {
+                value = func.apply( ConfigManager.get( SpecialMobs.MOD_ID ) );
+                value.setRange( DoubleField.Range.NON_NEGATIVE );
+            }
+            return value;
+        }
     }
     
     /** The spot color for spawn eggs of this species. The base color is determined by the family. */
@@ -171,7 +186,7 @@ public class BestiaryInfo {
     private BestiaryInfo( int eggColor, float scale, DefaultWeight weight, Theme spawnTheme, List<AttributeEntry> attributes,
                           ResourceLocation tex, ResourceLocation eyeTex, ResourceLocation ovrTex,
                           int xp, int regen, double fallDmg, boolean fireImm, boolean burnImm, boolean drownImm, boolean pushImm,
-                          boolean waterDmg, boolean leash, boolean plateImm, Block[] blockImm, Object[] effectImm,
+                          boolean waterDmg, boolean leash, boolean plateImm, Object[] blockImm, Object[] effectImm,
                           double raDmg, double raVar, double raSpd, int raCD, int raMCD, double raRng ) {
         eggSpotsColor = eggColor;
         baseScale = scale;
@@ -234,7 +249,7 @@ public class BestiaryInfo {
         private boolean isDamagedByWater;
         private boolean allowLeashing;
         private boolean ignorePressurePlates;
-        private final ArrayList<Block> immuneToStickyBlocks = new ArrayList<>();
+        private final ArrayList<Object> immuneToStickyBlocks = new ArrayList<>();
         private final ArrayList<Object> immuneToPotions = new ArrayList<>();
         private double rangedAttackDamage = -1.0;
         private double rangedAttackSpread = -1.0;
@@ -287,7 +302,7 @@ public class BestiaryInfo {
             
             return new BestiaryInfo( eggSpotsColor, baseScale, defaultWeight, spawnTheme, attributes, texture, eyesTexture, overlayTexture,
                     experience, healTime, fallDamageMultiplier, isImmuneToFire, isImmuneToBurning, canBreatheInWater, ignoreWaterPush, isDamagedByWater,
-                    allowLeashing, ignorePressurePlates, immuneToStickyBlocks.toArray(new Block[0]), immuneToPotions.toArray(),
+                    allowLeashing, ignorePressurePlates, immuneToStickyBlocks.toArray(), immuneToPotions.toArray(),
                     rangedAttackDamage, rangedAttackSpread, rangedWalkSpeed, rangedAttackCooldown, rangedAttackMaxCooldown, rangedAttackMaxRange );
         }
         

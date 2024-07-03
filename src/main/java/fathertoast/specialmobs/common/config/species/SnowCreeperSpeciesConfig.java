@@ -1,29 +1,29 @@
 package fathertoast.specialmobs.common.config.species;
 
+import fathertoast.crust.api.config.common.AbstractConfigCategory;
+import fathertoast.crust.api.config.common.ConfigManager;
+import fathertoast.crust.api.config.common.ConfigUtil;
+import fathertoast.crust.api.config.common.field.DoubleField;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
-import fathertoast.specialmobs.common.config.Config;
-import fathertoast.specialmobs.common.config.field.DoubleField;
-import fathertoast.specialmobs.common.config.file.ToastConfigSpec;
-import fathertoast.specialmobs.common.config.util.ConfigUtil;
 
 public class SnowCreeperSpeciesConfig extends CreeperSpeciesConfig {
     
     public final Snow SNOW;
     
     /** Builds the config spec that should be used for this config. */
-    public SnowCreeperSpeciesConfig( MobFamily.Species<?> species,
-                                     boolean cannotExplodeWhileWet, boolean explodeWhileBurning, boolean explodeWhenShot,
-                                     double globeChance ) {
-        super( species, cannotExplodeWhileWet, explodeWhileBurning, explodeWhenShot );
+    public SnowCreeperSpeciesConfig( ConfigManager manager, MobFamily.Species<?> species,
+                                    boolean cannotExplodeWhileWet, boolean explodeWhileBurning, boolean explodeWhenShot,
+                                    double globeChance ) {
+        super( manager, species, cannotExplodeWhileWet, explodeWhileBurning, explodeWhenShot );
         
-        SNOW = new Snow( SPEC, species, species.getConfigName(), globeChance );
+        SNOW = new Snow( this, species, species.getConfigName(), globeChance );
     }
     
-    public static class Snow extends Config.AbstractCategory {
+    public static class Snow extends AbstractConfigCategory<SnowCreeperSpeciesConfig> {
         
         public final DoubleField snowGlobeChance;
         
-        Snow( ToastConfigSpec parent, MobFamily.Species<?> species, String speciesName, double globeChance ) {
+        Snow( SnowCreeperSpeciesConfig parent, MobFamily.Species<?> species, String speciesName, double globeChance ) {
             super( parent, ConfigUtil.camelCaseToLowerUnderscore( species.specialVariantName ),
                     "Options specific to " + speciesName + "." );
             

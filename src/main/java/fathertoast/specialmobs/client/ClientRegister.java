@@ -45,7 +45,6 @@ public class ClientRegister {
                 ItemProperties.register( Items.FISHING_ROD, new ResourceLocation( "cast" ), new FishingRodItemPropertyGetter() );
             });
         }
-        ClientEventHandler.registerConfigGUIFactory();
     }
 
     @SubscribeEvent

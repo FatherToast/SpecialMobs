@@ -1,5 +1,6 @@
 package fathertoast.specialmobs.common.entity.witch;
 
+import fathertoast.crust.api.config.common.ConfigManager;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
@@ -43,8 +44,8 @@ public class WildsWitchEntity extends _SpecialWitchEntity {
     }
     
     @SpecialMob.ConfigSupplier
-    public static SpeciesConfig createConfig( MobFamily.Species<?> species ) {
-        return new WildsWitchSpeciesConfig( species, 1, 3,
+    public static SpeciesConfig createConfig( ConfigManager manager, MobFamily.Species<?> species ) {
+        return new WildsWitchSpeciesConfig( manager, species, 1, 3,
                 3, 6, 3, 4 );
     }
     

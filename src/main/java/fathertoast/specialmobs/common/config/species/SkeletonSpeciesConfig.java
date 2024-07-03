@@ -1,10 +1,11 @@
 package fathertoast.specialmobs.common.config.species;
 
+import fathertoast.crust.api.config.common.AbstractConfigCategory;
+import fathertoast.crust.api.config.common.ConfigManager;
+import fathertoast.crust.api.config.common.ConfigUtil;
+import fathertoast.crust.api.config.common.field.DoubleField;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
-import fathertoast.specialmobs.common.config.Config;
-import fathertoast.specialmobs.common.config.field.DoubleField;
-import fathertoast.specialmobs.common.config.file.ToastConfigSpec;
-import fathertoast.specialmobs.common.config.util.ConfigUtil;
+
 
 /**
  * This is the base species config for skeletons and wither skeletons.
@@ -14,19 +15,19 @@ public class SkeletonSpeciesConfig extends SpeciesConfig {
     public final Skeletons SKELETONS;
     
     /** Builds the config spec that should be used for this config. */
-    public SkeletonSpeciesConfig( MobFamily.Species<?> species, double bowChance, double shieldChance ) {
-        super( species );
+    public SkeletonSpeciesConfig( ConfigManager manager, MobFamily.Species<?> species, double bowChance, double shieldChance ) {
+        super( manager, species );
         
-        SKELETONS = new Skeletons( SPEC, species, species.getConfigName(), bowChance, shieldChance );
+        SKELETONS = new Skeletons( this, species, species.getConfigName(), bowChance, shieldChance );
     }
     
-    public static class Skeletons extends Config.AbstractCategory {
+    public static class Skeletons extends AbstractConfigCategory<SkeletonSpeciesConfig> {
         
         public final DoubleField bowEquipChance;
         
         public final DoubleField shieldEquipChance;
         
-        Skeletons( ToastConfigSpec parent, MobFamily.Species<?> species, String speciesName, double bowChance, double shieldChance ) {
+        Skeletons( SkeletonSpeciesConfig parent, MobFamily.Species<?> species, String speciesName, double bowChance, double shieldChance ) {
             super( parent, ConfigUtil.noSpaces( species.family.configName ),
                     "Options standard to all " + species.family.configName + "." );
             

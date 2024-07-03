@@ -1,5 +1,6 @@
 package fathertoast.specialmobs.common.entity.skeleton;
 
+import fathertoast.crust.api.config.common.ConfigManager;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
@@ -38,8 +39,8 @@ public class KnightSkeletonEntity extends _SpecialSkeletonEntity {
     }
     
     @SpecialMob.ConfigSupplier
-    public static SpeciesConfig createConfig( MobFamily.Species<?> species ) {
-        return new SkeletonSpeciesConfig( species, 0.05, 1.0 );
+    public static SpeciesConfig createConfig( ConfigManager manager, MobFamily.Species<?> species ) {
+        return new SkeletonSpeciesConfig( manager, species, 0.05, 1.0 );
     }
     
     @SpecialMob.LanguageProvider

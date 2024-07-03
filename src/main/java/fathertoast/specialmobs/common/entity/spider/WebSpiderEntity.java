@@ -1,5 +1,6 @@
 package fathertoast.specialmobs.common.entity.spider;
 
+import fathertoast.crust.api.config.common.ConfigManager;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
@@ -37,8 +38,8 @@ public class WebSpiderEntity extends _SpecialSpiderEntity {
     }
     
     @SpecialMob.ConfigSupplier
-    public static SpeciesConfig createConfig( MobFamily.Species<?> species ) {
-        return new WebSpiderSpeciesConfig( species, 0.02, 2, 6 );
+    public static SpeciesConfig createConfig( ConfigManager manager, MobFamily.Species<?> species ) {
+        return new WebSpiderSpeciesConfig( manager, species, 0.02, 2, 6 );
     }
     
     /** @return This entity's species config. */

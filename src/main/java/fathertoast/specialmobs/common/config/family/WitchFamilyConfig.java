@@ -1,10 +1,10 @@
 package fathertoast.specialmobs.common.config.family;
 
+import fathertoast.crust.api.config.common.AbstractConfigCategory;
+import fathertoast.crust.api.config.common.ConfigManager;
+import fathertoast.crust.api.config.common.ConfigUtil;
+import fathertoast.crust.api.config.common.field.BooleanField;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
-import fathertoast.specialmobs.common.config.Config;
-import fathertoast.specialmobs.common.config.field.BooleanField;
-import fathertoast.specialmobs.common.config.file.ToastConfigSpec;
-import fathertoast.specialmobs.common.config.util.ConfigUtil;
 
 /**
  * This is the family config for witches.
@@ -14,17 +14,17 @@ public class WitchFamilyConfig extends FamilyConfig {
     public final Witches WITCHES;
     
     /** Builds the config spec that should be used for this config. */
-    public WitchFamilyConfig( MobFamily<?, ?> family ) {
-        super( family );
+    public WitchFamilyConfig( ConfigManager manager, MobFamily<?, ?> family ) {
+        super( manager, family );
         
-        WITCHES = new Witches( SPEC, family );
+        WITCHES = new Witches( this, family );
     }
     
-    public static class Witches extends Config.AbstractCategory {
+    public static class Witches extends AbstractConfigCategory<WitchFamilyConfig> {
         
         public final BooleanField useSplashSwiftness;
         
-        Witches( ToastConfigSpec parent, MobFamily<?, ?> family ) {
+        Witches( WitchFamilyConfig parent, MobFamily<?, ?> family ) {
             super( parent, ConfigUtil.noSpaces( family.configName ),
                     "Options specific to the family of " + family.configName + "." );
             

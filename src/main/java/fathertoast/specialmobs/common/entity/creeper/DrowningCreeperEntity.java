@@ -1,13 +1,15 @@
 package fathertoast.specialmobs.common.entity.creeper;
 
+import fathertoast.crust.api.config.common.ConfigManager;
+import fathertoast.crust.api.config.common.value.EnvironmentEntry;
+import fathertoast.crust.api.config.common.value.EnvironmentList;
+import fathertoast.crust.api.config.common.value.environment.biome.BiomeCategory;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.block.UnderwaterSilverfishBlock;
 import fathertoast.specialmobs.common.config.species.DrowningCreeperSpeciesConfig;
 import fathertoast.specialmobs.common.config.species.SpeciesConfig;
-import fathertoast.specialmobs.common.config.util.EnvironmentEntry;
-import fathertoast.specialmobs.common.config.util.EnvironmentList;
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.entity.ai.AIHelper;
 import fathertoast.specialmobs.common.entity.ai.AmphibiousMovementController;
@@ -62,13 +64,13 @@ public class DrowningCreeperEntity extends _SpecialCreeperEntity implements IAmp
     }
     
     @SpecialMob.ConfigSupplier
-    public static SpeciesConfig createConfig( MobFamily.Species<?> species ) {
+    public static SpeciesConfig createConfig( ConfigManager manager, MobFamily.Species<?> species ) {
         SpeciesConfig.NEXT_NATURAL_SPAWN_CHANCE_EXCEPTIONS = new EnvironmentList(
-                EnvironmentEntry.builder( 0.06F ).inBiome( Biomes.WARM_OCEAN ).build(),
-                EnvironmentEntry.builder( 0.06F ).inBiomeTag( BiomeTags.IS_RIVER ).build(),
-                EnvironmentEntry.builder( 0.02F ).inBiomeTag( BiomeTags.IS_OCEAN ).belowSeaDepths().build(),
-                EnvironmentEntry.builder( 0.0F ).inBiomeTag( BiomeTags.IS_OCEAN ).build() );
-        return new DrowningCreeperSpeciesConfig( species, false, false, false,
+                EnvironmentEntry.builder( manager, 0.06F ).inBiome( Biomes.WARM_OCEAN ).build(),
+                EnvironmentEntry.builder( manager, 0.06F ).inBiomeCategory( BiomeCategory.RIVER ).build(),
+                EnvironmentEntry.builder( manager, 0.02F ).inBiomeCategory( BiomeCategory.OCEAN ).belowSeaDepths().build(),
+                EnvironmentEntry.builder( manager, 0.0F ).inBiomeCategory( BiomeCategory.OCEAN ).build() );
+        return new DrowningCreeperSpeciesConfig( manager, species, false, false, false,
                 0.25, 2, 4 );
     }
     
