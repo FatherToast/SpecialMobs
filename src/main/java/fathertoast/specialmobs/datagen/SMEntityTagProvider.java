@@ -35,7 +35,7 @@ public class SMEntityTagProvider extends EntityTypeTagsProvider {
         }
 
         // Manually added
-        tag(EntityTypeTags.IMPACT_PROJECTILES).add(
+        tag( EntityTypeTags.IMPACT_PROJECTILES ).add(
                 SMEntities.BONE_SHRAPNEL.get(),
                 SMEntities.BUG_SPIT.get()
         );

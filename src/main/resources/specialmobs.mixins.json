@@ -5,7 +5,8 @@
   "minVersion": "0.8",
   "refmap": "specialmobs.mixins.refmap.json",
   "mixins": [
-    "BlazeEntityMixin"
+    "BlazeEntityMixin",
+    "PiglinAiMixin"
   ],
   "client": [
   ],

@@ -29,7 +29,7 @@ public class SpecialPiglinRenderer extends PiglinRenderer {
         super( context, ModelLayers.PIGLIN, ModelLayers.PIGLIN_INNER_ARMOR, ModelLayers.PIGLIN_OUTER_ARMOR, missingRightEar );
         baseShadowRadius = shadowRadius;
         addLayer( new SpecialMobEyesLayer<>( this ) );
-        
+
         final PiglinModel<Mob> model = new PiglinModel<>( context.getModelSet().bakeLayer( ModelLayers.PIGLIN ) );
         if( missingRightEar )
             model.rightEar.visible = false; // This is "stage left" - actually on the piglin's right side
