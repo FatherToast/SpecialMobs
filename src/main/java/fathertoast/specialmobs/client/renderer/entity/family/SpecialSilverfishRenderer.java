@@ -1,8 +1,11 @@
 package fathertoast.specialmobs.client.renderer.entity.family;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import fathertoast.specialmobs.client.renderer.entity.layers.SMModelLayers;
 import fathertoast.specialmobs.client.renderer.entity.layers.SpecialMobEyesLayer;
+import fathertoast.specialmobs.client.renderer.entity.layers.SpecialMobOverlayLayer;
 import fathertoast.specialmobs.common.entity.ISpecialMob;
+import net.minecraft.client.model.SilverfishModel;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.SilverfishRenderer;
 import net.minecraft.resources.ResourceLocation;
@@ -16,8 +19,7 @@ public class SpecialSilverfishRenderer extends SilverfishRenderer {
         super( context );
         baseShadowRadius = shadowRadius;
         addLayer( new SpecialMobEyesLayer<>( this ) );
-        // Model doesn't support size parameter
-        //addLayer( new SpecialMobOverlayLayer<>( this, new SilverfishModel<>( 0.25F ) ) );
+        addLayer( new SpecialMobOverlayLayer<>( this, new SilverfishModel<>( context.bakeLayer( SMModelLayers.SILVERFISH_OUTER_LAYER ) ) ) );
     }
     
     @Override

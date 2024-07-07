@@ -1,6 +1,7 @@
 package fathertoast.specialmobs.client;
 
 import fathertoast.specialmobs.client.renderer.entity.family.*;
+import fathertoast.specialmobs.client.renderer.entity.layers.SMModelLayers;
 import fathertoast.specialmobs.client.renderer.entity.projectile.BoneShrapnelRenderer;
 import fathertoast.specialmobs.client.renderer.entity.projectile.BugSpitRenderer;
 import fathertoast.specialmobs.client.renderer.entity.projectile.SpecialFishingBobberRenderer;
@@ -18,6 +19,9 @@ import fathertoast.specialmobs.common.entity.slime.PotionSlimeEntity;
 import fathertoast.specialmobs.common.entity.witherskeleton.NinjaWitherSkeletonEntity;
 import fathertoast.specialmobs.common.entity.zombie.MadScientistZombieEntity;
 import fathertoast.specialmobs.common.entity.zombifiedpiglin.VampireZombifiedPiglinEntity;
+import net.minecraft.client.model.CreeperModel;
+import net.minecraft.client.model.geom.ModelLayers;
+import net.minecraft.client.model.geom.builders.CubeDeformation;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.ThrownItemRenderer;
 import net.minecraft.client.renderer.item.ItemProperties;
@@ -41,11 +45,25 @@ public class ClientRegister {
     @SubscribeEvent
     public static void onClientSetup( FMLClientSetupEvent event ) {
         if( Config.MAIN.GENERAL.fancyFishingMobs.get() ) {
-            event.enqueueWork(() -> {
+            event.enqueueWork( () -> {
                 ItemProperties.register( Items.FISHING_ROD, new ResourceLocation( "cast" ), new FishingRodItemPropertyGetter() );
             });
         }
     }
+
+
+    @SubscribeEvent
+    public static void registerLayerDefs( EntityRenderersEvent.RegisterLayerDefinitions event ) {
+        event.registerLayerDefinition( SMModelLayers.CREEPER_OUTER_LAYER, () -> CreeperModel.createBodyLayer( new CubeDeformation(0.25F ) ) );
+        event.registerLayerDefinition( SMModelLayers.BLAZE_OUTER_LAYER, () -> SMModelLayers.blazeBodyLayer( new CubeDeformation(0.25F ) ) );
+        event.registerLayerDefinition( SMModelLayers.ENDERMAN_OUTER_LAYER, () -> SMModelLayers.endermanBodyLayer( new CubeDeformation(0.25F ) ) );
+        event.registerLayerDefinition( SMModelLayers.GHAST_OUTER_LAYER, () -> SMModelLayers.ghastBodyLayer( new CubeDeformation( 0.25F ) ) );
+        event.registerLayerDefinition( SMModelLayers.MAGMA_CUBE_OUTER_LAYER, () -> SMModelLayers.magmaCubeBodyLayer( new CubeDeformation( 0.25F ) ) );
+        event.registerLayerDefinition( SMModelLayers.SILVERFISH_OUTER_LAYER, () -> SMModelLayers.silverfishBodyLayer( new CubeDeformation( 0.25F ) ) );
+        event.registerLayerDefinition( SMModelLayers.SLIME_OUTER_LAYER, () -> SMModelLayers.slimeOuterBodyLayer( new CubeDeformation( 0.25F ) ) );
+        event.registerLayerDefinition( SMModelLayers.SPIDER_OUTER_LAYER, () -> SMModelLayers.spiderBodyLayer( new CubeDeformation( 0.25F ) ) );
+    }
+
 
     @SubscribeEvent
     public static void registerEntityRenderers( EntityRenderersEvent.RegisterRenderers event ) {
@@ -54,8 +72,8 @@ public class ClientRegister {
         registerFamilyRenderers( event, MobFamily.ZOMBIE, SpecialZombieRenderer::new );
         registerFamilyRenderers( event, MobFamily.DROWNED, SpecialDrownedRenderer::new );
         registerFamilyRenderers( event, MobFamily.ZOMBIFIED_PIGLIN, SpecialPiglinRenderer::newMissingRightEar );
-        registerFamilyRenderers( event, MobFamily.SKELETON, SpecialSkeletonRenderer::new );
-        registerFamilyRenderers( event, MobFamily.WITHER_SKELETON, SpecialSkeletonRenderer::new );
+        registerFamilyRenderers( event, MobFamily.SKELETON, (context) -> new SpecialSkeletonRenderer( context, ModelLayers.SKELETON_INNER_ARMOR ) );
+        registerFamilyRenderers( event, MobFamily.WITHER_SKELETON, (context) -> new SpecialSkeletonRenderer( context, ModelLayers.WITHER_SKELETON_INNER_ARMOR ) );
         registerFamilyRenderers( event, MobFamily.SLIME, SpecialSlimeRenderer::new );
         registerFamilyRenderers( event, MobFamily.MAGMA_CUBE, SpecialMagmaCubeRenderer::new );
         registerFamilyRenderers( event, MobFamily.SPIDER, SpecialSpiderRenderer::new );
@@ -72,8 +90,8 @@ public class ClientRegister {
         registerSpeciesRenderer( event, MadScientistZombieEntity.SPECIES, SpecialZombieVillagerRenderer::new );
         registerSpeciesRenderer( event, VampireZombifiedPiglinEntity.SPECIES, SpecialPiglinRenderer::newBothEars );
         
-        registerSpeciesRenderer( event, NinjaSkeletonEntity.SPECIES, NinjaSkeletonRenderer::new );
-        registerSpeciesRenderer( event, NinjaWitherSkeletonEntity.SPECIES, NinjaSkeletonRenderer::new );
+        registerSpeciesRenderer( event, NinjaSkeletonEntity.SPECIES, (context) -> new NinjaSkeletonRenderer( context, ModelLayers.SKELETON_INNER_ARMOR ) );
+        registerSpeciesRenderer( event, NinjaWitherSkeletonEntity.SPECIES, (context) -> new NinjaSkeletonRenderer( context, ModelLayers.WITHER_SKELETON_INNER_ARMOR ) );
         
         registerSpeciesRenderer( event, PotionSlimeEntity.SPECIES, PotionSlimeRenderer::new );
         

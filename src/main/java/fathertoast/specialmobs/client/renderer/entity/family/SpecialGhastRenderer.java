@@ -1,8 +1,11 @@
 package fathertoast.specialmobs.client.renderer.entity.family;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import fathertoast.specialmobs.client.renderer.entity.layers.SMModelLayers;
+import fathertoast.specialmobs.client.renderer.entity.layers.SpecialMobOverlayLayer;
 import fathertoast.specialmobs.common.entity.ISpecialMob;
 import fathertoast.specialmobs.common.entity.SpecialMobData;
+import net.minecraft.client.model.GhastModel;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.GhastRenderer;
 import net.minecraft.resources.ResourceLocation;
@@ -17,8 +20,7 @@ public class SpecialGhastRenderer extends GhastRenderer {
         baseShadowRadius = shadowRadius;
         // Would require some big changes to make glowing eyes animate with the base texture
         //addLayer( new SpecialMobEyesLayer<>( this ) );
-        // Model doesn't support size parameter - overlay texture is applied to the animation instead
-        //addLayer( new SpecialMobOverlayLayer<>( this, new GhastModel<>( 0.25F ) ) );
+        addLayer( new SpecialMobOverlayLayer<>( this, new GhastModel<>( context.bakeLayer( SMModelLayers.GHAST_OUTER_LAYER ) ) ) );
     }
     
     @Override

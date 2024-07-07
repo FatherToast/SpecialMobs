@@ -30,7 +30,7 @@ public class SpecialCreeperChargeLayer extends CreeperPowerLayer {
     
     public SpecialCreeperChargeLayer( RenderLayerParent<Creeper, CreeperModel<Creeper>> renderer, EntityModelSet modelSet ) {
         super( renderer, modelSet );
-        this.model = new CreeperModel<>( modelSet.bakeLayer( ModelLayers.CREEPER ));
+        this.model = new CreeperModel<>( modelSet.bakeLayer( ModelLayers.CREEPER_ARMOR ));
     }
     
     @Override

@@ -19,7 +19,7 @@ public class SpecialZombieRenderer extends ZombieRenderer {
         super( context );
         baseShadowRadius = shadowRadius;
         addLayer( new SpecialMobEyesLayer<>( this ) );
-        addLayer( new SpecialMobOverlayLayer<>( this, new ZombieModel<>( context.bakeLayer( ModelLayers.ZOMBIE ) ) ) );
+        addLayer( new SpecialMobOverlayLayer<>( this, new ZombieModel<>( context.bakeLayer( ModelLayers.ZOMBIE_INNER_ARMOR ) ) ) );
     }
     
     @Override

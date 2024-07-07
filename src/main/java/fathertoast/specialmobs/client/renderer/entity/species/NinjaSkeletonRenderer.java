@@ -4,6 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import fathertoast.specialmobs.client.renderer.entity.family.SpecialSkeletonRenderer;
 import fathertoast.specialmobs.common.entity.ai.INinja;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.BlockRenderDispatcher;
@@ -19,8 +20,8 @@ public class NinjaSkeletonRenderer extends SpecialSkeletonRenderer {
     
     private final BlockRenderDispatcher blockRenderer;
     
-    public NinjaSkeletonRenderer( EntityRendererProvider.Context context ) {
-        super( context );
+    public NinjaSkeletonRenderer(EntityRendererProvider.Context context, ModelLayerLocation layerLocation ) {
+        super( context, layerLocation );
         blockRenderer = Minecraft.getInstance().getBlockRenderer();
     }
     

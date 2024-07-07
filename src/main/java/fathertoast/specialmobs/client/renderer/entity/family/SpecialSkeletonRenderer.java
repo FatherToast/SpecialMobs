@@ -5,7 +5,7 @@ import fathertoast.specialmobs.client.renderer.entity.layers.SpecialMobEyesLayer
 import fathertoast.specialmobs.client.renderer.entity.layers.SpecialMobOverlayLayer;
 import fathertoast.specialmobs.common.entity.ISpecialMob;
 import net.minecraft.client.model.SkeletonModel;
-import net.minecraft.client.model.geom.ModelLayers;
+import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.SkeletonRenderer;
 import net.minecraft.resources.ResourceLocation;
@@ -18,11 +18,11 @@ public class SpecialSkeletonRenderer extends SkeletonRenderer {
     
     private final float baseShadowRadius;
     
-    public SpecialSkeletonRenderer( EntityRendererProvider.Context context ) {
+    public SpecialSkeletonRenderer( EntityRendererProvider.Context context, ModelLayerLocation layerLocation ) {
         super( context );
         baseShadowRadius = shadowRadius;
         addLayer( new SpecialMobEyesLayer<>( this ) );
-        addLayer( new SpecialMobOverlayLayer<>( this, new SkeletonModel<>( context.bakeLayer( ModelLayers.SKELETON ) ) ) );
+        addLayer( new SpecialMobOverlayLayer<>( this, new SkeletonModel<>( context.bakeLayer( layerLocation ) ) ) );
     }
     
     @Override
