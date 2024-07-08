@@ -42,6 +42,6 @@ side = "BOTH"
 modId = "crust"
 mandatory = true
 versionRange = "[2.3,)"
-ordering = "NONE"
+ordering = "BEFORE"
 side = "BOTH"
 
