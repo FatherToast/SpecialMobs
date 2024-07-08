@@ -116,7 +116,7 @@ public class _SpecialZombifiedPiglinEntity extends ZombifiedPiglin implements Ra
     
     
     //--------------- Variant-Specific Breakouts ----------------
-    
+
     /** Called in the MobEntity.class constructor to initialize AI goals. */
     @Override
     protected void registerGoals() {

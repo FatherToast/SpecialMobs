@@ -14,10 +14,7 @@ import net.minecraft.client.renderer.entity.layers.CreeperPowerLayer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.monster.Creeper;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 
-@OnlyIn( Dist.CLIENT )
 public class SpecialCreeperChargeLayer extends CreeperPowerLayer {
     
     private static final ResourceLocation[] CHARGED = new ResourceLocation[] {
@@ -30,7 +27,7 @@ public class SpecialCreeperChargeLayer extends CreeperPowerLayer {
     
     public SpecialCreeperChargeLayer( RenderLayerParent<Creeper, CreeperModel<Creeper>> renderer, EntityModelSet modelSet ) {
         super( renderer, modelSet );
-        this.model = new CreeperModel<>( modelSet.bakeLayer( ModelLayers.CREEPER_ARMOR ));
+        this.model = new CreeperModel<>( modelSet.bakeLayer( ModelLayers.CREEPER_ARMOR ) );
     }
     
     @Override
@@ -40,8 +37,8 @@ public class SpecialCreeperChargeLayer extends CreeperPowerLayer {
             float textureOffset = tickAndPartial * 0.01F;
             
             model.prepareMobModel( creeper, limbSwing, limbSwingAmount, partialTicks );
-            this.getParentModel().copyPropertiesTo( model );
-            VertexConsumer vertexConsumer = buffer.getBuffer( RenderType.energySwirl( this.getTextureLocation( creeper ), textureOffset, textureOffset ) );
+            getParentModel().copyPropertiesTo( model );
+            VertexConsumer vertexConsumer = buffer.getBuffer( RenderType.energySwirl( getTextureLocation( creeper ), textureOffset, textureOffset ) );
             model.setupAnim( creeper, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch );
             model.renderToBuffer( poseStack, vertexConsumer, packedLight, OverlayTexture.NO_OVERLAY, 0.5F, 0.5F, 0.5F, 1.0F );
         }
@@ -49,6 +46,6 @@ public class SpecialCreeperChargeLayer extends CreeperPowerLayer {
 
     @Override
     protected ResourceLocation getTextureLocation( Creeper creeper ) {
-        return ((_SpecialCreeperEntity) creeper).isSupercharged() ? CHARGED[1] : CHARGED[0];
+        return ( (_SpecialCreeperEntity) creeper ).isSupercharged() ? CHARGED[1] : CHARGED[0];
     }
 }

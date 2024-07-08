@@ -20,8 +20,11 @@ import fathertoast.specialmobs.common.entity.witherskeleton.NinjaWitherSkeletonE
 import fathertoast.specialmobs.common.entity.zombie.MadScientistZombieEntity;
 import fathertoast.specialmobs.common.entity.zombifiedpiglin.VampireZombifiedPiglinEntity;
 import net.minecraft.client.model.CreeperModel;
+import net.minecraft.client.model.HumanoidArmorModel;
+import net.minecraft.client.model.PiglinModel;
 import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.model.geom.builders.CubeDeformation;
+import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.ThrownItemRenderer;
 import net.minecraft.client.renderer.item.ItemProperties;
@@ -62,6 +65,16 @@ public class ClientRegister {
         event.registerLayerDefinition( SMModelLayers.SILVERFISH_OUTER_LAYER, () -> SMModelLayers.silverfishBodyLayer( new CubeDeformation( 0.25F ) ) );
         event.registerLayerDefinition( SMModelLayers.SLIME_OUTER_LAYER, () -> SMModelLayers.slimeOuterBodyLayer( new CubeDeformation( 0.25F ) ) );
         event.registerLayerDefinition( SMModelLayers.SPIDER_OUTER_LAYER, () -> SMModelLayers.spiderBodyLayer( new CubeDeformation( 0.25F ) ) );
+
+        event.registerLayerDefinition( SMModelLayers.PIGLIN, () -> LayerDefinition.create( PiglinModel.createMesh( CubeDeformation.NONE ), 64, 64 ) );
+        event.registerLayerDefinition( SMModelLayers.PIGLIN_OUTER_LAYER, () -> LayerDefinition.create( PiglinModel.createMesh( new CubeDeformation( 0.25F ) ), 64, 64 ) );
+        event.registerLayerDefinition( SMModelLayers.PIGLIN_INNER_ARMOR, () -> LayerDefinition.create( HumanoidArmorModel.createBodyLayer( new CubeDeformation( 0.5F ) ), 64, 32 ) );
+        event.registerLayerDefinition( SMModelLayers.PIGLIN_OUTER_ARMOR, () -> LayerDefinition.create( HumanoidArmorModel.createBodyLayer( new CubeDeformation( 1.02F ) ), 64, 32 ) );
+
+        event.registerLayerDefinition( SMModelLayers.ZOMBIFIED_PIGLIN, () -> LayerDefinition.create( PiglinModel.createMesh( CubeDeformation.NONE ), 64, 64 ) );
+        event.registerLayerDefinition( SMModelLayers.ZOMBIFIED_PIGLIN_OUTER_LAYER, () -> LayerDefinition.create( PiglinModel.createMesh( new CubeDeformation( 0.25F ) ), 64, 64 ) );
+        event.registerLayerDefinition( SMModelLayers.ZOMBIFIED_PIGLIN_INNER_ARMOR, () -> LayerDefinition.create( HumanoidArmorModel.createBodyLayer( new CubeDeformation( 0.5F ) ), 64, 32 ) );
+        event.registerLayerDefinition( SMModelLayers.ZOMBIFIED_PIGLIN_OUTER_ARMOR, () -> LayerDefinition.create( HumanoidArmorModel.createBodyLayer( new CubeDeformation( 1.02F ) ), 64, 32 ) );
     }
 
 

@@ -21,7 +21,7 @@ public class SpecialMagmaCubeRenderer extends MagmaCubeRenderer {
         //addLayer( new SpecialMobEyesLayer<>( this ) );
         addLayer( new SpecialMobOverlayLayer<>( this, new LavaSlimeModel<>( context.bakeLayer( SMModelLayers.MAGMA_CUBE_OUTER_LAYER ) ) ) );
     }
-    
+
     @Override
     public ResourceLocation getTextureLocation( MagmaCube entity ) {
         return ((ISpecialMob<?>) entity).getSpecialData().getTexture();

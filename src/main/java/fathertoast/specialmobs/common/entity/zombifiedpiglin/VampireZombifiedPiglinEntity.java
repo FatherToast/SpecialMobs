@@ -6,6 +6,7 @@ import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EntityType;
@@ -16,6 +17,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
+
+import java.util.List;
 
 @SpecialMob
 public class VampireZombifiedPiglinEntity extends _SpecialZombifiedPiglinEntity {
@@ -47,6 +50,12 @@ public class VampireZombifiedPiglinEntity extends _SpecialZombifiedPiglinEntity 
         final ItemStack stake = new ItemStack( Items.WOODEN_SWORD );
         stake.enchant( Enchantments.SMITE, Enchantments.SMITE.getMaxLevel() * 2 );
         loot.addRareDrop( "rare", stake );
+    }
+
+    // Override default - vampire is not really zombified
+    @SpecialMob.EntityTagProvider
+    public static List<TagKey<EntityType<?>>> getEntityTags() {
+        return List.of();
     }
     
     @SpecialMob.Factory

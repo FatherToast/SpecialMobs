@@ -21,6 +21,15 @@ public class SMModelLayers {
     public static final ModelLayerLocation SLIME_OUTER_LAYER = create("slime", "outer");
     public static final ModelLayerLocation SPIDER_OUTER_LAYER = create("spider", "outer");
 
+    public static final ModelLayerLocation PIGLIN = create("piglin");
+    public static final ModelLayerLocation PIGLIN_OUTER_LAYER = create("piglin", "outer");
+    public static final ModelLayerLocation PIGLIN_INNER_ARMOR = create("piglin", "inner_armor");
+    public static final ModelLayerLocation PIGLIN_OUTER_ARMOR = create("piglin", "outer_armor");
+    public static final ModelLayerLocation ZOMBIFIED_PIGLIN = create("zombified_piglin");
+    public static final ModelLayerLocation ZOMBIFIED_PIGLIN_OUTER_LAYER = create("zombified_piglin", "outer");
+    public static final ModelLayerLocation ZOMBIFIED_PIGLIN_INNER_ARMOR = create("zombified_piglin", "inner_armor");
+    public static final ModelLayerLocation ZOMBIFIED_PIGLIN_OUTER_ARMOR = create("zombified_piglin", "outer_armor");
+
 
 
     private static ModelLayerLocation create(String path) {
