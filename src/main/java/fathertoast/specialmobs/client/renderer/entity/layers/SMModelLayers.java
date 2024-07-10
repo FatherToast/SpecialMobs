@@ -13,6 +13,7 @@ public class SMModelLayers {
 
 
     public static final ModelLayerLocation SCOPE_CREEPER = create( "scope_creeper" );
+    public static final ModelLayerLocation SLAB_GHAST = create( "slab_ghast" );
 
     public static final ModelLayerLocation CREEPER_OUTER_LAYER = create("creeper", "outer");
     public static final ModelLayerLocation BLAZE_OUTER_LAYER = create("blaze", "outer");

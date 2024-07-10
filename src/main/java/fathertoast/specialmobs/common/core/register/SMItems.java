@@ -2,6 +2,7 @@ package fathertoast.specialmobs.common.core.register;
 
 import fathertoast.specialmobs.common.core.SpecialMobs;
 import fathertoast.specialmobs.common.item.IncorporealFireChargeItem;
+import fathertoast.specialmobs.common.item.SlabFireChargeItem;
 import fathertoast.specialmobs.common.item.SyringeItem;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
@@ -21,8 +22,9 @@ public class SMItems {
     public static final List<RegistryObject<? extends Item>> SIMPLE_ITEMS = new ArrayList<>();
 
 
-    public static final RegistryObject<Item> SYRINGE = registerSimpleItem("syringe", SyringeItem::new);
-    public static final RegistryObject<Item> INCORPOREAL_FIREBALL = registerSimpleItem("incorporeal_fire_charge", IncorporealFireChargeItem::new);
+    public static final RegistryObject<Item> SYRINGE = registerSimpleItem( "syringe", SyringeItem::new );
+    public static final RegistryObject<Item> INCORPOREAL_FIREBALL = registerSimpleItem( "incorporeal_fire_charge", IncorporealFireChargeItem::new );
+    public static final RegistryObject<Item> SLAB_FIREBALL = registerSimpleItem( "slab_fire_charge", SlabFireChargeItem::new );
 
     
     /** Registers an entity type's spawn egg item to the deferred register. */

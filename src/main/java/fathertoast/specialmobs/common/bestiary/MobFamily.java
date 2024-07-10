@@ -105,7 +105,7 @@ public class MobFamily<T extends Mob, V extends FamilyConfig> {
     
     public static final MobFamily<Ghast, GhastFamilyConfig> GHAST = new MobFamily<>( GhastFamilyConfig::new,
             "Ghast", "ghasts", 0xF9F9F9, new EntityType[] { EntityType.GHAST },
-            "Baby", "CorporealShift", "Fighter", "King", "Queen", "Unholy"
+            "Baby", "CorporealShift", "Fighter", "King", "Queen", "Slab", "Unholy"
     );
     
     public static final MobFamily<Blaze, FamilyConfig> BLAZE = new MobFamily<>( FamilyConfig::new,

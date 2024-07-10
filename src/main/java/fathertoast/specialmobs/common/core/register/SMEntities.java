@@ -3,10 +3,7 @@ package fathertoast.specialmobs.common.core.register;
 import fathertoast.crust.api.config.common.value.ConfigDrivenAttributeModifierMap;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.core.SpecialMobs;
-import fathertoast.specialmobs.common.entity.projectile.BoneShrapnelEntity;
-import fathertoast.specialmobs.common.entity.projectile.BugSpitEntity;
-import fathertoast.specialmobs.common.entity.projectile.IncorporealFireballEntity;
-import fathertoast.specialmobs.common.entity.projectile.SpecialFishingBobberEntity;
+import fathertoast.specialmobs.common.entity.projectile.*;
 import fathertoast.specialmobs.common.util.AnnotationHelper;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -33,7 +30,11 @@ public class SMEntities {
     public static final RegistryObject<EntityType<IncorporealFireballEntity>> INCORPOREAL_FIREBALL = register( "incorporeal_fireball",
             EntityType.Builder.<IncorporealFireballEntity>of( IncorporealFireballEntity::new, MobCategory.MISC )
                     .sized( 1.0F, 1.0F ).clientTrackingRange( 4 ).updateInterval( 2 ) );
-    
+
+    public static final RegistryObject<EntityType<SlabFireballEntity>> SLAB_FIREBALL = register( "slab_fireball",
+            EntityType.Builder.<SlabFireballEntity>of( SlabFireballEntity::new, MobCategory.MISC )
+                    .sized( 1.0F, 1.0F ).clientTrackingRange( 4 ).updateInterval( 2 ) );
+
     public static final RegistryObject<EntityType<SpecialFishingBobberEntity>> FISHING_BOBBER = register( "fishing_bobber",
             EntityType.Builder.<SpecialFishingBobberEntity>of( SpecialFishingBobberEntity::new, MobCategory.MISC ).noSave().noSummon()
                     .sized( 0.25F, 0.25F ).clientTrackingRange( 4 ).updateInterval( 5 ) );

@@ -75,6 +75,9 @@ public class SMLanguageProvider extends LanguageProvider {
         translationList.add( References.translations( SMEntities.INCORPOREAL_FIREBALL.get().getDescriptionId(), "Incorporeal Fireball",
                 "Bola de fuego incorpórea", "Bola de fogo incorpórea", "Boule de feu incorporelle",
                 "Palla di fuoco incorporea", "Unkörperlicher Feuerkugel", "Haunted Cannonball" ) );
+        // TODO - I don't know these languages :( (Sarinsa)
+        translationList.add( References.translations( SMEntities.SLAB_FIREBALL.get().getDescriptionId(), "Slab Fireball",
+                "", "", "", "", "", "" ) );
         translationList.add( References.translations( SMEntities.FISHING_BOBBER.get().getDescriptionId(), "Fishing Bobber",
                 "Anzuelo", "Boia de pesca", "Flotteur", "Galleggiante da pesca", "Schwimmer", "Fishin' Bobber" ) );
         

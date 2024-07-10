@@ -13,6 +13,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.ProjectileUtil;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Rarity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.EntityHitResult;
@@ -64,5 +65,10 @@ public class IncorporealFireChargeItem extends Item {
                 ( entity ) -> !entity.isSpectator() && entity.isAlive() && entity.isPickable() && !player.isPassengerOfSameVehicle( entity ) );
         
         return result == null ? null : result.getEntity();
+    }
+
+    @Override
+    public Rarity getRarity( ItemStack itemStack ) {
+        return Rarity.UNCOMMON;
     }
 }

@@ -3,6 +3,7 @@ package fathertoast.specialmobs.client;
 import fathertoast.specialmobs.client.renderer.entity.family.*;
 import fathertoast.specialmobs.client.renderer.entity.layers.SMModelLayers;
 import fathertoast.specialmobs.client.renderer.entity.model.ScopeCreeperModel;
+import fathertoast.specialmobs.client.renderer.entity.model.SlabGhastModel;
 import fathertoast.specialmobs.client.renderer.entity.projectile.BoneShrapnelRenderer;
 import fathertoast.specialmobs.client.renderer.entity.projectile.BugSpitRenderer;
 import fathertoast.specialmobs.client.renderer.entity.projectile.SpecialFishingBobberRenderer;
@@ -15,6 +16,7 @@ import fathertoast.specialmobs.common.entity.creeper.EnderCreeperEntity;
 import fathertoast.specialmobs.common.entity.creeper.ScopeCreeperEntity;
 import fathertoast.specialmobs.common.entity.enderman.RunicEndermanEntity;
 import fathertoast.specialmobs.common.entity.ghast.CorporealShiftGhastEntity;
+import fathertoast.specialmobs.common.entity.ghast.SlabGhastEntity;
 import fathertoast.specialmobs.common.entity.silverfish.PufferSilverfishEntity;
 import fathertoast.specialmobs.common.entity.skeleton.NinjaSkeletonEntity;
 import fathertoast.specialmobs.common.entity.slime.PotionSlimeEntity;
@@ -60,6 +62,7 @@ public class ClientRegister {
     @SubscribeEvent
     public static void registerLayerDefs( EntityRenderersEvent.RegisterLayerDefinitions event ) {
         event.registerLayerDefinition( SMModelLayers.SCOPE_CREEPER, ScopeCreeperModel::createBodyLayer );
+        event.registerLayerDefinition( SMModelLayers.SLAB_GHAST, SlabGhastModel::createBodyLayer );
 
         event.registerLayerDefinition( SMModelLayers.CREEPER_OUTER_LAYER, () -> CreeperModel.createBodyLayer( new CubeDeformation(0.25F ) ) );
         event.registerLayerDefinition( SMModelLayers.BLAZE_OUTER_LAYER, () -> SMModelLayers.blazeBodyLayer( new CubeDeformation(0.25F ) ) );
@@ -116,6 +119,7 @@ public class ClientRegister {
         registerSpeciesRenderer( event, PufferSilverfishEntity.SPECIES, ShortSilverfishRenderer::new );
         
         registerSpeciesRenderer( event, CorporealShiftGhastEntity.SPECIES, CorporealShiftGhastRenderer::new );
+        registerSpeciesRenderer( event, SlabGhastEntity.SPECIES, SlabGhastRenderer::new );
 
         registerSpeciesRenderer( event, RunicEndermanEntity.SPECIES, RunicEndermanRenderer::new );
         
@@ -123,6 +127,7 @@ public class ClientRegister {
         registerRenderer( event, SMEntities.BONE_SHRAPNEL, BoneShrapnelRenderer::new );
         registerRenderer( event, SMEntities.BUG_SPIT, BugSpitRenderer::new );
         registerSpriteRenderer( event, SMEntities.INCORPOREAL_FIREBALL, 3.0F, true );
+        registerSpriteRenderer( event, SMEntities.SLAB_FIREBALL, 3.0F, true );
         registerRenderer( event, SMEntities.FISHING_BOBBER, SpecialFishingBobberRenderer::new );
     }
 

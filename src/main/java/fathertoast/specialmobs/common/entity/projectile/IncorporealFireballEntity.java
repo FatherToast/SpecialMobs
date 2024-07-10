@@ -1,11 +1,9 @@
 package fathertoast.specialmobs.common.entity.projectile;
 
-import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.core.register.SMEntities;
 import fathertoast.specialmobs.common.core.register.SMItems;
 import fathertoast.specialmobs.common.entity.ghast.CorporealShiftGhastEntity;
 import fathertoast.specialmobs.common.event.PlayerVelocityWatcher;
-import fathertoast.specialmobs.common.util.References;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.FriendlyByteBuf;
@@ -72,12 +70,7 @@ public class IncorporealFireballEntity extends AbstractHurtingProjectile impleme
         }
     }
     
-    @SpecialMob.LanguageProvider
-    public static String[] getTranslations( String langKey ) {
-        return References.translations( langKey, "Incorporeal Fireball",
-                "", "", "", "", "", "" );//TODO
-    }
-    
+
     @Override
     public void tick() {
         super.tick();
