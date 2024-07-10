@@ -45,8 +45,8 @@ public class MobFamily<T extends Mob, V extends FamilyConfig> {
     public static final MobFamily<Creeper, CreeperFamilyConfig> CREEPER = new MobFamily<>( CreeperFamilyConfig::new,
             "Creeper", "creepers", 0x0DA70B, new EntityType[] { EntityType.CREEPER },
             "Dark", "Death", "Dirt", "Doom", "Drowning", "Ender", "Fire", "Gravel", "Jumping", "Lightning",
-            "Mini", "Sand", /*"Scope",*/ "Snow", "Skeleton", "Splitting"
-    );//TODO scope - maybe in 1.18 when spyglasses exist
+            "Mini", "Sand", "Scope", "Snow", "Skeleton", "Splitting"
+    );
     
     public static final MobFamily<Zombie, FamilyConfig> ZOMBIE = new MobFamily<>( FamilyConfig::newLessSpecial,
             "Zombie", "zombies", 0x00AFAF, new EntityType[] { EntityType.ZOMBIE, EntityType.HUSK },

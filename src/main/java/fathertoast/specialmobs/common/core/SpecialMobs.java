@@ -57,7 +57,7 @@ public class SpecialMobs {
      *      + Vanishing boat (for pirate skeleton)
      *  - monster families (see doc for specifics)
      *      - creepers
-     *          + Scope creeper
+     *          - Scope creeper
      *          - chance to spawn charged during thunderstorms
      *          - chance to become supercharged when charged
      *          - explosion stats (while wet, while burning, when shot)

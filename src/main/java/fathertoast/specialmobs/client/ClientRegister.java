@@ -2,6 +2,7 @@ package fathertoast.specialmobs.client;
 
 import fathertoast.specialmobs.client.renderer.entity.family.*;
 import fathertoast.specialmobs.client.renderer.entity.layers.SMModelLayers;
+import fathertoast.specialmobs.client.renderer.entity.model.ScopeCreeperModel;
 import fathertoast.specialmobs.client.renderer.entity.projectile.BoneShrapnelRenderer;
 import fathertoast.specialmobs.client.renderer.entity.projectile.BugSpitRenderer;
 import fathertoast.specialmobs.client.renderer.entity.projectile.SpecialFishingBobberRenderer;
@@ -11,6 +12,7 @@ import fathertoast.specialmobs.common.config.Config;
 import fathertoast.specialmobs.common.core.SpecialMobs;
 import fathertoast.specialmobs.common.core.register.SMEntities;
 import fathertoast.specialmobs.common.entity.creeper.EnderCreeperEntity;
+import fathertoast.specialmobs.common.entity.creeper.ScopeCreeperEntity;
 import fathertoast.specialmobs.common.entity.enderman.RunicEndermanEntity;
 import fathertoast.specialmobs.common.entity.ghast.CorporealShiftGhastEntity;
 import fathertoast.specialmobs.common.entity.silverfish.PufferSilverfishEntity;
@@ -57,6 +59,8 @@ public class ClientRegister {
 
     @SubscribeEvent
     public static void registerLayerDefs( EntityRenderersEvent.RegisterLayerDefinitions event ) {
+        event.registerLayerDefinition( SMModelLayers.SCOPE_CREEPER, ScopeCreeperModel::createBodyLayer );
+
         event.registerLayerDefinition( SMModelLayers.CREEPER_OUTER_LAYER, () -> CreeperModel.createBodyLayer( new CubeDeformation(0.25F ) ) );
         event.registerLayerDefinition( SMModelLayers.BLAZE_OUTER_LAYER, () -> SMModelLayers.blazeBodyLayer( new CubeDeformation(0.25F ) ) );
         event.registerLayerDefinition( SMModelLayers.ENDERMAN_OUTER_LAYER, () -> SMModelLayers.endermanBodyLayer( new CubeDeformation(0.25F ) ) );
@@ -99,6 +103,7 @@ public class ClientRegister {
         
         // Species overrides
         registerSpeciesRenderer( event, EnderCreeperEntity.SPECIES, EnderCreeperRenderer::new );
+        registerSpeciesRenderer( event, ScopeCreeperEntity.SPECIES, ScopeCreeperRenderer::new );
         
         registerSpeciesRenderer( event, MadScientistZombieEntity.SPECIES, SpecialZombieVillagerRenderer::new );
         registerSpeciesRenderer( event, VampireZombifiedPiglinEntity.SPECIES, SpecialPiglinRenderer::newBothEars );

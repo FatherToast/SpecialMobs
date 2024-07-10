@@ -5,17 +5,19 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import fathertoast.specialmobs.common.entity.creeper._SpecialCreeperEntity;
 import fathertoast.specialmobs.common.util.References;
 import net.minecraft.client.model.CreeperModel;
+import net.minecraft.client.model.EntityModel;
+import net.minecraft.client.model.HierarchicalModel;
 import net.minecraft.client.model.geom.EntityModelSet;
 import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.RenderLayerParent;
-import net.minecraft.client.renderer.entity.layers.CreeperPowerLayer;
+import net.minecraft.client.renderer.entity.layers.EnergySwirlLayer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.monster.Creeper;
 
-public class SpecialCreeperChargeLayer extends CreeperPowerLayer {
+public class SpecialCreeperChargeLayer<T extends HierarchicalModel<Creeper>> extends EnergySwirlLayer<Creeper, T> {
     
     private static final ResourceLocation[] CHARGED = new ResourceLocation[] {
             new ResourceLocation( "textures/entity/creeper/creeper_armor.png" ),
@@ -25,8 +27,8 @@ public class SpecialCreeperChargeLayer extends CreeperPowerLayer {
     private final CreeperModel<Creeper> model;
 
     
-    public SpecialCreeperChargeLayer( RenderLayerParent<Creeper, CreeperModel<Creeper>> renderer, EntityModelSet modelSet ) {
-        super( renderer, modelSet );
+    public SpecialCreeperChargeLayer( RenderLayerParent<Creeper, T> renderer, EntityModelSet modelSet ) {
+        super( renderer );
         this.model = new CreeperModel<>( modelSet.bakeLayer( ModelLayers.CREEPER_ARMOR ) );
     }
     
@@ -47,5 +49,21 @@ public class SpecialCreeperChargeLayer extends CreeperPowerLayer {
     @Override
     protected ResourceLocation getTextureLocation( Creeper creeper ) {
         return ( (_SpecialCreeperEntity) creeper ).isSupercharged() ? CHARGED[1] : CHARGED[0];
+    }
+
+    @Override
+    protected float xOffset( float f ) {
+        return f * 0.01F;
+    }
+
+    // Not used, entity sensitive version used instead
+    @Override
+    protected ResourceLocation getTextureLocation() {
+        return CHARGED[0];
+    }
+
+    @Override
+    protected EntityModel<Creeper> model() {
+        return this.model;
     }
 }

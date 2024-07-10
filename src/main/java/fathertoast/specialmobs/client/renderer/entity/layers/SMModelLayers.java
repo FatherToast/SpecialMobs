@@ -12,6 +12,8 @@ import net.minecraft.util.RandomSource;
 public class SMModelLayers {
 
 
+    public static final ModelLayerLocation SCOPE_CREEPER = create( "scope_creeper" );
+
     public static final ModelLayerLocation CREEPER_OUTER_LAYER = create("creeper", "outer");
     public static final ModelLayerLocation BLAZE_OUTER_LAYER = create("blaze", "outer");
     public static final ModelLayerLocation ENDERMAN_OUTER_LAYER = create("enderman", "outer");
