@@ -21,7 +21,7 @@ public class ScopeCreeperEntity extends _SpecialCreeperEntity {
 
     @SpecialMob.BestiaryInfoSupplier
     public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
-        bestiaryInfo.color( 0xA85F58 )
+        bestiaryInfo.color( 0xFDAF40 )
                 .uniqueTextureBaseOnly()
                 .addExperience( 1 )
                 .effectImmune( MobEffects.BLINDNESS )
