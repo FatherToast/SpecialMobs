@@ -9,7 +9,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(PiglinAi.class)
-public class PiglinAiMixin {
+public abstract class PiglinAiMixin {
 
     /**
      * Tiny mixin to make piglins freak out over special zombified piglin variants

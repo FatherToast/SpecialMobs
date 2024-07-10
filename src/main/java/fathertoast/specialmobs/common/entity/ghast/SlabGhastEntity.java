@@ -29,6 +29,7 @@ public class SlabGhastEntity extends _SpecialGhastEntity {
                 .uniqueTextureWithAnimation()
                 .size( 1.0F, 4.0F, 2.0F )
                 .addExperience( 2 )
+                .fireballAttack( 0.0, 20, 20, 64.0 )
                 .addToAttribute( Attributes.MAX_HEALTH, 5.0 )
                 .addToAttribute( Attributes.ATTACK_DAMAGE, 4.0 )
                 .multiplyAttribute( Attributes.MOVEMENT_SPEED, 1.5 );
