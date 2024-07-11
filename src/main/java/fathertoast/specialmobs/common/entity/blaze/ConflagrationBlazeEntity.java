@@ -35,7 +35,8 @@ public class ConflagrationBlazeEntity extends _SpecialBlazeEntity {
     
     @SpecialMob.BestiaryInfoSupplier
     public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
-        bestiaryInfo.color( 0xFFF87E ).weight( BestiaryInfo.DefaultWeight.LOW )
+        bestiaryInfo.color( 0xFFF87E )
+                .weight( BestiaryInfo.DefaultWeight.LOW )
                 .uniqueTextureBaseOnly()
                 .size( 1.5F, 0.9F, 2.7F )
                 .addExperience( 4 ).regen( 20 );

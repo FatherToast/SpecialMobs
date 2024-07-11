@@ -39,6 +39,7 @@ public class ArmoredBlazeEntity extends _SpecialBlazeEntity {
     @SpecialMob.BestiaryInfoSupplier
     public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
         bestiaryInfo.color( 0xE5E5E5 )
+                .weight( BestiaryInfo.DefaultWeight.LOW )
                 .uniqueTextureBaseOnly()
                 .addExperience( 4 )
                 .fireballAttack( 0, 80, 120, 40.0 )
@@ -100,39 +101,40 @@ public class ArmoredBlazeEntity extends _SpecialBlazeEntity {
             if ( source.is( DamageTypeTags.BYPASSES_INVULNERABILITY ) ) {
                 return super.hurt( source, amount);
             }
-            // Check if damage type should damage the blaze's armor
-            if ( !source.is( SMTags.IS_MAGIC ) && !source.is( DamageTypeTags.IS_PROJECTILE ) && amount >= 2.0F ) {
-                Entity attacker = source.getDirectEntity();
-                int newArmorLevel = entityData.get( ARMOR_LEVEL ) - 1;
-                entityData.set( ARMOR_LEVEL, newArmorLevel );
+            // Check if damage type can damage the blaze's armor
+            if ( !source.is( SMTags.IS_MAGIC ) && !source.is( DamageTypeTags.IS_PROJECTILE ) ) {
+                // Do not damage the armor if the amount is less than 2.0
+                if ( amount >= 2.0F ) {
+                    int newArmorLevel = entityData.get( ARMOR_LEVEL ) - 1;
+                    entityData.set( ARMOR_LEVEL, newArmorLevel );
 
-                // If armor is depleted, play some cool effects
-                if ( newArmorLevel <= 0 ) {
-                    if ( !level().isClientSide ) {
-                        ((ServerLevel) level()).sendParticles(
-                                new ItemParticleOption(ParticleTypes.ITEM, new ItemStack(Items.IRON_HELMET)),
-                                getX() + 0.5D,
-                                getY() + 0.5D,
-                                getZ() + 0.5D,
-                                5,
-                                0.02,
-                                0.02,
-                                0.02,
-                                0
-                        );
+                    // If armor is depleted, play some cool effects
+                    if ( newArmorLevel <= 0 ) {
+                        if ( !level().isClientSide ) {
+                            ( (ServerLevel) level() ).sendParticles(
+                                    new ItemParticleOption(ParticleTypes.ITEM, new ItemStack( Items.IRON_HELMET ) ),
+                                    getX() + 0.5D,
+                                    getY() + 0.5D,
+                                    getZ() + 0.5D,
+                                    5,
+                                    0,
+                                    0,
+                                    0,
+                                    0.2
+                            );
+                            playSound( SoundEvents.ITEM_BREAK );
+                        }
                     }
-                    playSound( SoundEvents.ITEM_BREAK );
                 }
-                else {
-                    // Try knocking back attacker
-                    if ( attacker instanceof LivingEntity livingEntity ) {
-                        livingEntity.knockback(0.5F,
-                                getX() - attacker.getX(), getZ() - attacker.getZ());
-                    }
-                    playSound( SoundEvents.ANVIL_PLACE, 0.8F, 0.8F + level().random.nextFloat() * 0.4F );
-                }
-                return true;
             }
+            Entity attacker = source.getDirectEntity();
+
+            // Try knocking back attacker, if there is a direct attacker
+            if ( attacker instanceof LivingEntity livingEntity ) {
+                livingEntity.knockback( 0.5F,
+                        getX() - attacker.getX(), getZ() - attacker.getZ() );
+            }
+            playSound( SoundEvents.ANVIL_PLACE, 0.8F, 0.8F + level().random.nextFloat() * 0.4F );
             return false;
         }
         else {

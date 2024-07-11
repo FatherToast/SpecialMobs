@@ -25,7 +25,8 @@ public class EmberBlazeEntity extends _SpecialBlazeEntity {
     public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
         bestiaryInfo.color( 0x000000 )
                 .uniqueTextureBaseOnly()
-                .addExperience( 2 ).disableRangedAttack()
+                .addExperience( 2 )
+                .disableRangedAttack()
                 .addToAttribute( Attributes.MAX_HEALTH, 10.0 ).addToAttribute( Attributes.ARMOR, 10.0 )
                 .multiplyAttribute( Attributes.MOVEMENT_SPEED, 1.3 );
     }

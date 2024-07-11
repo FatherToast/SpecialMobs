@@ -21,9 +21,11 @@ public class CinderBlazeEntity extends _SpecialBlazeEntity {
     
     @SpecialMob.BestiaryInfoSupplier
     public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
-        bestiaryInfo.color( 0xFFC0CB ).weight( BestiaryInfo.DefaultWeight.DISABLED )
+        bestiaryInfo.color( 0xFFC0CB )
+                .weight( BestiaryInfo.DefaultWeight.DISABLED )
                 .size( 0.5F, 0.5F, 0.9F )
-                .experience( 2 ).disableRangedAttack()
+                .experience( 2 )
+                .disableRangedAttack()
                 .addToAttribute( Attributes.ATTACK_DAMAGE, -2.0 )
                 .multiplyAttribute( Attributes.MOVEMENT_SPEED, 1.3 );
     }
