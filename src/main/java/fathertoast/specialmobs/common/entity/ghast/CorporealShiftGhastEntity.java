@@ -16,6 +16,7 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
@@ -110,7 +111,12 @@ public class CorporealShiftGhastEntity extends _SpecialGhastEntity {
     
     /** @return Attempts to damage this entity; returns true if the hit was successful. */
     @Override
-    public boolean hurt( DamageSource source, float amount ) { return isCorporeal() && super.hurt( source, amount ); }
+    public boolean hurt( DamageSource source, float amount ) {
+        if ( isCorporeal() ) {
+            return source.is( DamageTypeTags.BYPASSES_INVULNERABILITY ) && super.hurt( source, amount );
+        }
+        return super.hurt( source, amount );
+    }
     
     public boolean isCorporeal() { return entityData.get( CORPOREAL ); }
     
