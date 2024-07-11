@@ -17,6 +17,7 @@ public class SMModelLayers {
 
     public static final ModelLayerLocation CREEPER_OUTER_LAYER = create("creeper", "outer");
     public static final ModelLayerLocation BLAZE_OUTER_LAYER = create("blaze", "outer");
+    public static final ModelLayerLocation BLAZE_OUTER_ARMOR_LAYER = create("blaze", "outer_armor");
     public static final ModelLayerLocation ENDERMAN_OUTER_LAYER = create("enderman", "outer");
     public static final ModelLayerLocation GHAST_OUTER_LAYER = create("ghast", "outer");
     public static final ModelLayerLocation MAGMA_CUBE_OUTER_LAYER = create("magma_cube", "outer");

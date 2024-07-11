@@ -51,7 +51,9 @@ public class _SpecialBlazeEntity extends Blaze implements RangedAttackMob, ISpec
     public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
         bestiaryInfo.color( 0xFFF87E )
                 .vanillaTextureBaseOnly( "textures/entity/blaze.png" )
-                .experience( 10 ).waterSensitive()
+                .experience( 10 )
+                .waterSensitive()
+                .fallImmune()
                 .fireballAttack( 1.0, 60, 100, 48.0 );
     }
     

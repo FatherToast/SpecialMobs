@@ -12,6 +12,7 @@ import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.config.Config;
 import fathertoast.specialmobs.common.core.SpecialMobs;
 import fathertoast.specialmobs.common.core.register.SMEntities;
+import fathertoast.specialmobs.common.entity.blaze.ArmoredBlazeEntity;
 import fathertoast.specialmobs.common.entity.creeper.EnderCreeperEntity;
 import fathertoast.specialmobs.common.entity.creeper.ScopeCreeperEntity;
 import fathertoast.specialmobs.common.entity.enderman.RunicEndermanEntity;
@@ -66,6 +67,7 @@ public class ClientRegister {
 
         event.registerLayerDefinition( SMModelLayers.CREEPER_OUTER_LAYER, () -> CreeperModel.createBodyLayer( new CubeDeformation(0.25F ) ) );
         event.registerLayerDefinition( SMModelLayers.BLAZE_OUTER_LAYER, () -> SMModelLayers.blazeBodyLayer( new CubeDeformation(0.25F ) ) );
+        event.registerLayerDefinition( SMModelLayers.BLAZE_OUTER_ARMOR_LAYER, () -> SMModelLayers.blazeBodyLayer( new CubeDeformation( 1.0F ) ) );
         event.registerLayerDefinition( SMModelLayers.ENDERMAN_OUTER_LAYER, () -> SMModelLayers.endermanBodyLayer( new CubeDeformation(0.25F ) ) );
         event.registerLayerDefinition( SMModelLayers.GHAST_OUTER_LAYER, () -> SMModelLayers.ghastBodyLayer( new CubeDeformation( 0.25F ) ) );
         event.registerLayerDefinition( SMModelLayers.MAGMA_CUBE_OUTER_LAYER, () -> SMModelLayers.magmaCubeBodyLayer( new CubeDeformation( 0.25F ) ) );
@@ -105,6 +107,8 @@ public class ClientRegister {
         registerFamilyRenderers( event, MobFamily.BLAZE, SpecialBlazeRenderer::new );
         
         // Species overrides
+        registerSpeciesRenderer( event, ArmoredBlazeEntity.SPECIES, ArmoredBlazeRenderer::new );
+
         registerSpeciesRenderer( event, EnderCreeperEntity.SPECIES, EnderCreeperRenderer::new );
         registerSpeciesRenderer( event, ScopeCreeperEntity.SPECIES, ScopeCreeperRenderer::new );
         

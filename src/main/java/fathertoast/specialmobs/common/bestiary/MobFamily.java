@@ -110,7 +110,7 @@ public class MobFamily<T extends Mob, V extends FamilyConfig> {
     
     public static final MobFamily<Blaze, FamilyConfig> BLAZE = new MobFamily<>( FamilyConfig::new,
             "Blaze", "blazes", 0xF6B201, new EntityType[] { EntityType.BLAZE },
-            "Cinder", "Conflagration", "Ember", "Hellfire", "Inferno", "Jolt", "Wildfire"
+            "Armored", "Cinder", "Conflagration", "Ember", "Hellfire", "Inferno", "Jolt", "Wildfire"
     );
     
     static {
