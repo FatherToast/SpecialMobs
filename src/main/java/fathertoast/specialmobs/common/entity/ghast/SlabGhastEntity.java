@@ -24,7 +24,7 @@ public class SlabGhastEntity extends _SpecialGhastEntity {
 
     @SpecialMob.BestiaryInfoSupplier
     public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
-        bestiaryInfo.color( 0xE8C51A )
+        bestiaryInfo.color( 0xCECECE )
                 .weight( BestiaryInfo.DefaultWeight.DEFAULT )
                 .uniqueTextureWithAnimation()
                 .size( 1.0F, 4.0F, 2.0F )
