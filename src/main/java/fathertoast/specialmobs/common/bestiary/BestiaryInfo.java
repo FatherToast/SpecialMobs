@@ -368,7 +368,7 @@ public class BestiaryInfo {
             return vanillaBaseTexture( tex ).noEyesTexture().vanillaOverlayTexture( ovrTex );
         }
         
-        /** Sets the species default base and animation (overlay) textures. Removes all other textures. */
+        /** Sets the species default base and animation textures. Removes all other textures. */
         public Builder vanillaTextureWithAnimation( String tex, String aniTex ) {
             return vanillaBaseTexture( tex ).noEyesTexture().vanillaAnimationTexture( aniTex );
         }
@@ -385,6 +385,7 @@ public class BestiaryInfo {
         /** Sets the species default overlay texture. */
         private Builder vanillaOverlayTexture( String ovrTex ) { return overlayTexture( new ResourceLocation( ovrTex ) ); }
 
+        /** Sets the species default animation texture. */
         private Builder vanillaAnimationTexture( String aniTex ) { return animationTexture( new ResourceLocation( aniTex ) ); }
         
         
@@ -399,7 +400,7 @@ public class BestiaryInfo {
         /** Sets the species default base and overlay textures. Removes all other textures. */
         public Builder uniqueTextureWithOverlay() { return uniqueBaseTexture().noEyesTexture().uniqueOverlayTexture(); }
         
-        /** Sets the species default base and animation (overlay) textures. Removes all other textures. */
+        /** Sets the species default base and animation textures. Removes all other textures. */
         public Builder uniqueTextureWithAnimation() { return uniqueBaseTexture().noEyesTexture().uniqueAnimationTexture(); }
         
         /** Sets the species default base texture. Removes all other textures. */
@@ -426,8 +427,8 @@ public class BestiaryInfo {
         
         /** @return The expected overlay texture for this builder. */
         private ResourceLocation getOverlayTexture() { return toTexture( References.TEXTURE_OVERLAY_SUFFIX ); }
-        
-        /** @return The given strings converted to a texture resource location. */
+
+        /** @return The expected animation texture for this builder. */
         private ResourceLocation getAnimationTexture() { return toTexture( References.TEXTURE_ANIMATION_SUFFIX ); }
         
         /** @return The given strings converted to a texture resource location. */
@@ -466,6 +467,7 @@ public class BestiaryInfo {
             return this;
         }
 
+        /** Sets the species default animation texture. */
         private Builder animationTexture( @Nullable ResourceLocation aniTex ) {
             animationTexture = aniTex;
             return this;
