@@ -33,7 +33,8 @@ public class QueenGhastEntity extends _SpecialGhastEntity {
         bestiaryInfo.color( 0xCE0Aff )
                 .uniqueTextureWithAnimation()
                 .size( 1.25F, 5.0F, 5.0F )
-                .addExperience( 2 ).regen( 20 )
+                .addExperience( 2 )
+                .regen( 20 )
                 .addToAttribute( Attributes.MAX_HEALTH, 20.0 )
                 .addToAttribute( Attributes.ATTACK_DAMAGE, 2.0 )
                 .multiplyAttribute( Attributes.MOVEMENT_SPEED, 0.6 );

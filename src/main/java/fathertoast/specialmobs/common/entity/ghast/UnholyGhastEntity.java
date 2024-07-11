@@ -29,7 +29,9 @@ public class UnholyGhastEntity extends _SpecialGhastEntity {
         bestiaryInfo.color( 0x7AC754 ).weight( BestiaryInfo.DefaultWeight.LOW )
                 .uniqueTextureWithAnimation()
                 .size( 0.5F, 2.0F, 2.0F )
-                .addExperience( 4 ).undead().disableRangedAttack()
+                .addExperience( 4 )
+                .undead()
+                .disableRangedAttack()
                 .addToAttribute( Attributes.MAX_HEALTH, 10.0 )
                 .addToAttribute( Attributes.ATTACK_DAMAGE, 2.0 )
                 .multiplyAttribute( Attributes.MOVEMENT_SPEED, 0.7 );

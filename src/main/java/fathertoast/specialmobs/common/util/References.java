@@ -61,8 +61,8 @@ public final class References {
     public static final String TEXTURE_BASE_SUFFIX = "";
     public static final String TEXTURE_EYES_SUFFIX = "_eyes";
     public static final String TEXTURE_OVERLAY_SUFFIX = "_overlay";
-    public static final String TEXTURE_SHOOTING_SUFFIX = "_shooting";
-    public static final String TEXTURE_SHOOTING_EYES_SUFFIX = "_shooting_eyes";
+    public static final String TEXTURE_ANIMATION_SUFFIX = "_anim";
+    public static final String TEXTURE_ANIMATION_EYES_SUFFIX = "_anim_eyes";
     
     public static ResourceLocation getEntityTexture(String path, String fileName ) { return getEntityTexture( path, fileName, "" ); }
     
@@ -82,11 +82,11 @@ public final class References {
     
     @SuppressWarnings( "unused" )
     public static ResourceLocation getEntityShootingTexture( String path, String fileName ) {
-        return getEntityTexture( path, fileName, TEXTURE_SHOOTING_SUFFIX );
+        return getEntityTexture( path, fileName, TEXTURE_ANIMATION_SUFFIX );
     }
     
     public static ResourceLocation getEntityShootingEyesTexture( String path, String fileName ) {
-        return getEntityTexture( path, fileName, TEXTURE_SHOOTING_EYES_SUFFIX );
+        return getEntityTexture( path, fileName, TEXTURE_ANIMATION_EYES_SUFFIX );
     }
     
     public static ResourceLocation getEntityTexture( String path, String fileName, String suffix ) {

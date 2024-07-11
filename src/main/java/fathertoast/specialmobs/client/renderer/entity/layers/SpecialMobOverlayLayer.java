@@ -17,10 +17,12 @@ public class SpecialMobOverlayLayer<T extends LivingEntity, M extends EntityMode
         super( renderer );
         layerModel = model;
     }
-    
+
+
     @Override
     public void render( PoseStack poseStack, MultiBufferSource buffer, int packedLight, T entity,
                        float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch ) {
+
         final ResourceLocation overlayTexture = ((ISpecialMob<?>) entity).getSpecialData().getTextureOverlay();
         if( overlayTexture == null ) return;
         

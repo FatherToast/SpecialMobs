@@ -194,6 +194,11 @@ public class SpecialMobData<T extends Mob & ISpecialMob<T>> {
     /** @return The overlay texture for the entity. */
     @Nullable
     public ResourceLocation getTextureOverlay() { return theEntity.getSpecies().bestiaryInfo.overlayTexture; }
+
+    @Nullable
+    public ResourceLocation getTextureAnimation() {
+        return theEntity.getSpecies().bestiaryInfo.animationTexture;
+    }
     
     //    /** @param textures The new texture(s) to set for the entity. */
     //    private void setTextures( ResourceLocation[] textures ) {

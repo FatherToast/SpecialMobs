@@ -150,11 +150,11 @@ public class BestiaryInfo {
     public final ResourceLocation texture;
     /** The default glowing eyes texture. Not applicable for ghasts or families normally rendered at max brightness. */
     public final ResourceLocation eyesTexture;
-    /**
-     * The default overlay texture.
-     * Generally only applicable for bipedal mobs, though this is used as the "shooting" texture for ghasts.
-     */
+    /** The default overlay texture. */
     public final ResourceLocation overlayTexture;
+    /** Generally used as the "shooting" texture for ghasts. */
+    public final ResourceLocation animationTexture;
+
     
     // Special Mob Data defaults
     public final int experience;
@@ -184,7 +184,7 @@ public class BestiaryInfo {
     }
     
     private BestiaryInfo( int eggColor, float scale, DefaultWeight weight, Theme spawnTheme, List<AttributeEntry> attributes,
-                          ResourceLocation tex, ResourceLocation eyeTex, ResourceLocation ovrTex,
+                          ResourceLocation tex, ResourceLocation eyeTex, ResourceLocation ovrTex, ResourceLocation animTex,
                           int xp, int regen, double fallDmg, boolean fireImm, boolean burnImm, boolean drownImm, boolean pushImm,
                           boolean waterDmg, boolean leash, boolean plateImm, Object[] blockImm, Object[] effectImm,
                           double raDmg, double raVar, double raSpd, int raCD, int raMCD, double raRng ) {
@@ -198,6 +198,7 @@ public class BestiaryInfo {
         texture = tex;
         eyesTexture = eyeTex;
         overlayTexture = ovrTex;
+        animationTexture = animTex;
         
         experience = xp;
         healTime = regen;
@@ -237,6 +238,7 @@ public class BestiaryInfo {
         private ResourceLocation texture;
         private ResourceLocation eyesTexture;
         private ResourceLocation overlayTexture;
+        private ResourceLocation animationTexture;
         
         // Special Mob Data fields (also inherited)
         private int experience = -1;
@@ -274,6 +276,7 @@ public class BestiaryInfo {
                 texture = parent.texture;
                 eyesTexture = parent.eyesTexture;
                 overlayTexture = parent.overlayTexture;
+                animationTexture = parent.animationTexture;
                 
                 experience = parent.experience;
                 healTime = parent.healTime;
@@ -300,7 +303,7 @@ public class BestiaryInfo {
             if( experience < 0 )
                 throw new IllegalStateException( "Family " + owningSpecies.family.name + " has not set the base experience value!" );
             
-            return new BestiaryInfo( eggSpotsColor, baseScale, defaultWeight, spawnTheme, attributes, texture, eyesTexture, overlayTexture,
+            return new BestiaryInfo( eggSpotsColor, baseScale, defaultWeight, spawnTheme, attributes, texture, eyesTexture, overlayTexture, animationTexture,
                     experience, healTime, fallDamageMultiplier, isImmuneToFire, isImmuneToBurning, canBreatheInWater, ignoreWaterPush, isDamagedByWater,
                     allowLeashing, ignorePressurePlates, immuneToStickyBlocks.toArray(), immuneToPotions.toArray(),
                     rangedAttackDamage, rangedAttackSpread, rangedWalkSpeed, rangedAttackCooldown, rangedAttackMaxCooldown, rangedAttackMaxRange );
@@ -366,7 +369,9 @@ public class BestiaryInfo {
         }
         
         /** Sets the species default base and animation (overlay) textures. Removes all other textures. */
-        public Builder vanillaTextureWithAnimation( String tex, String aniTex ) { return vanillaTextureWithOverlay( tex, aniTex ); }
+        public Builder vanillaTextureWithAnimation( String tex, String aniTex ) {
+            return vanillaBaseTexture( tex ).noEyesTexture().vanillaAnimationTexture( aniTex );
+        }
         
         /** Sets the species default base texture. Removes all other textures. */
         public Builder vanillaTextureBaseOnly( String tex ) { return vanillaBaseTexture( tex ).noEyesTexture().noOverlayTexture(); }
@@ -379,6 +384,8 @@ public class BestiaryInfo {
         
         /** Sets the species default overlay texture. */
         private Builder vanillaOverlayTexture( String ovrTex ) { return overlayTexture( new ResourceLocation( ovrTex ) ); }
+
+        private Builder vanillaAnimationTexture( String aniTex ) { return animationTexture( new ResourceLocation( aniTex ) ); }
         
         
         //--------------- Textures (Auto-selected) ----------------
@@ -408,8 +415,8 @@ public class BestiaryInfo {
         /** Sets the species default overlay texture. */
         public Builder uniqueOverlayTexture() { return overlayTexture( getOverlayTexture() ); }
         
-        /** Sets the species default animation texture (uses the overlay slot). */
-        public Builder uniqueAnimationTexture() { return overlayTexture( getShootingTexture() ); }
+        /** Sets the species default animation texture. */
+        public Builder uniqueAnimationTexture() { return animationTexture( getAnimationTexture() ); }
         
         /** @return The expected base texture for this builder. */
         private ResourceLocation getBaseTexture() { return toTexture( References.TEXTURE_BASE_SUFFIX ); }
@@ -421,7 +428,7 @@ public class BestiaryInfo {
         private ResourceLocation getOverlayTexture() { return toTexture( References.TEXTURE_OVERLAY_SUFFIX ); }
         
         /** @return The given strings converted to a texture resource location. */
-        private ResourceLocation getShootingTexture() { return toTexture( References.TEXTURE_SHOOTING_SUFFIX ); }
+        private ResourceLocation getAnimationTexture() { return toTexture( References.TEXTURE_ANIMATION_SUFFIX ); }
         
         /** @return The given strings converted to a texture resource location. */
         private ResourceLocation toTexture( String suffix ) {
@@ -438,8 +445,8 @@ public class BestiaryInfo {
         /** Removes the species default overlay texture. */
         public Builder noOverlayTexture() { return overlayTexture( null ); }
         
-        /** Removes the species default animation texture (uses the overlay slot). */
-        public Builder noAnimationTexture() { return noOverlayTexture(); }
+        /** Removes the species default animation texture. */
+        public Builder noAnimationTexture() { return animationTexture( null ); }
         
         /** Sets the species default base texture. */
         private Builder baseTexture( @Nullable ResourceLocation tex ) {
@@ -456,6 +463,11 @@ public class BestiaryInfo {
         /** Sets the species default overlay texture. */
         private Builder overlayTexture( @Nullable ResourceLocation ovrTex ) {
             overlayTexture = ovrTex;
+            return this;
+        }
+
+        private Builder animationTexture( @Nullable ResourceLocation aniTex ) {
+            animationTexture = aniTex;
             return this;
         }
         

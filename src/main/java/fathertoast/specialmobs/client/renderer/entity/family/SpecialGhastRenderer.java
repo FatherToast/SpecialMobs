@@ -26,11 +26,11 @@ public class SpecialGhastRenderer extends GhastRenderer {
     @Override
     public ResourceLocation getTextureLocation( Ghast entity ) {
         final SpecialMobData<?> data = ((ISpecialMob<?>) entity).getSpecialData();
-        return entity.isCharging() && data.getTextureOverlay() != null ? data.getTextureOverlay() : data.getTexture();
+        return entity.isCharging() && data.getTextureAnimation() != null ? data.getTextureAnimation() : data.getTexture();
     }
     
     @Override
-    protected void scale(Ghast entity, PoseStack poseStack, float partialTick ) {
+    protected void scale( Ghast entity, PoseStack poseStack, float partialTick ) {
         super.scale( entity, poseStack, partialTick );
         
         final float scale = ((ISpecialMob<?>) entity).getSpecialData().getRenderScale();

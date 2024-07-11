@@ -20,11 +20,14 @@ public class KingGhastEntity extends _SpecialGhastEntity {
     
     @SpecialMob.BestiaryInfoSupplier
     public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
-        bestiaryInfo.color( 0xE8C51A ).weight( BestiaryInfo.DefaultWeight.LOW )
+        bestiaryInfo.color( 0xE8C51A )
+                .weight( BestiaryInfo.DefaultWeight.LOW )
                 .uniqueTextureWithAnimation()
                 .size( 1.5F, 6.0F, 6.0F )
-                .addExperience( 4 ).regen( 30 )
-                .addToAttribute( Attributes.MAX_HEALTH, 20.0 ).addToAttribute( Attributes.ARMOR, 10.0 )
+                .addExperience( 4 )
+                .regen( 30 )
+                .addToAttribute( Attributes.MAX_HEALTH, 20.0 )
+                .addToAttribute( Attributes.ARMOR, 10.0 )
                 .addToAttribute( Attributes.ATTACK_DAMAGE, 4.0 )
                 .multiplyAttribute( Attributes.MOVEMENT_SPEED, 0.6 );
     }

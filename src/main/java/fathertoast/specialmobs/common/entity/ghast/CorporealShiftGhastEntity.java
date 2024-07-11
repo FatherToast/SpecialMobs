@@ -36,9 +36,11 @@ public class CorporealShiftGhastEntity extends _SpecialGhastEntity {
     
     @SpecialMob.BestiaryInfoSupplier
     public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
-        bestiaryInfo.color( 0xA7FF9B ).weight( BestiaryInfo.DefaultWeight.LOW )
+        bestiaryInfo.color( 0xA7FF9B )
+                .weight( BestiaryInfo.DefaultWeight.LOW )
                 .uniqueTextureWithAnimation()
-                .addExperience( 4 ).regen( 80 )
+                .addExperience( 4 )
+                .regen( 80 )
                 .addToAttribute( Attributes.MAX_HEALTH, 20.0 )
                 .multiplyAttribute( Attributes.MOVEMENT_SPEED, 0.8 );
     }
