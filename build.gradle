@@ -82,7 +82,6 @@ repositories {
             includeGroup 'curse.maven'
         }
     }
-    // Apocalypse isn't hosted on any maven servers anymore, oh well
     flatDir {
         dir 'flat_deps'
     }
