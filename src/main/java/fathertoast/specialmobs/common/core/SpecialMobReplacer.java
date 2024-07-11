@@ -9,6 +9,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.phys.AABB;
@@ -145,6 +146,7 @@ public final class SpecialMobReplacer {
         }
         
         replacement.load( tag );
+        replacement.setHealth( (float) replacement.getAttributeValue( Attributes.MAX_HEALTH ) );
         MobHelper.finalizeSpawn( replacement, (ServerLevelAccessor) level, level.getCurrentDifficultyAt( entityPos ), null, null );
         
         level.addFreshEntity( replacement );
