@@ -1,6 +1,7 @@
 1.16.5-1.0.3
     - Fixed a potential cause of world load deadlock.
     - The master disable for vanilla replacement now works.
+    - Drowning creepers no longer create water in the Nether (closes #43).
 1.16.5-1.0.2
     - Fixed a crash related to checking if mobs can stick to certain blocks.
     - Fixed ranged attack damage stat for arrows being double what it should be.

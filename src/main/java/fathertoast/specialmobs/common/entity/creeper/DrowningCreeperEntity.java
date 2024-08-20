@@ -21,6 +21,7 @@ import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootEntryItemBuilder;
 import fathertoast.specialmobs.datagen.loot.LootPoolBuilder;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
+import net.minecraft.block.AbstractFireBlock;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.*;
@@ -163,6 +164,8 @@ public class DrowningCreeperEntity extends _SpecialCreeperEntity implements IAmp
         
         if( explosionMode == Explosion.Mode.NONE ) return;
         
+        final boolean ultrawarm = level.dimensionType().ultraWarm();
+        
         final UnderwaterSilverfishBlock.Type mainType = UnderwaterSilverfishBlock.Type.next( random );
         final UnderwaterSilverfishBlock.Type rareType = UnderwaterSilverfishBlock.Type.next( random );
         final BlockState mainCoral = mainType.hostBlock().defaultBlockState();
@@ -196,7 +199,15 @@ public class DrowningCreeperEntity extends _SpecialCreeperEntity implements IAmp
                                 // Water fill
                                 final float fillChoice = random.nextFloat();
                                 
-                                if( fillChoice < 0.1F && seaPickle.canSurvive( level, pos ) ) {
+                                if( ultrawarm ) {
+                                    if( fillChoice < 0.3F ) {
+                                        BlockState fire = AbstractFireBlock.getState( level, pos );
+                                        if( fire.canSurvive( level, pos ) ) {
+                                            MobHelper.placeBlock( this, pos, fire );
+                                        }
+                                    }
+                                }
+                                else if( fillChoice < 0.1F && seaPickle.canSurvive( level, pos ) ) {
                                     MobHelper.placeBlock( this, pos, seaPickle );
                                 }
                                 else if( fillChoice < 0.3F && seaGrass.canSurvive( level, pos ) ) {
@@ -215,9 +226,16 @@ public class DrowningCreeperEntity extends _SpecialCreeperEntity implements IAmp
                             else if( isCoralSafe( rMinusOneSq, x, y, z ) ) {
                                 // Coral casing
                                 final boolean infested = getConfig().DROWNING.infestedBlockChance.rollChance( random );
-                                MobHelper.placeBlock( this, pos, random.nextFloat() < 0.8F ?
-                                        infested ? mainInfestedCoral : mainCoral :
-                                        infested ? rareInfestedCoral : rareCoral );
+                                if( ultrawarm ) {
+                                    MobHelper.placeBlock( this, pos, infested ?
+                                            Blocks.INFESTED_COBBLESTONE.defaultBlockState() :
+                                            Blocks.COBBLESTONE.defaultBlockState() );
+                                }
+                                else {
+                                    MobHelper.placeBlock( this, pos, random.nextFloat() < 0.8F ?
+                                            infested ? mainInfestedCoral : mainCoral :
+                                            infested ? rareInfestedCoral : rareCoral );
+                                }
                             }
                         }
                     }
