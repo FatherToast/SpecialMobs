@@ -141,7 +141,7 @@ public final class SpecialMobReplacer {
     
     /** @return True if a mob should be replaced. */
     private static boolean shouldReplace( MobFamily<?, ?> mobFamily, boolean isSpecial ) {
-        return isSpecial || mobFamily.config.GENERAL.vanillaReplacement.get();
+        return isSpecial || Config.MAIN.GENERAL.masterVanillaReplacement.get() && mobFamily.config.GENERAL.vanillaReplacement.get();
     }
     
     /** Replaces a mob, copying over all its data to the replacement. */
