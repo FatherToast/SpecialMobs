@@ -1,3 +1,8 @@
+1.16.5-1.0.3
+    - Fixed a potential cause of world load deadlock.
+1.16.5-1.0.2
+    - Fixed a crash related to checking if mobs can stick to certain blocks.
+    - Fixed ranged attack damage stat for arrows being double what it should be.
 1.16.5-1.0.1
     - Fixed certain vanilla advancements broken by mob replacement.
     - Cinders now spawn less smoke.

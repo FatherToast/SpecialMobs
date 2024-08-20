@@ -12,7 +12,9 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.world.IServerWorld;
+import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
+import net.minecraft.world.chunk.ChunkStatus;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
@@ -21,19 +23,28 @@ import net.minecraftforge.fml.common.Mod;
 
 import javax.annotation.Nullable;
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Deque;
+import java.util.List;
 import java.util.function.Predicate;
 
 @Mod.EventBusSubscriber( modid = SpecialMobs.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE )
 public final class SpecialMobReplacer {
     /** List of data for mobs needing replacement. */
     private static final Deque<MobReplacementEntry> TO_REPLACE = new ArrayDeque<>();
+    /** List of data for mobs waiting to check for mob replacement. */
+    private static final List<DelayedMobReplacementEntry> DELAYED_REPLACE = new ArrayList<>();
     
     /** Returns true if the species is not damaged by water. */
     private static final Predicate<MobFamily.Species<?>> WATER_INSENSITIVE_SELECTOR =
             ( species ) -> !species.config.GENERAL.isDamagedByWater.get();
     /** Returns true if the species's block height is less than or equal to the base vanilla entity's. */
     private static final Predicate<MobFamily.Species<?>> NO_GIANTS_SELECTOR = MobFamily.Species::isNotGiant;
+    
+    //TODO Temp check, replace this with Crust EnvironmentHelper check method in 1.20+
+    public static boolean isPosLoaded( IWorldReader world, BlockPos pos ) {
+        return world.getChunk( pos.getX() >> 4, pos.getZ() >> 4, ChunkStatus.FULL, false ) != null;
+    }
     
     
     /**
@@ -57,13 +68,18 @@ public final class SpecialMobReplacer {
             
             setInitFlag( entity ); // Do this regardless of replacement, should help prevent bizarre save glitches
             
-            final boolean isSpecial = shouldMakeNextSpecial( mobFamily, world, entityPos );
-            if( shouldReplace( mobFamily, isSpecial ) ) {
-                TO_REPLACE.addLast( new MobReplacementEntry( mobFamily, isSpecial, entity, world, entityPos ) );
-                
-                // Sadly, it's somewhat of a pain to make sure no warnings get logged
-                // when dealing with mounts/riders... Maybe someday :(
-                event.setCanceled( true );
+            if( isPosLoaded( world, entityPos ) ) {
+                final boolean isSpecial = shouldMakeNextSpecial( mobFamily, world, entityPos );
+                if( shouldReplace( mobFamily, isSpecial ) ) {
+                    TO_REPLACE.addLast( new MobReplacementEntry( mobFamily, isSpecial, entity, world, entityPos ) );
+                    
+                    // Sadly, it's somewhat of a pain to make sure no warnings get logged
+                    // when dealing with mounts/riders... Maybe someday :(
+                    event.setCanceled( true );
+                }
+            }
+            else {
+                DELAYED_REPLACE.add( new DelayedMobReplacementEntry( mobFamily, entity, world, entityPos ) );
             }
         }
     }
@@ -78,6 +94,10 @@ public final class SpecialMobReplacer {
     @SubscribeEvent( priority = EventPriority.NORMAL )
     public static void onServerTick( TickEvent.ServerTickEvent event ) {
         if( event.phase == TickEvent.Phase.END ) {
+            if( !DELAYED_REPLACE.isEmpty() ) {
+                DELAYED_REPLACE.removeIf( DelayedMobReplacementEntry::update );
+            }
+            
             while( !TO_REPLACE.isEmpty() ) {
                 final MobReplacementEntry replacement = TO_REPLACE.removeFirst();
                 replace( replacement.mobFamily, replacement.isSpecial, replacement.entityToReplace, replacement.entityWorld, replacement.entityPos );
@@ -204,6 +224,48 @@ public final class SpecialMobReplacer {
             entityToReplace = (LivingEntity) entity;
             entityWorld = world;
             entityPos = pos;
+        }
+    }
+    
+    /** All data needed for a single mob we are waiting to replace. */
+    private static class DelayedMobReplacementEntry {
+        final MobFamily<?, ?> mobFamily;
+        
+        final LivingEntity entityToReplace;
+        final World entityWorld;
+        final BlockPos entityPos;
+        
+        int ticksRemaining = 6;
+        
+        DelayedMobReplacementEntry( MobFamily<?, ?> family, Entity entity, World world, BlockPos pos ) {
+            mobFamily = family;
+            
+            entityToReplace = (LivingEntity) entity;
+            entityWorld = world;
+            entityPos = pos;
+        }
+        
+        /** Called each server tick to see if the mob is ready to be replaced. Return true when done. */
+        boolean update() {
+            if( ticksRemaining > 0 ) {
+                ticksRemaining--;
+            }
+            else if( !entityToReplace.isAlive() ) {
+                return true; // Entity was killed or unloaded before getting replaced
+            }
+            else if( isPosLoaded( entityWorld, entityPos ) ) {
+                // It is time to decide!
+                final boolean isSpecial = shouldMakeNextSpecial( mobFamily, entityWorld, entityPos );
+                if( shouldReplace( mobFamily, isSpecial ) ) {
+                    TO_REPLACE.addLast( new MobReplacementEntry( mobFamily, isSpecial, entityToReplace, entityWorld, entityPos ) );
+                    entityToReplace.remove();
+                }
+                return true;
+            }
+            else {
+                ticksRemaining = 5;
+            }
+            return false;
         }
     }
 }
