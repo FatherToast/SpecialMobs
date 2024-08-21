@@ -29,8 +29,8 @@ public class SkeletonFamilyConfig extends FamilyConfig {
                     "Options specific to the family of " + family.configName + "." );
             
             babyChance = SPEC.define( new DoubleField( "baby_chance", 0.05, DoubleField.Range.PERCENT,
-                    "Chance for valid " + family.configName + " to spawn as babies. Baby mobs are about half-sized,",
-                    "move 50% faster, drop 150% more experience, and are 50% cuter." ) );
+                    "Chance for valid " + family.configName + " to spawn as babies. Baby mobs are about " +
+                            "half-sized, move 50% faster, drop 150% more experience, and are 50% cuter." ) );
         }
     }
 }

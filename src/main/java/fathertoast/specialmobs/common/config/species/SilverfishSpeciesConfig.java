@@ -32,8 +32,8 @@ public class SilverfishSpeciesConfig extends SpeciesConfig {
                     "Options standard to all " + species.family.configName + "." );
             
             aggressiveChance = SPEC.define( new DoubleField( "aggressive_chance", -1.0, DoubleField.Range.SIGNED_PERCENT,
-                    "Chance for " + speciesName + " to spawn already calling for reinforcements.",
-                    "If this is set to a non-negative value, it overrides the value set for \"family_aggressive_chance\"." ) );
+                    "Chance for " + speciesName + " to spawn already calling for reinforcements. If this " +
+                            "is set to a non-negative value, it overrides the value set for \"family_aggressive_chance\"." ) );
             
             SPEC.newLine();
             

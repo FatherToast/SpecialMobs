@@ -16,7 +16,7 @@ public class CreeperSpeciesConfig extends SpeciesConfig {
     
     /** Builds the config spec that should be used for this config. */
     public CreeperSpeciesConfig( ConfigManager manager, MobFamily.Species<?> species,
-                                boolean cannotExplodeWhileWet, boolean explodeWhileBurning, boolean explodeWhenShot ) {
+                                 boolean cannotExplodeWhileWet, boolean explodeWhileBurning, boolean explodeWhenShot ) {
         super( manager, species );
         
         CREEPERS = new Creepers( this, species, species.getConfigName(), cannotExplodeWhileWet, explodeWhileBurning, explodeWhenShot );
@@ -37,16 +37,16 @@ public class CreeperSpeciesConfig extends SpeciesConfig {
                     "Options standard to all " + species.family.configName + "." );
             
             stormChargeChance = SPEC.define( new DoubleField( "storm_charge_chance", -1.0, DoubleField.Range.SIGNED_PERCENT,
-                    "Chance for " + speciesName + " to spawn charged during thunderstorms.",
-                    "If this is set to a non-negative value, it overrides the value set for \"family_storm_charge_chance\"." ) );
+                    "Chance for " + speciesName + " to spawn charged during thunderstorms. If this is set " +
+                            "to a non-negative value, it overrides the value set for \"family_storm_charge_chance\"." ) );
             
             SPEC.newLine();
             
             canExplodeWhileWet = SPEC.define( new BooleanField( "can_explode_while_wet", !cannotExplodeWhileWet,
                     "If true, " + speciesName + " can explode while wet (normal creeper behavior)." ) );
             explodesWhileBurning = SPEC.define( new BooleanField( "explodes_while_burning", explodeWhileBurning,
-                    "If true, " + speciesName + " will explode while burning. If extinguished before the fuse runs",
-                    "out, they will resume normal behavior." ) );
+                    "If true, " + speciesName + " will explode while burning. If extinguished before the fuse " +
+                            "runs out, they will resume normal behavior." ) );
             explodesWhenShot = SPEC.define( new BooleanField( "explodes_when_shot", explodeWhenShot,
                     "If true, " + speciesName + " will explode when hit by an indirect attack (e.g. an arrow)." ) );
         }

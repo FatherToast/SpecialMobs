@@ -41,8 +41,8 @@ public class FamilyConfig extends AbstractConfigFile {
     /** Builds the config spec that should be used for this config. */
     public FamilyConfig( ConfigManager manager, MobFamily<?, ?> family, double variantChance ) {
         super( manager, ConfigUtil.noSpaces( family.configName ) + "/" + fileName( family ),
-                "This config contains options that apply to the family of " + family.configName + " as a whole;",
-                "that is, the vanilla replacement and all special variants." );
+                "This config contains options that apply to the family of " + family.configName + " as a whole; " +
+                        "that is, the vanilla replacement and all special variants." );
         
         GENERAL = new General( this, family, variantChance );
     }
@@ -68,9 +68,9 @@ public class FamilyConfig extends AbstractConfigFile {
             SPEC.newLine();
             
             familyRandomScaling = SPEC.define( new DoubleField( "family_random_scaling", -1.0, DoubleField.Range.SIGNED_PERCENT,
-                    "When greater than 0, " + family.configName + " will have a random render scale applied. This is a visual effect only.",
-                    "If this is set to a non-negative value, it overrides the value set for \"master_random_scaling\", though",
-                    "species configs can override this value." ) );
+                    "When greater than 0, " + family.configName + " will have a random render scale applied. " +
+                            "This is a visual effect only. If this is set to a non-negative value, it overrides the value set " +
+                            "for \"master_random_scaling\", though species configs can override this value." ) );
             
             SPEC.newLine();
             
@@ -93,8 +93,8 @@ public class FamilyConfig extends AbstractConfigFile {
             final EnvironmentListField[] weightExceptions = new EnvironmentListField[family.variants.length];
             
             comment = TomlHelper.newComment(
-                    "The weight of each " + ConfigUtil.camelCaseToLowerSpace( family.name ) + " species to be chosen as the replacement when",
-                    family.configName + " spawn as special variants. Higher weight is more common." );
+                    "The weight of each " + ConfigUtil.camelCaseToLowerSpace( family.name ) + " species to be chosen as the replacement when " +
+                            family.configName + " spawn as special variants. Higher weight is more common." );
             comment.add( TomlHelper.multiFieldInfo( DoubleField.Range.NON_NEGATIVE ) );
             SPEC.comment( comment );
             for( int i = 0; i < family.variants.length; i++ ) {
@@ -106,8 +106,8 @@ public class FamilyConfig extends AbstractConfigFile {
             SPEC.newLine();
             
             comment = TomlHelper.newComment(
-                    "The weight of each " + ConfigUtil.camelCaseToLowerSpace( family.name ) + " species to be chosen as the replacement when",
-                    family.configName + " spawn as special variants when specific environmental conditions are met. Higher weight is more common." );
+                    "The weight of each " + ConfigUtil.camelCaseToLowerSpace( family.name ) + " species to be chosen as the replacement when " +
+                            family.configName + " spawn as special variants when specific environmental conditions are met. Higher weight is more common." );
             comment.add( TomlHelper.multiFieldInfo( DoubleField.Range.NON_NEGATIVE ) );
             SPEC.comment( comment );
             for( int i = 0; i < family.variants.length; i++ ) {

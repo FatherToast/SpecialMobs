@@ -29,8 +29,8 @@ public class WitchFamilyConfig extends FamilyConfig {
                     "Options specific to the family of " + family.configName + "." );
             
             useSplashSwiftness = SPEC.define( new BooleanField( "use_splash_swiftness", true,
-                    "If true, " + family.configName + " will use splash potions of swiftness when trying to keep up,",
-                    "rather than drinking a swiftness potion. Helps them keep up just a little better than vanilla." ) );
+                    "If true, " + family.configName + " will use splash potions of swiftness when trying to keep " +
+                            "up, rather than drinking a swiftness potion. Helps them keep up just a little better than vanilla." ) );
         }
     }
 }

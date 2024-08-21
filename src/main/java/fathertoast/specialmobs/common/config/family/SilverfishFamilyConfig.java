@@ -29,8 +29,8 @@ public class SilverfishFamilyConfig extends FamilyConfig {
                     "Options specific to the family of " + family.configName + "." );
             
             familyAggressiveChance = SPEC.define( new DoubleField( "family_aggressive_chance", 0.05, DoubleField.Range.PERCENT,
-                    "Chance for " + family.configName + " to spawn already calling for reinforcements.",
-                    "By default, this applies to all " + family.configName + "; but species configs can override it." ) );
+                    "Chance for " + family.configName + " to spawn already calling for reinforcements. " +
+                            "By default, this applies to all " + family.configName + "; but species configs can override it." ) );
         }
     }
 }

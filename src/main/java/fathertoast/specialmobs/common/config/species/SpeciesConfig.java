@@ -83,23 +83,23 @@ public class SpeciesConfig extends AbstractConfigFile {
             SPEC.newLine();
             
             randomScaling = SPEC.define( new DoubleField( "random_scaling", -1.0, DoubleField.Range.SIGNED_PERCENT,
-                    "When greater than 0, " + speciesName + " will have a random render scale applied. This is a visual effect only.",
-                    "If this is set to a non-negative value, it overrides the value set for both \"master_random_scaling\" and",
-                    "\"family_random_scaling\". The priority is species value > family value > master value." ) );
+                    "When greater than 0, " + speciesName + " will have a random render scale applied. This is a visual effect " +
+                            "only. If this is set to a non-negative value, it overrides the value set for both \"master_random_scaling\" " +
+                            "and \"family_random_scaling\". The priority is species value > family value > master value." ) );
             
             SPEC.newLine();
             
             attributeChanges = SPEC.define( new AttributeListField( "attributes", info.defaultAttributes,
-                    "Attribute modifiers for " + speciesName + ". If no attribute changes are defined here, " + speciesName,
-                    "will have the exact same attributes as their parent vanilla mob." ) );
+                    "Attribute modifiers for " + speciesName + ". If no attribute changes are defined here, " +
+                            speciesName + " will have the exact same attributes as their parent vanilla mob." ) );
             
             SPEC.increaseIndent();
             SPEC.subcategory( SPECIAL_DATA_SUBCAT.substring( 0, SPECIAL_DATA_SUBCAT.length() - 1 ),
                     "Special Mob Data. These are the values set to each " + species.getConfigNameSingular() + " on spawn (in their NBT)." );
             
             experience = SPEC.define( new IntField( SPECIAL_DATA_SUBCAT + "experience", info.experience, IntField.Range.NON_NEGATIVE,
-                    "The amount of experience " + speciesName + " drop when killed by a player. Multiplied by 2.5 for babies.",
-                    "Extra experience may drop based on equipment. Slime-style mobs also drop experience equal to slime size." ) );
+                    "The amount of experience " + speciesName + " drop when killed by a player. Multiplied by 2.5 for babies. " +
+                            "Extra experience may drop based on equipment. Slime-style mobs also drop experience equal to slime size." ) );
             healTime = SPEC.define( new IntField( SPECIAL_DATA_SUBCAT + "heal_time", info.healTime, IntField.Range.NON_NEGATIVE,
                     "If greater than 0, " + speciesName + " will heal 1 half-heart of health every \"heal_time\" ticks. (20 ticks = 1 second)" ) );
             fallDamageMultiplier = SPEC.define( new DoubleField( SPECIAL_DATA_SUBCAT + "fall_damage_multiplier", info.fallDamageMultiplier, DoubleField.Range.NON_NEGATIVE,
@@ -150,8 +150,8 @@ public class SpeciesConfig extends AbstractConfigFile {
                             "The total delay (in ticks) " + speciesName + " wait between each ranged attack. (20 ticks = 1 second)" ) );
             rangedAttackMaxRange = info.rangedAttackMaxRange < 0.0F ? null :
                     SPEC.define( new DoubleField( SPECIAL_DATA_SUBCAT + "ranged_attack.max_range", info.rangedAttackMaxRange, DoubleField.Range.NON_NEGATIVE,
-                            "The maximum distance (in blocks) at which " + speciesName + " can use their ranged attacks.",
-                            "0 disables ranged attacks." ) );
+                            "The maximum distance (in blocks) at which " + speciesName + " can use their ranged attacks. " +
+                                    "0 disables ranged attacks." ) );
             
             SPEC.decreaseIndent();
         }

@@ -46,8 +46,8 @@ public class PotionSlimeSpeciesConfig extends SpeciesConfig {
                             MobEffects.HEALTH_BOOST, MobEffects.ABSORPTION,
                             MobEffects.GLOWING
                     ),
-                    "List of potions that " + speciesName + " can be 'filled' with on spawn (they will apply it on hit).",
-                    "Each effect in the list has an equal chance to be selected." ) );
+                    "List of potions that " + speciesName + " can be 'filled' with on spawn (they will apply it on hit). " +
+                            "Each effect in the list has an equal chance to be selected." ) );
         }
     }
 }

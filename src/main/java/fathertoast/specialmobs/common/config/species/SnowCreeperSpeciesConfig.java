@@ -12,8 +12,8 @@ public class SnowCreeperSpeciesConfig extends CreeperSpeciesConfig {
     
     /** Builds the config spec that should be used for this config. */
     public SnowCreeperSpeciesConfig( ConfigManager manager, MobFamily.Species<?> species,
-                                    boolean cannotExplodeWhileWet, boolean explodeWhileBurning, boolean explodeWhenShot,
-                                    double globeChance ) {
+                                     boolean cannotExplodeWhileWet, boolean explodeWhileBurning, boolean explodeWhenShot,
+                                     double globeChance ) {
         super( manager, species, cannotExplodeWhileWet, explodeWhileBurning, explodeWhenShot );
         
         SNOW = new Snow( this, species, species.getConfigName(), globeChance );
@@ -28,8 +28,8 @@ public class SnowCreeperSpeciesConfig extends CreeperSpeciesConfig {
                     "Options specific to " + speciesName + "." );
             
             snowGlobeChance = SPEC.define( new DoubleField( "snow_globe_chance", globeChance, DoubleField.Range.PERCENT,
-                    "Chance for " + speciesName + " to create a snow globe instead of regular walls when exploding.",
-                    "The globe is always chosen if the " + species.getConfigNameSingular() + " is underwater for some reason." ) );
+                    "Chance for " + speciesName + " to create a snow globe instead of regular walls when exploding. " +
+                            "The globe is always chosen if the " + species.getConfigNameSingular() + " is underwater for some reason." ) );
         }
     }
 }

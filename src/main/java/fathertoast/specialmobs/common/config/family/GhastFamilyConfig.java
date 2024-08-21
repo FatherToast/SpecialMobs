@@ -29,8 +29,8 @@ public class GhastFamilyConfig extends FamilyConfig {
                     "Options specific to the family of " + family.configName + "." );
             
             allowVerticalTargeting = SPEC.define( new BooleanField( "allow_vertical_targeting", true,
-                    "If true, " + family.configName + " will be allowed to target any visible player in their follow range.",
-                    "As of MC 1.8, vanilla ghasts can only start targeting players nearly completely horizontal from them." ) );
+                    "If true, " + family.configName + " will be allowed to target any visible player in their follow range. " +
+                            "As of MC 1.8, vanilla ghasts can only start targeting players nearly completely horizontal from them." ) );
         }
     }
 }
