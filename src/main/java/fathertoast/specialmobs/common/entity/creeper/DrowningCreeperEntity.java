@@ -41,6 +41,7 @@ import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Biomes;
+import net.minecraft.world.level.block.BaseFireBlock;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -84,10 +85,10 @@ public class DrowningCreeperEntity extends _SpecialCreeperEntity implements IAmp
                 DrowningCreeperEntity::checkSpeciesSpawnRules );
     }
     
-    public static boolean checkSpeciesSpawnRules(EntityType<? extends DrowningCreeperEntity> type, ServerLevelAccessor level,
-                                                 MobSpawnType spawnType, BlockPos pos, RandomSource random ) {
+    public static boolean checkSpeciesSpawnRules( EntityType<? extends DrowningCreeperEntity> type, ServerLevelAccessor level,
+                                                  MobSpawnType spawnType, BlockPos pos, RandomSource random ) {
         final Holder<Biome> biome = level.getBiome( pos );
-        if( biome.is(BiomeTags.IS_OCEAN) || biome.is(BiomeTags.IS_RIVER) ) {
+        if( biome.is( BiomeTags.IS_OCEAN ) || biome.is( BiomeTags.IS_RIVER ) ) {
             return NaturalSpawnManager.checkSpawnRulesWater( type, level, spawnType, pos, random );
         }
         return NaturalSpawnManager.checkSpawnRulesDefault( type, level, spawnType, pos, random );
@@ -164,6 +165,8 @@ public class DrowningCreeperEntity extends _SpecialCreeperEntity implements IAmp
         
         if( explosionMode == Explosion.BlockInteraction.KEEP ) return;
         
+        final boolean ultrawarm = level().dimensionType().ultraWarm();
+        
         final UnderwaterSilverfishBlock.Type mainType = UnderwaterSilverfishBlock.Type.next( random );
         final UnderwaterSilverfishBlock.Type rareType = UnderwaterSilverfishBlock.Type.next( random );
         final BlockState mainCoral = mainType.hostBlock().defaultBlockState();
@@ -197,7 +200,15 @@ public class DrowningCreeperEntity extends _SpecialCreeperEntity implements IAmp
                                 // Water fill
                                 final float fillChoice = random.nextFloat();
                                 
-                                if( fillChoice < 0.1F && seaPickle.canSurvive( level(), pos ) ) {
+                                if( ultrawarm ) {
+                                    if( fillChoice < 0.3F ) {
+                                        BlockState fire = BaseFireBlock.getState( level(), pos );
+                                        if( fire.canSurvive( level(), pos ) ) {
+                                            MobHelper.placeBlock( this, pos, fire );
+                                        }
+                                    }
+                                }
+                                else if( fillChoice < 0.1F && seaPickle.canSurvive( level(), pos ) ) {
                                     MobHelper.placeBlock( this, pos, seaPickle );
                                 }
                                 else if( fillChoice < 0.3F && seaGrass.canSurvive( level(), pos ) ) {
@@ -216,9 +227,16 @@ public class DrowningCreeperEntity extends _SpecialCreeperEntity implements IAmp
                             else if( isCoralSafe( rMinusOneSq, x, y, z ) ) {
                                 // Coral casing
                                 final boolean infested = getConfig().DROWNING.infestedBlockChance.rollChance( random );
-                                MobHelper.placeBlock( this, pos, random.nextFloat() < 0.8F ?
-                                        infested ? mainInfestedCoral : mainCoral :
-                                        infested ? rareInfestedCoral : rareCoral );
+                                if( ultrawarm ) {
+                                    MobHelper.placeBlock( this, pos, infested ?
+                                            Blocks.INFESTED_COBBLESTONE.defaultBlockState() :
+                                            Blocks.COBBLESTONE.defaultBlockState() );
+                                }
+                                else {
+                                    MobHelper.placeBlock( this, pos, random.nextFloat() < 0.8F ?
+                                            infested ? mainInfestedCoral : mainCoral :
+                                            infested ? rareInfestedCoral : rareCoral );
+                                }
                             }
                         }
                     }
