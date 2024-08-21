@@ -1,4 +1,5 @@
 1.20.1-3.1.5
+    - Updated to Crust 2.3.4.
     - TODO Fixed a potential cause of world load deadlock.
     - TODO The master disable for vanilla replacement now works.
     - TODO Drowning creepers no longer create water in the Nether (closes #43).
