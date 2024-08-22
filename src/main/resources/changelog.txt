@@ -2,6 +2,7 @@
     - Updated to Crust 2.3.4.
     - Fixed a potential cause of world load deadlock.
     - The master disable for vanilla replacement now works.
+    - Added Ice Witch.
     - Drowning creepers no longer create water in the Nether (closes #43).
     - Blaze mixin now fails softly (closes #44).
     - Number of hits armored blazes can block is now configurable.

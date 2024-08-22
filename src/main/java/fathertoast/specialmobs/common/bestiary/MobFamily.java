@@ -100,7 +100,7 @@ public class MobFamily<T extends Mob, V extends FamilyConfig> {
     
     public static final MobFamily<Witch, WitchFamilyConfig> WITCH = new MobFamily<>( WitchFamilyConfig::new,
             "Witch", "witches", 0x340000, new EntityType[] { EntityType.WITCH },
-            /*"Burned",*/ "Domination", /*"Drowned", "Ice", "Sands",*/ "Shadows", "Undead", "Wilds", "Wind"
+            /*"Burned",*/ "Domination", /*"Drowned",*/ "Ice", /*"Sands",*/ "Shadows", "Undead", "Wilds", "Wind"
     );//TODO burned, drowned, ice, sands
     
     public static final MobFamily<Ghast, GhastFamilyConfig> GHAST = new MobFamily<>( GhastFamilyConfig::new,
@@ -195,7 +195,7 @@ public class MobFamily<T extends Mob, V extends FamilyConfig> {
             variants[i] = new Species<>( this, packageRoot, variantNames[i] );
         }
         
-        config = configSupplier.apply( ConfigManager.get(SpecialMobs.MOD_ID), this );
+        config = configSupplier.apply( ConfigManager.get( SpecialMobs.MOD_ID ), this );
         config.SPEC.initialize();
         
         // We register here because otherwise there's no way to find all families
@@ -301,7 +301,7 @@ public class MobFamily<T extends Mob, V extends FamilyConfig> {
             
             // Config uses bestiary info for default values
             // noinspection ConstantConditions
-            config = AnnotationHelper.createConfig( ConfigManager.get(SpecialMobs.MOD_ID), this );
+            config = AnnotationHelper.createConfig( ConfigManager.get( SpecialMobs.MOD_ID ), this );
             config.SPEC.initialize();
             
             // Register this species with the entity class
@@ -341,7 +341,7 @@ public class MobFamily<T extends Mob, V extends FamilyConfig> {
         }
         
         /** Registers this species's spawn placement and links the (now loaded) entity type to this species. */
-        public void registerSpawnPlacement( ) {
+        public void registerSpawnPlacement() {
             TYPE_TO_SPECIES_MAP.put( entityType.get(), this );
             AnnotationHelper.registerSpawnPlacement( this );
         }

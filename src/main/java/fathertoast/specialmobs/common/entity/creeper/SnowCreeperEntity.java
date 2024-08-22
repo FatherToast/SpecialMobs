@@ -99,10 +99,10 @@ public class SnowCreeperEntity extends _SpecialCreeperEntity {
     
     /** @return A new path navigator for this entity to use. */
     @Override
-    protected PathNavigation createNavigation(Level level ) {
+    protected PathNavigation createNavigation( Level level ) {
         return new FluidPathNavigator( this, level, true, false );
     }
-
+    
     /** @return Whether this entity can stand on a particular type of fluid. */
     @Override
     public boolean canStandOnFluid( FluidState fluid ) { return fluid.is( FluidTags.WATER ); }
@@ -137,6 +137,7 @@ public class SnowCreeperEntity extends _SpecialCreeperEntity {
         
         final int radius = (int) Math.floor( explosionPower );
         final BlockPos center = BlockPos.containing( explosion.getPos() );
+        final BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
         
         if( explosionMode != Explosion.BlockInteraction.KEEP ) {
             final boolean snowGlobe = isUnderWater() || random.nextDouble() < getConfig().SNOW.snowGlobeChance.get();
@@ -150,7 +151,7 @@ public class SnowCreeperEntity extends _SpecialCreeperEntity {
                         final int distSq = x * x + y * y + z * z;
                         
                         if( distSq <= radiusSq ) {
-                            final BlockPos pos = center.offset( x, y, z );
+                            pos.setWithOffset( center, x, y, z );
                             
                             // Freeze top layer of water sources and frosted ice within affected volume
                             final BlockState block = level().getBlockState( pos );
