@@ -64,7 +64,7 @@ public final class References {
     public static final String TEXTURE_ANIMATION_SUFFIX = "_anim";
     public static final String TEXTURE_ANIMATION_EYES_SUFFIX = "_anim_eyes";
     
-    public static ResourceLocation getEntityTexture(String path, String fileName ) { return getEntityTexture( path, fileName, "" ); }
+    public static ResourceLocation getEntityTexture( String path, String fileName ) { return getEntityTexture( path, fileName, "" ); }
     
     @SuppressWarnings( "unused" )
     public static ResourceLocation getEntityBaseTexture( String path, String fileName ) {
@@ -264,7 +264,7 @@ public final class References {
     
     // Misc.
     public static final String TAG_FUSE_TIME = "FuseTime"; // Blackberry Slime, Volatile Magma Cube
-    public static final String TAG_AMMO = "Ammo"; // Web (Cave) Spider, Mad Scientist Zombie, Desiccated Silverfish
+    public static final String TAG_AMMO = "Ammo"; // Web (Cave) Spider, Mad Scientist Zombie, Desiccated Silverfish, Armored Blaze
     public static final String TAG_IS_FAKE = "IsFake"; // Mirage Enderman
     public static final String TAG_EXPLOSION_POWER = "ExplosionPower"; // Hellfire Blaze
     

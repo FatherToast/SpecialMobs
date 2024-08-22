@@ -4,6 +4,7 @@
     - The master disable for vanilla replacement now works.
     - Drowning creepers no longer create water in the Nether (closes #43).
     - Blaze mixin now fails softly (closes #44).
+    - Number of hits armored blazes can block is now configurable.
     - Armored blazes no longer sound like a tin roof in the rain.
 1.20.1-3.1.4
     - Added Scope Creeper.
@@ -21,7 +22,7 @@
 1.20.1-3.1.2
     - Now requires Crust (significant internal config changes, will affect your existing configs).
 1.20.1-2.1.2-b
-    - Ported to 1.20.1.
+    - Ported to 1.20.1 (big extra help from Mrbysco!).
     - Jade compat for Ninja Skeletons.
     - Dropped The One Probe compat.
 1.16.5-1.0.2

@@ -4,7 +4,7 @@ import fathertoast.crust.api.config.common.ConfigManager;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
-import fathertoast.specialmobs.common.config.species.BlazeSpeciesConfig;
+import fathertoast.specialmobs.common.config.species.ArmoredBlazeSpeciesConfig;
 import fathertoast.specialmobs.common.config.species.SpeciesConfig;
 import fathertoast.specialmobs.common.core.register.SMTags;
 import fathertoast.specialmobs.common.util.References;
@@ -12,7 +12,6 @@ import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import net.minecraft.core.particles.ItemParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -41,13 +40,14 @@ public class ArmoredBlazeEntity extends _SpecialBlazeEntity {
                 .weight( BestiaryInfo.DefaultWeight.LOW )
                 .uniqueTextureBaseOnly()
                 .addExperience( 4 )
-                .fireballAttack( 0, 80, 120, 40.0 )
+                .fireballAttack( 0.0, 80, 120, 40.0 )
                 .addToAttribute( Attributes.MAX_HEALTH, 15.0 );
     }
     
     @SpecialMob.ConfigSupplier
     public static SpeciesConfig createConfig( ConfigManager manager, MobFamily.Species<?> species ) {
-        return new BlazeSpeciesConfig( manager, species, 5, 10 );
+        return new ArmoredBlazeSpeciesConfig( manager, species, 5, 10,
+                5, 7 );
     }
     
     @SpecialMob.LanguageProvider
@@ -74,18 +74,20 @@ public class ArmoredBlazeEntity extends _SpecialBlazeEntity {
     
     //--------------- Variant-Specific Implementations ----------------
     
+    /** The number of hits the armored blaze's armor can absorb. */
     public static final EntityDataAccessor<Integer> ARMOR_LEVEL = SynchedEntityData.defineId( ArmoredBlazeEntity.class, EntityDataSerializers.INT );
-    
-    /** The base explosion strength of this blaze's fireballs. */
-    private int explosionPower = 2;
     
     public ArmoredBlazeEntity( EntityType<? extends _SpecialBlazeEntity> entityType, Level level ) { super( entityType, level ); }
     
     @Override
     protected void defineSynchedData() {
         super.defineSynchedData();
-        entityData.define( ARMOR_LEVEL, 7 );
+        entityData.define( ARMOR_LEVEL, getConfig().ARMORED.armor.next( random ) );
     }
+    
+    /** @return This entity's species config. */
+    @Override
+    public ArmoredBlazeSpeciesConfig getConfig() { return (ArmoredBlazeSpeciesConfig) getSpecies().config; }
     
     public boolean hasArmor() {
         return entityData.get( ARMOR_LEVEL ) > 0;
@@ -139,18 +141,13 @@ public class ArmoredBlazeEntity extends _SpecialBlazeEntity {
     /** Override to save data to this entity's NBT data. */
     @Override
     public void addVariantSaveData( CompoundTag saveTag ) {
-        saveTag.putByte( References.TAG_EXPLOSION_POWER, (byte) explosionPower );
-        saveTag.putInt( "ArmorLevel", entityData.get( ARMOR_LEVEL ) );
+        saveTag.putInt( References.TAG_AMMO, entityData.get( ARMOR_LEVEL ) );
     }
     
     /** Override to load data from this entity's NBT data. */
     @Override
     public void readVariantSaveData( CompoundTag saveTag ) {
-        if( saveTag.contains( References.TAG_EXPLOSION_POWER, References.NBT_TYPE_NUMERICAL ) )
-            explosionPower = saveTag.getByte( References.TAG_EXPLOSION_POWER );
-        
-        if( saveTag.contains( "ArmorLevel", Tag.TAG_INT ) ) {
-            entityData.set( ARMOR_LEVEL, saveTag.getInt( "ArmorLevel" ) );
-        }
+        if( saveTag.contains( References.TAG_AMMO, References.NBT_TYPE_NUMERICAL ) )
+            entityData.set( ARMOR_LEVEL, saveTag.getInt( References.TAG_AMMO ) );
     }
 }
