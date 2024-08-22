@@ -101,6 +101,9 @@ public class NinjaGoal<T extends Mob & INinja> extends Goal {
                     .setValue( BlockStateProperties.ATTACH_FACE, AttachFace.FLOOR ), random );
             case 12: return randomPottedFlower( random );
             case 13: return Blocks.SWEET_BERRY_BUSH.defaultBlockState().setValue(SweetBerryBushBlock.AGE, 3);
+            case 14: return Blocks.BONE_BLOCK.defaultBlockState();
+            case 15: return Blocks.BOOKSHELF.defaultBlockState();
+            case 16: return Blocks.DETECTOR_RAIL.defaultBlockState();
         }
         
         final BlockPos posUnderFeet = entity.blockPosition().below();
@@ -122,7 +125,8 @@ public class NinjaGoal<T extends Mob & INinja> extends Goal {
                     case 8: return Blocks.REDSTONE_ORE.defaultBlockState();
                     case 9: return Blocks.DIAMOND_ORE.defaultBlockState();
                     case 10: return Blocks.EMERALD_ORE.defaultBlockState();
-                    case 11: return Blocks.MOSSY_COBBLESTONE.defaultBlockState();
+                    case 11: return Blocks.COPPER_ORE.defaultBlockState();
+                    case 12: return Blocks.MOSSY_COBBLESTONE.defaultBlockState();
                 }
             }
             else if ( blockUnderFeet.is( Blocks.DEEPSLATE )) {
@@ -139,10 +143,11 @@ public class NinjaGoal<T extends Mob & INinja> extends Goal {
                     case 8: return Blocks.DEEPSLATE_REDSTONE_ORE.defaultBlockState();
                     case 9: return Blocks.DEEPSLATE_DIAMOND_ORE.defaultBlockState();
                     case 10: return Blocks.DEEPSLATE_EMERALD_ORE.defaultBlockState();
-                    case 11: return Blocks.DEEPSLATE.defaultBlockState();
-                    case 12: return Blocks.DEEPSLATE_BRICK_SLAB.defaultBlockState();
-                    case 13: return Blocks.SCULK.defaultBlockState();
-                    case 14: return Blocks.SCULK_CATALYST.defaultBlockState();
+                    case 11: return Blocks.DEEPSLATE_COPPER_ORE.defaultBlockState();
+                    case 12: return Blocks.DEEPSLATE.defaultBlockState();
+                    case 13: return Blocks.DEEPSLATE_BRICK_SLAB.defaultBlockState();
+                    case 14: return Blocks.SCULK.defaultBlockState();
+                    case 15: return Blocks.SCULK_CATALYST.defaultBlockState();
                 }
             }
             else if( blockUnderFeet.is( Blocks.GRASS ) || blockUnderFeet.is( Blocks.DIRT ) || blockUnderFeet.is( Blocks.PODZOL ) ) {
