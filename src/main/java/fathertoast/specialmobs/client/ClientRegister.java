@@ -1,5 +1,6 @@
 package fathertoast.specialmobs.client;
 
+import fathertoast.crust.api.config.client.ClientConfigUtil;
 import fathertoast.specialmobs.client.renderer.entity.family.*;
 import fathertoast.specialmobs.client.renderer.entity.layers.SMModelLayers;
 import fathertoast.specialmobs.client.renderer.entity.model.ScopeCreeperModel;
@@ -53,40 +54,42 @@ public class ClientRegister {
     @SubscribeEvent
     public static void onClientSetup( FMLClientSetupEvent event ) {
         if( Config.MAIN.GENERAL.fancyFishingMobs.get() ) {
-            event.enqueueWork( () -> {
-                ItemProperties.register( Items.FISHING_ROD, new ResourceLocation( "cast" ), new FishingRodItemPropertyGetter() );
-            });
+            event.enqueueWork( () -> ItemProperties.register( Items.FISHING_ROD,
+                    new ResourceLocation( "cast" ), new FishingRodItemPropertyGetter() ) );
         }
+        
+        // Tell Forge to open the config editor when our mod's "Config" button is clicked in the Mods screen
+        ClientConfigUtil.registerConfigButtonAsEditScreen();
     }
-
-
+    
+    
     @SubscribeEvent
     public static void registerLayerDefs( EntityRenderersEvent.RegisterLayerDefinitions event ) {
         event.registerLayerDefinition( SMModelLayers.SCOPE_CREEPER, ScopeCreeperModel::createBodyLayer );
         event.registerLayerDefinition( SMModelLayers.SLAB_GHAST, SlabGhastModel::createBodyLayer );
-
-        event.registerLayerDefinition( SMModelLayers.CREEPER_OUTER_LAYER, () -> CreeperModel.createBodyLayer( new CubeDeformation(0.25F ) ) );
-        event.registerLayerDefinition( SMModelLayers.BLAZE_OUTER_LAYER, () -> SMModelLayers.blazeBodyLayer( new CubeDeformation(0.25F ) ) );
+        
+        event.registerLayerDefinition( SMModelLayers.CREEPER_OUTER_LAYER, () -> CreeperModel.createBodyLayer( new CubeDeformation( 0.25F ) ) );
+        event.registerLayerDefinition( SMModelLayers.BLAZE_OUTER_LAYER, () -> SMModelLayers.blazeBodyLayer( new CubeDeformation( 0.25F ) ) );
         event.registerLayerDefinition( SMModelLayers.BLAZE_OUTER_ARMOR_LAYER, () -> SMModelLayers.blazeBodyLayer( new CubeDeformation( 1.0F ) ) );
-        event.registerLayerDefinition( SMModelLayers.ENDERMAN_OUTER_LAYER, () -> SMModelLayers.endermanBodyLayer( new CubeDeformation(0.25F ) ) );
+        event.registerLayerDefinition( SMModelLayers.ENDERMAN_OUTER_LAYER, () -> SMModelLayers.endermanBodyLayer( new CubeDeformation( 0.25F ) ) );
         event.registerLayerDefinition( SMModelLayers.GHAST_OUTER_LAYER, () -> SMModelLayers.ghastBodyLayer( new CubeDeformation( 0.25F ) ) );
         event.registerLayerDefinition( SMModelLayers.MAGMA_CUBE_OUTER_LAYER, () -> SMModelLayers.magmaCubeBodyLayer( new CubeDeformation( 0.25F ) ) );
         event.registerLayerDefinition( SMModelLayers.SILVERFISH_OUTER_LAYER, () -> SMModelLayers.silverfishBodyLayer( new CubeDeformation( 0.25F ) ) );
         event.registerLayerDefinition( SMModelLayers.SLIME_OUTER_LAYER, () -> SMModelLayers.slimeOuterBodyLayer( new CubeDeformation( 0.25F ) ) );
         event.registerLayerDefinition( SMModelLayers.SPIDER_OUTER_LAYER, () -> SMModelLayers.spiderBodyLayer( new CubeDeformation( 0.25F ) ) );
-
+        
         event.registerLayerDefinition( SMModelLayers.PIGLIN, () -> LayerDefinition.create( PiglinModel.createMesh( CubeDeformation.NONE ), 64, 64 ) );
         event.registerLayerDefinition( SMModelLayers.PIGLIN_OUTER_LAYER, () -> LayerDefinition.create( PiglinModel.createMesh( new CubeDeformation( 0.25F ) ), 64, 64 ) );
         event.registerLayerDefinition( SMModelLayers.PIGLIN_INNER_ARMOR, () -> LayerDefinition.create( HumanoidArmorModel.createBodyLayer( new CubeDeformation( 0.5F ) ), 64, 32 ) );
         event.registerLayerDefinition( SMModelLayers.PIGLIN_OUTER_ARMOR, () -> LayerDefinition.create( HumanoidArmorModel.createBodyLayer( new CubeDeformation( 1.02F ) ), 64, 32 ) );
-
+        
         event.registerLayerDefinition( SMModelLayers.ZOMBIFIED_PIGLIN, () -> LayerDefinition.create( PiglinModel.createMesh( CubeDeformation.NONE ), 64, 64 ) );
         event.registerLayerDefinition( SMModelLayers.ZOMBIFIED_PIGLIN_OUTER_LAYER, () -> LayerDefinition.create( PiglinModel.createMesh( new CubeDeformation( 0.25F ) ), 64, 64 ) );
         event.registerLayerDefinition( SMModelLayers.ZOMBIFIED_PIGLIN_INNER_ARMOR, () -> LayerDefinition.create( HumanoidArmorModel.createBodyLayer( new CubeDeformation( 0.5F ) ), 64, 32 ) );
         event.registerLayerDefinition( SMModelLayers.ZOMBIFIED_PIGLIN_OUTER_ARMOR, () -> LayerDefinition.create( HumanoidArmorModel.createBodyLayer( new CubeDeformation( 1.02F ) ), 64, 32 ) );
     }
-
-
+    
+    
     @SubscribeEvent
     public static void registerEntityRenderers( EntityRenderersEvent.RegisterRenderers event ) {
         // Family-based renderers
@@ -94,8 +97,8 @@ public class ClientRegister {
         registerFamilyRenderers( event, MobFamily.ZOMBIE, SpecialZombieRenderer::new );
         registerFamilyRenderers( event, MobFamily.DROWNED, SpecialDrownedRenderer::new );
         registerFamilyRenderers( event, MobFamily.ZOMBIFIED_PIGLIN, SpecialPiglinRenderer::newMissingRightEar );
-        registerFamilyRenderers( event, MobFamily.SKELETON, (context) -> new SpecialSkeletonRenderer( context, ModelLayers.SKELETON_INNER_ARMOR ) );
-        registerFamilyRenderers( event, MobFamily.WITHER_SKELETON, (context) -> new SpecialSkeletonRenderer( context, ModelLayers.WITHER_SKELETON_INNER_ARMOR ) );
+        registerFamilyRenderers( event, MobFamily.SKELETON, ( context ) -> new SpecialSkeletonRenderer( context, ModelLayers.SKELETON_INNER_ARMOR ) );
+        registerFamilyRenderers( event, MobFamily.WITHER_SKELETON, ( context ) -> new SpecialSkeletonRenderer( context, ModelLayers.WITHER_SKELETON_INNER_ARMOR ) );
         registerFamilyRenderers( event, MobFamily.SLIME, SpecialSlimeRenderer::new );
         registerFamilyRenderers( event, MobFamily.MAGMA_CUBE, SpecialMagmaCubeRenderer::new );
         registerFamilyRenderers( event, MobFamily.SPIDER, SpecialSpiderRenderer::new );
@@ -108,15 +111,15 @@ public class ClientRegister {
         
         // Species overrides
         registerSpeciesRenderer( event, ArmoredBlazeEntity.SPECIES, ArmoredBlazeRenderer::new );
-
+        
         registerSpeciesRenderer( event, EnderCreeperEntity.SPECIES, EnderCreeperRenderer::new );
         registerSpeciesRenderer( event, ScopeCreeperEntity.SPECIES, ScopeCreeperRenderer::new );
         
         registerSpeciesRenderer( event, MadScientistZombieEntity.SPECIES, SpecialZombieVillagerRenderer::new );
         registerSpeciesRenderer( event, VampireZombifiedPiglinEntity.SPECIES, SpecialPiglinRenderer::newBothEars );
         
-        registerSpeciesRenderer( event, NinjaSkeletonEntity.SPECIES, (context) -> new NinjaSkeletonRenderer( context, ModelLayers.SKELETON_INNER_ARMOR ) );
-        registerSpeciesRenderer( event, NinjaWitherSkeletonEntity.SPECIES, (context) -> new NinjaSkeletonRenderer( context, ModelLayers.WITHER_SKELETON_INNER_ARMOR ) );
+        registerSpeciesRenderer( event, NinjaSkeletonEntity.SPECIES, ( context ) -> new NinjaSkeletonRenderer( context, ModelLayers.SKELETON_INNER_ARMOR ) );
+        registerSpeciesRenderer( event, NinjaWitherSkeletonEntity.SPECIES, ( context ) -> new NinjaSkeletonRenderer( context, ModelLayers.WITHER_SKELETON_INNER_ARMOR ) );
         
         registerSpeciesRenderer( event, PotionSlimeEntity.SPECIES, PotionSlimeRenderer::new );
         
@@ -124,7 +127,7 @@ public class ClientRegister {
         
         registerSpeciesRenderer( event, CorporealShiftGhastEntity.SPECIES, CorporealShiftGhastRenderer::new );
         registerSpeciesRenderer( event, SlabGhastEntity.SPECIES, SlabGhastRenderer::new );
-
+        
         registerSpeciesRenderer( event, RunicEndermanEntity.SPECIES, RunicEndermanRenderer::new );
         
         // Other
@@ -134,15 +137,15 @@ public class ClientRegister {
         registerSpriteRenderer( event, SMEntities.SLAB_FIREBALL, 3.0F, true );
         registerRenderer( event, SMEntities.FISHING_BOBBER, SpecialFishingBobberRenderer::new );
     }
-
-    @SuppressWarnings("unchecked")
+    
+    @SuppressWarnings( "unchecked" )
     private static <T extends Mob, E extends LivingEntity> void registerFamilyRenderers( EntityRenderersEvent.RegisterRenderers event, MobFamily<T, ?> family, EntityRendererProvider<E> renderFactory ) {
         event.registerEntityRenderer( family.vanillaReplacement.entityType.get(), (EntityRendererProvider<T>) renderFactory );
         for( MobFamily.Species<? extends T> species : family.variants )
             registerSpeciesRenderer( event, species, renderFactory );
     }
-
-    @SuppressWarnings("unchecked")
+    
+    @SuppressWarnings( "unchecked" )
     private static <T extends Mob, E extends LivingEntity> void registerSpeciesRenderer( EntityRenderersEvent.RegisterRenderers event, MobFamily.Species<T> species, EntityRendererProvider<E> renderFactory ) {
         registerRenderer( event, species.entityType, (EntityRendererProvider<T>) renderFactory );
     }
