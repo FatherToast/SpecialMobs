@@ -63,7 +63,7 @@ public class MobFamily<T extends Mob, V extends FamilyConfig> {
     
     public static final MobFamily<AbstractSkeleton, SkeletonFamilyConfig> SKELETON = new MobFamily<>( SkeletonFamilyConfig::new,
             "Skeleton", "skeletons", 0xC1C1C1, new EntityType[] { EntityType.SKELETON, EntityType.STRAY },
-            "Brute", "Fire", "Gatling", "Giant", "Knight", "Ninja", "Poison", "Sniper", "Spitfire", "Stray", "Weathered"
+            "Brute", "Fire", "Gatling", "Giant", "Knight", "Ninja", "Pirate", "Poison", "Sniper", "Spitfire", "Stray", "Weathered"
     );
     public static final MobFamily<AbstractSkeleton, SkeletonFamilyConfig> WITHER_SKELETON = new MobFamily<>( SkeletonFamilyConfig::new,
             "WitherSkeleton", "wither skeletons", 0x141414, new EntityType[] { EntityType.WITHER_SKELETON },
@@ -101,7 +101,7 @@ public class MobFamily<T extends Mob, V extends FamilyConfig> {
     public static final MobFamily<Witch, WitchFamilyConfig> WITCH = new MobFamily<>( WitchFamilyConfig::new,
             "Witch", "witches", 0x340000, new EntityType[] { EntityType.WITCH },
             /*"Burned",*/ "Domination", /*"Drowned",*/ "Ice", /*"Sands",*/ "Shadows", "Undead", "Wilds", "Wind"
-    );//TODO burned, drowned, ice, sands
+    );//TODO burned, drowned, sands
     
     public static final MobFamily<Ghast, GhastFamilyConfig> GHAST = new MobFamily<>( GhastFamilyConfig::new,
             "Ghast", "ghasts", 0xF9F9F9, new EntityType[] { EntityType.GHAST },

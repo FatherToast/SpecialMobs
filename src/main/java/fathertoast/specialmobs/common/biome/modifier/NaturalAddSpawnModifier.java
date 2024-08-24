@@ -36,7 +36,7 @@ import java.util.List;
 public record NaturalAddSpawnModifier(String comment) implements BiomeModifier {
 
     public static final Codec<NaturalAddSpawnModifier> CODEC = RecordCodecBuilder.create(builder -> builder.group(
-            Codec.STRING.fieldOf("comment").forGetter(NaturalAddSpawnModifier::comment))
+            Codec.STRING.fieldOf("_comment").forGetter(NaturalAddSpawnModifier::comment))
             .apply(builder, NaturalAddSpawnModifier::new));
 
 
