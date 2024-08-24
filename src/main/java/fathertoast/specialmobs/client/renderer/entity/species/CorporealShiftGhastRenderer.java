@@ -42,7 +42,7 @@ public class CorporealShiftGhastRenderer extends MobRenderer<CorporealShiftGhast
     @Override
     public ResourceLocation getTextureLocation( CorporealShiftGhastEntity entity ) {
         final SpecialMobData<?> data = ((ISpecialMob<?>) entity).getSpecialData();
-        return entity.isCharging() && data.getTextureOverlay() != null ? data.getTextureOverlay() : data.getTexture();
+        return entity.isCharging() && data.getTextureAnimation() != null ? data.getTextureAnimation() : data.getTexture();
     }
     
     @Override

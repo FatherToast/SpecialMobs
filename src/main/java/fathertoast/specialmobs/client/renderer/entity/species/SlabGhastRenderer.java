@@ -22,7 +22,7 @@ public class SlabGhastRenderer extends MobRenderer<SlabGhastEntity, SlabGhastMod
     @Override
     public ResourceLocation getTextureLocation( SlabGhastEntity entity ) {
         final SpecialMobData<?> data = ((ISpecialMob<?>) entity).getSpecialData();
-        return entity.isCharging() && data.getTextureOverlay() != null ? data.getTextureOverlay() : data.getTexture();
+        return entity.isCharging() && data.getTextureAnimation() != null ? data.getTextureAnimation() : data.getTexture();
     }
 
     @Override
