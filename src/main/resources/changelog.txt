@@ -7,6 +7,7 @@
     - Blaze mixin now fails softly (closes #44).
     - Number of hits armored blazes can block is now configurable.
     - Armored blazes no longer sound like a tin roof in the rain.
+    - Fixed Slab Ghast not using its shooting texture
 1.20.1-3.1.4
     - Added Scope Creeper.
     - Added Slab Ghast.
