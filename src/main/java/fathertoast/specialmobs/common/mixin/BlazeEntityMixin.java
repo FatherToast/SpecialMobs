@@ -8,8 +8,7 @@ import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Redirect;
-import org.spongepowered.asm.mixin.injection.Slice;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
 
 @Mixin(Blaze.class)
 public abstract class BlazeEntityMixin extends Monster {
@@ -18,11 +17,9 @@ public abstract class BlazeEntityMixin extends Monster {
         super(entityType, level);
     }
 
-    @Redirect(method = "aiStep",
-            slice = @Slice(
-                    from = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;playLocalSound(DDDLnet/minecraft/sounds/SoundEvent;Lnet/minecraft/sounds/SoundSource;FFZ)V")),
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;addParticle(Lnet/minecraft/core/particles/ParticleOptions;DDDDDD)V", ordinal = 0), require = -1)
-    public void onAiStep(Level instance, ParticleOptions particleOptions, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
-        CommonMixinHooks.handleBlazeSmoke((Blaze) (Object) this);
+
+    @ModifyArg(method = "aiStep", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;addParticle(Lnet/minecraft/core/particles/ParticleOptions;DDDDDD)V"), require = -1)
+    public ParticleOptions modifyParticleOptions(ParticleOptions particleOptions) {
+        return CommonMixinHooks.getBlazeSmoke((Blaze) (Object) this);
     }
 }

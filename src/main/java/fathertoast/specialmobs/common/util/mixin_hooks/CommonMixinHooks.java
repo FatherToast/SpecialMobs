@@ -10,19 +10,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 public class CommonMixinHooks {
 
-    public static void handleBlazeSmoke( Blaze blaze ) {
-        ParticleOptions smoke = blaze instanceof CinderBlazeEntity
+    public static ParticleOptions getBlazeSmoke( Blaze blaze ) {
+        return blaze instanceof CinderBlazeEntity
                 ? ParticleTypes.SMOKE
                 : ParticleTypes.LARGE_SMOKE;
-
-        blaze.level().addParticle( smoke,
-                blaze.getRandomX( 0.5D ),
-                blaze.getRandomY(),
-                blaze.getRandomZ( 0.5D ),
-                0.0D,
-                0.0D,
-                0.0D
-        );
     }
 
     public static void handleIsZombified( EntityType<?> entityType, CallbackInfoReturnable<Boolean> cir ) {
