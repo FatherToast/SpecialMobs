@@ -141,7 +141,8 @@ public final class SpecialMobReplacer {
     
     /** Replaces a mob, copying over all its data to the replacement. */
     private static void replace( MobFamily<?, ?> mobFamily, boolean isSpecial, Entity entityToReplace, Level level, BlockPos entityPos ) {
-        if( !(level instanceof ServerLevelAccessor) ) return;
+        // Make sure the chunk the entity is in is loaded
+        if( !(level instanceof ServerLevelAccessor) || !EnvironmentHelper.isLoaded(level, entityPos) ) return;
         
         final CompoundTag tag = new CompoundTag();
         entityToReplace.saveWithoutId( tag );
