@@ -1,7 +1,7 @@
 {
   "required": true,
   "package": "fathertoast.specialmobs.common.mixin",
-  "compatibilityLevel": "JAVA_8",
+  "compatibilityLevel": "JAVA_17",
   "minVersion": "0.8",
   "refmap": "specialmobs.mixins.refmap.json",
   "mixins": [
