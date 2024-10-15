@@ -2,6 +2,7 @@ package fathertoast.specialmobs.common.bestiary;
 
 import fathertoast.crust.api.config.common.ConfigManager;
 import fathertoast.crust.api.config.common.ConfigUtil;
+import fathertoast.specialmobs.common.config.Config;
 import fathertoast.specialmobs.common.config.family.*;
 import fathertoast.specialmobs.common.config.species.SpeciesConfig;
 import fathertoast.specialmobs.common.core.SpecialMobs;
@@ -195,7 +196,7 @@ public class MobFamily<T extends Mob, V extends FamilyConfig> {
             variants[i] = new Species<>( this, packageRoot, variantNames[i] );
         }
         
-        config = configSupplier.apply( ConfigManager.get( SpecialMobs.MOD_ID ), this );
+        config = configSupplier.apply( Config.MANAGER, this );
         config.SPEC.initialize();
         
         // We register here because otherwise there's no way to find all families

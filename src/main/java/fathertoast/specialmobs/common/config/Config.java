@@ -10,15 +10,15 @@ import fathertoast.specialmobs.common.bestiary.MobFamily;
  * configurable value.
  */
 public class Config {
-
-    private static final ConfigManager MANAGER = ConfigManager.create( "SpecialMobs" );
-
+    
+    public static final ConfigManager MANAGER = ConfigManager.create( "SpecialMobs" );
+    
     public static final MainConfig MAIN = new MainConfig( MANAGER, "main" );
     
     /** Performs initial loading of all configs in this mod. */
     public static void initialize() {
         ReadMeConfig.makeReadMe( MANAGER );
         MAIN.SPEC.initialize();
-        MobFamily.initBestiary();
+        MobFamily.initBestiary(); // Just make sure this class gets loaded
     }
 }
