@@ -7,6 +7,7 @@ import fathertoast.specialmobs.common.core.register.SMBiomeMods;
 import fathertoast.specialmobs.common.entity.creeper.DrowningCreeperEntity;
 import fathertoast.specialmobs.common.entity.creeper.EnderCreeperEntity;
 import fathertoast.specialmobs.common.entity.creeper.FireCreeperEntity;
+import fathertoast.specialmobs.common.entity.skeleton.PirateSkeletonEntity;
 import fathertoast.specialmobs.common.entity.slime.BlueberrySlimeEntity;
 import fathertoast.specialmobs.common.entity.spider.FireSpiderEntity;
 import fathertoast.specialmobs.common.entity.zombie.FireZombieEntity;
@@ -94,6 +95,8 @@ public record NaturalAddSpawnModifier(String comment) implements BiomeModifier {
                     Config.MAIN.NATURAL_SPAWNING.drowningCreeperOceanWeight.get() );
             addSpawn( builder, BlueberrySlimeEntity.SPECIES.entityType.get(),
                     Config.MAIN.NATURAL_SPAWNING.blueberrySlimeOceanWeight.get() );
+            addSpawn( builder, PirateSkeletonEntity.SPECIES.entityType.get(),
+                    Config.MAIN.NATURAL_SPAWNING.pirateSkeletonOceanWeight.get());
         }
         else if ( holder.is( BiomeTags.IS_RIVER ) ) {
             addSpawn( builder, DrowningCreeperEntity.SPECIES.entityType.get(),

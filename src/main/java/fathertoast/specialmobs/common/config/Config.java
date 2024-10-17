@@ -2,6 +2,7 @@ package fathertoast.specialmobs.common.config;
 
 import fathertoast.crust.api.config.common.ConfigManager;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
+import fathertoast.specialmobs.common.core.SpecialMobs;
 
 /**
  * Used as the sole hub for all config access from outside the config package.
@@ -11,14 +12,21 @@ import fathertoast.specialmobs.common.bestiary.MobFamily;
  */
 public class Config {
     
-    public static final ConfigManager MANAGER = ConfigManager.create( "SpecialMobs" );
-    
-    public static final MainConfig MAIN = new MainConfig( MANAGER, "main" );
-    
-    /** Performs initial loading of all configs in this mod. */
-    public static void initialize() {
+    public static final ConfigManager MANAGER;
+    public static final MainConfig MAIN;
+
+
+    static {
+        MANAGER = ConfigManager.create( "SpecialMobs" );
+        MAIN = new MainConfig( MANAGER, "main" );
+
         ReadMeConfig.makeReadMe( MANAGER );
         MAIN.SPEC.initialize();
         MobFamily.initBestiary(); // Just make sure this class gets loaded
+    }
+
+    /** Called from {@link SpecialMobs#SpecialMobs()} to load this class. */
+    public static void initialize() {
+
     }
 }

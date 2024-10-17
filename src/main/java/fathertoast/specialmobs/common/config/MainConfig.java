@@ -78,7 +78,10 @@ public class MainConfig extends AbstractConfigFile {
         
         public final IntField drowningCreeperOceanWeight;
         public final IntField drowningCreeperRiverWeight;
-        
+
+        public final IntField pirateSkeletonOceanWeight;
+        public final IntField pirateSkeletonRiverWeight;
+
         public final IntField blueberrySlimeOceanWeight;
         public final IntField blueberrySlimeRiverWeight;
         
@@ -138,6 +141,17 @@ public class MainConfig extends AbstractConfigFile {
                             "spawn feature is completely disabled. Finer tuning can be done with the natural spawn chances " +
                             "in the species config file." ), RestartNote.WORLD );
             
+            SPEC.newLine();
+
+            pirateSkeletonOceanWeight = SPEC.define( new IntField( "pirate_skeleton_weight.ocean", 6, IntField.Range.NON_NEGATIVE,
+                    "Option to add pirate skeletons as natural spawns to oceans.",
+                    "When set to 0, this added spawn feature is completely disabled.",
+                    "Finer tuning can be done with the natural spawn chances in the species config file." ), RestartNote.WORLD );
+            pirateSkeletonRiverWeight = SPEC.define( new IntField( "pirate_skeleton_weight.river", 1, IntField.Range.NON_NEGATIVE,
+                    "Option to add pirate skeletons as natural spawns to rivers. When set to 0, this added " +
+                            "spawn feature is completely disabled. Finer tuning can be done with the natural spawn chances " +
+                            "in the species config file." ), RestartNote.WORLD );
+
             SPEC.newLine();
             
             blueberrySlimeOceanWeight = SPEC.define( new IntField( "blueberry_slime_weight.ocean", 2, IntField.Range.NON_NEGATIVE,
