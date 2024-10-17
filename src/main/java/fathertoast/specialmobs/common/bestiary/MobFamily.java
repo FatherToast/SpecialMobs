@@ -5,7 +5,6 @@ import fathertoast.crust.api.config.common.ConfigUtil;
 import fathertoast.specialmobs.common.config.Config;
 import fathertoast.specialmobs.common.config.family.*;
 import fathertoast.specialmobs.common.config.species.SpeciesConfig;
-import fathertoast.specialmobs.common.core.SpecialMobs;
 import fathertoast.specialmobs.common.core.register.SMEntities;
 import fathertoast.specialmobs.common.core.register.SMItems;
 import fathertoast.specialmobs.common.util.AnnotationHelper;
@@ -64,7 +63,7 @@ public class MobFamily<T extends Mob, V extends FamilyConfig> {
     
     public static final MobFamily<AbstractSkeleton, SkeletonFamilyConfig> SKELETON = new MobFamily<>( SkeletonFamilyConfig::new,
             "Skeleton", "skeletons", 0xC1C1C1, new EntityType[] { EntityType.SKELETON, EntityType.STRAY },
-            "Brute", "Fire", "Gatling", "Giant", "Knight", "Ninja", /*"Pirate", */"Poison", "Sniper", "Spitfire", "Stray", "Weathered"
+            "Brute", "Fire", "Gatling", "Giant", "Knight", "Ninja", "Pirate", "Poison", "Sniper", "Spitfire", "Stray", "Weathered"
     );
     public static final MobFamily<AbstractSkeleton, SkeletonFamilyConfig> WITHER_SKELETON = new MobFamily<>( SkeletonFamilyConfig::new,
             "WitherSkeleton", "wither skeletons", 0x141414, new EntityType[] { EntityType.WITHER_SKELETON },
@@ -302,7 +301,7 @@ public class MobFamily<T extends Mob, V extends FamilyConfig> {
             
             // Config uses bestiary info for default values
             // noinspection ConstantConditions
-            config = AnnotationHelper.createConfig( ConfigManager.get( SpecialMobs.MOD_ID ), this );
+            config = AnnotationHelper.createConfig( Config.MANAGER, this );
             config.SPEC.initialize();
             
             // Register this species with the entity class

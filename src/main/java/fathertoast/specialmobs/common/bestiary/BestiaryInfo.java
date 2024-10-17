@@ -5,7 +5,7 @@ import fathertoast.crust.api.config.common.ConfigUtil;
 import fathertoast.crust.api.config.common.field.DoubleField;
 import fathertoast.crust.api.config.common.value.*;
 import fathertoast.crust.api.config.common.value.environment.biome.BiomeCategory;
-import fathertoast.specialmobs.common.core.SpecialMobs;
+import fathertoast.specialmobs.common.config.Config;
 import fathertoast.specialmobs.common.util.References;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffect;
@@ -127,7 +127,7 @@ public class BestiaryInfo {
 
         public EnvironmentList getValue() {
             if ( value == null ) {
-                value = func.apply( ConfigManager.get( SpecialMobs.MOD_ID ) );
+                value = func.apply( Config.MANAGER );
                 value.setRange( DoubleField.Range.NON_NEGATIVE );
             }
             return value;
