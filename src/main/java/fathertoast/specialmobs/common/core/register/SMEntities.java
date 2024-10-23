@@ -3,6 +3,7 @@ package fathertoast.specialmobs.common.core.register;
 import fathertoast.crust.api.config.common.value.ConfigDrivenAttributeModifierMap;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.core.SpecialMobs;
+import fathertoast.specialmobs.common.entity.misc.MobBoat;
 import fathertoast.specialmobs.common.entity.projectile.*;
 import fathertoast.specialmobs.common.util.AnnotationHelper;
 import net.minecraft.world.entity.Entity;
@@ -38,6 +39,10 @@ public class SMEntities {
     public static final RegistryObject<EntityType<SpecialFishingBobberEntity>> FISHING_BOBBER = register( "fishing_bobber",
             EntityType.Builder.<SpecialFishingBobberEntity>of( SpecialFishingBobberEntity::new, MobCategory.MISC ).noSave().noSummon()
                     .sized( 0.25F, 0.25F ).clientTrackingRange( 4 ).updateInterval( 5 ) );
+
+    public static final RegistryObject<EntityType<MobBoat>> MOB_BOAT = register( "mob_boat",
+            EntityType.Builder.<MobBoat>of( MobBoat::new, MobCategory.MISC )
+                    .sized( 1.375F, 0.5625F ).clientTrackingRange( 10 ).noSummon() );
     
     
     /** Registers an entity type to the deferred register. */

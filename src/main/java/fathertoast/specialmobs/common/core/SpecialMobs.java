@@ -124,7 +124,7 @@ public class SpecialMobs {
     
     public SpecialMobs() {
         Config.initialize();
-        
+
         packetHandler.registerMessages();
         
         final IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
@@ -142,14 +142,9 @@ public class SpecialMobs {
         modEventBus.addListener( this::sendIMCMessages );
         modEventBus.addListener( NaturalSpawnManager::registerSpawnPlacements );
 
-        //MinecraftForge.EVENT_BUS.addListener( EventPriority.LOW, NaturalSpawnManager::onBiomeLoad );
         MinecraftForge.EVENT_BUS.register( new GameEvents() );
         MinecraftForge.EVENT_BUS.register( new AdvancementFixer() );
     }
-    
-    //    public void onParallelDispatch( FMLConstructModEvent event ) {
-    //        event.enqueueWork( Config::initialize );
-    //    }
     
     public void setup( FMLCommonSetupEvent event ) {
         event.enqueueWork(() -> {
@@ -157,7 +152,6 @@ public class SpecialMobs {
         });
     }
     
-    @SuppressWarnings( "SpellCheckingInspection" )
     public void sendIMCMessages( InterModEnqueueEvent event ) {
 
     }

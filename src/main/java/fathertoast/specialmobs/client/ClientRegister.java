@@ -3,6 +3,9 @@ package fathertoast.specialmobs.client;
 import fathertoast.crust.api.config.client.ClientConfigUtil;
 import fathertoast.specialmobs.client.renderer.entity.family.*;
 import fathertoast.specialmobs.client.renderer.entity.layers.SMModelLayers;
+import fathertoast.specialmobs.client.renderer.entity.misc.MobBoatRenderer;
+import fathertoast.specialmobs.client.renderer.entity.model.MobBoatModel;
+import fathertoast.specialmobs.client.renderer.entity.model.MobRaftModel;
 import fathertoast.specialmobs.client.renderer.entity.model.ScopeCreeperModel;
 import fathertoast.specialmobs.client.renderer.entity.model.SlabGhastModel;
 import fathertoast.specialmobs.client.renderer.entity.projectile.BoneShrapnelRenderer;
@@ -40,6 +43,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.projectile.ItemSupplier;
+import net.minecraft.world.entity.vehicle.Boat;
 import net.minecraft.world.item.Items;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.EntityRenderersEvent;
@@ -87,6 +91,16 @@ public class ClientRegister {
         event.registerLayerDefinition( SMModelLayers.ZOMBIFIED_PIGLIN_OUTER_LAYER, () -> LayerDefinition.create( PiglinModel.createMesh( new CubeDeformation( 0.25F ) ), 64, 64 ) );
         event.registerLayerDefinition( SMModelLayers.ZOMBIFIED_PIGLIN_INNER_ARMOR, () -> LayerDefinition.create( HumanoidArmorModel.createBodyLayer( new CubeDeformation( 0.5F ) ), 64, 32 ) );
         event.registerLayerDefinition( SMModelLayers.ZOMBIFIED_PIGLIN_OUTER_ARMOR, () -> LayerDefinition.create( HumanoidArmorModel.createBodyLayer( new CubeDeformation( 1.02F ) ), 64, 32 ) );
+
+        // Funny boat moment
+        for ( Boat.Type type : Boat.Type.values() ) {
+            if ( type == Boat.Type.BAMBOO ) {
+                event.registerLayerDefinition( SMModelLayers.createBoatModelName( type ), MobRaftModel::createBodyModel );
+            }
+            else {
+                event.registerLayerDefinition( SMModelLayers.createBoatModelName( type ), MobBoatModel::createBodyModel );
+            }
+        }
     }
     
     
@@ -136,6 +150,7 @@ public class ClientRegister {
         registerSpriteRenderer( event, SMEntities.INCORPOREAL_FIREBALL, 3.0F, true );
         registerSpriteRenderer( event, SMEntities.SLAB_FIREBALL, 3.0F, true );
         registerRenderer( event, SMEntities.FISHING_BOBBER, SpecialFishingBobberRenderer::new );
+        registerRenderer( event, SMEntities.MOB_BOAT, MobBoatRenderer::new );
     }
     
     @SuppressWarnings( "unchecked" )

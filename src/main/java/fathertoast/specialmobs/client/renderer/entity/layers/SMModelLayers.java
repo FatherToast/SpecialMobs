@@ -7,6 +7,7 @@ import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.entity.vehicle.Boat;
 
 
 public class SMModelLayers {
@@ -205,5 +206,25 @@ public class SMModelLayers {
         partDefinition.addOrReplaceChild("left_front_leg", leftPartsBuilder, PartPose.offset(4.0F, 15.0F, -1.0F));
 
         return LayerDefinition.create(meshDefinition, 64, 32);
+    }
+
+    public static ModelLayerLocation createRaftModelName( Boat.Type type ) {
+        return createModLocation("raft/" + type.getName(), "main");
+    }
+
+    public static ModelLayerLocation createChestRaftModelName( Boat.Type type ) {
+        return createModLocation("chest_raft/" + type.getName(), "main");
+    }
+
+    public static ModelLayerLocation createBoatModelName( Boat.Type type ) {
+        return createModLocation("boat/" + type.getName(), "main");
+    }
+
+    public static ModelLayerLocation createChestBoatModelName( Boat.Type type ) {
+        return createModLocation("chest_boat/" + type.getName(), "main");
+    }
+
+    private static ModelLayerLocation createModLocation( String location, String name ) {
+        return new ModelLayerLocation( SpecialMobs.resourceLoc( location ), name );
     }
 }

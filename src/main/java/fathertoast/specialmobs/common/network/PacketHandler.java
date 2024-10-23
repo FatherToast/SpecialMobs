@@ -1,6 +1,7 @@
 package fathertoast.specialmobs.common.network;
 
 import fathertoast.specialmobs.common.core.SpecialMobs;
+import fathertoast.specialmobs.common.network.message.S2CUpdateBoatInputs;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
@@ -32,10 +33,10 @@ public class PacketHandler {
     }
     
     public final void registerMessages() {
-
+        registerMessage( S2CUpdateBoatInputs.class, S2CUpdateBoatInputs::encode, S2CUpdateBoatInputs::decode, S2CUpdateBoatInputs::handle );
     }
     
-    public <MSG> void registerMessage(Class<MSG> messageType, BiConsumer<MSG, FriendlyByteBuf> encoder, Function<FriendlyByteBuf, MSG> decoder, BiConsumer<MSG, Supplier<NetworkEvent.Context>> handler ) {
+    public <MSG> void registerMessage( Class<MSG> messageType, BiConsumer<MSG, FriendlyByteBuf> encoder, Function<FriendlyByteBuf, MSG> decoder, BiConsumer<MSG, Supplier<NetworkEvent.Context>> handler ) {
         CHANNEL.registerMessage( this.messageIndex++, messageType, encoder, decoder, handler, Optional.empty() );
     }
     
