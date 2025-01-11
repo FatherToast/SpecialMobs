@@ -17,6 +17,7 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
+import net.minecraftforge.event.ForgeEventFactory;
 
 import javax.annotation.Nullable;
 
@@ -130,7 +131,7 @@ public class QueenGhastEntity extends _SpecialGhastEntity {
         baby.copyPosition( this );
         baby.yHeadRot = getYRot();
         baby.yBodyRot = getYRot();
-        groupData = baby.finalizeSpawn( (ServerLevelAccessor) level(), level().getCurrentDifficultyAt( blockPosition() ),
+        groupData = ForgeEventFactory.onFinalizeSpawn( baby, (ServerLevelAccessor) level(), level().getCurrentDifficultyAt( blockPosition() ),
                 MobSpawnType.MOB_SUMMONED, groupData, null );
         baby.setTarget( getTarget() );
         

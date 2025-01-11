@@ -18,6 +18,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
+import net.minecraftforge.event.ForgeEventFactory;
 
 @SpecialMob
 public class UndeadWitchEntity extends _SpecialWitchEntity {
@@ -85,7 +86,7 @@ public class UndeadWitchEntity extends _SpecialWitchEntity {
                 skeleton.copyPosition( this );
                 skeleton.yHeadRot = getYRot();
                 skeleton.yBodyRot = getYRot();
-                skeleton.finalizeSpawn( (ServerLevelAccessor) level(), level().getCurrentDifficultyAt( blockPosition() ),
+                ForgeEventFactory.onFinalizeSpawn( skeleton, (ServerLevelAccessor) level(), level().getCurrentDifficultyAt( blockPosition() ),
                         MobSpawnType.MOB_SUMMONED, null, null );
                 skeleton.setItemSlot( EquipmentSlot.MAINHAND, new ItemStack( Items.IRON_SWORD ) );
                 skeleton.setItemSlot( EquipmentSlot.HEAD, new ItemStack( Items.CHAINMAIL_HELMET ) );

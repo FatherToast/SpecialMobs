@@ -34,6 +34,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.pathfinder.BlockPathTypes;
 import net.minecraftforge.common.ForgeMod;
+import net.minecraftforge.event.ForgeEventFactory;
 
 @SpecialMob
 public class SnowCreeperEntity extends _SpecialCreeperEntity {
@@ -278,7 +279,7 @@ public class SnowCreeperEntity extends _SpecialCreeperEntity {
         }
         
         stray.setTarget( getTarget() );
-        stray.finalizeSpawn( (ServerLevelAccessor) level(), level().getCurrentDifficultyAt( blockPosition() ),
+        ForgeEventFactory.onFinalizeSpawn( stray, (ServerLevelAccessor) level(), level().getCurrentDifficultyAt( blockPosition() ),
                 MobSpawnType.MOB_SUMMONED, null, null );
         level().addFreshEntity( stray );
         stray.spawnAnim();

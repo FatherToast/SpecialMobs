@@ -23,7 +23,9 @@ import net.minecraft.world.item.alchemy.PotionUtils;
 import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
+import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.ForgeMod;
+import net.minecraftforge.event.ForgeEventFactory;
 
 import javax.annotation.Nullable;
 
@@ -124,8 +126,10 @@ public class WildsWitchEntity extends _SpecialWitchEntity {
         baby.copyPosition( this );
         baby.yHeadRot = getYRot();
         baby.yBodyRot = getYRot();
-        groupData = baby.finalizeSpawn( (ServerLevelAccessor) level(), level().getCurrentDifficultyAt( blockPosition() ),
+
+        groupData = ForgeEventFactory.onFinalizeSpawn( baby, (ServerLevelAccessor) level(), level().getCurrentDifficultyAt( blockPosition() ),
                 MobSpawnType.MOB_SUMMONED, groupData, null );
+
         baby.setTarget( getTarget() );
         
         baby.setDeltaMovement(
@@ -170,9 +174,9 @@ public class WildsWitchEntity extends _SpecialWitchEntity {
                 if( level().noCollision( spider.getBoundingBox() ) ) {
                     spiderMounts--;
                     potionUseCooldownTimer = 40;
-                    
+
                     spider.setTarget( getTarget() );
-                    spider.finalizeSpawn( (ServerLevelAccessor) level(), level().getCurrentDifficultyAt( blockPosition() ),
+                    ForgeEventFactory.onFinalizeSpawn( spider, (ServerLevelAccessor) level(), level().getCurrentDifficultyAt( blockPosition() ),
                             MobSpawnType.MOB_SUMMONED, null, null );
                     level().addFreshEntity( spider );
                     spider.spawnAnim();
