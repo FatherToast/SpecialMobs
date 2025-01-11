@@ -4,19 +4,26 @@ import fathertoast.crust.api.lib.EnvironmentHelper;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.config.Config;
 import fathertoast.specialmobs.common.entity.MobHelper;
+import fathertoast.specialmobs.common.entity.spider.MotherSpiderEntity;
 import fathertoast.specialmobs.common.util.References;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerChunkCache;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.WorldGenRegion;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
+import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.EntityJoinLevelEvent;
+import net.minecraftforge.event.entity.living.MobSpawnEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -38,10 +45,29 @@ public final class SpecialMobReplacer {
     /** Returns true if the species is not damaged by water. */
     private static final Predicate<MobFamily.Species<?>> WATER_INSENSITIVE_SELECTOR =
             ( species ) -> !species.config.GENERAL.isDamagedByWater.get();
-    /** Returns true if the species's block height is less than or equal to the base vanilla entity's. */
+    /** Returns true if the species' block height is less than or equal to the base vanilla entity's. */
     private static final Predicate<MobFamily.Species<?>> NO_GIANTS_SELECTOR = MobFamily.Species::isNotGiant;
-    
-    
+
+
+    /**
+     * Called when a mob is being finalized before being added to the world and passed
+     * to {@link EntityJoinLevelEvent}.
+     * <p>
+     * Here we check for spawns that are potentially unsafe to process later, such as chunk
+     * gen spawns or structure spawns, and mark them as already initialised by SM if so to skip them.
+     *
+     * @param event The event data.
+     */
+    @SubscribeEvent
+    public static void onMobSpawn( MobSpawnEvent.FinalizeSpawn event ) {
+        final MobSpawnType spawnType = event.getSpawnType();
+
+        if ( spawnType == MobSpawnType.CHUNK_GENERATION || spawnType == MobSpawnType.STRUCTURE ) {
+            setInitFlag( event.getEntity() );
+            setInitFlag( event.getEntity() );
+        }
+    }
+
     /**
      * Called when any entity is spawned into the world by any means (such as natural/spawner spawns or chunk loading).
      * <p>
@@ -51,18 +77,19 @@ public final class SpecialMobReplacer {
      * @param event The event data.
      */
     @SubscribeEvent( priority = EventPriority.LOWEST )
-    public static void onEntitySpawn( EntityJoinLevelEvent event ) {
-        if( event.getLevel().isClientSide() || !Config.MAIN.GENERAL.enableMobReplacement.get() || event.isCanceled() )
+    public static void onEntityJoinLevel( EntityJoinLevelEvent event ) {
+        if( event.getLevel().isClientSide() || event.loadedFromDisk() || !Config.MAIN.GENERAL.enableMobReplacement.get() )
             return;
         
         final Entity entity = event.getEntity();
         final MobFamily<?, ?> mobFamily = getReplacingMobFamily( entity );
+
         if( mobFamily != null ) {
             final Level level = event.getLevel();
             final BlockPos entityPos = BlockPos.containing( entity.position() );
-            
+
             setInitFlag( entity ); // Do this regardless of replacement, should help prevent bizarre save glitches
-            
+
             if( EnvironmentHelper.isLoaded( level, entityPos ) ) {
                 final boolean isSpecial = shouldMakeNextSpecial( mobFamily, level, entityPos );
                 if( shouldReplace( mobFamily, isSpecial ) ) {
