@@ -15,9 +15,8 @@ public class Config {
     public static final ConfigManager MANAGER;
     public static final MainConfig MAIN;
 
-
     static {
-        MANAGER = ConfigManager.create( "SpecialMobs" );
+        MANAGER = ConfigManager.create( "SpecialMobs", SpecialMobs.MOD_ID );
         MAIN = new MainConfig( MANAGER, "main" );
 
         ReadMeConfig.makeReadMe( MANAGER );
@@ -25,7 +24,7 @@ public class Config {
         MobFamily.initBestiary(); // Just make sure this class gets loaded
     }
 
-    /** Called from {@link SpecialMobs#SpecialMobs()} to load this class. */
+    /** Called from {@link SpecialMobs#SpecialMobs(net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext)} to load this class. */
     public static void initialize() {
 
     }
