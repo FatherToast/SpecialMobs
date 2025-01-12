@@ -1,3 +1,9 @@
+1.20.1-3.1.9
+    - Bumped min required Forge version to 47.3.22
+    - Bumped min required Crust version to 2.3.7
+    - New security checks during mob replacement to hopefully prevent world deadlocks
+    - Added calls to ForgeEventFactory#onFinalizeSpawn where needed
+    - "Added" Pirate Skeleton (still a work in progress, but at least the ocean is less lonely now)
 1.20.1-3.1.8
     - Fixed a potential NPE crash on startup.
 1.20.1-3.1.7
