@@ -76,6 +76,7 @@ public class PirateSpawnBoatGoal extends Goal {
             if ( nearbyBoats.isEmpty() ) {
                 MobBoat boat = new MobBoat( pirate.level(), pirate.getX(), pirate.getY() + (heightLevel + 1), pirate.getZ() );
                 boat.setVariant( Boat.Type.values()[pirate.level().random.nextInt(Boat.Type.values().length)] );
+                boat.setYRot( pirate.getYHeadRot() );
 
                 pirate.level().addFreshEntity( boat );
                 pirate.startRiding( boat );

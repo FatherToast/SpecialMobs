@@ -51,12 +51,6 @@ public class PirateControlBoatGoal extends Goal {
         boolean right = false;
         boolean left = false;
 
-        if ( pirate.getXRot() > pirate.xRotO ) {
-            right = true;
-        }
-        else if ( pirate.getXRot() < pirate.xRotO ) {
-            left = true;
-        }
-        NetworkHelper.sendUpdateBoatInputs( boat, true, false, left, right );
+        //NetworkHelper.sendUpdateBoatInputs( boat, true, false, left, right );
     }
 }
