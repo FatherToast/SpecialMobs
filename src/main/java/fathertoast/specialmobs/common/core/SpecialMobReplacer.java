@@ -4,13 +4,9 @@ import fathertoast.crust.api.lib.EnvironmentHelper;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.config.Config;
 import fathertoast.specialmobs.common.entity.MobHelper;
-import fathertoast.specialmobs.common.entity.spider.MotherSpiderEntity;
 import fathertoast.specialmobs.common.util.References;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.server.level.ServerChunkCache;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.WorldGenRegion;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -18,7 +14,6 @@ import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
-import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraftforge.event.TickEvent;
@@ -63,7 +58,6 @@ public final class SpecialMobReplacer {
         final MobSpawnType spawnType = event.getSpawnType();
 
         if ( spawnType == MobSpawnType.CHUNK_GENERATION || spawnType == MobSpawnType.STRUCTURE ) {
-            setInitFlag( event.getEntity() );
             setInitFlag( event.getEntity() );
         }
     }
