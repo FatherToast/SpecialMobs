@@ -1,3 +1,7 @@
+1.20.1-3.1.10
+    - Bumped required Crust version to 2.4.8
+    - Downgraded required min Forge version to 47.3.0
+    - Pause file watcher during config initialization
 1.20.1-3.1.9
     - Bumped min required Forge version to 47.3.22
     - Bumped min required Crust version to 2.3.7
