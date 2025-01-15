@@ -122,12 +122,12 @@ public class SpecialMobs {
     @SuppressWarnings( "FieldCanBeLocal" )
     private final PacketHandler packetHandler = new PacketHandler();
     
-    public SpecialMobs( FMLJavaModLoadingContext context ) {
+    public SpecialMobs() {
         Config.initialize();
 
         packetHandler.registerMessages();
         
-        final IEventBus modEventBus = context.getModEventBus();
+        final IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
         
         SMBlocks.REGISTRY.register( modEventBus );
         SMItems.REGISTRY.register( modEventBus );
