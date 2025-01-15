@@ -1,5 +1,6 @@
 package fathertoast.specialmobs.common.config;
 
+import com.electronwill.nightconfig.core.file.FileWatcher;
 import fathertoast.crust.api.config.common.ConfigManager;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.core.SpecialMobs;
@@ -19,12 +20,16 @@ public class Config {
         MANAGER = ConfigManager.create( "SpecialMobs", SpecialMobs.MOD_ID );
         MAIN = new MainConfig( MANAGER, "main" );
 
+        MANAGER.freezeFileWatcher = true;
+
         ReadMeConfig.makeReadMe( MANAGER );
         MAIN.SPEC.initialize();
         MobFamily.initBestiary(); // Just make sure this class gets loaded
+
+        MANAGER.freezeFileWatcher = false;
     }
 
-    /** Called from {@link SpecialMobs#SpecialMobs(net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext)} to load this class. */
+    /** Called from {@link SpecialMobs#SpecialMobs()} to load this class. */
     public static void initialize() {
 
     }
