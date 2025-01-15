@@ -27,7 +27,7 @@ Discussion: https://discord.gg/GFTzTdX
 [[dependencies.specialmobs]]
 modId = "forge"
 mandatory = true
-versionRange = "[47,)"
+versionRange = "[47.3.0,)"
 ordering = "NONE"
 side = "BOTH"
 
@@ -41,6 +41,6 @@ side = "BOTH"
 [[dependencies.specialmobs]]
 modId = "crust"
 mandatory = true
-versionRange = "[2.3.4,)"
+versionRange = "[2.4.8,)"
 ordering = "AFTER"
 side = "BOTH"
