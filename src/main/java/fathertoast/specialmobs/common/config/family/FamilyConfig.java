@@ -80,7 +80,7 @@ public class FamilyConfig extends AbstractConfigFile {
                             "NOTE: Some environment check types can cause deadlocks on servers currently, so be careful!" ) ),
                     SPEC.define( new EnvironmentListField( "special_variant_chance.exceptions", new EnvironmentList(
                             EnvironmentEntry.builder( SPEC, (float) variantChance * 0.5F ).beforeDays( 5 ).build(), // Also skips first night's full moon
-                            EnvironmentEntry.builder( SPEC, (float) variantChance * 2.0F ).atMaxMoonLight().aboveDifficulty( 0.5F ).build(),
+                            EnvironmentEntry.builder( SPEC, (float) variantChance * 2.0F ).atMaxMoonLight()./*aboveDifficulty( 0.5F ).*/build(),
                             EnvironmentEntry.builder( SPEC, (float) variantChance * 1.5F ).atMaxMoonLight().build() )
                             //EnvironmentEntry.builder( SPEC, (float) variantChance * 1.5F ).aboveDifficulty( 0.5F ).build() )
                             .setRange( DoubleField.Range.PERCENT ),
