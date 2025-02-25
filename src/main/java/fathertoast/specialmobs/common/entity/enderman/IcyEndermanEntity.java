@@ -97,18 +97,6 @@ public class IcyEndermanEntity extends _SpecialEndermanEntity {
     @Override
     public boolean canStandOnFluid( FluidState fluid ) { return fluid.is( FluidTags.WATER ); }
     
-    /** @return Attempts to damage this entity; returns true if the hit was successful. */
-    @Override
-    public boolean hurt( DamageSource source, float amount ) {
-        if( source.is( DamageTypeTags.IS_DROWNING ) ) {
-            for( int i = 0; i < 64; i++ ) {
-                if( teleport() ) return true;
-            }
-            return false;
-        }
-        return super.hurt( source, amount );
-    }
-    
     /** Called whenever this entity's block position changes. */
     @Override
     protected void onChangedBlock( BlockPos pos ) {
@@ -151,6 +139,9 @@ public class IcyEndermanEntity extends _SpecialEndermanEntity {
     /** This is #randomTeleport, but uses a pre-determined y-coord. */
     @SuppressWarnings( "SameParameterValue" ) // Don't care; maintain vanilla's method signature
     private boolean uncheckedTeleport( double x, double y, double z, boolean spawnParticles ) {
+        // Can't teleport if in a vehicle
+        if ( this.isPassenger() ) return false;
+
         final double xI = getX();
         final double yI = getY();
         final double zI = getZ();
