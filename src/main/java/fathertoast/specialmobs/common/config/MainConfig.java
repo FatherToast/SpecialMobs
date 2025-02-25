@@ -143,7 +143,7 @@ public class MainConfig extends AbstractConfigFile {
             
             SPEC.newLine();
 
-            pirateSkeletonOceanWeight = SPEC.define( new IntField( "pirate_skeleton_weight.ocean", 6, IntField.Range.NON_NEGATIVE,
+            pirateSkeletonOceanWeight = SPEC.define( new IntField( "pirate_skeleton_weight.ocean", 2, IntField.Range.NON_NEGATIVE,
                     "Option to add pirate skeletons as natural spawns to oceans.",
                     "When set to 0, this added spawn feature is completely disabled.",
                     "Finer tuning can be done with the natural spawn chances in the species config file." ), RestartNote.WORLD );
