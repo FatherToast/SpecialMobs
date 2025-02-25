@@ -3,10 +3,12 @@ package fathertoast.specialmobs.common.core;
 import fathertoast.crust.api.lib.EnvironmentHelper;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.config.Config;
+import fathertoast.specialmobs.common.config.MainConfig;
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.util.References;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerChunkCache;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -74,7 +76,7 @@ public final class SpecialMobReplacer {
     public static void onEntityJoinLevel( EntityJoinLevelEvent event ) {
         if( event.getLevel().isClientSide() || event.loadedFromDisk() || !Config.MAIN.GENERAL.enableMobReplacement.get() )
             return;
-        
+
         final Entity entity = event.getEntity();
         final MobFamily<?, ?> mobFamily = getReplacingMobFamily( entity );
 
@@ -84,7 +86,7 @@ public final class SpecialMobReplacer {
 
             setInitFlag( entity ); // Do this regardless of replacement, should help prevent bizarre save glitches
 
-            if( EnvironmentHelper.isLoaded( level, entityPos ) ) {
+            if( level.isLoaded( BlockPos.containing( entity.getX(), entity.getY(), entity.getZ() ) ) ) {
                 final boolean isSpecial = shouldMakeNextSpecial( mobFamily, level, entityPos );
                 if( shouldReplace( mobFamily, isSpecial ) ) {
                     TO_REPLACE.addLast( new MobReplacementEntry( mobFamily, isSpecial, entity, level, entityPos ) );
@@ -271,7 +273,7 @@ public final class SpecialMobReplacer {
             else if( !entityToReplace.isAlive() ) {
                 return true; // Entity was killed or unloaded before getting replaced
             }
-            else if( EnvironmentHelper.isLoaded( entityLevel, entityPos ) ) {
+            else if( entityLevel.isLoaded( entityPos ) ) {
                 // It is time to decide!
                 final boolean isSpecial = shouldMakeNextSpecial( mobFamily, entityLevel, entityPos );
                 if( shouldReplace( mobFamily, isSpecial ) ) {

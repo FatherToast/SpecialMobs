@@ -76,7 +76,8 @@ public class FamilyConfig extends AbstractConfigFile {
             
             specialVariantChance = new DoubleField.EnvironmentSensitive(
                     SPEC.define( new DoubleField( "special_variant_chance.base", variantChance, DoubleField.Range.PERCENT,
-                            "The chance for " + family.configName + " to spawn as special variants." ) ),
+                            "The chance for " + family.configName + " to spawn as special variants.",
+                            "NOTE: Some environment check types can cause deadlocks on servers currently, so be careful!" ) ),
                     SPEC.define( new EnvironmentListField( "special_variant_chance.exceptions", new EnvironmentList(
                             EnvironmentEntry.builder( SPEC, (float) variantChance * 0.5F ).beforeDays( 5 ).build(), // Also skips first night's full moon
                             EnvironmentEntry.builder( SPEC, (float) variantChance * 2.0F ).atMaxMoonLight().aboveDifficulty( 0.5F ).build(),
