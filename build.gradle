@@ -62,7 +62,7 @@ minecraft {
         }
 
         gameTestServer {
-            property 'forge.enabledGameTestNamespaces', 'naturalabsorption'
+            property 'forge.enabledGameTestNamespaces', 'specialmobs'
         }
 
         data {
