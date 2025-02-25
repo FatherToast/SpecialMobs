@@ -1,6 +1,5 @@
 package fathertoast.specialmobs.common.config;
 
-import com.electronwill.nightconfig.core.file.FileWatcher;
 import fathertoast.crust.api.config.common.ConfigManager;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.core.SpecialMobs;
