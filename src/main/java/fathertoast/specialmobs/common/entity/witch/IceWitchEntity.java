@@ -4,6 +4,7 @@ import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.block.MeltingIceBlock;
+import fathertoast.specialmobs.common.core.register.SMTags;
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.entity.ai.AIHelper;
 import fathertoast.specialmobs.common.entity.ai.FluidPathNavigator;
@@ -14,7 +15,9 @@ import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.BlockTags;
+import net.minecraft.tags.EntityTypeTags;
 import net.minecraft.tags.FluidTags;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -30,6 +33,9 @@ import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.pathfinder.BlockPathTypes;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.ForgeMod;
+
+import java.util.Collections;
+import java.util.List;
 
 @SpecialMob
 public class IceWitchEntity extends _SpecialWitchEntity {
@@ -63,7 +69,12 @@ public class IceWitchEntity extends _SpecialWitchEntity {
     
     @SpecialMob.Factory
     public static EntityType.EntityFactory<IceWitchEntity> getVariantFactory() { return IceWitchEntity::new; }
-    
+
+    @SpecialMob.EntityTagProvider
+    public static List<TagKey<EntityType<?>>> getEntityTags() {
+        return List.of( SMTags.EntityTypes.WITCHES, EntityTypeTags.FREEZE_IMMUNE_ENTITY_TYPES );
+    }
+
     /** @return This entity's mob species. */
     @SpecialMob.SpeciesSupplier
     @Override

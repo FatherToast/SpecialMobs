@@ -6,9 +6,12 @@ import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.config.species.SkeletonSpeciesConfig;
 import fathertoast.specialmobs.common.config.species.SpeciesConfig;
+import fathertoast.specialmobs.common.core.register.SMTags;
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
+import net.minecraft.tags.EntityTypeTags;
+import net.minecraft.tags.TagKey;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -16,6 +19,8 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.projectile.SmallFireball;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
+
+import java.util.List;
 
 @SpecialMob
 public class SpitfireWitherSkeletonEntity extends _SpecialWitherSkeletonEntity {
@@ -50,6 +55,11 @@ public class SpitfireWitherSkeletonEntity extends _SpecialWitherSkeletonEntity {
     public static void buildLootTable( LootTableBuilder loot ) {
         addBaseLoot( loot );
         loot.addCommonDrop( "common", Items.FIRE_CHARGE );
+    }
+
+    @SpecialMob.EntityTagProvider
+    public static List<TagKey<EntityType<?>>> getEntityTags() {
+        return List.of( SMTags.EntityTypes.WITHER_SKELETONS, EntityTypeTags.FREEZE_HURTS_EXTRA_TYPES );
     }
     
     @SpecialMob.Factory

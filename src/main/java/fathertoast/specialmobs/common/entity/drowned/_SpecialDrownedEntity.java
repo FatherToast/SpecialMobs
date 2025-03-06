@@ -23,6 +23,7 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.tags.EntityTypeTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
@@ -106,7 +107,7 @@ public class _SpecialDrownedEntity extends Drowned implements ISpecialMob<_Speci
 
     @SpecialMob.EntityTagProvider
     public static List<TagKey<EntityType<?>>> getEntityTags() {
-        return Collections.singletonList( SMTags.EntityTypes.DROWNED );
+        return List.of( SMTags.EntityTypes.DROWNED, EntityTypeTags.AXOLOTL_ALWAYS_HOSTILES );
     }
     
     @SpecialMob.Factory

@@ -43,7 +43,6 @@ public class VampireZombifiedPiglinEntity extends _SpecialZombifiedPiglinEntity 
                 "", "", "", "", "", "" );//TODO
     }
 
-    EntityTypeTags
     @SpecialMob.LootTableProvider
     public static void buildLootTable( LootTableBuilder loot ) {
         addBaseLoot( loot );

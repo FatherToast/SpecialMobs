@@ -16,6 +16,7 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.tags.EntityTypeTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.DifficultyInstance;
@@ -84,7 +85,7 @@ public class _SpecialMagmaCubeEntity extends MagmaCube implements ISpecialMob<_S
 
     @SpecialMob.EntityTagProvider
     public static List<TagKey<EntityType<?>>> getEntityTags() {
-        return Collections.singletonList( SMTags.EntityTypes.MAGMA_CUBES );
+        return List.of( SMTags.EntityTypes.MAGMA_CUBES, EntityTypeTags.FROG_FOOD, EntityTypeTags.FREEZE_HURTS_EXTRA_TYPES );
     }
     
     @SpecialMob.Factory

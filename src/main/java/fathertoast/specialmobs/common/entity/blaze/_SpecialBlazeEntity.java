@@ -92,7 +92,7 @@ public class _SpecialBlazeEntity extends Blaze implements RangedAttackMob, ISpec
 
     @SpecialMob.EntityTagProvider
     public static List<TagKey<EntityType<?>>> getEntityTags() {
-        return Collections.singletonList( SMTags.EntityTypes.BLAZES );
+        return List.of( SMTags.EntityTypes.BLAZES, EntityTypeTags.FREEZE_HURTS_EXTRA_TYPES );
     }
     
     @SpecialMob.Factory

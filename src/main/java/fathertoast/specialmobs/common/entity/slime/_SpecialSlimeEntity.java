@@ -16,6 +16,7 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.tags.EntityTypeTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.DifficultyInstance;
@@ -84,7 +85,7 @@ public class _SpecialSlimeEntity extends Slime implements ISpecialMob<_SpecialSl
 
     @SpecialMob.EntityTagProvider
     public static List<TagKey<EntityType<?>>> getEntityTags() {
-        return Collections.singletonList( SMTags.EntityTypes.SLIMES );
+        return List.of( SMTags.EntityTypes.SLIMES, EntityTypeTags.FROG_FOOD );
     }
     
     @SpecialMob.Factory

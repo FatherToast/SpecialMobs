@@ -3,6 +3,7 @@ package fathertoast.specialmobs.common.entity.slime;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
+import fathertoast.specialmobs.common.core.register.SMTags;
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.entity.ai.AIHelper;
 import fathertoast.specialmobs.common.entity.ai.FluidPathNavigator;
@@ -12,7 +13,9 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.tags.EntityTypeTags;
 import net.minecraft.tags.FluidTags;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -23,6 +26,9 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.pathfinder.BlockPathTypes;
 import net.minecraftforge.common.ForgeMod;
+
+import java.util.Collections;
+import java.util.List;
 
 
 @SpecialMob
@@ -52,6 +58,11 @@ public class FrozenSlimeEntity extends _SpecialSlimeEntity {
         addBaseLoot( loot );
         loot.addCommonDrop( "common", Blocks.ICE );
         loot.addRareDrop( "rare", Blocks.BLUE_ICE );
+    }
+
+    @SpecialMob.EntityTagProvider
+    public static List<TagKey<EntityType<?>>> getEntityTags() {
+        return List.of( SMTags.EntityTypes.SLIMES, EntityTypeTags.FREEZE_IMMUNE_ENTITY_TYPES );
     }
     
     @SpecialMob.Factory

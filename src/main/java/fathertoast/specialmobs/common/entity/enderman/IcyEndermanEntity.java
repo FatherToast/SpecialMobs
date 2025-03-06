@@ -3,6 +3,7 @@ package fathertoast.specialmobs.common.entity.enderman;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
+import fathertoast.specialmobs.common.core.register.SMTags;
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.entity.ai.AIHelper;
 import fathertoast.specialmobs.common.entity.ai.FluidPathNavigator;
@@ -13,7 +14,9 @@ import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.DamageTypeTags;
+import net.minecraft.tags.EntityTypeTags;
 import net.minecraft.tags.FluidTags;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EntityType;
@@ -28,6 +31,9 @@ import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.pathfinder.BlockPathTypes;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.entity.EntityTeleportEvent;
+
+import java.util.Collections;
+import java.util.List;
 
 @SpecialMob
 public class IcyEndermanEntity extends _SpecialEndermanEntity {
@@ -56,6 +62,11 @@ public class IcyEndermanEntity extends _SpecialEndermanEntity {
         addBaseLoot( loot );
         loot.addClusterDrop( "common", Items.SNOWBALL );
         loot.addUncommonDrop( "uncommon", Blocks.BLUE_ICE );
+    }
+
+    @SpecialMob.EntityTagProvider
+    public static List<TagKey<EntityType<?>>> getEntityTags() {
+        return List.of( SMTags.EntityTypes.ENDERMEN, EntityTypeTags.FREEZE_IMMUNE_ENTITY_TYPES );
     }
     
     @SpecialMob.Factory

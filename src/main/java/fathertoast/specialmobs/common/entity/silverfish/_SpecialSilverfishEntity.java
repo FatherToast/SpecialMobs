@@ -23,6 +23,7 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.tags.EntityTypeTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.DifficultyInstance;
@@ -103,7 +104,7 @@ public class _SpecialSilverfishEntity extends Silverfish implements RangedAttack
 
     @SpecialMob.EntityTagProvider
     public static List<TagKey<EntityType<?>>> getEntityTags() {
-        return Collections.singletonList( SMTags.EntityTypes.SILVERFISH );
+        return List.of( SMTags.EntityTypes.SILVERFISH, EntityTypeTags.POWDER_SNOW_WALKABLE_MOBS );
     }
     
     @SpecialMob.Factory

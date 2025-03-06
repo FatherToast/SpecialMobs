@@ -3,8 +3,11 @@ package fathertoast.specialmobs.common.entity.silverfish;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
+import fathertoast.specialmobs.common.core.register.SMTags;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
+import net.minecraft.tags.EntityTypeTags;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EntityType;
@@ -42,7 +45,12 @@ public class FireSilverfishEntity extends _SpecialSilverfishEntity {
         loot.addCommonDrop( "common", Items.FIRE_CHARGE );
         loot.addUncommonDrop( "uncommon", Items.COAL );
     }
-    
+
+    @SpecialMob.EntityTagProvider
+    public static List<TagKey<EntityType<?>>> getEntityTags() {
+        return List.of( SMTags.EntityTypes.SILVERFISH, EntityTypeTags.FREEZE_HURTS_EXTRA_TYPES );
+    }
+
     @SpecialMob.Factory
     public static EntityType.EntityFactory<FireSilverfishEntity> getVariantFactory() { return FireSilverfishEntity::new; }
     

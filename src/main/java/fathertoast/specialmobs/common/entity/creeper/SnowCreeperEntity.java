@@ -7,6 +7,7 @@ import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.block.MeltingIceBlock;
 import fathertoast.specialmobs.common.config.species.SnowCreeperSpeciesConfig;
 import fathertoast.specialmobs.common.config.species.SpeciesConfig;
+import fathertoast.specialmobs.common.core.register.SMTags;
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.entity.ai.AIHelper;
 import fathertoast.specialmobs.common.entity.ai.FluidPathNavigator;
@@ -17,7 +18,9 @@ import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.tags.BlockTags;
+import net.minecraft.tags.EntityTypeTags;
 import net.minecraft.tags.FluidTags;
+import net.minecraft.tags.TagKey;
 import net.minecraft.util.Mth;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EntityType;
@@ -35,6 +38,9 @@ import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.pathfinder.BlockPathTypes;
 import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.event.ForgeEventFactory;
+
+import java.util.Collections;
+import java.util.List;
 
 @SpecialMob
 public class SnowCreeperEntity extends _SpecialCreeperEntity {
@@ -78,7 +84,12 @@ public class SnowCreeperEntity extends _SpecialCreeperEntity {
     
     @SpecialMob.Factory
     public static EntityType.EntityFactory<SnowCreeperEntity> getVariantFactory() { return SnowCreeperEntity::new; }
-    
+
+    @SpecialMob.EntityTagProvider
+    public static List<TagKey<EntityType<?>>> getEntityTags() {
+        return List.of( SMTags.EntityTypes.CREEPERS, EntityTypeTags.FREEZE_IMMUNE_ENTITY_TYPES );
+    }
+
     /** @return This entity's mob species. */
     @SpecialMob.SpeciesSupplier
     @Override

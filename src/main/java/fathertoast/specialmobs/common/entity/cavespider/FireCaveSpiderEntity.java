@@ -3,15 +3,21 @@ package fathertoast.specialmobs.common.entity.cavespider;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
+import fathertoast.specialmobs.common.core.register.SMTags;
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import net.minecraft.core.BlockPos;
+import net.minecraft.tags.EntityTypeTags;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
+
+import java.util.Collections;
+import java.util.List;
 
 @SpecialMob
 public class FireCaveSpiderEntity extends _SpecialCaveSpiderEntity {
@@ -40,7 +46,12 @@ public class FireCaveSpiderEntity extends _SpecialCaveSpiderEntity {
         loot.addCommonDrop( "common", Items.FIRE_CHARGE );
         loot.addUncommonDrop( "uncommon", Items.COAL );
     }
-    
+
+    @SpecialMob.EntityTagProvider
+    public static List<TagKey<EntityType<?>>> getEntityTags() {
+        return List.of( SMTags.EntityTypes.CAVE_SPIDERS, EntityTypeTags.FREEZE_HURTS_EXTRA_TYPES );
+    }
+
     @SpecialMob.Factory
     public static EntityType.EntityFactory<FireCaveSpiderEntity> getVariantFactory() { return FireCaveSpiderEntity::new; }
     
