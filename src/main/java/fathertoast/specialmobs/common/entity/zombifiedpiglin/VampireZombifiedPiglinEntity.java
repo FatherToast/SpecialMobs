@@ -6,6 +6,7 @@ import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
+import net.minecraft.tags.EntityTypeTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffects;
@@ -41,7 +42,8 @@ public class VampireZombifiedPiglinEntity extends _SpecialZombifiedPiglinEntity 
         return References.translations( langKey, "Vampire Piglin",
                 "", "", "", "", "", "" );//TODO
     }
-    
+
+    EntityTypeTags
     @SpecialMob.LootTableProvider
     public static void buildLootTable( LootTableBuilder loot ) {
         addBaseLoot( loot );

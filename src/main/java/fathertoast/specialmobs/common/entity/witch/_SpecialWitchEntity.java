@@ -4,6 +4,7 @@ import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.core.SpecialMobs;
+import fathertoast.specialmobs.common.core.register.SMTags;
 import fathertoast.specialmobs.common.entity.ISpecialMob;
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.entity.SpecialMobData;
@@ -103,9 +104,9 @@ public class _SpecialWitchEntity extends Witch implements ISpecialMob<_SpecialWi
 
     @SpecialMob.EntityTagProvider
     public static List<TagKey<EntityType<?>>> getEntityTags() {
-        return Collections.singletonList(EntityTypeTags.RAIDERS);
+        return List.of( EntityTypeTags.RAIDERS, SMTags.EntityTypes.WITCHES );
     }
-    
+
     @SpecialMob.Factory
     public static EntityType.EntityFactory<_SpecialWitchEntity> getFactory() { return _SpecialWitchEntity::new; }
     

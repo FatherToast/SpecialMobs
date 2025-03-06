@@ -103,7 +103,7 @@ public class ArmoredBlazeEntity extends _SpecialBlazeEntity {
                 return super.hurt( source, amount );
             }
             // Check if damage type can damage the blaze's armor
-            if( !source.is( SMTags.IS_MAGIC ) && !source.is( DamageTypeTags.IS_PROJECTILE ) ) {
+            if( !source.is( SMTags.DamageTypes.IS_MAGIC ) && !source.is( DamageTypeTags.IS_PROJECTILE ) ) {
                 // Do not damage the armor if the amount is less than 2.0
                 if( amount >= 2.0F ) {
                     int newArmorLevel = entityData.get( ARMOR_LEVEL ) - 1;

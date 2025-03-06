@@ -45,7 +45,7 @@ public class SpecialPiglinModel<T extends Mob> extends PlayerModel<T> {
         leftEar.zRot = ( -(float) Math.PI / 6F ) - Mth.cos( f1 * 1.2F ) * f2;
         rightEar.zRot = ( (float) Math.PI / 6F ) + Mth.cos( f1 ) * f2;
 
-        if ( !piglin.getType().is( SMTags.ZOMBIFIED_PIGLINS ) ) {
+        if ( !piglin.getType().is( SMTags.EntityTypes.ZOMBIFIED_PIGLINS ) ) {
             // TODO - maybe make use of these animations
             /*
             PiglinArmPose piglinArmPose = piglin.getArmPose();

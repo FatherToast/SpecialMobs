@@ -17,7 +17,7 @@ public class CommonMixinHooks {
     }
 
     public static void handleIsZombified( EntityType<?> entityType, CallbackInfoReturnable<Boolean> cir ) {
-        if ( entityType.is( SMTags.ZOMBIFIED_PIGLINS ) ) {
+        if ( entityType.is( SMTags.EntityTypes.ZOMBIFIED_PIGLINS ) ) {
             cir.setReturnValue( true );
         }
     }

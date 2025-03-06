@@ -21,7 +21,7 @@ public class SMDamageTagProvider extends DamageTypeTagsProvider {
 
     @Override
     protected void addTags(HolderLookup.Provider provider) {
-        this.tag( SMTags.IS_MAGIC ).add( DamageTypes.MAGIC, DamageTypes.INDIRECT_MAGIC );
+        this.tag( SMTags.DamageTypes.IS_MAGIC ).add( DamageTypes.MAGIC, DamageTypes.INDIRECT_MAGIC );
 
         this.tag( DamageTypeTags.BYPASSES_ARMOR ).add( SMDamageTypes.GRAB );
         this.tag( DamageTypeTags.BYPASSES_EFFECTS ).add( SMDamageTypes.GRAB );

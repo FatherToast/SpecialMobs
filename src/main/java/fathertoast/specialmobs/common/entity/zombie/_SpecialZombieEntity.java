@@ -6,6 +6,7 @@ import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.config.species.SpeciesConfig;
 import fathertoast.specialmobs.common.config.species.ZombieSpeciesConfig;
+import fathertoast.specialmobs.common.core.register.SMTags;
 import fathertoast.specialmobs.common.entity.ISpecialMob;
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.entity.SpecialMobData;
@@ -20,6 +21,7 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.tags.TagKey;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.DifficultyInstance;
@@ -47,6 +49,8 @@ import net.minecraft.world.level.pathfinder.BlockPathTypes;
 import net.minecraft.world.phys.Vec3;
 
 import javax.annotation.Nullable;
+import java.util.Collections;
+import java.util.List;
 
 @SpecialMob
 public class _SpecialZombieEntity extends Zombie implements RangedAttackMob, ISpecialMob<_SpecialZombieEntity> {
@@ -94,7 +98,12 @@ public class _SpecialZombieEntity extends Zombie implements RangedAttackMob, ISp
     public static void addBaseLoot( LootTableBuilder loot ) {
         loot.addLootTable( "main", EntityType.ZOMBIE.getDefaultLootTable() );
     }
-    
+
+    @SpecialMob.EntityTagProvider
+    public static List<TagKey<EntityType<?>>> getEntityTags() {
+        return Collections.singletonList( SMTags.EntityTypes.ZOMBIES );
+    }
+
     @SpecialMob.Factory
     public static EntityType.EntityFactory<_SpecialZombieEntity> getFactory() { return _SpecialZombieEntity::new; }
     

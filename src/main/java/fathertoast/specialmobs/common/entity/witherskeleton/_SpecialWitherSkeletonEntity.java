@@ -6,6 +6,7 @@ import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.config.species.SkeletonSpeciesConfig;
 import fathertoast.specialmobs.common.config.species.SpeciesConfig;
+import fathertoast.specialmobs.common.core.register.SMTags;
 import fathertoast.specialmobs.common.entity.ISpecialMob;
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.entity.SpecialMobData;
@@ -100,7 +101,7 @@ public class _SpecialWitherSkeletonEntity extends WitherSkeleton implements ISpe
 
     @SpecialMob.EntityTagProvider
     public static List<TagKey<EntityType<?>>> getEntityTags() {
-        return Collections.singletonList(EntityTypeTags.SKELETONS);
+        return List.of( EntityTypeTags.SKELETONS, SMTags.EntityTypes.WITHER_SKELETONS );
     }
     
     @SpecialMob.Factory

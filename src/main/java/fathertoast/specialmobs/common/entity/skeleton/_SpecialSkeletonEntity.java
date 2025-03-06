@@ -101,7 +101,7 @@ public class _SpecialSkeletonEntity extends AbstractSkeleton implements ISpecial
 
     @SpecialMob.EntityTagProvider
     public static List<TagKey<EntityType<?>>> getEntityTags() {
-        return Collections.singletonList(EntityTypeTags.SKELETONS);
+        return Collections.singletonList( EntityTypeTags.SKELETONS );
     }
     
     @SpecialMob.Factory

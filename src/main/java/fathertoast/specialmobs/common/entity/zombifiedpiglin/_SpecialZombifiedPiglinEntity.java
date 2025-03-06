@@ -108,7 +108,7 @@ public class _SpecialZombifiedPiglinEntity extends ZombifiedPiglin implements Ra
 
     @SpecialMob.EntityTagProvider
     public static List<TagKey<EntityType<?>>> getEntityTags() {
-        return Collections.singletonList(SMTags.ZOMBIFIED_PIGLINS);
+        return Collections.singletonList( SMTags.EntityTypes.ZOMBIFIED_PIGLINS );
     }
     
     @SpecialMob.Factory

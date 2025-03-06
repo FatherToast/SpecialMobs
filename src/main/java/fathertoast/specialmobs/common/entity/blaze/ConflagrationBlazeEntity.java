@@ -86,7 +86,7 @@ public class ConflagrationBlazeEntity extends _SpecialBlazeEntity {
     public boolean hurt( DamageSource source, float amount ) {
         if( isInvulnerableTo( source ) || fireImmune() && source.is(DamageTypeTags.IS_FIRE) ) return false;
         
-        if( !source.is( DamageTypeTags.IS_EXPLOSION ) && !source.is( SMTags.IS_MAGIC ) && !source.is( DamageTypeTags.IS_DROWNING ) &&
+        if( !source.is( DamageTypeTags.IS_EXPLOSION ) && !source.is( SMTags.DamageTypes.IS_MAGIC ) && !source.is( DamageTypeTags.IS_DROWNING ) &&
                 !(source.getDirectEntity() instanceof Snowball ) ) {
             
             if( !level().isClientSide() && growthLevel < 7 ) {
