@@ -1,0 +1,145 @@
+potion.potency.-10=-X
+potion.potency.-9=-IX
+potion.potency.-8=-VIII
+potion.potency.-7=-VII
+potion.potency.-6=-VI
+potion.potency.-5=-V
+potion.potency.-4=-IV
+potion.potency.-3=-III
+potion.potency.-2=-II
+potion.potency.-1=-I
+potion.potency.4=IV
+potion.potency.5=V
+potion.potency.6=VI
+potion.potency.7=VII
+potion.potency.8=VIII
+potion.potency.9=IX
+
+entity.EntityAreaEffectCloud.name=Przewlekła chmura mikstury
+
+entity.SMFishHook.name=Haczyk
+
+entity.SpecialBlaze.name=Płomyk
+entity.CinderBlaze.name=Popiół
+entity.ConflagrationBlaze.name=Pożar
+entity.EmberBlaze.name=Żar
+entity.HellfireBlaze.name=Ogień piekielny
+entity.InfernoBlaze.name=Inferno
+entity.JoltBlaze.name=Wstrząs
+entity.WildfireBlaze.name=Dziki ogień
+
+entity.SpecialCaveSpider.name=Pająk jaskiniowy
+entity.BabyCaveSpider.name=Młody pająk jaskiniowy
+entity.FlyingCaveSpider.name=Latający pająk jaskiniowy
+entity.MotherCaveSpider.name=Matka pająków jaskiniowych
+entity.WebCaveSpider.name=Pajęczy pająk jaskiniowy
+entity.WitchCaveSpider.name=Wiedźmi pająk jaskiniowy
+
+entity.SpecialCreeper.name=Creeper
+entity.DarkCreeper.name=Mroczny creeper
+entity.DeathCreeper.name=Śmiercionośny creeper
+entity.DirtCreeper.name=Ziemny creeper
+entity.DoomCreeper.name=Creeper zagłady
+entity.DrowningCreeper.name=Topiący się reeper
+entity.EnderCreeper.name=Creeper Kresu
+entity.FireCreeper.name=Ognisty creeper
+entity.GravelCreeper.name=Żwirowy creeper
+entity.JumpingCreeper.name=Skaczący creeper
+entity.LightningCreeper.name=Piorunowy creeper
+entity.MiniCreeper.name=Mały creeper
+entity.SplittingCreeper.name=Rozsadzający creeper
+
+entity.SpecialEnderman.name=Enderman
+entity.BlindingEnderman.name=Oślepiający enderman
+entity.IcyEnderman.name=Lodowy enderman
+entity.LightningEnderman.name=Piorunowy enderman
+entity.MiniEnderman.name=Mały enderman
+entity.MirageEnderman.name=Złudny enderman
+entity.ThiefEnderman.name=Złodziejski enderman
+
+entity.SpecialGhast.name=Ghast
+entity.BabyGhast.name=Młody ghast
+entity.FighterGhast.name=Wojowniczy ghast
+entity.KingGhast.name=Królewski ghast
+entity.QueenGhast.name=Księżniczy ghast
+entity.UnholyGhast.name=Piekielny ghast
+
+entity.SpecialLavaSlime.name=Kostka magmy
+entity.FlyingLavaSlime.name=Latająca kostka magmy
+entity.HardenedLavaSlime.name=Twarda kostka magmy
+entity.StickyLavaSlime.name=Lepka kostka magmy
+entity.VolatileLavaSlime.name=Lotna kostka magmy
+
+entity.SpecialPigZombie.name=Zombie pigman
+entity.BrutePigZombie.name=Brutalny zombie pigman
+entity.FishingPigZombie.name=Łowiący ryby zombie pigman
+entity.GiantPigZombie.name=Duży zombie pigman
+entity.HungryPigZombie.name=Głodny zombie pigman
+entity.KnightPigZombie.name=Książęcy zombie pigman
+entity.PlaguePigZombie.name=Zarażony zombie pigman
+entity.VampirePigZombie.name=Wampir pigman
+
+entity.SpecialSilverfish.name=Rybik cukrowy
+entity.BlindingSilverfish.name=Oślepiający rybik cukrowy
+entity.FishingSilverfish.name=Łowiący ryby rybik cukrowy
+entity.FlyingSilverfish.name=Latający rybik cukrowy
+entity.PoisonSilverfish.name=Trujący rybik cukrowy
+entity.ToughSilverfish.name=Wytrzymały rybik cukrowy
+
+entity.SpecialSkeleton.name=Szkielet
+entity.BruteSkeleton.name=Brutalny szkielet
+entity.FireSkeleton.name=Ognisty szkielet
+entity.GatlingSkeleton.name=Szkielet-gatling
+entity.GiantSkeleton.name=Duży szkielet
+entity.KnightSkeleton.name=Książęcy szkielet
+entity.NinjaSkeleton.name=Szkielet-ninja
+entity.PoisonSkeleton.name=Trujący szkielet
+entity.SniperSkeleton.name=Szkielet-snajper
+entity.SpitfireSkeleton.name=Złośliwy szkielet
+entity.StraySkeleton.name=Zbłąkany szkielet
+
+entity.SpecialSlime.name=Szlam
+entity.BlackberrySlime.name=Jeżynowy szlam
+entity.BlueberrySlime.name=Jagodowy szlam
+entity.CaramelSlime.name=Karmelowy szlam
+entity.GrapeSlime.name=Winogronowy szlam
+entity.LemonSlime.name=Cytrynowy szlam
+entity.StrawberrySlime.name=Truskawkowy szlam
+entity.WatermelonSlime.name=Arbuzowy szlam
+
+entity.SpecialSpider.name=Pająk
+entity.BabySpider.name=Młody pająk
+entity.DesertSpider.name=Pustynny pająk
+entity.FlyingSpider.name=Latający pająk
+entity.GiantSpider.name=Duży pająk
+entity.HungrySpider.name=Głodny pająk
+entity.MotherSpider.name=Matka pająków
+entity.PaleSpider.name=Blady pająk
+entity.PoisonSpider.name=Trujący pająk
+entity.WebSpider.name=Pajęczy pająk
+entity.WitchSpider.name=Wiedźmi pająk
+
+entity.SpecialWitch.name=Wiedźma
+entity.DominationWitch.name=Wiedźma dominacji
+entity.ShadowsWitch.name=Wiedźma cieni
+entity.UndeadWitch.name=Licz
+entity.WildsWitch.name=Wiedźma dziczy
+entity.WindWitch.name=Wiedźma wiatru
+
+entity.SpecialWitherSkeleton.name=Witherowy szkielet
+entity.BruteWitherSkeleton.name=Brutalny witherowy szkielet
+entity.GatlingWitherSkeleton.name=Witherowy szkielet-gatling
+entity.GiantWitherSkeleton.name=Duży witherowy szkielet
+entity.KnightWitherSkeleton.name=Książęcy witherowy szkielet
+entity.NinjaWitherSkeleton.name=Witherowy szkielet-ninja
+entity.SniperWitherSkeleton.name=Witherowy szkielet-snajper
+entity.SpitfireWitherSkeleton.name=Złośliwy witherowy szkielet
+
+entity.SpecialZombie.name=Zombie
+entity.BruteZombie.name=Brutalny zombie
+entity.FireZombie.name=Ognisty zombie
+entity.FishingZombie.name=Łowiący ryby zombie
+entity.GiantZombie.name=Duży zombie
+entity.HungryZombie.name=Głodny zombie
+entity.HuskZombie.name=Posuch
+entity.PlagueZombie.name=Zarażony zombie
