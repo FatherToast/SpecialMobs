@@ -114,7 +114,7 @@ public class CorporealShiftGhastEntity extends _SpecialGhastEntity {
     /** @return Attempts to damage this entity; returns true if the hit was successful. */
     @Override
     public boolean hurt( DamageSource source, float amount ) {
-        if ( isCorporeal() ) {
+        if ( !isCorporeal() ) {
             return source.is( DamageTypeTags.BYPASSES_INVULNERABILITY ) && super.hurt( source, amount );
         }
         return super.hurt( source, amount );
