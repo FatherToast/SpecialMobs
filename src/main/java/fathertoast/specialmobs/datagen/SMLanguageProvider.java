@@ -100,7 +100,7 @@ public class SMLanguageProvider extends LanguageProvider {
         
         // Assign all specific locales to the translation we want to use
         mapAll( TranslationKey.ENGLISH, "us" ); // We can ignore other English locales, en_us is the fallback for all languages
-        mapAll( TranslationKey.SPANISH, "es", "ar", "cl", "ec", "mx", "uy", "ve" );
+        mapAll( TranslationKey.SPANISH, "ar", "cl", "ec", "mx", "uy", "ve" );
         mapAll( TranslationKey.PORTUGUESE, "pt", "br" );
         mapAll( TranslationKey.FRENCH, "fr", "ca" );
         mapAll( TranslationKey.ITALIAN, "it" );
