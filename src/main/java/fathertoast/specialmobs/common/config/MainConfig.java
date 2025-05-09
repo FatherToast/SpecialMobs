@@ -28,7 +28,9 @@ public class MainConfig extends AbstractConfigFile {
         
         public final BooleanField enableMobReplacement;
         public final BooleanField enableNaturalSpawning;
-        
+
+        public final BooleanField skipSpawnerSpawns;
+
         public final BooleanField masterVanillaReplacement;
         public final DoubleField masterRandomScaling;
         
@@ -47,6 +49,11 @@ public class MainConfig extends AbstractConfigFile {
             enableNaturalSpawning = SPEC.define( new BooleanField( "enable_added_natural_spawning", true,
                     "Whether the natural spawning category (see below) is enabled." ) );
             
+            SPEC.newLine();
+
+            skipSpawnerSpawns = SPEC.define( new BooleanField( "skip_spawner_spawns", false,
+                    "If enabled, mobs spawned from spawner blocks/dungeon spawners will not be subject to mob replacement.") );
+
             SPEC.newLine();
             
             masterVanillaReplacement = SPEC.define( new BooleanField( "master_vanilla_replacement", true,

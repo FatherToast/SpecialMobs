@@ -49,9 +49,6 @@ public final class SpecialMobReplacer {
     /**
      * Called when a mob is being finalized before being added to the world and passed
      * to {@link EntityJoinLevelEvent}.
-     * <p>
-     * Here we check for spawns that are potentially unsafe to process later, such as chunk
-     * gen spawns or structure spawns, and mark them as already initialised by SM if so to skip them.
      *
      * @param event The event data.
      */
@@ -59,7 +56,14 @@ public final class SpecialMobReplacer {
     public static void onMobSpawn( MobSpawnEvent.FinalizeSpawn event ) {
         final MobSpawnType spawnType = event.getSpawnType();
 
+        // Mark spawns that are likely unsafe to process later so we can skip them.
         if ( spawnType == MobSpawnType.CHUNK_GENERATION || spawnType == MobSpawnType.STRUCTURE ) {
+            setInitFlag( event.getEntity() );
+            return;
+        }
+
+        // Check if spawner spawns should be skipped later.
+        if ( spawnType == MobSpawnType.SPAWNER && Config.MAIN.GENERAL.skipSpawnerSpawns.get() ) {
             setInitFlag( event.getEntity() );
         }
     }
