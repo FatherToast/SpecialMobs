@@ -20,6 +20,7 @@ public class MiniCreeperEntity extends _SpecialCreeperEntity {
     @SpecialMob.BestiaryInfoSupplier
     public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
         bestiaryInfo.color( 0xFFC0CB ).weight( BestiaryInfo.DefaultWeight.LOW )
+                .modBaseTexture( "textures/entity/creeper/base_creeper.png" )
                 .size( 0.5F, 0.5F, 0.9F )
                 .multiplyAttribute( Attributes.MOVEMENT_SPEED, 1.3 );
     }

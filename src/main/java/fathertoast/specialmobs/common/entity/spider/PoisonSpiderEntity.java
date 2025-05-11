@@ -23,7 +23,7 @@ public class PoisonSpiderEntity extends _SpecialSpiderEntity {
     @SpecialMob.BestiaryInfoSupplier
     public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
         bestiaryInfo.color( 0x0C424E ).theme( BestiaryInfo.Theme.FOREST )
-                .vanillaTextureWithEyes( "textures/entity/spider/cave_spider.png", "textures/entity/spider_eyes.png" )
+                .modBaseTexture( "textures/entity/cave_spider/base_cave_spider.png" ).modEyesTexture( "textures/entity/cave_spider/base_cave_spider_eyes.png" )
                 .addExperience( 1 );
     }
     

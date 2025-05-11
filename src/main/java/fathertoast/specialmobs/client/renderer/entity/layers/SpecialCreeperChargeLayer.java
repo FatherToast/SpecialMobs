@@ -20,7 +20,7 @@ import net.minecraft.world.entity.monster.Creeper;
 public class SpecialCreeperChargeLayer<T extends HierarchicalModel<Creeper>> extends EnergySwirlLayer<Creeper, T> {
     
     private static final ResourceLocation[] CHARGED = new ResourceLocation[] {
-            new ResourceLocation( "textures/entity/creeper/creeper_armor.png" ),
+            References.getEntityTexture( "creeper", "creeper_armor" ),
             References.getEntityTexture( "creeper", "super_charged" )
     };
     

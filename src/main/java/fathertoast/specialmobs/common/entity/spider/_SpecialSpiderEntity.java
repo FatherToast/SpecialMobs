@@ -53,7 +53,7 @@ public class _SpecialSpiderEntity extends Spider implements RangedAttackMob, ISp
     @SpecialMob.BestiaryInfoSupplier
     public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
         bestiaryInfo.color( 0xA80E0E )
-                .vanillaTextureWithEyes( "textures/entity/spider/spider.png", "textures/entity/spider_eyes.png" )
+                .modBaseTexture( "textures/entity/spider/base_spider.png" ).modEyesTexture( "textures/entity/spider/base_spider_eyes.png" )
                 .experience( 5 ).spider()
                 .spitAttack( 2.0, 1.4, 20, 40, 12.0 );
     }

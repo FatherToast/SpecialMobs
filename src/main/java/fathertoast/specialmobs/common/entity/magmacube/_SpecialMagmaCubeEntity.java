@@ -49,7 +49,7 @@ public class _SpecialMagmaCubeEntity extends MagmaCube implements ISpecialMob<_S
     @SpecialMob.BestiaryInfoSupplier
     public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
         bestiaryInfo.color( 0xFCFC00 )
-                .vanillaTextureBaseOnly( "textures/entity/slime/magmacube.png" )
+                .modBaseTexture( "textures/entity/magma_cube/base_magmacube.png" )
                 .experience( 0 );
     }
     

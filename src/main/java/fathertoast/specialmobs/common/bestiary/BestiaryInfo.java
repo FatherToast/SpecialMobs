@@ -6,6 +6,7 @@ import fathertoast.crust.api.config.common.field.DoubleField;
 import fathertoast.crust.api.config.common.value.*;
 import fathertoast.crust.api.config.common.value.environment.biome.BiomeCategory;
 import fathertoast.specialmobs.common.config.Config;
+import fathertoast.specialmobs.common.core.SpecialMobs;
 import fathertoast.specialmobs.common.util.References;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffect;
@@ -18,6 +19,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.registries.ForgeRegistries;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -350,42 +352,52 @@ public class BestiaryInfo {
             return this;
         }
         
-        
         //--------------- Textures (Vanilla) ----------------
-        
+        // Selecting vanilla textures can have unexpected results with some resource packs
+
+
         /** Sets the species default base, glowing eyes, and overlay textures. */
+        @Deprecated(since = "3.1.14", forRemoval = true)
         public Builder vanillaTexturesAll( String tex, String eyeTex, String ovrTex ) {
             return vanillaBaseTexture( tex ).vanillaEyesTexture( eyeTex ).vanillaOverlayTexture( ovrTex );
         }
         
         /** Sets the species default base and glowing eyes textures. Removes all other textures. */
+        @Deprecated(since = "3.1.14", forRemoval = true)
         public Builder vanillaTextureWithEyes( String tex, String eyeTex ) {
             return vanillaBaseTexture( tex ).vanillaEyesTexture( eyeTex ).noOverlayTexture();
         }
         
         /** Sets the species default base and overlay textures. Removes all other textures. */
+        @Deprecated(since = "3.1.14", forRemoval = true)
         public Builder vanillaTextureWithOverlay( String tex, String ovrTex ) {
             return vanillaBaseTexture( tex ).noEyesTexture().vanillaOverlayTexture( ovrTex );
         }
         
         /** Sets the species default base and animation textures. Removes all other textures. */
+        @Deprecated(since = "3.1.14", forRemoval = true)
         public Builder vanillaTextureWithAnimation( String tex, String aniTex ) {
             return vanillaBaseTexture( tex ).noEyesTexture().vanillaAnimationTexture( aniTex );
         }
         
         /** Sets the species default base texture. Removes all other textures. */
+        @Deprecated(since = "3.1.14", forRemoval = true)
         public Builder vanillaTextureBaseOnly( String tex ) { return vanillaBaseTexture( tex ).noEyesTexture().noOverlayTexture(); }
         
         /** Sets the species default base texture. */
+        @Deprecated(since = "3.1.14", forRemoval = true)
         private Builder vanillaBaseTexture( String tex ) { return baseTexture( new ResourceLocation( tex ) ); }
         
         /** Sets the species default glowing eyes texture. */
+        @Deprecated(since = "3.1.14", forRemoval = true)
         private Builder vanillaEyesTexture( String eyeTex ) { return eyesTexture( new ResourceLocation( eyeTex ) ); }
         
         /** Sets the species default overlay texture. */
+        @Deprecated(since = "3.1.14", forRemoval = true)
         private Builder vanillaOverlayTexture( String ovrTex ) { return overlayTexture( new ResourceLocation( ovrTex ) ); }
 
         /** Sets the species default animation texture. */
+        @Deprecated(since = "3.1.14", forRemoval = true)
         private Builder vanillaAnimationTexture( String aniTex ) { return animationTexture( new ResourceLocation( aniTex ) ); }
         
         
@@ -448,7 +460,31 @@ public class BestiaryInfo {
         
         /** Removes the species default animation texture. */
         public Builder noAnimationTexture() { return animationTexture( null ); }
-        
+
+        /** Sets the species default base texture, under the Special Mobs namespace. */
+        public Builder modBaseTexture( @Nonnull String tex ) {
+            texture = SpecialMobs.resourceLoc( tex );
+            return this;
+        }
+
+        /** Sets the species default glowing eyes texture, under the Special Mobs namespace. */
+        public Builder modEyesTexture( @Nonnull String eyesTex ) {
+            eyesTexture = SpecialMobs.resourceLoc( eyesTex );
+            return this;
+        }
+
+        /** Sets the species default overlay texture, under the Special Mobs namespace. */
+        public Builder modOverlayTexture( @Nonnull String ovrTex ) {
+            overlayTexture = SpecialMobs.resourceLoc( ovrTex );
+            return this;
+        }
+
+        /** Sets the species default animation texture, under the Special Mobs namespace. */
+        public Builder modAnimationTexture( @Nonnull String aniTex ) {
+            animationTexture = SpecialMobs.resourceLoc( aniTex );
+            return this;
+        }
+
         /** Sets the species default base texture. */
         private Builder baseTexture( @Nullable ResourceLocation tex ) {
             texture = tex;

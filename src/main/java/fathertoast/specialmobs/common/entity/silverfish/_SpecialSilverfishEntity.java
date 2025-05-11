@@ -59,7 +59,7 @@ public class _SpecialSilverfishEntity extends Silverfish implements RangedAttack
     @SpecialMob.BestiaryInfoSupplier
     public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
         bestiaryInfo.color( 0x303030 )
-                .vanillaTextureBaseOnly( "textures/entity/silverfish.png" )
+                .modBaseTexture( "textures/entity/silverfish/base_silverfish.png" )
                 .experience( 5 )
                 .spitAttack( 1.0, 1.0, 30, 60, 10.0 );
     }

@@ -32,6 +32,7 @@ public class KnightZombifiedPiglinEntity extends _SpecialZombifiedPiglinEntity {
     @SpecialMob.BestiaryInfoSupplier
     public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
         bestiaryInfo.color( 0xFDEF28 )
+                .modBaseTexture( "textures/entity/zombified_piglin/base_zombified_piglin.png" )
                 .addExperience( 2 ).multiplyRangedSpread( 1.2 )
                 .addToAttribute( Attributes.MAX_HEALTH, 10.0 ).addToAttribute( Attributes.ARMOR, 10.0 )
                 .addToAttribute( Attributes.ATTACK_DAMAGE, 6.0 ).addToRangedDamage( 6.0 )

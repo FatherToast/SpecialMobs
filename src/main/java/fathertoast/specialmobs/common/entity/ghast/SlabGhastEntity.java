@@ -25,8 +25,8 @@ public class SlabGhastEntity extends _SpecialGhastEntity {
     @SpecialMob.BestiaryInfoSupplier
     public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
         bestiaryInfo.color( 0xCECECE )
-                .weight( BestiaryInfo.DefaultWeight.LOWEST )
                 .uniqueTextureWithAnimation()
+                .weight( BestiaryInfo.DefaultWeight.LOWEST )
                 .size( 1.0F, 4.0F, 2.0F )
                 .addExperience( 2 )
                 .fireballAttack( 0.0, 20, 20, 64.0 )

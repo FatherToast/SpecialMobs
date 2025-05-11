@@ -41,7 +41,9 @@ public class FishingDrownedEntity extends _SpecialDrownedEntity implements IAngl
     
     @SpecialMob.BestiaryInfoSupplier
     public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
-        bestiaryInfo.color( 0x2D41F4 ).weight( BestiaryInfo.DefaultWeight.LOW )
+        bestiaryInfo.color( 0x2D41F4 )
+                .modBaseTexture( "textures/entity/drowned/base_drowned.png" ).modOverlayTexture( "textures/entity/drowned/drowned_overlay.png" )
+                .weight( BestiaryInfo.DefaultWeight.LOW )
                 .addExperience( 2 ).drownImmune().fluidPushImmune()
                 .convertRangedAttackToFishing( 1.0, 40, 15.0 )
                 .multiplyAttribute( Attributes.MOVEMENT_SPEED, 0.8 );

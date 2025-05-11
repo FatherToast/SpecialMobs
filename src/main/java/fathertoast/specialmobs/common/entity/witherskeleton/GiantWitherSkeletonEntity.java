@@ -25,6 +25,7 @@ public class GiantWitherSkeletonEntity extends _SpecialWitherSkeletonEntity {
     @SpecialMob.BestiaryInfoSupplier
     public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
         bestiaryInfo.color( 0x474D4D )
+                .modBaseTexture( "textures/entity/wither_skeleton/base_wither_skeleton.png" )
                 .size( 1.8F, 0.95F, 3.6F )
                 .addExperience( 1 )
                 .addToAttribute( Attributes.MAX_HEALTH, 20.0 )

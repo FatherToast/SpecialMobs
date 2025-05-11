@@ -44,7 +44,7 @@ public class _SpecialEndermanEntity extends EnderMan implements ISpecialMob<_Spe
     @SpecialMob.BestiaryInfoSupplier
     public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
         bestiaryInfo.color( 0x000000 )
-                .vanillaTextureWithEyes( "textures/entity/enderman/enderman.png", "textures/entity/enderman/enderman_eyes.png" )
+                .modBaseTexture( "textures/entity/enderman/base_enderman.png" ).modEyesTexture( "textures/entity/enderman/base_enderman_eyes.png" )
                 .experience( 5 ).waterSensitive();
     }
     

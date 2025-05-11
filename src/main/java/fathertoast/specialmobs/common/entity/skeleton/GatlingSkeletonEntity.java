@@ -24,7 +24,7 @@ public class GatlingSkeletonEntity extends _SpecialSkeletonEntity {
     @SpecialMob.BestiaryInfoSupplier
     public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
         bestiaryInfo.color( 0xFFFF0B )
-                .uniqueOverlayTexture()
+                .modBaseTexture( "textures/entity/skeleton/base_skeleton.png" ).uniqueOverlayTexture()
                 .addExperience( 2 )
                 .multiplyRangedSpread( 2.0 ).multiplyRangedWalkSpeed( 0.3 ).rangedCooldown( 1 )
                 .addToAttribute( Attributes.MAX_HEALTH, 10.0 )

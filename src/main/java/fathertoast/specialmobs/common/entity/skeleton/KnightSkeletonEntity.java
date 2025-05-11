@@ -32,6 +32,7 @@ public class KnightSkeletonEntity extends _SpecialSkeletonEntity {
     @SpecialMob.BestiaryInfoSupplier
     public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
         bestiaryInfo.color( 0xDDDDDD )
+                .modBaseTexture( "textures/entity/skeleton/base_skeleton.png" )
                 .addExperience( 2 ).multiplyRangedSpread( 1.2 )
                 .addToAttribute( Attributes.MAX_HEALTH, 10.0 )
                 .addToAttribute( Attributes.ATTACK_DAMAGE, 4.0 ).addToRangedDamage( 4.0 )

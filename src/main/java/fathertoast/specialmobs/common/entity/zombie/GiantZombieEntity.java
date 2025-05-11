@@ -27,6 +27,7 @@ public class GiantZombieEntity extends _SpecialZombieEntity {
     @SpecialMob.BestiaryInfoSupplier
     public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
         bestiaryInfo.color( 0x799C65 ).theme( BestiaryInfo.Theme.MOUNTAIN )
+                .modBaseTexture( "textures/entity/zombie/base_zombie.png" )
                 .size( 1.5F, 0.9F, 2.95F )
                 .addExperience( 1 )
                 .addToAttribute( Attributes.MAX_HEALTH, 20.0 )

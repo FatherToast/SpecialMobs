@@ -32,6 +32,7 @@ public class KnightDrownedEntity extends _SpecialDrownedEntity {
     @SpecialMob.BestiaryInfoSupplier
     public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
         bestiaryInfo.color( 0xDDDDDD )
+                .modBaseTexture( "textures/entity/drowned/base_drowned.png" ).modOverlayTexture( "textures/entity/drowned/drowned_overlay.png" )
                 .addExperience( 2 ).multiplyRangedSpread( 1.2 )
                 .addToAttribute( Attributes.MAX_HEALTH, 10.0 ).addToAttribute( Attributes.ARMOR, 10.0 )
                 .addToAttribute( Attributes.ATTACK_DAMAGE, 8.0 )

@@ -25,6 +25,7 @@ public class GiantSkeletonEntity extends _SpecialSkeletonEntity {
     @SpecialMob.BestiaryInfoSupplier
     public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
         bestiaryInfo.color( 0x494949 ).theme( BestiaryInfo.Theme.MOUNTAIN )
+                .modBaseTexture( "textures/entity/skeleton/base_skeleton.png" )
                 .size( 1.5F, 0.9F, 2.99F )
                 .addExperience( 1 )
                 .addToAttribute( Attributes.MAX_HEALTH, 20.0 )

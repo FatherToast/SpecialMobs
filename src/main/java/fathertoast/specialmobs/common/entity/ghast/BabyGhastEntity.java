@@ -22,6 +22,7 @@ public class BabyGhastEntity extends _SpecialGhastEntity {
     @SpecialMob.BestiaryInfoSupplier
     public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
         bestiaryInfo.color( 0xFFC0CB )
+                .modBaseTexture( "textures/entity/ghast/base_ghast.png" ).modAnimationTexture( "textures/entity/ghast/base_ghast_anim.png" )
                 .weight( BestiaryInfo.DefaultWeight.DISABLED )
                 .size( 0.25F, 1.0F, 1.0F )
                 .experience( 1 )

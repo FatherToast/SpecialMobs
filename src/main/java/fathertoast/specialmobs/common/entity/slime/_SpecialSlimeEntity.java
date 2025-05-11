@@ -50,7 +50,7 @@ public class _SpecialSlimeEntity extends Slime implements ISpecialMob<_SpecialSl
     @SpecialMob.BestiaryInfoSupplier
     public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
         bestiaryInfo.color( 0x7EBF6E )
-                .vanillaTextureBaseOnly( "textures/entity/slime/slime.png" )
+                .modBaseTexture( "textures/entity/slime/base_slime.png" )
                 .experience( 0 );
     }
     

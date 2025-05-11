@@ -19,7 +19,9 @@ public class MiniEndermanEntity extends _SpecialEndermanEntity {
     
     @SpecialMob.BestiaryInfoSupplier
     public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
-        bestiaryInfo.color( 0xFFC0CB ).weight( BestiaryInfo.DefaultWeight.LOW )
+        bestiaryInfo.color( 0xFFC0CB )
+                .modBaseTexture( "textures/entity/enderman/base_enderman.png" ).modEyesTexture( "textures/entity/enderman/base_enderman_eyes.png" )
+                .weight( BestiaryInfo.DefaultWeight.LOW )
                 .size( 0.35F, 0.5F, 0.99F )
                 .addExperience( 1 )
                 .addToAttribute( Attributes.ATTACK_DAMAGE, -2.0 )

@@ -10,6 +10,8 @@ import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.event.NaturalSpawnManager;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
+import net.minecraft.client.renderer.entity.HuskRenderer;
+import net.minecraft.client.renderer.entity.StrayRenderer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
@@ -39,12 +41,13 @@ public class HuskZombieEntity extends _SpecialZombieEntity {
     
     @SpecialMob.BestiaryInfoSupplier
     public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
-        bestiaryInfo.color( 0xE6CC94 ).weight( BestiaryInfo.DefaultWeight.LOW ).theme( BestiaryInfo.Theme.DESERT )
-                .vanillaTextureBaseOnly( "textures/entity/zombie/husk.png" )
+        bestiaryInfo.color( 0xE6CC94 )
+                .modBaseTexture( "textures/entity/zombie/base_husk.png" )
+                .weight( BestiaryInfo.DefaultWeight.LOW ).theme( BestiaryInfo.Theme.DESERT )
                 .size( 1.0625F, 0.6F, 1.95F )
                 .addExperience( 1 );
     }
-    
+
     @SpecialMob.ConfigSupplier
     public static SpeciesConfig createConfig( ConfigManager manager, MobFamily.Species<?> species ) {
         return new HuskZombieSpeciesConfig( manager, species, DEFAULT_BOW_CHANCE, DEFAULT_SHIELD_CHANCE );

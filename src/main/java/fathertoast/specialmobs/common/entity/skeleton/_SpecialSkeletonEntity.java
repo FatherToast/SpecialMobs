@@ -63,7 +63,7 @@ public class _SpecialSkeletonEntity extends AbstractSkeleton implements ISpecial
     @SpecialMob.BestiaryInfoSupplier
     public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
         bestiaryInfo.color( 0x494949 )
-                .vanillaTextureBaseOnly( "textures/entity/skeleton/skeleton.png" )
+                .modBaseTexture( "textures/entity/skeleton/base_skeleton.png" )
                 .experience( 5 ).undead()
                 .bowAttack( 2.0, 1.0, 1.0, 20, 15.0 );
     }

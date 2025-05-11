@@ -40,7 +40,7 @@ public class StraySkeletonEntity extends _SpecialSkeletonEntity {
     @SpecialMob.BestiaryInfoSupplier
     public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
         bestiaryInfo.color( 0xDDEAEA ).weight( BestiaryInfo.DefaultWeight.LOW ).theme( BestiaryInfo.Theme.ICE )
-                .vanillaTextureWithOverlay( "textures/entity/skeleton/stray.png", "textures/entity/skeleton/stray_overlay.png" )
+                .modBaseTexture( "textures/entity/skeleton/base_stray.png" ).modOverlayTexture( "textures/entity/skeleton/base_stray_overlay.png" )
                 .addExperience( 1 );
     }
     

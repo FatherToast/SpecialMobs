@@ -57,7 +57,7 @@ public class _SpecialGhastEntity extends Ghast implements RangedAttackMob, ISpec
     @SpecialMob.BestiaryInfoSupplier
     public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
         bestiaryInfo.color( 0xBCBCBC )
-                .vanillaTextureWithAnimation( "textures/entity/ghast/ghast.png", "textures/entity/ghast/ghast_shooting.png" )
+                .modBaseTexture( "textures/entity/ghast/base_ghast.png" ).modAnimationTexture( "textures/entity/ghast/base_ghast_anim.png" )
                 .experience( 5 )
                 .fireballAttack( 0.0, 20, 40, 64.0 );
     }

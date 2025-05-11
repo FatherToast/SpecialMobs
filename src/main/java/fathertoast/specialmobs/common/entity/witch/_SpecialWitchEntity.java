@@ -76,7 +76,7 @@ public class _SpecialWitchEntity extends Witch implements ISpecialMob<_SpecialWi
     @SpecialMob.BestiaryInfoSupplier
     public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
         bestiaryInfo.color( 0x51A03E )
-                .vanillaTextureBaseOnly( "textures/entity/witch.png" )
+                .modBaseTexture( "textures/entity/witch/base_witch.png" )
                 .experience( 5 )
                 .throwAttack( 1.0, 1.0, 60, 10.0 );
     }

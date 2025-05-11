@@ -47,7 +47,7 @@ public class NinjaSkeletonEntity extends _SpecialSkeletonEntity implements INinj
     @SpecialMob.BestiaryInfoSupplier
     public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
         bestiaryInfo.color( 0x333366 )
-                .uniqueOverlayTexture()
+                .modBaseTexture( "textures/entity/skeleton/base_skeleton.png" ).uniqueOverlayTexture()
                 .addExperience( 2 ).pressurePlateImmune()
                 .multiplyRangedCooldown( 0.5F ).rangedMaxRange( 9.0 )
                 .multiplyAttribute( Attributes.MOVEMENT_SPEED, 1.2 );

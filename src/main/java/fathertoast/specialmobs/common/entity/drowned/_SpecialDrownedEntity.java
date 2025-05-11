@@ -61,7 +61,7 @@ public class _SpecialDrownedEntity extends Drowned implements ISpecialMob<_Speci
     @SpecialMob.BestiaryInfoSupplier
     public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
         bestiaryInfo.color( 0x799C65 )
-                .vanillaTextureWithOverlay( "textures/entity/zombie/drowned.png", "textures/entity/zombie/drowned_outer_layer.png" )
+                .modBaseTexture( "textures/entity/drowned/base_drowned.png" ).modOverlayTexture( "textures/entity/drowned/drowned_overlay.png" )
                 .experience( 5 ).undead()
                 .throwAttack( 1.0, 1.0, 40, 10.0 );
     }

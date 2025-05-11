@@ -23,6 +23,7 @@ public class BabyCaveSpiderEntity extends _SpecialCaveSpiderEntity {
     @SpecialMob.BestiaryInfoSupplier
     public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
         bestiaryInfo.color( 0xFFC0CB ).weight( BestiaryInfo.DefaultWeight.DISABLED )
+                .modBaseTexture( "textures/entity/cave_spider/base_cave_spider.png" ).modEyesTexture( "textures/entity/cave_spider/base_cave_spider_eyes.png" )
                 .size( 0.4F, 0.6F, 0.4F )
                 .experience( 1 ).disableRangedAttack()
                 .multiplyAttribute( Attributes.MAX_HEALTH, 0.33 )

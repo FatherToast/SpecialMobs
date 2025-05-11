@@ -63,7 +63,7 @@ public class _SpecialZombieEntity extends Zombie implements RangedAttackMob, ISp
     @SpecialMob.BestiaryInfoSupplier
     public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
         bestiaryInfo.color( 0x799C65 )
-                .vanillaTextureBaseOnly( "textures/entity/zombie/zombie.png" )
+                .modBaseTexture( "textures/entity/zombie/base_zombie.png" )
                 .experience( 5 ).undead()
                 .bowAttack( 2.0, 1.4, 0.8, 30, 12.0 );
     }

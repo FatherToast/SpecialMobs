@@ -47,7 +47,7 @@ public class NinjaWitherSkeletonEntity extends _SpecialWitherSkeletonEntity impl
     @SpecialMob.BestiaryInfoSupplier
     public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
         bestiaryInfo.color( 0x333366 )
-                .uniqueOverlayTexture()
+                .modBaseTexture( "textures/entity/wither_skeleton/base_wither_skeleton.png" ).uniqueOverlayTexture()
                 .addExperience( 2 ).pressurePlateImmune()
                 .multiplyRangedCooldown( 0.5F ).rangedMaxRange( 9.0 )
                 .multiplyAttribute( Attributes.MOVEMENT_SPEED, 1.2 );

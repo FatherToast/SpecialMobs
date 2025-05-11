@@ -52,7 +52,7 @@ public class _SpecialCreeperEntity extends Creeper implements IExplodingMob, ISp
     @SpecialMob.BestiaryInfoSupplier
     public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
         bestiaryInfo.color( 0x000000 )
-                .vanillaTextureBaseOnly( "textures/entity/creeper/creeper.png" )
+                .modBaseTexture( "textures/entity/creeper/base_creeper.png" )
                 .experience( 5 );
     }
     

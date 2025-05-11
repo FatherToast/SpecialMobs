@@ -23,6 +23,7 @@ public class GiantSpiderEntity extends _SpecialSpiderEntity {
     @SpecialMob.BestiaryInfoSupplier
     public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
         bestiaryInfo.color( 0xA80E0E )
+                .modBaseTexture( "textures/entity/spider/base_spider.png" ).modEyesTexture( "textures/entity/spider/base_spider_eyes.png" )
                 .size( 1.5F, 1.9F, 1.3F )
                 .addExperience( 1 )
                 .addToAttribute( Attributes.MAX_HEALTH, 16.0 )

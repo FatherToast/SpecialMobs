@@ -41,7 +41,7 @@ public class PirateSkeletonEntity extends _SpecialSkeletonEntity {
         // TODO - change the colors
         bestiaryInfo.color( 0xFFF87E )
                 .weight(BestiaryInfo.DefaultWeight.DISABLED)
-                .uniqueOverlayTexture()
+                .modBaseTexture( "textures/entity/skeleton/base_skeleton.png" ).uniqueOverlayTexture()
                 .addExperience( 3 )
                 .addToAttribute( Attributes.MAX_HEALTH, 15.0 )
                 .addToAttribute( Attributes.FOLLOW_RANGE, 40.0D );

@@ -22,6 +22,7 @@ public class CinderBlazeEntity extends _SpecialBlazeEntity {
     @SpecialMob.BestiaryInfoSupplier
     public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
         bestiaryInfo.color( 0xFFC0CB )
+                .modBaseTexture( "textures/entity/blaze/base_blaze.png" )
                 .weight( BestiaryInfo.DefaultWeight.DISABLED )
                 .size( 0.5F, 0.5F, 0.9F )
                 .experience( 2 )

@@ -2,6 +2,7 @@ package fathertoast.specialmobs.datagen;
 
 import fathertoast.specialmobs.common.core.SpecialMobs;
 import fathertoast.specialmobs.common.core.register.SMDamageTypes;
+import net.minecraft.client.renderer.entity.CaveSpiderRenderer;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.RegistrySetBuilder;
@@ -23,7 +24,7 @@ import java.util.concurrent.CompletableFuture;
 
 @Mod.EventBusSubscriber( modid = SpecialMobs.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD )
 public class DataGatherListener {
-    
+
     @SubscribeEvent
     public static void onGatherData( GatherDataEvent event ) {
         DataGenerator generator = event.getGenerator();
@@ -51,7 +52,7 @@ public class DataGatherListener {
                     packOutput, lookupProvider, Set.of( SpecialMobs.MOD_ID )));
         }
     }
-
+    
     private static HolderLookup.Provider getProvider() {
         final RegistrySetBuilder registryBuilder = new RegistrySetBuilder();
         registryBuilder.add(Registries.DAMAGE_TYPE, SMDamageTypes::bootstrap);

@@ -61,7 +61,7 @@ public class _SpecialWitherSkeletonEntity extends WitherSkeleton implements ISpe
     @SpecialMob.BestiaryInfoSupplier
     public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
         bestiaryInfo.color( 0x474D4D )
-                .vanillaTextureBaseOnly( "textures/entity/skeleton/wither_skeleton.png" )
+                .modBaseTexture( "textures/entity/wither_skeleton/base_wither_skeleton.png" )
                 .familySize( 1.2F )
                 .experience( 5 ).undead()
                 .bowAttack( 2.0, 1.0, 1.0, 20, 15.0 );

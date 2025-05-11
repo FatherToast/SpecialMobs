@@ -53,7 +53,7 @@ public class _SpecialCaveSpiderEntity extends CaveSpider implements RangedAttack
     @SpecialMob.BestiaryInfoSupplier
     public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
         bestiaryInfo.color( 0xA80E0E ).familySize( 0.7F )
-                .vanillaTextureWithEyes( "textures/entity/spider/cave_spider.png", "textures/entity/spider_eyes.png" )
+                .modBaseTexture( "textures/entity/cave_spider/base_cave_spider.png" ).modEyesTexture( "textures/entity/cave_spider/base_cave_spider_eyes.png" )
                 .experience( 5 ).spider()
                 .spitAttack( 2.0, 1.4, 20, 40, 10.0 );
     }
