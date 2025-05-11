@@ -83,6 +83,11 @@ public class SpecialGhastMeleeAttackGoal extends Goal {
     }
 
     @Override
+    public void stop() {
+        ghast.setCharging( false );
+    }
+
+    @Override
     public boolean requiresUpdateEveryTick() {
         return true;
     }
