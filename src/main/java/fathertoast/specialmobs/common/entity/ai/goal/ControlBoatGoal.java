@@ -11,31 +11,38 @@ import java.util.EnumSet;
 
 /**
  * A goal that allows mobs to control a {@link MobBoat} to navigate
- * to their current target.
+ * to their current target.<br><br>
+ * If the distance to the mob's target is greater
+ * or equal to {@link ControlBoatGoal#sqrStartDist}, the goal will try to run.
+ * If the goal is currently running and the distance to the target is now lesser
+ * or equal to {@link ControlBoatGoal#sqrStopDist}, the goal will stop running.
  */
 public class ControlBoatGoal extends Goal {
 
 
     private final Mob mob;
     /** Required squared distance to target before this goal can run. */
-    private final double sqrDist;
+    private final double sqrStartDist;
+    /** The squared distance to target for when this goal should stop. */
+    private final double sqrStopDist;
 
 
-    public ControlBoatGoal( Mob mob, double sqrDist ) {
+    public ControlBoatGoal( Mob mob, double sqrStartDist, double sqrStopDist ) {
         this.mob = mob;
-        this.sqrDist = sqrDist;
+        this.sqrStartDist = sqrStartDist;
+        this.sqrStopDist = sqrStopDist;
         setFlags( EnumSet.of( Flag.MOVE ) );
     }
 
 
     @Override
     public boolean canUse() {
-        return mob.isAlive() && mob.getTarget() != null && mob.distanceToSqr( mob.getTarget() ) >= sqrDist && mob.getVehicle() instanceof MobBoat;
+        return mob.isAlive() && mob.getTarget() != null && mob.distanceToSqr( mob.getTarget() ) >= sqrStartDist && mob.getVehicle() instanceof MobBoat;
     }
 
     @Override
     public boolean canContinueToUse() {
-        return this.canUse();
+        return mob.isAlive() && mob.getTarget() != null && mob.distanceToSqr( mob.getTarget() ) > sqrStopDist && mob.getVehicle() instanceof MobBoat;
     }
 
     @Override

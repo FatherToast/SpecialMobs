@@ -116,7 +116,7 @@ public class PirateSkeletonEntity extends _SpecialSkeletonEntity {
     protected void registerVariantGoals() {
         goalSelector.addGoal( 0, new FloatGoal( this ) );
         goalSelector.addGoal( 1, new PirateSpawnBoatGoal( this ) );
-        goalSelector.addGoal( 1, new ControlBoatGoal( this, 512.0D ) );
+        goalSelector.addGoal( 1, new ControlBoatGoal( this, 512.0D, 256.0D ) );
 
         AIHelper.replaceWaterAvoidingRandomWalking( this, 1.0D );
     }
