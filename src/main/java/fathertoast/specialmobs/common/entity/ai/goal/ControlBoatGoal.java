@@ -29,6 +29,10 @@ public class ControlBoatGoal extends Goal {
 
     public ControlBoatGoal( Mob mob, double sqrStartDist, double sqrStopDist ) {
         this.mob = mob;
+
+        if ( (sqrStartDist == sqrStopDist) || (sqrStopDist > sqrStartDist) )
+            throw new IllegalArgumentException("Stop distance must be lesser than start distance for ControlBoatGoal!");
+
         this.sqrStartDist = sqrStartDist;
         this.sqrStopDist = sqrStopDist;
         setFlags( EnumSet.of( Flag.MOVE ) );
