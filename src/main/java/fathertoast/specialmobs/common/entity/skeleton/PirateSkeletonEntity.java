@@ -5,7 +5,7 @@ import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.entity.ai.AIHelper;
-import fathertoast.specialmobs.common.entity.ai.goal.PirateControlBoatGoal;
+import fathertoast.specialmobs.common.entity.ai.goal.ControlBoatGoal;
 import fathertoast.specialmobs.common.entity.ai.goal.PirateSpawnBoatGoal;
 import fathertoast.specialmobs.common.event.NaturalSpawnManager;
 import fathertoast.specialmobs.common.util.References;
@@ -16,9 +16,12 @@ import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.DifficultyInstance;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.SpawnGroupData;
 import net.minecraft.world.entity.SpawnPlacements;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.FloatGoal;
@@ -28,6 +31,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
+import org.jetbrains.annotations.Nullable;
 
 public class PirateSkeletonEntity extends _SpecialSkeletonEntity {
 
@@ -112,8 +116,19 @@ public class PirateSkeletonEntity extends _SpecialSkeletonEntity {
     protected void registerVariantGoals() {
         goalSelector.addGoal( 0, new FloatGoal( this ) );
         goalSelector.addGoal( 1, new PirateSpawnBoatGoal( this ) );
-        goalSelector.addGoal( 1, new PirateControlBoatGoal( this ) );
+        goalSelector.addGoal( 1, new ControlBoatGoal( this, 512.0D ) );
 
         AIHelper.replaceWaterAvoidingRandomWalking( this, 1.0D );
+    }
+
+    /**
+     * Make sure the Pirate Skeleton always has a bow so it is not
+     * completely helpless out in the ocean.
+     */
+    @Override
+    public void finalizeVariantSpawn( ServerLevelAccessor level, DifficultyInstance difficulty,
+                                      @Nullable MobSpawnType spawnType, @Nullable SpawnGroupData groupData ) {
+        setItemInHand( InteractionHand.MAIN_HAND, new ItemStack( Items.BOW ) );
+        enchantSpawnedWeapon( level.getRandom(), difficulty.getSpecialMultiplier() );
     }
 }

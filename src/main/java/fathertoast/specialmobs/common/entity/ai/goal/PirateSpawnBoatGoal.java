@@ -26,7 +26,6 @@ public class PirateSpawnBoatGoal extends Goal {
 
     public PirateSpawnBoatGoal(PirateSkeletonEntity pirate ) {
         this.pirate = pirate;
-        setFlags( EnumSet.of( Flag.MOVE ) );
     }
 
 

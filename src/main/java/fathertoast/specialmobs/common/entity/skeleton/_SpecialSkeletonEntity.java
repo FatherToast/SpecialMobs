@@ -182,7 +182,7 @@ public class _SpecialSkeletonEntity extends AbstractSkeleton implements ISpecial
     private static final EntityDataAccessor<Float> SCALE = SynchedEntityData.defineId( _SpecialSkeletonEntity.class, EntityDataSerializers.FLOAT );
     
     /** This entity's attack AI. */
-    private Goal currentAttackAI;
+    protected Goal currentAttackAI;
     
     public _SpecialSkeletonEntity( EntityType<? extends _SpecialSkeletonEntity> entityType, Level level ) {
         super( entityType, level );

@@ -10,7 +10,6 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
-import net.minecraft.network.protocol.game.ServerboundPaddleBoatPacket;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -299,10 +298,7 @@ public class MobBoat extends Entity implements IEntityAdditionalSpawnData {
         if ( getControllingPassenger() != null ) {
             floatBoat();
 
-            if ( level().isClientSide ) {
-                controlBoat();
-                level().sendPacketToServer( new ServerboundPaddleBoatPacket( getPaddleState( 0 ), getPaddleState( 1 ) ) );
-            }
+            controlBoat();
             move( MoverType.SELF, getDeltaMovement() );
         }
         else {
