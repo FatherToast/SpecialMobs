@@ -37,8 +37,8 @@ public class SpecialFishingBobberRenderer extends EntityRenderer<SpecialFishingB
         poseStack.scale( 0.5F, 0.5F, 0.5F );
         poseStack.mulPose( entityRenderDispatcher.cameraOrientation() );
         poseStack.mulPose( Axis.YP.rotationDegrees( 180.0F ) );
-        final PoseStack.Pose matrixEntry = poseStack.last();
-        drawQuad( buffer.getBuffer( RENDER_TYPE ), matrixEntry.pose(), matrixEntry.normal(), packedLight );
+        final PoseStack.Pose lastPose = poseStack.last();
+        drawQuad( buffer.getBuffer( RENDER_TYPE ), lastPose.pose(), lastPose.normal(), packedLight );
         poseStack.popPose();
         
         // Render the fishing line connecting the top of the bobber to the tip of angler's fishing rod

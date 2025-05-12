@@ -27,17 +27,17 @@ public class NinjaSkeletonRenderer extends SpecialSkeletonRenderer {
     
     @Override
     public void render(AbstractSkeleton entity, float rotation, float partialTicks,
-                       PoseStack matrixStack, MultiBufferSource buffer, int packedLight ) {
+                       PoseStack poseStack, MultiBufferSource buffer, int packedLight ) {
         
         INinja ninja = (INinja) entity;
         final BlockState disguiseBlock = ninja.getHiddenDragon();
         
         if( disguiseBlock == null ) {
-            super.render( entity, rotation, partialTicks, matrixStack, buffer, packedLight );
+            super.render( entity, rotation, partialTicks, poseStack, buffer, packedLight );
         }
         else {
             shadowRadius = 0.0F;
-            renderBlockDisguise( disguiseBlock, entity.blockPosition(), entity.level(), matrixStack, buffer, entity.getRandom() );
+            renderBlockDisguise( disguiseBlock, entity.blockPosition(), entity.level(), poseStack, buffer, entity.getRandom() );
         }
     }
     

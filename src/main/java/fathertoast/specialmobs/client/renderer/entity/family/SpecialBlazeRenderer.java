@@ -28,11 +28,11 @@ public class SpecialBlazeRenderer extends BlazeRenderer {
     }
     
     @Override
-    protected void scale( Blaze entity, PoseStack matrixStack, float partialTick ) {
-        super.scale( entity, matrixStack, partialTick );
+    protected void scale( Blaze entity, PoseStack poseStack, float partialTick ) {
+        super.scale( entity, poseStack, partialTick );
         
         final float scale = ((ISpecialMob<?>) entity).getSpecialData().getRenderScale();
         shadowRadius = baseShadowRadius * scale;
-        matrixStack.scale( scale, scale, scale );
+        poseStack.scale( scale, scale, scale );
     }
 }

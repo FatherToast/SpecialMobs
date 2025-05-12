@@ -5,11 +5,12 @@ import fathertoast.crust.api.config.common.ConfigManager;
 import fathertoast.crust.api.config.common.field.BooleanField;
 
 public class ReadMeConfig extends AbstractConfigFile {
-    @SuppressWarnings( "SameParameterValue" )
-    static void makeReadMe( ConfigManager manager ) { new ReadMeConfig( manager ).SPEC.initialize(); }
-    
+
+    // TODO - maybe do something funny with this
+    public final BooleanField secretMode;
+
     /** Builds the config spec that should be used for this config. */
-    private ReadMeConfig( ConfigManager manager ) {
+    protected ReadMeConfig( ConfigManager manager ) {
         super( manager, "README", "This file contains helpful information about how to use the config files in this mod." );
         SPEC.newLine( 2 );
         SPEC.comment(
@@ -31,6 +32,6 @@ public class ReadMeConfig extends AbstractConfigFile {
         SPEC.describeEnvironmentListPart2of2();
         
         SPEC.newLine( 6 );
-        SPEC.define( new BooleanField( "secret_mode", false, (String[]) null ) );
+        secretMode = SPEC.define( new BooleanField( "secret_mode", false, (String[]) null ) );
     }
 }

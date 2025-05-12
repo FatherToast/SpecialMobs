@@ -87,9 +87,9 @@ public class RunicEndermanRenderer extends SpecialEndermanRenderer {
         poseStack.mulPose( Axis.XP.rotation( (float) -Math.atan2( dH, dY ) - (float) Math.PI / 2.0F ) );
         
         final VertexConsumer vertexConsumer = buffer.getBuffer( BEAM );
-        final PoseStack.Pose matrixEntry = poseStack.last();
-        final Matrix4f pose = matrixEntry.pose();
-        final Matrix3f normal = matrixEntry.normal();
+        final PoseStack.Pose lastPose = poseStack.last();
+        final Matrix4f pose = lastPose.pose();
+        final Matrix3f normal = lastPose.normal();
         
         final int c1, c2;
         final float endScale;

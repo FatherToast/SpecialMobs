@@ -10,7 +10,9 @@
     "PiglinAiMixin",
     "ThrownTridentMixin"
   ],
-  "client": [],
+  "client": [
+    "LivingEntityRendererMixin"
+  ],
   "server": [],
   "injectors": {
     "defaultRequire": 1
