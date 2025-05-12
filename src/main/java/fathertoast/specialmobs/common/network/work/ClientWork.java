@@ -12,6 +12,7 @@ public class ClientWork {
 
         if ( level.getEntity( message.entityId ) instanceof MobBoat boat ) {
             boat.setInput( message.left, message.right, message.forward, message.backward );
+            boat.setPaddleState( message.right && !message.left || message.forward, message.left && !message.right || message.forward );
         }
     }
 }

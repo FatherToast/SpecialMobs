@@ -298,7 +298,9 @@ public class MobBoat extends Entity implements IEntityAdditionalSpawnData {
         if ( getControllingPassenger() != null ) {
             floatBoat();
 
-            controlBoat();
+            if ( !level().isClientSide ) {
+                controlBoat();
+            }
             move( MoverType.SELF, getDeltaMovement() );
         }
         else {
@@ -374,7 +376,7 @@ public class MobBoat extends Entity implements IEntityAdditionalSpawnData {
         }
 
         if ( !level().isClientSide ) {
-            if (getPassengers().isEmpty()) {
+            if ( getPassengers().isEmpty() ) {
                 ++timeExistedNoPassengers;
             }
             else {
@@ -438,7 +440,7 @@ public class MobBoat extends Entity implements IEntityAdditionalSpawnData {
     }
 
     private void tickLerp() {
-        if ( getControllingPassenger() != null && level().isClientSide ) {
+        if ( getControllingPassenger() != null && !level().isClientSide ) {
             lerpSteps = 0;
             syncPacketPositionCodec( getX(), getY(), getZ() );
         }
@@ -674,6 +676,7 @@ public class MobBoat extends Entity implements IEntityAdditionalSpawnData {
         }
     }
 
+    /** Called on server. Delta movement synced to client. */
     public void controlBoat() {
         if ( isVehicle() ) {
             float momentum = 0.0F;
@@ -699,11 +702,12 @@ public class MobBoat extends Entity implements IEntityAdditionalSpawnData {
                 momentum -= 0.005F;
             }
 
-            setDeltaMovement( getDeltaMovement().add(
+            Vec3 deltaMovement =  getDeltaMovement().add(
                     Mth.sin(-getYRot() * ( (float) Math.PI / 180F ) ) * momentum,
                     0.0D,
-                    Mth.cos( getYRot() * ( (float) Math.PI / 180F ) ) * momentum)
-            );
+                    Mth.cos( getYRot() * ( (float) Math.PI / 180F ) ) * momentum);
+
+            setDeltaMovement( deltaMovement );
 
             setPaddleState( inputRight && !inputLeft || inputUp, inputLeft && !inputRight || inputUp );
         }
