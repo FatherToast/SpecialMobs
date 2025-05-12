@@ -28,8 +28,8 @@ public class CorporealShiftGhastRenderer extends MobRenderer<CorporealShiftGhast
     
     public CorporealShiftGhastRenderer( EntityRendererProvider.Context context ) {
         super( context, new GhastModel<>( context.bakeLayer( ModelLayers.GHAST ) ), 1.5F );
-        addLayer( new SpecialGhastEyesLayer<>( this, EYES, SHOOT_EYES ) );
         baseShadowRadius = shadowRadius;
+        addLayer( new SpecialGhastEyesLayer<>( this, EYES, SHOOT_EYES ) );
     }
     
     @Override
@@ -47,8 +47,10 @@ public class CorporealShiftGhastRenderer extends MobRenderer<CorporealShiftGhast
     
     @Override
     protected void scale( CorporealShiftGhastEntity entity, PoseStack poseStack, float partialTick ) {
-        // The base scale of 4.5 is taken from GhastRenderer
-        final float scale = 4.5F * ((ISpecialMob<?>) entity).getSpecialData().getRenderScale();
+        // Base scale for ghasts
+        poseStack.scale(4.5F, 4.5F, 4.5F);
+
+        final float scale = ((ISpecialMob<?>) entity).getSpecialData().getRenderScale();
         shadowRadius = baseShadowRadius * scale;
         poseStack.scale( scale, scale, scale );
     }

@@ -27,8 +27,10 @@ public class SlabGhastRenderer extends MobRenderer<SlabGhastEntity, SlabGhastMod
 
     @Override
     protected void scale( SlabGhastEntity entity, PoseStack poseStack, float partialTick ) {
-        // The base scale of 4.5 is taken from GhastRenderer
-        final float scale = 4.5F * ((ISpecialMob<?>) entity).getSpecialData().getRenderScale();
+        // Base scale for ghasts
+        poseStack.scale(4.5F, 4.5F, 4.5F);
+
+        final float scale = ((ISpecialMob<?>) entity).getSpecialData().getRenderScale();
         shadowRadius = baseShadowRadius * scale;
         poseStack.scale( scale, scale, scale );
     }

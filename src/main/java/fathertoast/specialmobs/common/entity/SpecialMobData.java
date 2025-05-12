@@ -200,74 +200,8 @@ public class SpecialMobData<T extends Mob & ISpecialMob<T>> {
         return theEntity.getSpecies().bestiaryInfo.animationTexture;
     }
     
-    //    /** @param textures The new texture(s) to set for the entity. */
-    //    private void setTextures( ResourceLocation[] textures ) {
-    //        texture = textures[0];
-    //        textureEyes = textures.length > 1 ? textures[1] : null;
-    //        textureOverlay = textures.length > 2 ? textures[2] : null;
-    //    }
-    
-    //    /** @param textures The new texture(s) to load for the entity. Called when loaded from a packet. */
-    //    public void loadTextures( String[] textures ) {
-    //        try {
-    //            loadTexture( textures[0] );
-    //            loadTextureEyes( textures.length > 1 ? textures[1] : "" );
-    //            loadTextureOverlay( textures.length > 2 ? textures[2] : "" );
-    //        }
-    //        catch( Exception ex ) {
-    //            SpecialMobs.LOG.warn( "Failed to load textures for {}! ({})", theEntity, textures );
-    //            ex.printStackTrace();
-    //        }
-    //    }
-    
-    //    private void loadTexture( String tex ) {
-    //        if( tex.isEmpty() ) throw new IllegalArgumentException( "Entity must have a base texture" );
-    //        final ResourceLocation newTexture = new ResourceLocation( tex );
-    //        if( !newTexture.toString().equals( texture.toString() ) ) {
-    //            texture = newTexture;
-    //            updateTextures = true;
-    //        }
-    //    }
-    
-    //    private void loadTextureEyes( String tex ) {
-    //        if( tex.isEmpty() ) {
-    //            if( textureEyes != null ) {
-    //                textureEyes = null;
-    //                updateTextures = true;
-    //            }
-    //        }
-    //        else if( textureEyes == null ) {
-    //            textureEyes = new ResourceLocation( tex );
-    //            updateTextures = true;
-    //        }
-    //        else {
-    //            final ResourceLocation newTexture = new ResourceLocation( tex );
-    //            if( !newTexture.toString().equals( textureEyes.toString() ) ) {
-    //                texture = newTexture;
-    //                updateTextures = true;
-    //            }
-    //        }
-    //    }
-    
-    //    private void loadTextureOverlay( String tex ) {
-    //        if( tex.isEmpty() ) {
-    //            if( textureOverlay != null ) {
-    //                textureOverlay = null;
-    //                updateTextures = true;
-    //            }
-    //        }
-    //        else if( textureOverlay == null ) {
-    //            textureOverlay = new ResourceLocation( tex );
-    //            updateTextures = true;
-    //        }
-    //        else {
-    //            final ResourceLocation newTexture = new ResourceLocation( tex );
-    //            if( !newTexture.toString().equals( textureOverlay.toString() ) ) {
-    //                texture = newTexture;
-    //                updateTextures = true;
-    //            }
-    //        }
-    //    }
+
+
     
     /** @return The render scale for the entity, including any applied random scaling. */
     public float getRenderScale() { return theEntity.getEntityData().get( renderScale ); }
@@ -495,22 +429,7 @@ public class SpecialMobData<T extends Mob & ISpecialMob<T>> {
         if( tag.contains( TAG_RENDER_SCALE, NBT_TYPE_NUMERICAL ) ) {
             setRenderScale( tag.getFloat( TAG_RENDER_SCALE ) );
         }
-        
-        //        try {
-        //            if( tag.contains( TAG_TEXTURE, NBT_TYPE_STRING ) ) {
-        //                loadTexture( tag.getString( TAG_TEXTURE ) );
-        //            }
-        //            if( tag.contains( TAG_TEXTURE_EYES, NBT_TYPE_STRING ) ) {
-        //                loadTextureEyes( tag.getString( TAG_TEXTURE_EYES ) );
-        //            }
-        //            if( tag.contains( TAG_TEXTURE_OVER, NBT_TYPE_STRING ) ) {
-        //                loadTextureOverlay( tag.getString( TAG_TEXTURE_OVER ) );
-        //            }
-        //        }
-        //        catch( Exception ex ) {
-        //            SpecialMobs.LOG.warn( "Failed to load textures from NBT! " + theEntity.toString() );
-        //        }
-        
+
         // Capabilities
         if( tag.contains( TAG_EXPERIENCE, NBT_TYPE_NUMERICAL ) ) {
             theEntity.setExperience( tag.getInt( TAG_EXPERIENCE ) );
