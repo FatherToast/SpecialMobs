@@ -54,7 +54,7 @@ public class MobFamily<T extends Mob, V extends FamilyConfig> {
     );
     public static final MobFamily<Drowned, FamilyConfig> DROWNED = new MobFamily<>( FamilyConfig::new,
             "Drowned", "drowned", 0x8FF1D7, new EntityType[] { EntityType.DROWNED },
-            "Abyssal", "Brute", "Fishing", "Frozen", "Giant", "Hungry", "Knight", "Plague"//, "Tropical"
+            "Abyssal", "Brute", "Fishing", "Frozen", "Giant", "Hungry", "Knight", "Plague", "Tropical"
     );
     public static final MobFamily<ZombifiedPiglin, FamilyConfig> ZOMBIFIED_PIGLIN = new MobFamily<>( FamilyConfig::new,
             "ZombifiedPiglin", "zombified piglins", 0xEA9393, new EntityType[] { EntityType.ZOMBIFIED_PIGLIN },

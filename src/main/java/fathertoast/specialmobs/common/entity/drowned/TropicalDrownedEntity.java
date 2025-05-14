@@ -9,10 +9,12 @@ import fathertoast.specialmobs.common.config.species.SpeciesConfig;
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
+import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 
@@ -73,5 +75,14 @@ public class TropicalDrownedEntity extends _SpecialDrownedEntity {
     @Override
     protected void onVariantAttack( LivingEntity target ) {
         MobHelper.applyEffect( target, MobEffects.POISON );
+    }
+
+    /**
+     * Called from {@link _SpecialDrownedEntity#performRangedAttack(LivingEntity, float)}.<br>
+     * Override this if a custom trident stack is needed.
+     */
+    @Override
+    protected ItemStack getTridentForRanged() {
+        return MobHelper.tridentWithEffect( MobEffects.POISON, 1, MobHelper.defaultEffectDuration( level().getDifficulty() ) );
     }
 }
