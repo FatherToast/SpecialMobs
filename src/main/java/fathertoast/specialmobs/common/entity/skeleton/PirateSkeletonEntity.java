@@ -5,8 +5,10 @@ import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.entity.ai.AIHelper;
+import fathertoast.specialmobs.common.entity.ai.IBoatRider;
 import fathertoast.specialmobs.common.entity.ai.goal.ControlBoatGoal;
 import fathertoast.specialmobs.common.entity.ai.goal.PirateSpawnBoatGoal;
+import fathertoast.specialmobs.common.entity.misc.MobBoat;
 import fathertoast.specialmobs.common.event.NaturalSpawnManager;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
@@ -33,7 +35,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
 import org.jetbrains.annotations.Nullable;
 
-public class PirateSkeletonEntity extends _SpecialSkeletonEntity {
+public class PirateSkeletonEntity extends _SpecialSkeletonEntity implements IBoatRider {
 
     //--------------- Static Special Mob Hooks ----------------
 
@@ -42,7 +44,7 @@ public class PirateSkeletonEntity extends _SpecialSkeletonEntity {
 
     @SpecialMob.BestiaryInfoSupplier
     public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
-        // TODO - change the colors
+        // TODO - change the colors, maybe?
         bestiaryInfo.color( 0xFFF87E )
                 .weight(BestiaryInfo.DefaultWeight.DISABLED)
                 .modBaseTexture( "textures/entity/skeleton/base_skeleton.png" ).uniqueOverlayTexture()
@@ -130,5 +132,20 @@ public class PirateSkeletonEntity extends _SpecialSkeletonEntity {
                                       @Nullable MobSpawnType spawnType, @Nullable SpawnGroupData groupData ) {
         setItemInHand( InteractionHand.MAIN_HAND, new ItemStack( Items.BOW ) );
         enchantSpawnedWeapon( level.getRandom(), difficulty.getSpecialMultiplier() );
+    }
+
+    // TODO - This shit doesn't work! Lets fix it, eventually!
+    /** Despawn the pirate skelly's boat if it was discarded or despawned naturally. */
+    @Override
+    public void onRemovedFromWorld() {
+        if ( getRemovalReason() == RemovalReason.DISCARDED && getVehicle() instanceof MobBoat mobBoat ) {
+            mobBoat.discard();
+        }
+    }
+
+    /** Make sure the pirate skeleton can despawn naturally while in their boat. */
+    @Override
+    public boolean requiresCustomPersistence() {
+        return false;
     }
 }

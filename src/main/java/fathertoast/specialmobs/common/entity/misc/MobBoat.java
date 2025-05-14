@@ -2,6 +2,8 @@ package fathertoast.specialmobs.common.entity.misc;
 
 import com.google.common.collect.Lists;
 import fathertoast.specialmobs.common.core.register.SMEntities;
+import fathertoast.specialmobs.common.entity.ai.IBoatRider;
+import fathertoast.specialmobs.common.entity.skeleton.PirateSkeletonEntity;
 import net.minecraft.BlockUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -263,9 +265,25 @@ public class MobBoat extends Entity implements IEntityAdditionalSpawnData {
         this.lerpSteps = 10;
     }
 
+
+
     @Override
     public Direction getMotionDirection() {
         return getDirection().getClockWise();
+    }
+
+    /**
+     * Despawn boat if rider has been despawned as well.
+     * This is necessary to prevent heaps of boats accumulating
+     * in the ocean.
+     */
+    @Override
+    protected void removePassenger( Entity entity ) {
+        super.removePassenger( entity );
+
+        if ( entity instanceof IBoatRider && entity.getRemovalReason() == RemovalReason.DISCARDED ) {
+            discard();
+        }
     }
 
     @Override
