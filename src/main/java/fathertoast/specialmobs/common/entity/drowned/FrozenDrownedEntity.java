@@ -15,6 +15,7 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
@@ -77,7 +78,16 @@ public class FrozenDrownedEntity extends _SpecialDrownedEntity {
     protected void onVariantAttack( LivingEntity target ) {
         MobHelper.applyEffect( target, MobEffects.MOVEMENT_SLOWDOWN, 2 );
     }
-    
+
+    /**
+     * Called from {@link _SpecialDrownedEntity#performRangedAttack(LivingEntity, float)}.<br>
+     * Override this if a custom trident stack is needed.
+     */
+    @Override
+    protected ItemStack getTridentForRanged() {
+        return MobHelper.tridentWithEffect( MobEffects.MOVEMENT_SLOWDOWN, 2, MobHelper.defaultEffectDuration( level().getDifficulty() ) );
+    }
+
     /** Called each tick to update this entity's movement. */
     @Override
     public void aiStep() {
