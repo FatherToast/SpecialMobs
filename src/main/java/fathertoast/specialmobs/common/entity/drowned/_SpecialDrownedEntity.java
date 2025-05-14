@@ -154,7 +154,14 @@ public class _SpecialDrownedEntity extends Drowned implements ISpecialMob<_Speci
     
     /** Override to load data from this entity's NBT data. */
     public void readVariantSaveData( CompoundTag saveTag ) { }
-    
+
+    /**
+     * Called from {@link _SpecialDrownedEntity#performRangedAttack(LivingEntity, float)}.<br>
+     * Override this if a custom trident stack is needed.
+     */
+    protected ItemStack getTridentForRanged() {
+        return new ItemStack( Items.TRIDENT );
+    }
     
     //--------------- Family-Specific Implementations ----------------
     
@@ -189,7 +196,7 @@ public class _SpecialDrownedEntity extends Drowned implements ISpecialMob<_Speci
     /** Called to attack the target with a ranged attack. */
     @Override
     public void performRangedAttack( LivingEntity target, float damageMulti ) {
-        final ThrownTrident trident = new ThrownTrident( level(), this, new ItemStack( Items.TRIDENT ) );
+        final ThrownTrident trident = new ThrownTrident( level(), this, getTridentForRanged() );
 
         final double dX = target.getX() - getX();
         final double dY = target.getY( 0.3333 ) - trident.getY();

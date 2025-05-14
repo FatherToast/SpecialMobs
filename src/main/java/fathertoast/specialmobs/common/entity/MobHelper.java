@@ -6,6 +6,8 @@ import fathertoast.specialmobs.common.entity.creeper._SpecialCreeperEntity;
 import fathertoast.specialmobs.common.util.References;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.DamageTypeTags;
@@ -416,6 +418,44 @@ public final class MobHelper {
             arrow1.addEffect( new MobEffectInstance( template.getEffect(), template.getEffect().isInstantenous() ? 1 :
                     baseDuration * template.getDuration(), template.getAmplifier() ) );
         return arrow;
+    }
+
+    /**
+     * Creates a new trident ItemStack and writes the desired potion effect to it,
+     * which applies the effect on ranged attack.
+     */
+    public static ItemStack tridentWithEffect( MobEffect effect, int level, int duration ) {
+        ItemStack trident = new ItemStack( Items.TRIDENT );
+        CompoundTag stackTag = trident.getOrCreateTag();
+        CompoundTag modTag = new CompoundTag();
+        CompoundTag effectTag = new CompoundTag();
+
+        MobEffectInstance instance = new MobEffectInstance( effect, duration, level - 1 );
+
+        instance.save( effectTag );
+        modTag.put( "TridentEffect", effectTag );
+        stackTag.put( "special_mobs_ModData", modTag );
+
+        return trident;
+    }
+
+    /**
+     * Checks the given trident ItemStack for ranged potion effect and
+     * returns it if it exists.<br>
+     * Also returns null if the item is not a trident.
+     */
+    @Nullable
+    public static MobEffectInstance getTridentEffect( ItemStack tridentStack ) {
+        if ( tridentStack.getItem() != Items.TRIDENT ) return null;
+
+        if ( tridentStack.hasTag() && tridentStack.getTag().contains( "special_mobs_ModData", Tag.TAG_COMPOUND ) ) {
+            CompoundTag modTag = tridentStack.getTag().getCompound( "special_mobs_ModData" );
+
+            if ( modTag.contains( "TridentEffect", Tag.TAG_COMPOUND ) ) {
+                return MobEffectInstance.load( modTag.getCompound( "TridentEffect" ) );
+            }
+        }
+        return null;
     }
     
     /** @return The base debuff duration. */

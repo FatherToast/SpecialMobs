@@ -1,10 +1,13 @@
 package fathertoast.specialmobs.common.event;
 
 import fathertoast.specialmobs.common.bestiary.MobFamily;
+import fathertoast.specialmobs.common.entity.MobHelper;
 import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.projectile.ThrownTrident;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -19,10 +22,24 @@ import java.util.function.Supplier;
 public class GameEvents {
 
 
-
     @SubscribeEvent( priority = EventPriority.NORMAL )
-    public void onLivingHurt( LivingHurtEvent event ) {
+    public void onLivingHurtNormalPrio( LivingHurtEvent event ) {
 
+    }
+
+    /**
+     * Check if thrown tridents have a potion effect, and apply it if so.
+     */
+    @SubscribeEvent( priority = EventPriority.LOWEST )
+    public void onLivingHurtLowPrio( LivingHurtEvent event ) {
+        if ( event.getSource().getDirectEntity() instanceof ThrownTrident thrownTrident ) {
+            ItemStack tridentStack = thrownTrident.getPickupItem();
+            MobEffectInstance effectInstance = MobHelper.getTridentEffect( tridentStack );
+
+            if ( effectInstance != null ) {
+                event.getEntity().addEffect( effectInstance );
+            }
+        }
     }
 
     @SubscribeEvent( priority = EventPriority.NORMAL )
