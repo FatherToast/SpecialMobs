@@ -114,16 +114,16 @@ public class SpecialFishingBobberRenderer extends EntityRenderer<SpecialFishingB
         float normalY = y * (k * k + k) * 0.5F + 0.25F - vertY;
         float normalZ = z * k - vertZ;
 
-        float squared = Mth.sqrt(normalX * normalX + normalY * normalY + normalZ * normalZ);
+        float sqRoot = Mth.sqrt( normalX * normalX + normalY * normalY + normalZ * normalZ );
 
-        normalX /= squared;
-        normalY /= squared;
-        normalZ /= squared;
+        normalX /= sqRoot;
+        normalY /= sqRoot;
+        normalZ /= sqRoot;
 
         vertexConsumer
-                .vertex(pose.pose(), vertX, vertY, vertZ)
+                .vertex( pose.pose(), vertX, vertY, vertZ )
                 .color(0, 0, 0, 255)
-                .normal(pose.normal(), normalX, normalY, normalZ)
+                .normal( pose.normal(), normalX, normalY, normalZ )
                 .endVertex();
     }
     

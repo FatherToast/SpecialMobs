@@ -2,7 +2,7 @@ package fathertoast.specialmobs.client.renderer.entity.species;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import fathertoast.specialmobs.client.renderer.entity.layers.ArmoredBlazeLayer;
-import fathertoast.specialmobs.client.renderer.entity.layers.SMModelLayers;
+import fathertoast.specialmobs.client.SMModelLayers;
 import fathertoast.specialmobs.client.renderer.entity.layers.SpecialMobOverlayLayer;
 import fathertoast.specialmobs.common.entity.ISpecialMob;
 import net.minecraft.client.model.BlazeModel;

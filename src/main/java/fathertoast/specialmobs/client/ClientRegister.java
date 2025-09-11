@@ -2,7 +2,6 @@ package fathertoast.specialmobs.client;
 
 import fathertoast.crust.api.config.client.ClientConfigUtil;
 import fathertoast.specialmobs.client.renderer.entity.family.*;
-import fathertoast.specialmobs.client.renderer.entity.layers.SMModelLayers;
 import fathertoast.specialmobs.client.renderer.entity.misc.MobBoatRenderer;
 import fathertoast.specialmobs.client.renderer.entity.model.MobBoatModel;
 import fathertoast.specialmobs.client.renderer.entity.model.MobRaftModel;

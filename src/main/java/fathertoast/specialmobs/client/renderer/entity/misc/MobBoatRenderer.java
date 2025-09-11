@@ -5,7 +5,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.math.Axis;
-import fathertoast.specialmobs.client.renderer.entity.layers.SMModelLayers;
+import fathertoast.specialmobs.client.SMModelLayers;
 import fathertoast.specialmobs.client.renderer.entity.model.MobBoatModel;
 import fathertoast.specialmobs.client.renderer.entity.model.MobRaftModel;
 import fathertoast.specialmobs.common.entity.misc.MobBoat;

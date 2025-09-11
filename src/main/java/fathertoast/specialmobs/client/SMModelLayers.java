@@ -1,4 +1,4 @@
-package fathertoast.specialmobs.client.renderer.entity.layers;
+package fathertoast.specialmobs.client;
 
 import fathertoast.specialmobs.common.core.SpecialMobs;
 import net.minecraft.client.model.HumanoidModel;

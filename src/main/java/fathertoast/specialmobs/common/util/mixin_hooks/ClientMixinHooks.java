@@ -9,6 +9,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 public class ClientMixinHooks {
 
+    /**
+     * Called from {@link fathertoast.specialmobs.common.mixin.LivingEntityRendererMixin#onRender(LivingEntity, float, float, PoseStack, MultiBufferSource, int, CallbackInfo)}.
+     * <br><br>
+     * Makes all living entities slowly rotate when secret mode is enabled. Very funny stuff.
+     */
     public static <T extends LivingEntity> void handleLivingEntityRender( T entity, float rotation, float partialTick,
                                                                          PoseStack poseStack, MultiBufferSource bufferSource,
                                                                          int packedLight, CallbackInfo cir ) {

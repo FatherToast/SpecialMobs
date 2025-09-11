@@ -531,7 +531,7 @@ public class MobBoat extends Entity implements IEntityAdditionalSpawnData {
                 for ( int z = minZ; z < maxZ; ++z ) {
                     pos.set( x, y, z );
                     FluidState fluidState = level().getFluidState( pos );
-
+                    
                     // TODO - Consider calling fluidState.supportsBoating() with a dummy boat or something maybe?
                     if ( fluidState.is( Fluids.WATER )) {
                         waterLevel = Math.max( waterLevel, fluidState.getHeight( level(), pos ) );
