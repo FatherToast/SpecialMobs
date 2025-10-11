@@ -6,7 +6,6 @@ import fathertoast.crust.api.config.common.field.BooleanField;
 
 public class ReadMeConfig extends AbstractConfigFile {
 
-    // TODO - maybe do something funny with this
     public final BooleanField secretMode;
 
     /** Builds the config spec that should be used for this config. */

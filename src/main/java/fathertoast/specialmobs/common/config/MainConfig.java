@@ -19,9 +19,17 @@ public class MainConfig extends AbstractConfigFile {
         super( manager, fileName,
                 "This config contains options that apply to the mod as a whole, including some master " +
                         "settings toggles for convenience." );
+
+        SPEC.fileOnlyNewLine();
+        SPEC.describeEnvironmentListPart1of2();
+        SPEC.fileOnlyNewLine();
         
         GENERAL = new General( this );
         NATURAL_SPAWNING = new NaturalSpawning( this );
+
+        SPEC.fileOnlyNewLine();
+        SPEC.describeEnvironmentListPart2of2();
+        SPEC.fileOnlyNewLine();
     }
     
     public static class General extends AbstractConfigCategory<MainConfig> {
