@@ -122,12 +122,12 @@ public class SpecialMobs {
     @SuppressWarnings( "FieldCanBeLocal" )
     private final PacketHandler packetHandler = new PacketHandler();
     
-    public SpecialMobs() {
+    public SpecialMobs( FMLJavaModLoadingContext context ) {
         Config.initialize();
 
         packetHandler.registerMessages();
         
-        final IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
+        final IEventBus modEventBus = context.getModEventBus();
         
         SMBlocks.REGISTRY.register( modEventBus );
         SMItems.REGISTRY.register( modEventBus );
@@ -157,7 +157,7 @@ public class SpecialMobs {
     }
     
     /** @return A ResourceLocation with the mod's namespace. */
-    public static ResourceLocation resourceLoc(String path ) { return new ResourceLocation( MOD_ID, path ); }
+    public static ResourceLocation rl( String path ) { return ResourceLocation.fromNamespaceAndPath( MOD_ID, path ); }
     
     /** @return Returns a Forge registry entry as a string, or "null" if it is null. */
     public static <T> String toString( @Nullable T regEntry, IForgeRegistry<T> registry ) {
