@@ -12,7 +12,7 @@ import net.minecraft.world.entity.monster.Blaze;
 
 public class ArmoredBlazeLayer extends RenderLayer<Blaze, BlazeModel<Blaze>> {
 
-    private static final ResourceLocation ARMOR_TEXTURE = SpecialMobs.resourceLoc("textures/entity/blaze/armored_overlay.png");
+    private static final ResourceLocation ARMOR_TEXTURE = SpecialMobs.rl( "textures/entity/blaze/armored_overlay.png" );
 
     private final BlazeModel<Blaze> layerModel;
 

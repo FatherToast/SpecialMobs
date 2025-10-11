@@ -16,38 +16,38 @@ import snownee.jade.api.config.IWailaConfig;
 @WailaPlugin
 public class SMJadePlugin implements IWailaPlugin {
 
-    private static final ResourceLocation displayNinjaDisguises = SpecialMobs.resourceLoc("display_ninja_disguises");
+    private static final ResourceLocation displayNinjaDisguises = SpecialMobs.rl( "display_ninja_disguises" );
 
 
     @Override
-    public void register(IWailaCommonRegistration registration) {
+    public void register( IWailaCommonRegistration registration ) {
 
     }
 
     @Override
-    public void registerClient(IWailaClientRegistration registration) {
-        registration.addConfig(displayNinjaDisguises, true);
-        registration.markAsClientFeature(displayNinjaDisguises);
+    public void registerClient( IWailaClientRegistration registration ) {
+        registration.addConfig( displayNinjaDisguises, true );
+        registration.markAsClientFeature( displayNinjaDisguises );
 
-        // Make Jade display disguised ninjas as their disguise
-        registration.addRayTraceCallback((hitResult, accessor, originalAccessor) -> {
-            if (accessor instanceof EntityAccessor entityAccessor) {
-                if (entityAccessor.getEntity() instanceof INinja ninja) {
+        // Make Jade display disguised ninjas as their disguise block
+        registration.addRayTraceCallback( ( hitResult, accessor, originalAccessor ) -> {
+            if ( accessor instanceof EntityAccessor entityAccessor ) {
+                if ( entityAccessor.getEntity() instanceof INinja ninja ) {
                     BlockState disguise = ninja.getHiddenDragon();
 
-                    if (IWailaConfig.get().getPlugin().get(displayNinjaDisguises) && disguise != null) {
+                    if ( IWailaConfig.get().getPlugin().get( displayNinjaDisguises ) && disguise != null ) {
                         Vec3 vec3 = entityAccessor.getHitResult().getLocation();
 
                         return registration.blockAccessor()
-                                .blockEntity(() -> null)
-                                .blockState(disguise)
-                                .level(entityAccessor.getLevel())
-                                .player(entityAccessor.getPlayer())
-                                .serverConnected(entityAccessor.isServerConnected())
-                                .showDetails(false)
-                                .hit(new BlockHitResult(
+                                .blockEntity( () -> null )
+                                .blockState( disguise )
+                                .level( entityAccessor.getLevel() )
+                                .player( entityAccessor.getPlayer() )
+                                .serverConnected( entityAccessor.isServerConnected() )
+                                .showDetails( false )
+                                .hit( new BlockHitResult(
                                         vec3,
-                                        Direction.getNearest(vec3.x, vec3.y, vec3.z),
+                                        Direction.getNearest( vec3.x, vec3.y, vec3.z ),
                                         entityAccessor.getHitResult().getEntity().blockPosition(),
                                         false
                                 ))

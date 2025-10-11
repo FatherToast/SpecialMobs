@@ -463,25 +463,25 @@ public class BestiaryInfo {
 
         /** Sets the species default base texture, under the Special Mobs namespace. */
         public Builder modBaseTexture( @Nonnull String tex ) {
-            texture = SpecialMobs.resourceLoc( tex );
+            texture = SpecialMobs.rl( tex );
             return this;
         }
 
         /** Sets the species default glowing eyes texture, under the Special Mobs namespace. */
         public Builder modEyesTexture( @Nonnull String eyesTex ) {
-            eyesTexture = SpecialMobs.resourceLoc( eyesTex );
+            eyesTexture = SpecialMobs.rl( eyesTex );
             return this;
         }
 
         /** Sets the species default overlay texture, under the Special Mobs namespace. */
         public Builder modOverlayTexture( @Nonnull String ovrTex ) {
-            overlayTexture = SpecialMobs.resourceLoc( ovrTex );
+            overlayTexture = SpecialMobs.rl( ovrTex );
             return this;
         }
 
         /** Sets the species default animation texture, under the Special Mobs namespace. */
         public Builder modAnimationTexture( @Nonnull String aniTex ) {
-            animationTexture = SpecialMobs.resourceLoc( aniTex );
+            animationTexture = SpecialMobs.rl( aniTex );
             return this;
         }
 

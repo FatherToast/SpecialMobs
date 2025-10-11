@@ -90,7 +90,7 @@ public final class References {
     }
     
     public static ResourceLocation getEntityTexture( String path, String fileName, String suffix ) {
-        return SpecialMobs.resourceLoc( String.format( TEXTURE_FORMAT, path, fileName, suffix ) );
+        return SpecialMobs.rl( String.format( TEXTURE_FORMAT, path, fileName, suffix ) );
     }
     
     

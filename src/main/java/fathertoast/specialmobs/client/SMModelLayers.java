@@ -37,12 +37,12 @@ public class SMModelLayers {
 
 
 
-    private static ModelLayerLocation create(String path) {
+    private static ModelLayerLocation create( String path ) {
         return create(path, "main");
     }
 
-    private static ModelLayerLocation create(String path, String layerName) {
-        return new ModelLayerLocation(SpecialMobs.resourceLoc(path), layerName);
+    private static ModelLayerLocation create( String path, String layerName ) {
+        return new ModelLayerLocation( SpecialMobs.rl( path ), layerName );
     }
 
 
@@ -70,7 +70,7 @@ public class SMModelLayers {
 
         f = ((float)Math.PI / 4F);
 
-        for (int j = 4; j < 8; ++j) {
+        for ( int j = 4; j < 8; ++j ) {
             float x = Mth.cos(f) * 7.0F;
             float y = 2.0F + Mth.cos((float)(j * 2) * 0.25F);
             float z = Mth.sin(f) * 7.0F;
@@ -225,6 +225,6 @@ public class SMModelLayers {
     }
 
     private static ModelLayerLocation createModLocation( String location, String name ) {
-        return new ModelLayerLocation( SpecialMobs.resourceLoc( location ), name );
+        return new ModelLayerLocation( SpecialMobs.rl( location ), name );
     }
 }

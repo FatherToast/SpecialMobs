@@ -26,7 +26,7 @@ public class SMCreativeTabs {
 
 	private static CreativeTabRegObj register(String name, Supplier<CreativeModeTab> supplier) {
 		RegistryObject<CreativeModeTab> regObj = REGISTRY.register(name, supplier);
-		return new CreativeTabRegObj(regObj, ResourceKey.create(Registries.CREATIVE_MODE_TAB, SpecialMobs.resourceLoc(name)));
+		return new CreativeTabRegObj(regObj, ResourceKey.create(Registries.CREATIVE_MODE_TAB, SpecialMobs.rl(name)));
 	}
 
 
