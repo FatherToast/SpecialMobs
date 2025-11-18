@@ -21,14 +21,14 @@ import org.joml.Matrix3f;
 import org.joml.Matrix4f;
 
 public class RunicEndermanRenderer extends SpecialEndermanRenderer {
-    public static final ResourceLocation BEAM_TEXTURE_LOCATION = new ResourceLocation( "textures/entity/end_crystal/end_crystal_beam.png" );
+    public static final ResourceLocation BEAM_TEXTURE_LOCATION = ResourceLocation.withDefaultNamespace( "textures/entity/end_crystal/end_crystal_beam.png" );
     private static final RenderType BEAM = RenderType.entitySmoothCutout( BEAM_TEXTURE_LOCATION );
     
     public RunicEndermanRenderer( EntityRendererProvider.Context context ) { super( context ); }
     
     @Override
     public void render( EnderMan entity, float rotation, float partialTicks,
-                       PoseStack poseStack, MultiBufferSource buffer, int packedLight ) {
+                        PoseStack poseStack, MultiBufferSource buffer, int packedLight ) {
         // Beam attack
         final RunicEndermanEntity.BeamState beamState = ((RunicEndermanEntity) entity).getBeamState();
         if( beamState != RunicEndermanEntity.BeamState.OFF ) {
@@ -48,7 +48,7 @@ public class RunicEndermanRenderer extends SpecialEndermanRenderer {
             
             renderBeamAttack( beamState, entity.getEyeHeight(), (float) beamVec.x, (float) beamVec.y, (float) beamVec.z,
                     partialTicks, entity.tickCount, poseStack, buffer, packedLight );
-
+            
             poseStack.popPose();
         }
         
@@ -121,7 +121,7 @@ public class RunicEndermanRenderer extends SpecialEndermanRenderer {
             final float angle = u2 * (float) Math.PI * 2.0F;
             final float x2 = Mth.sin( angle ) * 0.75F;
             final float y2 = Mth.cos( angle ) * 0.75F;
-
+            
             vertexConsumer.vertex( pose, x1 * 0.2F, y1 * 0.2F, 0.0F )
                     .color( c1, c1, c1, 255 )
                     .uv( u1, v1 ).overlayCoords( OverlayTexture.NO_OVERLAY ).uv2( packedLight )

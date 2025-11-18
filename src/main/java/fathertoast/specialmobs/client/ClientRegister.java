@@ -58,7 +58,7 @@ public class ClientRegister {
     public static void onClientSetup( FMLClientSetupEvent event ) {
         if( Config.MAIN.GENERAL.fancyFishingMobs.get() ) {
             event.enqueueWork( () -> ItemProperties.register( Items.FISHING_ROD,
-                    new ResourceLocation( "cast" ), new FishingRodItemPropertyGetter() ) );
+                    ResourceLocation.withDefaultNamespace( "cast" ), new FishingRodItemPropertyGetter() ) );
         }
         
         // Tell Forge to open the config editor when our mod's "Config" button is clicked in the Mods screen
@@ -90,10 +90,10 @@ public class ClientRegister {
         event.registerLayerDefinition( SMModelLayers.ZOMBIFIED_PIGLIN_OUTER_LAYER, () -> LayerDefinition.create( PiglinModel.createMesh( new CubeDeformation( 0.25F ) ), 64, 64 ) );
         event.registerLayerDefinition( SMModelLayers.ZOMBIFIED_PIGLIN_INNER_ARMOR, () -> LayerDefinition.create( HumanoidArmorModel.createBodyLayer( new CubeDeformation( 0.5F ) ), 64, 32 ) );
         event.registerLayerDefinition( SMModelLayers.ZOMBIFIED_PIGLIN_OUTER_ARMOR, () -> LayerDefinition.create( HumanoidArmorModel.createBodyLayer( new CubeDeformation( 1.02F ) ), 64, 32 ) );
-
+        
         // Funny boat moment
-        for ( Boat.Type type : Boat.Type.values() ) {
-            if ( type == Boat.Type.BAMBOO ) {
+        for( Boat.Type type : Boat.Type.values() ) {
+            if( type == Boat.Type.BAMBOO ) {
                 event.registerLayerDefinition( SMModelLayers.createBoatModelName( type ), MobRaftModel::createBodyModel );
             }
             else {

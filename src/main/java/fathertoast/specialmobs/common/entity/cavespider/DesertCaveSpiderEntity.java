@@ -1,6 +1,5 @@
 package fathertoast.specialmobs.common.entity.cavespider;
 
-import fathertoast.crust.api.ICrustApi;
 import fathertoast.crust.api.lib.CrustObjects;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
@@ -29,7 +28,7 @@ public class DesertCaveSpiderEntity extends _SpecialCaveSpiderEntity {
         bestiaryInfo.color( 0xE6DDAC ).theme( BestiaryInfo.Theme.DESERT )
                 .uniqueTextureWithEyes()
                 .size( 0.6F, 0.7F, 0.5F )
-                .addExperience( 2 ).effectImmune( MobEffects.MOVEMENT_SLOWDOWN, ICrustApi.MOD_ID + ":" + CrustObjects.ID.VULNERABILITY )
+                .addExperience( 2 ).effectImmune( MobEffects.MOVEMENT_SLOWDOWN, CrustObjects.Effects.VULNERABILITY )
                 .addToAttribute( Attributes.MAX_HEALTH, 4.0 );
     }
     
@@ -69,6 +68,6 @@ public class DesertCaveSpiderEntity extends _SpecialCaveSpiderEntity {
         MobHelper.applyEffect( target, MobEffects.BLINDNESS );
         MobHelper.removeNightVision( target );
         MobHelper.applyEffect( target, MobEffects.MOVEMENT_SLOWDOWN, 2 );
-        MobHelper.applyEffect( target, CrustObjects.vulnerability() );
+        MobHelper.applyEffect( target, CrustObjects.Effects.VULNERABILITY.get() );
     }
 }

@@ -15,15 +15,15 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 
 public class SpecialMobEyesLayer<T extends Entity, M extends EntityModel<T>> extends EyesLayer<T, M> {
-    private static final RenderType FALLBACK = RenderType.eyes( new ResourceLocation( "textures/entity/spider_eyes.png" ) );
+    private static final RenderType FALLBACK = RenderType.eyes( ResourceLocation.withDefaultNamespace( "textures/entity/spider_eyes.png" ) );
     
     public SpecialMobEyesLayer( RenderLayerParent<T, M> renderer ) {
         super( renderer );
     }
     
     @Override
-    public void render(PoseStack poseStack, MultiBufferSource buffer, int packedLight, T entity, float limbSwing,
-                       float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch ) {
+    public void render( PoseStack poseStack, MultiBufferSource buffer, int packedLight, T entity, float limbSwing,
+                        float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch ) {
         final ResourceLocation eyesTexture = ((ISpecialMob<?>) entity).getSpecialData().getTextureEyes();
         if( eyesTexture == null ) return;
         

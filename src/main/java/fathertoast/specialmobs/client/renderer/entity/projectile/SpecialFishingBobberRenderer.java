@@ -19,17 +19,17 @@ import org.joml.Matrix3f;
 import org.joml.Matrix4f;
 
 public class SpecialFishingBobberRenderer extends EntityRenderer<SpecialFishingBobberEntity> {
-    private static final ResourceLocation TEXTURE_LOCATION = new ResourceLocation( "textures/entity/fishing_hook.png" );
+    private static final ResourceLocation TEXTURE_LOCATION = ResourceLocation.withDefaultNamespace( "textures/entity/fishing_hook.png" );
     private static final RenderType RENDER_TYPE = RenderType.entityCutout( TEXTURE_LOCATION );
     
     public SpecialFishingBobberRenderer( EntityRendererProvider.Context context ) { super( context ); }
     
     @Override
-    public void render(SpecialFishingBobberEntity entity, float rotation, float partialTicks,
-                       PoseStack poseStack, MultiBufferSource buffer, int packedLight ) {
+    public void render( SpecialFishingBobberEntity entity, float rotation, float partialTicks,
+                        PoseStack poseStack, MultiBufferSource buffer, int packedLight ) {
         final LivingEntity angler = entity.getLivingOwner();
         if( angler == null ) return;
-
+        
         poseStack.pushPose();
         
         // Render the hook/bobber texture
@@ -64,7 +64,7 @@ public class SpecialFishingBobberRenderer extends EntityRenderer<SpecialFishingB
         final double xBobber = Mth.lerp( partialTicks, entity.xo, entity.getX() );
         final double yBobber = Mth.lerp( partialTicks, entity.yo, entity.getY() ) + 0.25;
         final double zBobber = Mth.lerp( partialTicks, entity.zo, entity.getZ() );
-
+        
         drawLine( buffer.getBuffer( RenderType.lineStrip() ), poseStack.last(), 16,
                 xBobber, yBobber, zBobber, xRod, yRod, zRod );
         
@@ -74,7 +74,7 @@ public class SpecialFishingBobberRenderer extends EntityRenderer<SpecialFishingB
     }
     
     /** Creates the vertexes for a quad. */
-    private static void drawQuad(VertexConsumer vertexConsumer, Matrix4f pose, Matrix3f normal, int packedLight ) {
+    private static void drawQuad( VertexConsumer vertexConsumer, Matrix4f pose, Matrix3f normal, int packedLight ) {
         quadVertex( vertexConsumer, pose, normal, packedLight, 0.0F, 0.0F, 0, 1 );
         quadVertex( vertexConsumer, pose, normal, packedLight, 1.0F, 0.0F, 1, 1 );
         quadVertex( vertexConsumer, pose, normal, packedLight, 1.0F, 1.0F, 1, 0 );
@@ -101,28 +101,28 @@ public class SpecialFishingBobberRenderer extends EntityRenderer<SpecialFishingB
             lineVertex( dX, dY, dZ, vertexConsumer, pose, segment, resolution );
         }
     }
-
-    private static void lineVertex(float x, float y, float z, VertexConsumer vertexConsumer, PoseStack.Pose pose, float segment, float totalSegments) {
+    
+    private static void lineVertex( float x, float y, float z, VertexConsumer vertexConsumer, PoseStack.Pose pose, float segment, float totalSegments ) {
         final float r = segment / totalSegments;
         final float k = segment + 1 / totalSegments;
-
+        
         float vertX = x * r;
         float vertY = y * (r * r + r) * 0.5F + 0.25F;
         float vertZ = z * r;
-
+        
         float normalX = x * k - vertX;
         float normalY = y * (k * k + k) * 0.5F + 0.25F - vertY;
         float normalZ = z * k - vertZ;
-
+        
         float sqRoot = Mth.sqrt( normalX * normalX + normalY * normalY + normalZ * normalZ );
-
+        
         normalX /= sqRoot;
         normalY /= sqRoot;
         normalZ /= sqRoot;
-
+        
         vertexConsumer
                 .vertex( pose.pose(), vertX, vertY, vertZ )
-                .color(0, 0, 0, 255)
+                .color( 0, 0, 0, 255 )
                 .normal( pose.normal(), normalX, normalY, normalZ )
                 .endVertex();
     }

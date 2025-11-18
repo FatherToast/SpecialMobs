@@ -14,7 +14,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.monster.Ghast;
 
 public class SpecialGhastEyesLayer<T extends Ghast, M extends EntityModel<T>> extends EyesLayer<T, M> {
-    private final RenderType FALLBACK = RenderType.eyes( new ResourceLocation( "textures/entity/spider_eyes.png" ) );
+    private final RenderType FALLBACK = RenderType.eyes( ResourceLocation.withDefaultNamespace( "textures/entity/spider_eyes.png" ) );
     private final ResourceLocation eyes;
     private final ResourceLocation shootEyes;
     
@@ -27,7 +27,7 @@ public class SpecialGhastEyesLayer<T extends Ghast, M extends EntityModel<T>> ex
     
     @Override
     public void render( PoseStack poseStack, MultiBufferSource buffer, int packedLight, T ghast, float limbSwing,
-                       float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch ) {
+                        float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch ) {
         
         final VertexConsumer vertexConsumer = buffer.getBuffer( RenderType.entityCutout( ghast.isCharging() ? shootEyes : eyes ) );
         getParentModel().renderToBuffer( poseStack, vertexConsumer, LightTexture.pack( 15, 15 ), OverlayTexture.NO_OVERLAY,

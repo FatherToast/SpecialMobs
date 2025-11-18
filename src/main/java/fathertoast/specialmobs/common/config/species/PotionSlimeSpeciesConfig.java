@@ -1,6 +1,5 @@
 package fathertoast.specialmobs.common.config.species;
 
-import fathertoast.crust.api.ICrustApi;
 import fathertoast.crust.api.config.common.AbstractConfigCategory;
 import fathertoast.crust.api.config.common.ConfigManager;
 import fathertoast.crust.api.config.common.ConfigUtil;
@@ -39,8 +38,8 @@ public class PotionSlimeSpeciesConfig extends SpeciesConfig {
                             MobEffects.DAMAGE_BOOST, MobEffects.WEAKNESS,
                             MobEffects.HEAL, MobEffects.HARM, MobEffects.HUNGER,
                             MobEffects.REGENERATION, MobEffects.POISON, MobEffects.WITHER,
-                            MobEffects.JUMP, MobEffects.LEVITATION, MobEffects.SLOW_FALLING, ICrustApi.MOD_ID + ":" + CrustObjects.ID.WEIGHT,
-                            MobEffects.DAMAGE_RESISTANCE, ICrustApi.MOD_ID + ":" + CrustObjects.ID.VULNERABILITY,
+                            MobEffects.JUMP, MobEffects.LEVITATION, MobEffects.SLOW_FALLING, CrustObjects.Effects.WEIGHT,
+                            MobEffects.DAMAGE_RESISTANCE, CrustObjects.Effects.VULNERABILITY,
                             MobEffects.FIRE_RESISTANCE, MobEffects.WATER_BREATHING,
                             MobEffects.BLINDNESS, MobEffects.NIGHT_VISION, MobEffects.CONFUSION,
                             MobEffects.HEALTH_BOOST, MobEffects.ABSORPTION,

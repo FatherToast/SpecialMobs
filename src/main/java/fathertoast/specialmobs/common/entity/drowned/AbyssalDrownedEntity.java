@@ -1,6 +1,5 @@
 package fathertoast.specialmobs.common.entity.drowned;
 
-import fathertoast.crust.api.ICrustApi;
 import fathertoast.crust.api.lib.CrustObjects;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
@@ -29,7 +28,7 @@ public class AbyssalDrownedEntity extends _SpecialDrownedEntity {
     public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
         bestiaryInfo.color( 0x223844 ).weight( BestiaryInfo.DefaultWeight.LOW )
                 .uniqueTexturesAll()
-                .addExperience( 2 ).effectImmune( ICrustApi.MOD_ID + ":" + CrustObjects.ID.WEIGHT, MobEffects.LEVITATION )
+                .addExperience( 2 ).effectImmune( CrustObjects.Effects.WEIGHT, MobEffects.LEVITATION )
                 .addToAttribute( Attributes.MAX_HEALTH, 20.0 )
                 .multiplyAttribute( Attributes.MOVEMENT_SPEED, 1.2 );
     }
@@ -73,6 +72,6 @@ public class AbyssalDrownedEntity extends _SpecialDrownedEntity {
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override
     protected void onVariantAttack( LivingEntity target ) {
-        MobHelper.applyEffect( target, CrustObjects.weight(), 2 );
+        MobHelper.applyEffect( target, CrustObjects.Effects.WEIGHT.get(), 2 );
     }
 }

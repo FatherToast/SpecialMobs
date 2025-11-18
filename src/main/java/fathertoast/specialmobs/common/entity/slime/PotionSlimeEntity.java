@@ -194,6 +194,6 @@ public class PotionSlimeEntity extends _SpecialSlimeEntity {
     @Override
     public void readVariantSaveData( CompoundTag saveTag ) {
         if( saveTag.contains( TAG_AMMO, NBT_TYPE_STRING ) )
-            setPotionFill( ForgeRegistries.MOB_EFFECTS.getValue( new ResourceLocation( saveTag.getString( TAG_AMMO ) ) ) );
+            setPotionFill( ForgeRegistries.MOB_EFFECTS.getValue( ResourceLocation.tryParse( saveTag.getString( TAG_AMMO ) ) ) );
     }
 }

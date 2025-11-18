@@ -1,7 +1,32 @@
+1.20.1-4.1.16
+    - Bumped required Crust version to 4.9.15.
+1.20.1-4.1.15
+    - Pirate Skeletons and their boats now despawn naturally, preventing them from accumulating in the ocean.
+    - Thrown Tridents can now apply potion effects.
+    - Frozen Drowned now applies slowness on ranged trident attack.
+    - Added Tropical Drowned.
+1.20.1-4.1.14
+    - SM mobs now use local copies of vanilla textures to avoid problems with certain resource packs.
+    - Added spanish translation "es_es" (credits to 121415A).
+    - Added config option to disable mob replacement for spawner mob spawns.
+    - Fixed melee-based ghasts getting stuck with their "bite" texture.
+    - Fixed Pirate Skeleton AI.
+    - Fixed shadow size of some ghast variants.
+    - Fixed mob boat control.
+    - Fixed mob boat server-client desync.
+    - Bumped required Crust version.
+    - Added secret coolness.
+1.20.1-3.1.12
+    - Added all Special Mobs mob types to their respective forge entity type tags.
+    - Added all relevant Special Mobs mob types to misc vanilla entity type tags for better vanilla compat.
+1.20.1-3.1.11
+    - Tweaked FamilyConfig default environment entries for 'special_variant_chance.exceptions' to help avoid deadlocks on servers. This is a temporary fix.
+    - Fixed Icy Enderman trying to generate ice blocks when stuck in a boat while it rains.
+    - Reduced spawn weight for Pirate Skeletons in ocean biomes.
 1.20.1-3.1.10
-    - Bumped required Crust version to 2.4.8
-    - Downgraded required min Forge version to 47.3.0
-    - Pause file watcher during config initialization
+    - Bumped required Crust version to 2.4.8.
+    - Downgraded required min Forge version to 47.3.0.
+    - Pause file watcher during config initialization.
 1.20.1-3.1.9
     - Bumped min required Forge version to 47.3.22
     - Bumped min required Crust version to 2.3.7

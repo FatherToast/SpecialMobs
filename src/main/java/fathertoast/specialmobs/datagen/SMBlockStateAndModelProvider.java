@@ -18,13 +18,12 @@ import java.util.Objects;
 import java.util.function.Supplier;
 
 public class SMBlockStateAndModelProvider extends BlockStateProvider {
-
+    
     // Render type ids
-    private static final ResourceLocation R_TRANSLUCENT = new ResourceLocation("translucent");
-
-
-
-    public SMBlockStateAndModelProvider(PackOutput output, ExistingFileHelper existingFileHelper ) {
+    private static final ResourceLocation R_TRANSLUCENT = ResourceLocation.withDefaultNamespace( "translucent" );
+    
+    
+    public SMBlockStateAndModelProvider( PackOutput output, ExistingFileHelper existingFileHelper ) {
         super( output, SpecialMobs.MOD_ID, existingFileHelper );
     }
     
@@ -32,30 +31,30 @@ public class SMBlockStateAndModelProvider extends BlockStateProvider {
     protected void registerStatesAndModels() {
         // Melting ice
         final VariantBlockStateBuilder builder = getVariantBuilder( SMBlocks.MELTING_ICE.get() );
-        String name = blockName(Blocks.FROSTED_ICE);
+        String name = blockName( Blocks.FROSTED_ICE );
         for( int age = 0; age <= 3; age++ ) {
             builder.partialState().with( MeltingIceBlock.AGE, age ).modelForState().modelFile( models().getExistingFile(
                     mcLoc( ModelProvider.BLOCK_FOLDER + "/" + name + "_" + age ) ) ).addModel();
         }
         itemModels().withExistingParent( SMBlocks.MELTING_ICE.getId().getPath(),
-                mcLoc( ModelProvider.BLOCK_FOLDER + "/" + name + "_0" ) )
-                .renderType(R_TRANSLUCENT);
+                        mcLoc( ModelProvider.BLOCK_FOLDER + "/" + name + "_0" ) )
+                .renderType( R_TRANSLUCENT );
         
         // Infested coral
         for( UnderwaterSilverfishBlock.Type type : UnderwaterSilverfishBlock.Type.values() ) {
-            name = blockName(type.hostBlock());
+            name = blockName( type.hostBlock() );
             
             getVariantBuilder( type.block() ).partialState().modelForState().modelFile( models().getExistingFile(
                     mcLoc( ModelProvider.BLOCK_FOLDER + "/" + name ) ) ).addModel();
             itemModels().withExistingParent( type.blockId(), mcLoc( ModelProvider.BLOCK_FOLDER + "/" + name ) );
         }
     }
-
-    private String blockName(Supplier<Block> block) {
-        return Objects.requireNonNull(ForgeRegistries.BLOCKS.getKey(block.get())).getPath();
+    
+    private String blockName( Supplier<Block> block ) {
+        return Objects.requireNonNull( ForgeRegistries.BLOCKS.getKey( block.get() ) ).getPath();
     }
-
-    private String blockName(Block block) {
-        return Objects.requireNonNull(ForgeRegistries.BLOCKS.getKey(block)).getPath();
+    
+    private String blockName( Block block ) {
+        return Objects.requireNonNull( ForgeRegistries.BLOCKS.getKey( block ) ).getPath();
     }
 }

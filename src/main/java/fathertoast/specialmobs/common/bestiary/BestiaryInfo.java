@@ -46,8 +46,8 @@ public class BestiaryInfo {
     }
     
     public enum Theme {
-        NONE( (cfgManager) -> new EnvironmentList() ),
-        FIRE( (cfgManager) -> new EnvironmentList(
+        NONE( ( cfgManager ) -> new EnvironmentList() ),
+        FIRE( ( cfgManager ) -> new EnvironmentList(
                 EnvironmentEntry.builder( cfgManager, DefaultWeight.HIGHEST.value ).inUltraWarmDimension().build(),
                 EnvironmentEntry.builder( cfgManager, DefaultWeight.HIGHEST.value ).isHot().build(),
                 EnvironmentEntry.builder( cfgManager, DefaultWeight.HIGH.value ).isWarm().build(),
@@ -60,7 +60,7 @@ public class BestiaryInfo {
                 EnvironmentEntry.builder( cfgManager, DefaultWeight.LOW.value ).inBiome( Biomes.DEEP_COLD_OCEAN ).build(),
                 EnvironmentEntry.builder( cfgManager, DefaultWeight.LOWEST.value ).inBiome( Biomes.DEEP_FROZEN_OCEAN ).build()
         ) ),
-        ICE( (cfgManager) ->  new EnvironmentList(
+        ICE( ( cfgManager ) -> new EnvironmentList(
                 EnvironmentEntry.builder( cfgManager, DefaultWeight.LOWEST.value ).inUltraWarmDimension().build(),
                 EnvironmentEntry.builder( cfgManager, DefaultWeight.HIGHEST.value ).isFreezing().build(),
                 EnvironmentEntry.builder( cfgManager, DefaultWeight.LOW.value ).isWarm().build(),
@@ -73,7 +73,7 @@ public class BestiaryInfo {
                 EnvironmentEntry.builder( cfgManager, DefaultWeight.LOW.value ).inBiome( Biomes.DEEP_LUKEWARM_OCEAN ).build(),
                 EnvironmentEntry.builder( cfgManager, DefaultWeight.LOWEST.value ).inBiome( Biomes.WARM_OCEAN ).build()
         ) ),
-        DESERT( (cfgManager) -> new EnvironmentList(
+        DESERT( ( cfgManager ) -> new EnvironmentList(
                 EnvironmentEntry.builder( cfgManager, DefaultWeight.HIGHEST.value ).inUltraWarmDimension().build(),
                 EnvironmentEntry.builder( cfgManager, DefaultWeight.HIGHEST.value ).inNaturalDimension().inDryBiome().build(),
                 EnvironmentEntry.builder( cfgManager, DefaultWeight.LOWEST.value ).inWaterBiome().build(),
@@ -81,7 +81,7 @@ public class BestiaryInfo {
                 EnvironmentEntry.builder( cfgManager, DefaultWeight.LOWEST.value ).isRaining().canSeeSky().build(),
                 EnvironmentEntry.builder( cfgManager, DefaultWeight.HIGH.value ).belowHalfMoonLight().build()
         ) ),
-        WATER( (cfgManager) -> new EnvironmentList(
+        WATER( ( cfgManager ) -> new EnvironmentList(
                 EnvironmentEntry.builder( cfgManager, DefaultWeight.LOWEST.value ).inUltraWarmDimension().build(),
                 EnvironmentEntry.builder( cfgManager, DefaultWeight.LOWEST.value ).inNaturalDimension().inDryBiome().build(),
                 EnvironmentEntry.builder( cfgManager, DefaultWeight.HIGHEST.value ).inWaterBiome().build(),
@@ -89,7 +89,7 @@ public class BestiaryInfo {
                 EnvironmentEntry.builder( cfgManager, DefaultWeight.HIGHEST.value ).isRaining().canSeeSky().build(),
                 EnvironmentEntry.builder( cfgManager, DefaultWeight.HIGH.value ).aboveHalfMoonLight().build()
         ) ),
-        FOREST( (cfgManager) -> new EnvironmentList(
+        FOREST( ( cfgManager ) -> new EnvironmentList(
                 EnvironmentEntry.builder( cfgManager, DefaultWeight.HIGHEST.value ).inBiomeCategory( BiomeCategory.TAIGA ).build(),
                 EnvironmentEntry.builder( cfgManager, DefaultWeight.HIGHEST.value ).inBiomeCategory( BiomeCategory.JUNGLE ).build(),
                 EnvironmentEntry.builder( cfgManager, DefaultWeight.HIGHEST.value ).inBiomeCategory( BiomeCategory.FOREST ).build(),
@@ -97,38 +97,38 @@ public class BestiaryInfo {
                 EnvironmentEntry.builder( cfgManager, DefaultWeight.HIGHEST.value ).inBiome( Biomes.CRIMSON_FOREST ).build(),
                 EnvironmentEntry.builder( cfgManager, DefaultWeight.HIGH.value ).atMaxMoonLight().build()
         ) ),
-        MOUNTAIN( (cfgManager) -> new EnvironmentList(
+        MOUNTAIN( ( cfgManager ) -> new EnvironmentList(
                 EnvironmentEntry.builder( cfgManager, DefaultWeight.HIGHEST.value ).inMountainBiome().build(),
                 EnvironmentEntry.builder( cfgManager, DefaultWeight.HIGHEST.value ).aboveMountainLevel().build(),
                 EnvironmentEntry.builder( cfgManager, DefaultWeight.HIGH.value ).atNoMoonLight().build(),
                 EnvironmentEntry.builder( cfgManager, DefaultWeight.LOW.value ).belowSeaLevel().build()
         ) ),
-        STORM( (cfgManager) -> new EnvironmentList(
+        STORM( ( cfgManager ) -> new EnvironmentList(
                 EnvironmentEntry.builder( cfgManager, DefaultWeight.HIGHEST.value ).isThundering().build(),
                 EnvironmentEntry.builder( cfgManager, DefaultWeight.HIGH.value ).isRaining().build(),
                 EnvironmentEntry.builder( cfgManager, DefaultWeight.LOW.value ).cannotSeeSky().build()
         ) ),
-        TROPICAL( (cfgManager) -> new EnvironmentList(
+        TROPICAL( ( cfgManager ) -> new EnvironmentList(
                 // All ocean biomes (except regular frozen ocean) have the same temp of 0.5, so we must call out specific biomes
                 EnvironmentEntry.builder( cfgManager, DefaultWeight.HIGHEST.value ).inBiome( Biomes.WARM_OCEAN ).build(),
                 EnvironmentEntry.builder( cfgManager, DefaultWeight.DISABLED.value ).isFreezing().build(),
                 EnvironmentEntry.builder( cfgManager, DefaultWeight.DISABLED.value ).inBiome( Biomes.DEEP_FROZEN_OCEAN ).build()
         ) ),
-        FISHING( (cfgManager) -> new EnvironmentList(
+        FISHING( ( cfgManager ) -> new EnvironmentList(
                 EnvironmentEntry.builder( cfgManager, DefaultWeight.HIGHEST.value ).inWaterBiome().build(),
                 EnvironmentEntry.builder( cfgManager, DefaultWeight.HIGH.value ).atMaxMoonLight().build(),
                 EnvironmentEntry.builder( cfgManager, DefaultWeight.HIGH.value ).isRaining().notInDryBiome().build()
         ) );
-
+        
         private final Function<ConfigManager, EnvironmentList> func;
         private EnvironmentList value;
         
         Theme( Function<ConfigManager, EnvironmentList> func ) {
             this.func = func;
         }
-
+        
         public EnvironmentList getValue() {
-            if ( value == null ) {
+            if( value == null ) {
                 value = func.apply( Config.MANAGER );
                 value.setRange( DoubleField.Range.NON_NEGATIVE );
             }
@@ -156,7 +156,7 @@ public class BestiaryInfo {
     public final ResourceLocation overlayTexture;
     /** Generally used as the "shooting" texture for ghasts. */
     public final ResourceLocation animationTexture;
-
+    
     
     // Special Mob Data defaults
     public final int experience;
@@ -354,51 +354,51 @@ public class BestiaryInfo {
         
         //--------------- Textures (Vanilla) ----------------
         // Selecting vanilla textures can have unexpected results with some resource packs
-
-
+        
+        
         /** Sets the species default base, glowing eyes, and overlay textures. */
-        @Deprecated(since = "3.1.14", forRemoval = true)
+        @Deprecated( since = "3.1.14", forRemoval = true )
         public Builder vanillaTexturesAll( String tex, String eyeTex, String ovrTex ) {
             return vanillaBaseTexture( tex ).vanillaEyesTexture( eyeTex ).vanillaOverlayTexture( ovrTex );
         }
         
         /** Sets the species default base and glowing eyes textures. Removes all other textures. */
-        @Deprecated(since = "3.1.14", forRemoval = true)
+        @Deprecated( since = "3.1.14", forRemoval = true )
         public Builder vanillaTextureWithEyes( String tex, String eyeTex ) {
             return vanillaBaseTexture( tex ).vanillaEyesTexture( eyeTex ).noOverlayTexture();
         }
         
         /** Sets the species default base and overlay textures. Removes all other textures. */
-        @Deprecated(since = "3.1.14", forRemoval = true)
+        @Deprecated( since = "3.1.14", forRemoval = true )
         public Builder vanillaTextureWithOverlay( String tex, String ovrTex ) {
             return vanillaBaseTexture( tex ).noEyesTexture().vanillaOverlayTexture( ovrTex );
         }
         
         /** Sets the species default base and animation textures. Removes all other textures. */
-        @Deprecated(since = "3.1.14", forRemoval = true)
+        @Deprecated( since = "3.1.14", forRemoval = true )
         public Builder vanillaTextureWithAnimation( String tex, String aniTex ) {
             return vanillaBaseTexture( tex ).noEyesTexture().vanillaAnimationTexture( aniTex );
         }
         
         /** Sets the species default base texture. Removes all other textures. */
-        @Deprecated(since = "3.1.14", forRemoval = true)
+        @Deprecated( since = "3.1.14", forRemoval = true )
         public Builder vanillaTextureBaseOnly( String tex ) { return vanillaBaseTexture( tex ).noEyesTexture().noOverlayTexture(); }
         
         /** Sets the species default base texture. */
-        @Deprecated(since = "3.1.14", forRemoval = true)
-        private Builder vanillaBaseTexture( String tex ) { return baseTexture( new ResourceLocation( tex ) ); }
+        @Deprecated( since = "3.1.14", forRemoval = true )
+        private Builder vanillaBaseTexture( String tex ) { return baseTexture( ResourceLocation.tryParse( tex ) ); }
         
         /** Sets the species default glowing eyes texture. */
-        @Deprecated(since = "3.1.14", forRemoval = true)
-        private Builder vanillaEyesTexture( String eyeTex ) { return eyesTexture( new ResourceLocation( eyeTex ) ); }
+        @Deprecated( since = "3.1.14", forRemoval = true )
+        private Builder vanillaEyesTexture( String eyeTex ) { return eyesTexture( ResourceLocation.tryParse( eyeTex ) ); }
         
         /** Sets the species default overlay texture. */
-        @Deprecated(since = "3.1.14", forRemoval = true)
-        private Builder vanillaOverlayTexture( String ovrTex ) { return overlayTexture( new ResourceLocation( ovrTex ) ); }
-
+        @Deprecated( since = "3.1.14", forRemoval = true )
+        private Builder vanillaOverlayTexture( String ovrTex ) { return overlayTexture( ResourceLocation.tryParse( ovrTex ) ); }
+        
         /** Sets the species default animation texture. */
-        @Deprecated(since = "3.1.14", forRemoval = true)
-        private Builder vanillaAnimationTexture( String aniTex ) { return animationTexture( new ResourceLocation( aniTex ) ); }
+        @Deprecated( since = "3.1.14", forRemoval = true )
+        private Builder vanillaAnimationTexture( String aniTex ) { return animationTexture( ResourceLocation.tryParse( aniTex ) ); }
         
         
         //--------------- Textures (Auto-selected) ----------------
@@ -439,7 +439,7 @@ public class BestiaryInfo {
         
         /** @return The expected overlay texture for this builder. */
         private ResourceLocation getOverlayTexture() { return toTexture( References.TEXTURE_OVERLAY_SUFFIX ); }
-
+        
         /** @return The expected animation texture for this builder. */
         private ResourceLocation getAnimationTexture() { return toTexture( References.TEXTURE_ANIMATION_SUFFIX ); }
         
@@ -460,31 +460,31 @@ public class BestiaryInfo {
         
         /** Removes the species default animation texture. */
         public Builder noAnimationTexture() { return animationTexture( null ); }
-
+        
         /** Sets the species default base texture, under the Special Mobs namespace. */
         public Builder modBaseTexture( @Nonnull String tex ) {
             texture = SpecialMobs.rl( tex );
             return this;
         }
-
+        
         /** Sets the species default glowing eyes texture, under the Special Mobs namespace. */
         public Builder modEyesTexture( @Nonnull String eyesTex ) {
             eyesTexture = SpecialMobs.rl( eyesTex );
             return this;
         }
-
+        
         /** Sets the species default overlay texture, under the Special Mobs namespace. */
         public Builder modOverlayTexture( @Nonnull String ovrTex ) {
             overlayTexture = SpecialMobs.rl( ovrTex );
             return this;
         }
-
+        
         /** Sets the species default animation texture, under the Special Mobs namespace. */
         public Builder modAnimationTexture( @Nonnull String aniTex ) {
             animationTexture = SpecialMobs.rl( aniTex );
             return this;
         }
-
+        
         /** Sets the species default base texture. */
         private Builder baseTexture( @Nullable ResourceLocation tex ) {
             texture = tex;
@@ -502,7 +502,7 @@ public class BestiaryInfo {
             overlayTexture = ovrTex;
             return this;
         }
-
+        
         /** Sets the species default animation texture. */
         private Builder animationTexture( @Nullable ResourceLocation aniTex ) {
             animationTexture = aniTex;
@@ -748,7 +748,7 @@ public class BestiaryInfo {
         //--------------- Attribute Changes ----------------
         
         /** Adds a flat value to the base attribute. Not applicable for the movement speed attribute, use a multiplier instead. */
-        public Builder addToAttribute(Attribute attribute, double value ) {
+        public Builder addToAttribute( Attribute attribute, double value ) {
             if( attribute == Attributes.MOVEMENT_SPEED )
                 throw new IllegalArgumentException( "Do not add flat movement speed!" );
             attributes.add( AttributeEntry.add( attribute, value ) );

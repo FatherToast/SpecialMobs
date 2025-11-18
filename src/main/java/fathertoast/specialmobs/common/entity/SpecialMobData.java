@@ -32,7 +32,7 @@ public class SpecialMobData<T extends Mob & ISpecialMob<T>> {
      * @param tag The mob's base nbt tag.
      * @return The nbt tag to save special mob data to.
      */
-    public static CompoundTag getSaveLocation(CompoundTag tag ) {
+    public static CompoundTag getSaveLocation( CompoundTag tag ) {
         if( !tag.contains( TAG_FORGE_DATA, NBT_TYPE_COMPOUND ) ) {
             tag.put( TAG_FORGE_DATA, new CompoundTag() );
         }
@@ -194,14 +194,12 @@ public class SpecialMobData<T extends Mob & ISpecialMob<T>> {
     /** @return The overlay texture for the entity. */
     @Nullable
     public ResourceLocation getTextureOverlay() { return theEntity.getSpecies().bestiaryInfo.overlayTexture; }
-
+    
     @Nullable
     public ResourceLocation getTextureAnimation() {
         return theEntity.getSpecies().bestiaryInfo.animationTexture;
     }
     
-
-
     
     /** @return The render scale for the entity, including any applied random scaling. */
     public float getRenderScale() { return theEntity.getEntityData().get( renderScale ); }
@@ -224,7 +222,7 @@ public class SpecialMobData<T extends Mob & ISpecialMob<T>> {
      * @return The height scale, including baby modifier if applicable. Used to calculate eye height for families that are not auto-scaled.
      * Note: Baby scale is derived from {@link net.minecraft.entity.monster.ZombieEntity#getStandingEyeHeight(Pose, EntitySize)}.
      */
-    @SuppressWarnings("JavadocReference")
+    @SuppressWarnings( "JavadocReference" )
     public float getHeightScaleByAge() { return getHeightScale() * (theEntity.isBaby() ? 0.53448F : 1.0F); }
     
     /** @return The base render scale for the entity, which is a property of the mob species. */
@@ -331,10 +329,10 @@ public class SpecialMobData<T extends Mob & ISpecialMob<T>> {
     public boolean isPotionApplicable( MobEffectInstance effect ) {
         final MobEffectEvent.Applicable event = new MobEffectEvent.Applicable( theEntity, effect );
         MinecraftForge.EVENT_BUS.post( event );
-        return switch (event.getResult()) {
+        return switch( event.getResult() ) {
             case DENY -> false;
             case ALLOW -> true;
-            default -> !immuneToPotions.contains(effect.getEffect());
+            default -> !immuneToPotions.contains( effect.getEffect() );
         };
     }
     
@@ -429,7 +427,7 @@ public class SpecialMobData<T extends Mob & ISpecialMob<T>> {
         if( tag.contains( TAG_RENDER_SCALE, NBT_TYPE_NUMERICAL ) ) {
             setRenderScale( tag.getFloat( TAG_RENDER_SCALE ) );
         }
-
+        
         // Capabilities
         if( tag.contains( TAG_EXPERIENCE, NBT_TYPE_NUMERICAL ) ) {
             theEntity.setExperience( tag.getInt( TAG_EXPERIENCE ) );
@@ -465,7 +463,7 @@ public class SpecialMobData<T extends Mob & ISpecialMob<T>> {
             final ListTag stickyBlocksTag = tag.getList( TAG_STICKY_IMMUNE, NBT_TYPE_STRING );
             immuneToStickyBlocks.clear();
             for( int i = 0; i < stickyBlocksTag.size(); i++ ) {
-                final Block block = ForgeRegistries.BLOCKS.getValue( new ResourceLocation( stickyBlocksTag.getString( i ) ) );
+                final Block block = ForgeRegistries.BLOCKS.getValue( ResourceLocation.tryParse( stickyBlocksTag.getString( i ) ) );
                 if( block != null && !block.defaultBlockState().is( Blocks.AIR ) )
                     immuneToStickyBlocks.add( block );
             }
@@ -474,7 +472,7 @@ public class SpecialMobData<T extends Mob & ISpecialMob<T>> {
             final ListTag potionsTag = tag.getList( TAG_POTION_IMMUNE, NBT_TYPE_STRING );
             immuneToPotions.clear();
             for( int i = 0; i < potionsTag.size(); i++ ) {
-                final MobEffect effect = ForgeRegistries.MOB_EFFECTS.getValue( new ResourceLocation( potionsTag.getString( i ) ) );
+                final MobEffect effect = ForgeRegistries.MOB_EFFECTS.getValue( ResourceLocation.tryParse( potionsTag.getString( i ) ) );
                 if( effect != null )
                     immuneToPotions.add( effect );
             }

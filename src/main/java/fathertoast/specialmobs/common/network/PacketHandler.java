@@ -25,7 +25,7 @@ public class PacketHandler {
     
     private static SimpleChannel createChannel() {
         return NetworkRegistry.ChannelBuilder
-                .named( new ResourceLocation( SpecialMobs.MOD_ID, "channel" ) )
+                .named( ResourceLocation.fromNamespaceAndPath( SpecialMobs.MOD_ID, "channel" ) )
                 .serverAcceptedVersions( PROTOCOL_VERSION::equals )
                 .clientAcceptedVersions( PROTOCOL_VERSION::equals )
                 .networkProtocolVersion( () -> PROTOCOL_VERSION )
