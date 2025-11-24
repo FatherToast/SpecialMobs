@@ -1,4 +1,4 @@
-package fathertoast.specialmobs.datagen;
+package fathertoast.specialmobs.datagen.tag;
 
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.core.SpecialMobs;

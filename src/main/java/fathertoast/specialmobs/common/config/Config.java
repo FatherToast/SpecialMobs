@@ -3,6 +3,7 @@ package fathertoast.specialmobs.common.config;
 import fathertoast.crust.api.config.common.ConfigManager;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.core.SpecialMobs;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
 /**
  * Used as the sole hub for all config access from outside the config package.
@@ -31,8 +32,6 @@ public class Config {
         MANAGER.freezeFileWatcher = false;
     }
 
-    /** Called from {@link SpecialMobs#SpecialMobs()} to load this class. */
-    public static void initialize() {
-
-    }
+    /** Called from {@link SpecialMobs#SpecialMobs(FMLJavaModLoadingContext)} to load this class. */
+    public static void initialize() {}
 }

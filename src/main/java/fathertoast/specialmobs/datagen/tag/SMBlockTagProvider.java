@@ -1,4 +1,4 @@
-package fathertoast.specialmobs.datagen;
+package fathertoast.specialmobs.datagen.tag;
 
 import fathertoast.specialmobs.common.core.SpecialMobs;
 import net.minecraft.core.HolderLookup;

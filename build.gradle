@@ -100,20 +100,24 @@ dependencies {
     runtimeOnly fg.deobf("curse.maven:jei-238222:${jei_version}")
     implementation fg.deobf("curse.maven:jade-324717:${jade_version}")
 
+    // Tinker's Construct
+    implementation fg.deobf("curse.maven:tc-74072:${tc_version}")
+    implementation fg.deobf("curse.maven:mantle-74924:${mantle_version}")
+
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 }
 
 jar {
     manifest {
         attributes([
-                "Specification-Title": "Special Mobs",
-                "Specification-Vendor": "FatherToast",
-                "Specification-Version": "1", // We are version 1 of ourselves
-                "Implementation-Title": project.name,
-                "Implementation-Version": "${version}",
-                "Implementation-Vendor" :"FatherToast",
+                "Specification-Title"     : "Special Mobs",
+                "Specification-Vendor"    : "FatherToast",
+                "Specification-Version"   : "1", // We are version 1 of ourselves
+                "Implementation-Title"    : project.name,
+                "Implementation-Version"  : "${version}",
+                "Implementation-Vendor"   : "FatherToast",
                 "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
-                "MixinConfigs": "specialmobs.mixins.json"
+                "MixinConfigs"            : "specialmobs.mixins.json"
         ])
     }
 }

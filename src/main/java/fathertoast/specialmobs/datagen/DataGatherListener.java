@@ -2,7 +2,15 @@ package fathertoast.specialmobs.datagen;
 
 import fathertoast.specialmobs.common.core.SpecialMobs;
 import fathertoast.specialmobs.common.core.register.SMDamageTypes;
-import net.minecraft.client.renderer.entity.CaveSpiderRenderer;
+import fathertoast.specialmobs.datagen.lang.SMLanguageProvider;
+import fathertoast.specialmobs.datagen.loot.SMLootTableProvider;
+import fathertoast.specialmobs.datagen.model.SMBlockStateAndModelProvider;
+import fathertoast.specialmobs.datagen.model.SMItemModelProvider;
+import fathertoast.specialmobs.datagen.recipe.SMRecipeProvider;
+import fathertoast.specialmobs.datagen.tag.SMBlockTagProvider;
+import fathertoast.specialmobs.datagen.tag.SMDamageTagProvider;
+import fathertoast.specialmobs.datagen.tag.SMEntityTagProvider;
+import fathertoast.specialmobs.datagen.tag.SMItemTagProvider;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.RegistrySetBuilder;
@@ -41,6 +49,7 @@ public class DataGatherListener {
         }
         if( event.includeServer() ) {
             generator.addProvider( true, new SMLootTableProvider( packOutput ) );
+            generator.addProvider( true, new SMRecipeProvider( packOutput ) );
 
             BlockTagsProvider blockTagProvider = new SMBlockTagProvider( packOutput, lookupProvider, fileHelper );
 
@@ -48,7 +57,7 @@ public class DataGatherListener {
             generator.addProvider(true, new SMItemTagProvider( packOutput, lookupProvider, blockTagProvider.contentsGetter(), fileHelper ) );
             generator.addProvider( true, new SMEntityTagProvider( packOutput, lookupProvider, fileHelper ) );
             generator.addProvider( true, new SMDamageTagProvider( packOutput, lookupProvider, fileHelper ) );
-            generator.addProvider( event.includeServer(), new DatapackBuiltinEntriesProvider(
+            generator.addProvider( true, new DatapackBuiltinEntriesProvider(
                     packOutput, lookupProvider, Set.of( SpecialMobs.MOD_ID )));
         }
     }

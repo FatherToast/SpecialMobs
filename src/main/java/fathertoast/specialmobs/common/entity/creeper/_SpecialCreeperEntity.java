@@ -82,7 +82,7 @@ public class _SpecialCreeperEntity extends Creeper implements IExplodingMob, ISp
     public static void addBaseLoot( LootTableBuilder loot ) {
         loot.addLootTable( "main", EntityType.CREEPER.getDefaultLootTable() );
     }
-
+    
     @SpecialMob.EntityTagProvider
     public static List<TagKey<EntityType<?>>> getEntityTags() {
         return Collections.singletonList( SMTags.EntityTypes.CREEPERS );
@@ -106,12 +106,12 @@ public class _SpecialCreeperEntity extends Creeper implements IExplodingMob, ISp
     
     /** Override to change starting equipment or stats. */
     @SuppressWarnings( "unused" )
-    public void finalizeVariantSpawn(ServerLevelAccessor level, DifficultyInstance difficulty, @Nullable MobSpawnType spawnType,
-                                     @Nullable SpawnGroupData groupData ) { }
+    public void finalizeVariantSpawn( ServerLevelAccessor level, DifficultyInstance difficulty, @Nullable MobSpawnType spawnType,
+                                      @Nullable SpawnGroupData groupData ) { }
     
     /** Called when this entity successfully damages a target to apply on-hit effects. */
     @Override
-    public void doEnchantDamageEffects(LivingEntity attacker, Entity target ) {
+    public void doEnchantDamageEffects( LivingEntity attacker, Entity target ) {
         if( target instanceof LivingEntity ) onVariantAttack( (LivingEntity) target );
         super.doEnchantDamageEffects( attacker, target );
     }
@@ -353,7 +353,7 @@ public class _SpecialCreeperEntity extends Creeper implements IExplodingMob, ISp
     @Nullable
     @Override
     public final SpawnGroupData finalizeSpawn( ServerLevelAccessor level, DifficultyInstance difficulty, MobSpawnType spawnType,
-                                                  @Nullable SpawnGroupData groupData, @Nullable CompoundTag eggTag ) {
+                                               @Nullable SpawnGroupData groupData, @Nullable CompoundTag eggTag ) {
         return MobHelper.finalizeSpawn( this, level, difficulty, spawnType,
                 super.finalizeSpawn( level, difficulty, spawnType, groupData, eggTag ) );
     }
@@ -415,7 +415,7 @@ public class _SpecialCreeperEntity extends Creeper implements IExplodingMob, ISp
     
     /** @return Called when this mob falls. Calculates and applies fall damage. Returns false if canceled. */
     @Override
-    public boolean causeFallDamage( float distance, float damageMultiplier, DamageSource damageSource) {
+    public boolean causeFallDamage( float distance, float damageMultiplier, DamageSource damageSource ) {
         return super.causeFallDamage( distance, damageMultiplier * getSpecialData().getFallDamageMultiplier(), damageSource );
     }
     

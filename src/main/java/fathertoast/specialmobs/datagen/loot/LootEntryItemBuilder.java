@@ -1,6 +1,5 @@
 package fathertoast.specialmobs.datagen.loot;
 
-import fathertoast.specialmobs.datagen.SMLootTableProvider;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
