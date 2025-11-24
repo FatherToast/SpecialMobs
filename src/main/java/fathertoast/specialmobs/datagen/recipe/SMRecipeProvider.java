@@ -66,6 +66,9 @@ public class SMRecipeProvider extends RecipeProvider {
         tinkersEntityMelting( EntityIngredient.of( SMTags.EntityTypes.SPIDERS ), TinkerFluids.venom.get(), 25, 2,
                 saver, "venom_from_all_spiders" );
         
+        tinkersEntityMelting( EntityIngredient.of( SMTags.EntityTypes.CAVE_SPIDERS ), TinkerFluids.venom.get(), 25, 2,
+                saver, "venom_from_all_cave_spiders" );
+        
         tinkersEntityMelting( EntityIngredient.of( SMTags.EntityTypes.ZOMBIES ), TinkerFluids.moltenIron.get(), 10, 4,
                 saver, "molten_iron_from_all_zombies" );
     }
