@@ -1,3 +1,6 @@
+1.20.1-4.1.17
+    - Tinker's Construct compat:
+        - Added default entity melting recipes for relevant vanilla replacements and mob families.
 1.20.1-4.1.16
     - Bumped required Crust version to 4.9.15.
 1.20.1-4.1.15
