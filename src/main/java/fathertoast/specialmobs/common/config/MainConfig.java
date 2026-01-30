@@ -19,14 +19,14 @@ public class MainConfig extends AbstractConfigFile {
         super( manager, fileName,
                 "This config contains options that apply to the mod as a whole, including some master " +
                         "settings toggles for convenience." );
-
+        
         SPEC.fileOnlyNewLine();
         SPEC.describeEnvironmentListPart1of2();
         SPEC.fileOnlyNewLine();
         
         GENERAL = new General( this );
         NATURAL_SPAWNING = new NaturalSpawning( this );
-
+        
         SPEC.fileOnlyNewLine();
         SPEC.describeEnvironmentListPart2of2();
         SPEC.fileOnlyNewLine();
@@ -36,9 +36,10 @@ public class MainConfig extends AbstractConfigFile {
         
         public final BooleanField enableMobReplacement;
         public final BooleanField enableNaturalSpawning;
-
+        
         public final BooleanField skipSpawnerSpawns;
-
+        public final BooleanField skipStructureSpawns;
+        
         public final BooleanField masterVanillaReplacement;
         public final DoubleField masterRandomScaling;
         
@@ -58,10 +59,12 @@ public class MainConfig extends AbstractConfigFile {
                     "Whether the natural spawning category (see below) is enabled." ) );
             
             SPEC.newLine();
-
+            
             skipSpawnerSpawns = SPEC.define( new BooleanField( "skip_spawner_spawns", false,
-                    "If enabled, mobs spawned from spawner blocks/dungeon spawners will not be subject to mob replacement.") );
-
+                    "If enabled, mobs spawned from spawner blocks/dungeon spawners will not be subject to mob replacement." ) );
+            skipStructureSpawns = SPEC.define( new BooleanField( "skip_structure_spawns", false,
+                    "If enabled, mobs spawned from structures will not be subject to mob replacement." ) );
+            
             SPEC.newLine();
             
             masterVanillaReplacement = SPEC.define( new BooleanField( "master_vanilla_replacement", true,
@@ -93,10 +96,10 @@ public class MainConfig extends AbstractConfigFile {
         
         public final IntField drowningCreeperOceanWeight;
         public final IntField drowningCreeperRiverWeight;
-
+        
         public final IntField pirateSkeletonOceanWeight;
         public final IntField pirateSkeletonRiverWeight;
-
+        
         public final IntField blueberrySlimeOceanWeight;
         public final IntField blueberrySlimeRiverWeight;
         
@@ -157,7 +160,7 @@ public class MainConfig extends AbstractConfigFile {
                             "in the species config file." ), RestartNote.WORLD );
             
             SPEC.newLine();
-
+            
             pirateSkeletonOceanWeight = SPEC.define( new IntField( "pirate_skeleton_weight.ocean", 1, IntField.Range.NON_NEGATIVE,
                     "Option to add pirate skeletons as natural spawns to oceans.",
                     "When set to 0, this added spawn feature is completely disabled.",
@@ -166,7 +169,7 @@ public class MainConfig extends AbstractConfigFile {
                     "Option to add pirate skeletons as natural spawns to rivers. When set to 0, this added " +
                             "spawn feature is completely disabled. Finer tuning can be done with the natural spawn chances " +
                             "in the species config file." ), RestartNote.WORLD );
-
+            
             SPEC.newLine();
             
             blueberrySlimeOceanWeight = SPEC.define( new IntField( "blueberry_slime_weight.ocean", 2, IntField.Range.NON_NEGATIVE,
