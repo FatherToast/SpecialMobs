@@ -1,3 +1,7 @@
+1.20.1-4.1.18
+    - Hopefully fixes chunk loading deadlock on dedicated servers.
+    - Made README config more readable in the editor GUI.
+    - Added config option for forcing the mob replacer to skip structure spawns.
 1.20.1-4.1.17
     - Tinker's Construct compat:
         - Added default entity melting recipes for relevant vanilla replacements and mob families.
