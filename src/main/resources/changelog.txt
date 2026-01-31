@@ -1,3 +1,6 @@
+1.20.1-4.1.19
+    - Fixed comod crash happening if FinalizeSpawn event is fired outside the main server thread.
+    - Added config blacklist for mob spawn types that the special mobs replacer should skip.
 1.20.1-4.1.18
     - Hopefully fixes chunk loading deadlock on dedicated servers.
     - Made README config more readable in the editor GUI.
