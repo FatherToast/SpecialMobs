@@ -5,9 +5,15 @@ import fathertoast.crust.api.config.common.AbstractConfigFile;
 import fathertoast.crust.api.config.common.ConfigManager;
 import fathertoast.crust.api.config.common.ConfigUtil;
 import fathertoast.crust.api.config.common.field.*;
+import fathertoast.crust.api.config.common.file.TomlHelper;
 import fathertoast.crust.api.config.common.value.EnvironmentEntry;
 import fathertoast.crust.api.config.common.value.EnvironmentList;
+import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.level.levelgen.structure.BuiltinStructures;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 
 public class MainConfig extends AbstractConfigFile {
     
@@ -34,11 +40,18 @@ public class MainConfig extends AbstractConfigFile {
     
     public static class General extends AbstractConfigCategory<MainConfig> {
         
+        public static final List<String> mobSpawnTypes = new ArrayList<>();
+        
+        static {
+            for( MobSpawnType type : MobSpawnType.values() ) {
+                mobSpawnTypes.add( type.name().toLowerCase( Locale.ROOT ) );
+            }
+        }
+        
         public final BooleanField enableMobReplacement;
         public final BooleanField enableNaturalSpawning;
         
-        public final BooleanField skipSpawnerSpawns;
-        public final BooleanField skipStructureSpawns;
+        public final PredicateStringListField skippedSpawnTypes;
         
         public final BooleanField masterVanillaReplacement;
         public final DoubleField masterRandomScaling;
@@ -60,10 +73,11 @@ public class MainConfig extends AbstractConfigFile {
             
             SPEC.newLine();
             
-            skipSpawnerSpawns = SPEC.define( new BooleanField( "skip_spawner_spawns", false,
-                    "If enabled, mobs spawned from spawner blocks/dungeon spawners will not be subject to mob replacement." ) );
-            skipStructureSpawns = SPEC.define( new BooleanField( "skip_structure_spawns", false,
-                    "If enabled, mobs spawned from structures will not be subject to mob replacement." ) );
+            skippedSpawnTypes = SPEC.define( new PredicateStringListField( "skipped_spawn_types", "MobSpawnType",
+                    makeDefaultSkippedSpawnTypes(), mobSpawnTypes::contains,
+                    "A list of mob spawn types that the mob replacer should not process.",
+                    "For example, listing \"spawner\" here will stop the mob replacer from processing mobs spawned from spawners.",
+                    "Valid types are as follows: " + TomlHelper.literalList( mobSpawnTypes ) ) );
             
             SPEC.newLine();
             
@@ -86,6 +100,14 @@ public class MainConfig extends AbstractConfigFile {
                     "Overrides the default fishing rod item animation so that it is compatible with fishing mobs " +
                             "from this mod. Set to false if it causes problems with another mod. Fishing mobs will instead " +
                             "render a stick while casting." ), RestartNote.GAME );
+        }
+        
+        private List<String> makeDefaultSkippedSpawnTypes() {
+            return List.of(
+                    MobSpawnType.STRUCTURE.name().toLowerCase( Locale.ROOT ),
+                    MobSpawnType.BUCKET.name().toLowerCase( Locale.ROOT ),
+                    MobSpawnType.CHUNK_GENERATION.name().toLowerCase( Locale.ROOT )
+            );
         }
     }
     

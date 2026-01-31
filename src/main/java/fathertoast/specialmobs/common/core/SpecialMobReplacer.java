@@ -24,10 +24,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
 import javax.annotation.Nullable;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Deque;
-import java.util.List;
+import java.util.*;
 import java.util.function.Predicate;
 
 import static com.mojang.text2speech.Narrator.LOGGER;
@@ -69,13 +66,8 @@ public final class SpecialMobReplacer {
         
         final MobSpawnType spawnType = event.getSpawnType();
         
-        // Check if structure spawns should be skipped.
-        if( spawnType == MobSpawnType.STRUCTURE && Config.MAIN.GENERAL.skipStructureSpawns.get() ) {
-            return;
-        }
-        
-        // Check if spawner spawns should be skipped.
-        if( spawnType == MobSpawnType.SPAWNER && Config.MAIN.GENERAL.skipSpawnerSpawns.get() ) {
+        // Check if the spawn type is one that should be skipped.
+        if( Config.MAIN.GENERAL.skippedSpawnTypes.get().contains( spawnType.name().toLowerCase( Locale.ROOT ) ) ) {
             return;
         }
         
@@ -89,22 +81,22 @@ public final class SpecialMobReplacer {
             // FinalizeSpawn should never be called multiple times on an entity, but who knows.
             setInitFlag( entity );
             
-            // Ensure we do this on the main server thread! Badness is sure to unfold if not!
-            level.getServer().execute( () -> {
+            // If we for whatever reason are not in a loaded chunk, delay replacement.
+            if( EnvironmentHelper.isLoaded( level, entityPos ) ) {
+                final boolean isSpecial = shouldMakeNextSpecial( mobFamily, level, entityPos );
                 
-                // If we for whatever reason are not in a loaded chunk, delay replacement.
-                if( EnvironmentHelper.isLoaded( level, entityPos ) ) {
-                    final boolean isSpecial = shouldMakeNextSpecial( mobFamily, level, entityPos );
-                    
-                    if( shouldReplace( mobFamily, isSpecial ) ) {
-                        TO_REPLACE.addLast( new MobReplacementEntry( mobFamily, isSpecial, entity, level, entityPos ) );
-                        event.setSpawnCancelled( true );
-                    }
+                if( shouldReplace( mobFamily, isSpecial ) ) {
+                    level.getServer().execute(
+                            () -> TO_REPLACE.addLast( new MobReplacementEntry( mobFamily, isSpecial, entity, level, entityPos ) )
+                    );
+                    event.setSpawnCancelled( true );
                 }
-                else {
-                    DELAYED_REPLACE.add( new DelayedMobReplacementEntry( mobFamily, entity, level, entityPos ) );
-                }
-            } );
+            }
+            else {
+                level.getServer().execute( () ->
+                        DELAYED_REPLACE.add( new DelayedMobReplacementEntry( mobFamily, entity, level, entityPos ) )
+                );
+            }
         }
     }
     
