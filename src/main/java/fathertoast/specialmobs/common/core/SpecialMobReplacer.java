@@ -30,6 +30,8 @@ import java.util.Deque;
 import java.util.List;
 import java.util.function.Predicate;
 
+import static com.mojang.text2speech.Narrator.LOGGER;
+
 @Mod.EventBusSubscriber( modid = SpecialMobs.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE )
 public final class SpecialMobReplacer {
     /** List of data for mobs needing replacement. */
@@ -54,8 +56,16 @@ public final class SpecialMobReplacer {
      */
     @SubscribeEvent( priority = EventPriority.HIGH )
     public static void onFinalizeSpawn( MobSpawnEvent.FinalizeSpawn event ) {
+        // Check if replacement is even enabled.
         if( !Config.MAIN.GENERAL.enableMobReplacement.get() )
             return;
+        
+        final ServerLevel level = event.getLevel().getLevel();
+        
+        // Log a warning if we are not on the main server thread.
+        if( !level.getServer().isSameThread() ) {
+            LOGGER.warn( "FinalizeSpawn event fired outside main server thread! This is bad! Offending thread: {}", Thread.currentThread() );
+        }
         
         final MobSpawnType spawnType = event.getSpawnType();
         
@@ -73,26 +83,28 @@ public final class SpecialMobReplacer {
         final MobFamily<?, ?> mobFamily = getReplacingMobFamily( entity );
         
         if( mobFamily != null ) {
-            final ServerLevel level = event.getLevel().getLevel();
             final BlockPos entityPos = BlockPos.containing( entity.position() );
             
             // Do this regardless of replacement, should help prevent bizarre save glitches.
             // FinalizeSpawn should never be called multiple times on an entity, but who knows.
             setInitFlag( entity );
             
-            // If we for whatever reason are not in a loaded chunk, delay replacement.
-            if( EnvironmentHelper.isLoaded( level, entityPos ) ) {
-                final boolean isSpecial = shouldMakeNextSpecial( mobFamily, level, entityPos );
+            // Ensure we do this on the main server thread! Badness is sure to unfold if not!
+            level.getServer().execute( () -> {
                 
-                if( shouldReplace( mobFamily, isSpecial ) ) {
-                    TO_REPLACE.addLast( new MobReplacementEntry( mobFamily, isSpecial, entity, level, entityPos ) );
+                // If we for whatever reason are not in a loaded chunk, delay replacement.
+                if( EnvironmentHelper.isLoaded( level, entityPos ) ) {
+                    final boolean isSpecial = shouldMakeNextSpecial( mobFamily, level, entityPos );
                     
-                    event.setSpawnCancelled( true );
+                    if( shouldReplace( mobFamily, isSpecial ) ) {
+                        TO_REPLACE.addLast( new MobReplacementEntry( mobFamily, isSpecial, entity, level, entityPos ) );
+                        event.setSpawnCancelled( true );
+                    }
                 }
-            }
-            else {
-                DELAYED_REPLACE.add( new DelayedMobReplacementEntry( mobFamily, entity, level, entityPos ) );
-            }
+                else {
+                    DELAYED_REPLACE.add( new DelayedMobReplacementEntry( mobFamily, entity, level, entityPos ) );
+                }
+            } );
         }
     }
     
