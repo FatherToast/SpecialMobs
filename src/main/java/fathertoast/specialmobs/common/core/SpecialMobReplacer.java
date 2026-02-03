@@ -3,12 +3,11 @@ package fathertoast.specialmobs.common.core;
 import fathertoast.crust.api.lib.EnvironmentHelper;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.config.Config;
-import fathertoast.specialmobs.common.config.MainConfig;
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.util.References;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.server.level.ServerChunkCache;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -19,18 +18,16 @@ import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.event.entity.living.MobSpawnEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
 import javax.annotation.Nullable;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Deque;
-import java.util.List;
+import java.util.*;
 import java.util.function.Predicate;
+
+import static com.mojang.text2speech.Narrator.LOGGER;
 
 @Mod.EventBusSubscriber( modid = SpecialMobs.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE )
 public final class SpecialMobReplacer {
@@ -44,64 +41,61 @@ public final class SpecialMobReplacer {
             ( species ) -> !species.config.GENERAL.isDamagedByWater.get();
     /** Returns true if the species' block height is less than or equal to the base vanilla entity's. */
     private static final Predicate<MobFamily.Species<?>> NO_GIANTS_SELECTOR = MobFamily.Species::isNotGiant;
-
-
+    
+    
     /**
-     * Called when a mob is being finalized before being added to the world and passed
-     * to {@link EntityJoinLevelEvent}.
-     *
-     * @param event The event data.
-     */
-    @SubscribeEvent
-    public static void onMobSpawn( MobSpawnEvent.FinalizeSpawn event ) {
-        final MobSpawnType spawnType = event.getSpawnType();
-
-        // Mark spawns that are likely unsafe to process later so we can skip them.
-        if ( spawnType == MobSpawnType.CHUNK_GENERATION || spawnType == MobSpawnType.STRUCTURE ) {
-            setInitFlag( event.getEntity() );
-            return;
-        }
-
-        // Check if spawner spawns should be skipped later.
-        if ( spawnType == MobSpawnType.SPAWNER && Config.MAIN.GENERAL.skipSpawnerSpawns.get() ) {
-            setInitFlag( event.getEntity() );
-        }
-    }
-
-    /**
-     * Called when any entity is spawned into the world by any means (such as natural/spawner spawns or chunk loading).
-     * <p>
+     * Called when a mob is being finalized before being added to the world.
+     * <br><br>
      * This checks whether the entity belongs to a special mob family and appropriately marks the mob to be replaced
      * by the tick handler after deciding whether the mob should be spawned as a special variant species.
      *
      * @param event The event data.
      */
-    @SubscribeEvent( priority = EventPriority.LOWEST )
-    public static void onEntityJoinLevel( EntityJoinLevelEvent event ) {
-        if( event.getLevel().isClientSide() || event.loadedFromDisk() || !Config.MAIN.GENERAL.enableMobReplacement.get() )
+    @SubscribeEvent( priority = EventPriority.HIGH )
+    public static void onFinalizeSpawn( MobSpawnEvent.FinalizeSpawn event ) {
+        // Check if replacement is even enabled.
+        if( !Config.MAIN.GENERAL.enableMobReplacement.get() )
             return;
-
+        
+        final ServerLevel level = event.getLevel().getLevel();
+        
+        // Log a warning if we are not on the main server thread.
+        if( !level.getServer().isSameThread() ) {
+            LOGGER.warn( "FinalizeSpawn event fired outside main server thread! This is bad! Offending thread: {}", Thread.currentThread() );
+        }
+        
+        final MobSpawnType spawnType = event.getSpawnType();
+        
+        // Check if the spawn type is one that should be skipped.
+        if( Config.MAIN.GENERAL.skippedSpawnTypes.get().contains( spawnType.name().toLowerCase( Locale.ROOT ) ) ) {
+            return;
+        }
+        
         final Entity entity = event.getEntity();
         final MobFamily<?, ?> mobFamily = getReplacingMobFamily( entity );
-
+        
         if( mobFamily != null ) {
-            final Level level = event.getLevel();
             final BlockPos entityPos = BlockPos.containing( entity.position() );
-
-            setInitFlag( entity ); // Do this regardless of replacement, should help prevent bizarre save glitches
-
-            if( level.isLoaded( BlockPos.containing( entity.getX(), entity.getY(), entity.getZ() ) ) ) {
+            
+            // Do this regardless of replacement, should help prevent bizarre save glitches.
+            // FinalizeSpawn should never be called multiple times on an entity, but who knows.
+            setInitFlag( entity );
+            
+            // If we for whatever reason are not in a loaded chunk, delay replacement.
+            if( EnvironmentHelper.isLoaded( level, entityPos ) ) {
                 final boolean isSpecial = shouldMakeNextSpecial( mobFamily, level, entityPos );
+                
                 if( shouldReplace( mobFamily, isSpecial ) ) {
-                    TO_REPLACE.addLast( new MobReplacementEntry( mobFamily, isSpecial, entity, level, entityPos ) );
-                    
-                    // Sadly, it's somewhat of a pain to make sure no warnings get logged
-                    // when dealing with mounts/riders... Maybe someday :(
-                    event.setCanceled( true );
+                    level.getServer().execute(
+                            () -> TO_REPLACE.addLast( new MobReplacementEntry( mobFamily, isSpecial, entity, level, entityPos ) )
+                    );
+                    event.setSpawnCancelled( true );
                 }
             }
             else {
-                DELAYED_REPLACE.add( new DelayedMobReplacementEntry( mobFamily, entity, level, entityPos ) );
+                level.getServer().execute( () ->
+                        DELAYED_REPLACE.add( new DelayedMobReplacementEntry( mobFamily, entity, level, entityPos ) )
+                );
             }
         }
     }
@@ -169,7 +163,7 @@ public final class SpecialMobReplacer {
     /** Replaces a mob, copying over all its data to the replacement. */
     private static void replace( MobFamily<?, ?> mobFamily, boolean isSpecial, Entity entityToReplace, Level level, BlockPos entityPos ) {
         // Make sure the chunk the entity is in is loaded
-        if( !(level instanceof ServerLevelAccessor) || !EnvironmentHelper.isLoaded(level, entityPos) ) return;
+        if( !EnvironmentHelper.isLoaded( level, entityPos ) ) return;
         
         final CompoundTag tag = new CompoundTag();
         entityToReplace.saveWithoutId( tag );

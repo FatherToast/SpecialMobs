@@ -5,9 +5,15 @@ import fathertoast.crust.api.config.common.AbstractConfigFile;
 import fathertoast.crust.api.config.common.ConfigManager;
 import fathertoast.crust.api.config.common.ConfigUtil;
 import fathertoast.crust.api.config.common.field.*;
+import fathertoast.crust.api.config.common.file.TomlHelper;
 import fathertoast.crust.api.config.common.value.EnvironmentEntry;
 import fathertoast.crust.api.config.common.value.EnvironmentList;
+import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.level.levelgen.structure.BuiltinStructures;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 
 public class MainConfig extends AbstractConfigFile {
     
@@ -19,14 +25,14 @@ public class MainConfig extends AbstractConfigFile {
         super( manager, fileName,
                 "This config contains options that apply to the mod as a whole, including some master " +
                         "settings toggles for convenience." );
-
+        
         SPEC.fileOnlyNewLine();
         SPEC.describeEnvironmentListPart1of2();
         SPEC.fileOnlyNewLine();
         
         GENERAL = new General( this );
         NATURAL_SPAWNING = new NaturalSpawning( this );
-
+        
         SPEC.fileOnlyNewLine();
         SPEC.describeEnvironmentListPart2of2();
         SPEC.fileOnlyNewLine();
@@ -34,11 +40,19 @@ public class MainConfig extends AbstractConfigFile {
     
     public static class General extends AbstractConfigCategory<MainConfig> {
         
+        public static final List<String> mobSpawnTypes = new ArrayList<>();
+        
+        static {
+            for( MobSpawnType type : MobSpawnType.values() ) {
+                mobSpawnTypes.add( type.name().toLowerCase( Locale.ROOT ) );
+            }
+        }
+        
         public final BooleanField enableMobReplacement;
         public final BooleanField enableNaturalSpawning;
-
-        public final BooleanField skipSpawnerSpawns;
-
+        
+        public final PredicateStringListField skippedSpawnTypes;
+        
         public final BooleanField masterVanillaReplacement;
         public final DoubleField masterRandomScaling;
         
@@ -58,10 +72,13 @@ public class MainConfig extends AbstractConfigFile {
                     "Whether the natural spawning category (see below) is enabled." ) );
             
             SPEC.newLine();
-
-            skipSpawnerSpawns = SPEC.define( new BooleanField( "skip_spawner_spawns", false,
-                    "If enabled, mobs spawned from spawner blocks/dungeon spawners will not be subject to mob replacement.") );
-
+            
+            skippedSpawnTypes = SPEC.define( new PredicateStringListField( "skipped_spawn_types", "MobSpawnType",
+                    makeDefaultSkippedSpawnTypes(), mobSpawnTypes::contains,
+                    "A list of mob spawn types that the mob replacer should not process.",
+                    "For example, listing \"spawner\" here will stop the mob replacer from processing mobs spawned from spawners.",
+                    "Valid types are as follows: " + TomlHelper.literalList( mobSpawnTypes ) ) );
+            
             SPEC.newLine();
             
             masterVanillaReplacement = SPEC.define( new BooleanField( "master_vanilla_replacement", true,
@@ -84,6 +101,14 @@ public class MainConfig extends AbstractConfigFile {
                             "from this mod. Set to false if it causes problems with another mod. Fishing mobs will instead " +
                             "render a stick while casting." ), RestartNote.GAME );
         }
+        
+        private List<String> makeDefaultSkippedSpawnTypes() {
+            return List.of(
+                    MobSpawnType.STRUCTURE.name().toLowerCase( Locale.ROOT ),
+                    MobSpawnType.BUCKET.name().toLowerCase( Locale.ROOT ),
+                    MobSpawnType.CHUNK_GENERATION.name().toLowerCase( Locale.ROOT )
+            );
+        }
     }
     
     public static class NaturalSpawning extends AbstractConfigCategory<MainConfig> {
@@ -93,10 +118,10 @@ public class MainConfig extends AbstractConfigFile {
         
         public final IntField drowningCreeperOceanWeight;
         public final IntField drowningCreeperRiverWeight;
-
+        
         public final IntField pirateSkeletonOceanWeight;
         public final IntField pirateSkeletonRiverWeight;
-
+        
         public final IntField blueberrySlimeOceanWeight;
         public final IntField blueberrySlimeRiverWeight;
         
@@ -157,7 +182,7 @@ public class MainConfig extends AbstractConfigFile {
                             "in the species config file." ), RestartNote.WORLD );
             
             SPEC.newLine();
-
+            
             pirateSkeletonOceanWeight = SPEC.define( new IntField( "pirate_skeleton_weight.ocean", 1, IntField.Range.NON_NEGATIVE,
                     "Option to add pirate skeletons as natural spawns to oceans.",
                     "When set to 0, this added spawn feature is completely disabled.",
@@ -166,7 +191,7 @@ public class MainConfig extends AbstractConfigFile {
                     "Option to add pirate skeletons as natural spawns to rivers. When set to 0, this added " +
                             "spawn feature is completely disabled. Finer tuning can be done with the natural spawn chances " +
                             "in the species config file." ), RestartNote.WORLD );
-
+            
             SPEC.newLine();
             
             blueberrySlimeOceanWeight = SPEC.define( new IntField( "blueberry_slime_weight.ocean", 2, IntField.Range.NON_NEGATIVE,
