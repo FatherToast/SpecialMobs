@@ -20,7 +20,7 @@ public class EntityEmberBlaze extends Entity_SpecialBlaze {
         getSpecialData().setTextures( EntityEmberBlaze.TEXTURES );
     }
     
-    /// Overridden to modify inherited attribites.
+    /// Overridden to modify inherited attributes.
     @Override
     protected void adjustTypeAttributes() {
         getSpecialData().addAttribute( SharedMonsterAttributes.maxHealth, 10.0 );
