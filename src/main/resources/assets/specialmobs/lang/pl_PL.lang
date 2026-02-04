@@ -15,6 +15,7 @@ potion.potency.7=VIII
 potion.potency.8=IX
 potion.potency.9=X
 
+entity.SpecialMobs.SMFireball.name=Ognista kula
 entity.SpecialMobs.SMFishHook.name=Haczyk
 
 entity.SpecialMobs.SpecialBlaze.name=Płomyk
