@@ -5,15 +5,14 @@ package toast.specialMobs.entity;
  * It allows for commonly used data to be stored conveniently and for
  * attribute changes to be appropriately applied.
  */
-public interface ISpecialMob
-{
+public interface ISpecialMob {
     /**
      * @return this mob's special data
      */
-    public SpecialMobData getSpecialData();
-
+    SpecialMobData getSpecialData();
+    
     /**
      * Called to modify the mob's inherited attributes.
      */
-    public void adjustEntityAttributes();
+    void adjustEntityAttributes();
 }

@@ -1,5 +1,7 @@
 package toast.specialMobs;
 
+import cpw.mods.fml.common.eventhandler.EventPriority;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
@@ -20,15 +22,13 @@ import toast.specialMobs.entity.pigzombie.EntityPlaguePigZombie;
 import toast.specialMobs.entity.skeleton.EntityPoisonSkeleton;
 import toast.specialMobs.entity.witch.EntityUndeadWitch;
 import toast.specialMobs.entity.zombie.EntityPlagueZombie;
-import cpw.mods.fml.common.eventhandler.EventPriority;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
-public class EventHandler
-{
+public class EventHandler {
+    
     public EventHandler() {
-        MinecraftForge.EVENT_BUS.register(this);
+        MinecraftForge.EVENT_BUS.register( this );
     }
-
+    
     /**
      * Called by World.spawnEntityInWorld().
      * Entity entity = the entity joining the world.
@@ -36,52 +36,52 @@ public class EventHandler
      *
      * @param event the event being triggered.
      */
-    @SubscribeEvent(priority = EventPriority.LOWEST)
-    public void onEntityJoinWorld(EntityJoinWorldEvent event) {
+    @SubscribeEvent( priority = EventPriority.LOWEST )
+    public void onEntityJoinWorld( EntityJoinWorldEvent event ) {
         // Special bow effect transfer.
-        if (event.entity instanceof EntityArrow && ((EntityArrow)event.entity).shootingEntity instanceof EntityLivingBase) {
-            ItemStack heldItem = ((EntityLivingBase)((EntityArrow)event.entity).shootingEntity).getHeldItem();
-            if (heldItem != null) {
+        if( event.entity instanceof EntityArrow && ((EntityArrow) event.entity).shootingEntity instanceof EntityLivingBase ) {
+            ItemStack heldItem = ((EntityLivingBase) ((EntityArrow) event.entity).shootingEntity).getHeldItem();
+            if( heldItem != null ) {
                 int level;
                 // Pain
-                if (EnchantmentSpecial.painBow != null) {
-                    level = EnchantmentHelper.getEnchantmentLevel(EnchantmentSpecial.painBow.effectId, heldItem);
+                if( EnchantmentSpecial.painBow != null ) {
+                    level = EnchantmentHelper.getEnchantmentLevel( EnchantmentSpecial.painBow.effectId, heldItem );
                 }
                 else {
                     level = 0;
                 }
-                if (level > 0) {
-                    event.entity.getEntityData().setInteger("SM|Pain", level);
+                if( level > 0 ) {
+                    event.entity.getEntityData().setInteger( "SM|Pain", level );
                 }
                 // Plague
-                if (EnchantmentSpecial.plagueBow != null) {
-                    level = EnchantmentHelper.getEnchantmentLevel(EnchantmentSpecial.plagueBow.effectId, heldItem);
+                if( EnchantmentSpecial.plagueBow != null ) {
+                    level = EnchantmentHelper.getEnchantmentLevel( EnchantmentSpecial.plagueBow.effectId, heldItem );
                 }
                 else {
-                    level = ((EntityArrow)event.entity).shootingEntity instanceof EntityPlagueZombie || ((EntityArrow)event.entity).shootingEntity instanceof EntityPlaguePigZombie ? 1 : 0;
+                    level = ((EntityArrow) event.entity).shootingEntity instanceof EntityPlagueZombie || ((EntityArrow) event.entity).shootingEntity instanceof EntityPlaguePigZombie ? 1 : 0;
                 }
-                if (level > 0) {
-                    event.entity.getEntityData().setInteger("SM|Plague", level);
+                if( level > 0 ) {
+                    event.entity.getEntityData().setInteger( "SM|Plague", level );
                 }
                 // Poison
-                if (EnchantmentSpecial.poisonBow != null) {
-                    level = EnchantmentHelper.getEnchantmentLevel(EnchantmentSpecial.poisonBow.effectId, heldItem);
+                if( EnchantmentSpecial.poisonBow != null ) {
+                    level = EnchantmentHelper.getEnchantmentLevel( EnchantmentSpecial.poisonBow.effectId, heldItem );
                 }
                 else {
-                    level = ((EntityArrow)event.entity).shootingEntity instanceof EntityPoisonSkeleton ? 1 : 0;
+                    level = ((EntityArrow) event.entity).shootingEntity instanceof EntityPoisonSkeleton ? 1 : 0;
                 }
-                if (level > 0) {
-                    event.entity.getEntityData().setInteger("SM|Poison", level);
+                if( level > 0 ) {
+                    event.entity.getEntityData().setInteger( "SM|Poison", level );
                 }
             }
         }
-
+        
         // Special mob replacement.
-        if (!event.world.isRemote && event.entity instanceof EntityLiving && !Properties.dimensionBlacklist().contains(event.world.provider.dimensionId)) {
-            EventHandler.replaceMob(event.world, (EntityLiving)event.entity);
+        if( !event.world.isRemote && event.entity instanceof EntityLiving && !Properties.dimensionBlacklist().contains( event.world.provider.dimensionId ) ) {
+            EventHandler.replaceMob( event.world, (EntityLiving) event.entity );
         }
     }
-
+    
     /**
      * Called by EntityLivingBase.attackEntityFrom().
      * EntityLivingBase entityLiving = the entity being damaged.
@@ -90,67 +90,67 @@ public class EventHandler
      *
      * @param event the event being triggered.
      */
-    @SubscribeEvent(priority = EventPriority.NORMAL)
-    public void onLivingHurt(LivingHurtEvent event) {
-        if (event.source != null) {
-        	if (event.source.getEntity() instanceof EntitySmolderBlaze) {
-        		event.entityLiving.addPotionEffect(new PotionEffect(Potion.blindness.id, 80));
-        	}
-
-            Entity attacker = null;
+    @SubscribeEvent( priority = EventPriority.NORMAL )
+    public void onLivingHurt( LivingHurtEvent event ) {
+        if( event.source != null ) {
+            if( event.source.getEntity() instanceof EntitySmolderBlaze ) {
+                event.entityLiving.addPotionEffect( new PotionEffect( Potion.blindness.id, 80 ) );
+            }
+            Entity attacker;
             attacker = event.source.getSourceOfDamage();
             int pain = 0;
             int plague = 0;
             int poison = 0;
-            if (attacker instanceof EntityArrow) {
-                pain = attacker.getEntityData().getInteger("SM|Pain");
-                plague = attacker.getEntityData().getInteger("SM|Plague");
-                poison = attacker.getEntityData().getInteger("SM|Poison");
+            
+            if( attacker instanceof EntityArrow ) {
+                pain = attacker.getEntityData().getInteger( "SM|Pain" );
+                plague = attacker.getEntityData().getInteger( "SM|Plague" );
+                poison = attacker.getEntityData().getInteger( "SM|Poison" );
             }
-            else if (attacker instanceof EntityLivingBase) {
-                ItemStack heldItem = ((EntityLivingBase)attacker).getHeldItem();
+            else if( attacker instanceof EntityLivingBase ) {
+                ItemStack heldItem = ((EntityLivingBase) attacker).getHeldItem();
                 // Pain
-                if (heldItem != null && EnchantmentSpecial.painSword != null) {
-                    pain = EnchantmentHelper.getEnchantmentLevel(EnchantmentSpecial.painSword.effectId, heldItem);
+                if( heldItem != null && EnchantmentSpecial.painSword != null ) {
+                    pain = EnchantmentHelper.getEnchantmentLevel( EnchantmentSpecial.painSword.effectId, heldItem );
                 }
                 else {
                     pain = 0;
                 }
                 // Plague
-                if (heldItem != null && EnchantmentSpecial.plagueSword != null) {
-                    plague = EnchantmentHelper.getEnchantmentLevel(EnchantmentSpecial.plagueSword.effectId, heldItem);
+                if( heldItem != null && EnchantmentSpecial.plagueSword != null ) {
+                    plague = EnchantmentHelper.getEnchantmentLevel( EnchantmentSpecial.plagueSword.effectId, heldItem );
                 }
                 else {
                     plague = attacker instanceof EntityPlagueZombie || attacker instanceof EntityPlaguePigZombie ? 1 : 0;
                 }
                 // Poison
-                if (heldItem != null && EnchantmentSpecial.poisonSword != null) {
-                    poison = EnchantmentHelper.getEnchantmentLevel(EnchantmentSpecial.poisonSword.effectId, heldItem);
+                if( heldItem != null && EnchantmentSpecial.poisonSword != null ) {
+                    poison = EnchantmentHelper.getEnchantmentLevel( EnchantmentSpecial.poisonSword.effectId, heldItem );
                 }
                 else {
                     poison = attacker instanceof EntityPoisonSkeleton ? 1 : 0;
                 }
             }
-
-            if (pain > 0) {
-                event.entityLiving.setHealth(event.entityLiving.getHealth() - pain);
+            
+            if( pain > 0 ) {
+                event.entityLiving.setHealth( event.entityLiving.getHealth() - pain );
             }
-            if (plague > 0) {
-                EffectHelper.plagueEffect(event.entityLiving, plague);
+            if( plague > 0 ) {
+                EffectHelper.plagueEffect( event.entityLiving, plague );
             }
-            if (poison > 0) {
-                EffectHelper.stackEffect(event.entityLiving, Potion.poison, 300, poison - 1, 3);
+            if( poison > 0 ) {
+                EffectHelper.stackEffect( event.entityLiving, Potion.poison, 300, poison - 1, 3 );
             }
         }
     }
-
+    
     // Marks the mob to be replaced with a Special Mobs version, if needed.
-    public static void replaceMob(World world, EntityLiving entity) {
-        if (MobHelper.canReplace(entity)) {
-            TickHandler.markEntityToBeReplaced(entity);
+    public static void replaceMob( World world, EntityLiving entity ) {
+        if( MobHelper.canReplace( entity ) ) {
+            TickHandler.markEntityToBeReplaced( entity );
         }
     }
-
+    
     /**
      * Called by EntityLivingBase.onDeath().
      * EntityLivingBase entityLiving = the entity being killed.
@@ -158,14 +158,14 @@ public class EventHandler
      *
      * @param event the event being triggered.
      */
-    @SubscribeEvent(priority = EventPriority.NORMAL)
-    public void onLivingDeath(LivingDeathEvent event) {
-    	if (event.entityLiving.getCreatureAttribute() == EnumCreatureAttribute.UNDEAD && !(event.entityLiving instanceof EntitySkeleton) && event.entityLiving.getRNG().nextInt(6) != 0) {
-    		for (Object entity : event.entityLiving.worldObj.getEntitiesWithinAABBExcludingEntity(event.entityLiving, event.entityLiving.boundingBox.expand(16.0, 8.0, 16.0))) {
-    			if (entity instanceof EntityUndeadWitch) {
-    				((EntityUndeadWitch) entity).skeletonCount++;
-    			}
-    		}
-    	}
+    @SubscribeEvent( priority = EventPriority.NORMAL )
+    public void onLivingDeath( LivingDeathEvent event ) {
+        if( event.entityLiving.getCreatureAttribute() == EnumCreatureAttribute.UNDEAD && !(event.entityLiving instanceof EntitySkeleton) && event.entityLiving.getRNG().nextInt( 6 ) != 0 ) {
+            for( Object entity : event.entityLiving.worldObj.getEntitiesWithinAABBExcludingEntity( event.entityLiving, event.entityLiving.boundingBox.expand( 16.0, 8.0, 16.0 ) ) ) {
+                if( entity instanceof EntityUndeadWitch ) {
+                    ((EntityUndeadWitch) entity).skeletonCount++;
+                }
+            }
+        }
     }
 }

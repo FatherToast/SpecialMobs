@@ -9,32 +9,32 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import toast.specialMobs._SpecialMobs;
 
-public class EntityPaleSpider extends Entity_SpecialSpider
-{
-    @SuppressWarnings("hiding")
+public class EntityPaleSpider extends Entity_SpecialSpider {
+    
+    @SuppressWarnings( "hiding" )
     public static final ResourceLocation[] TEXTURES = new ResourceLocation[] {
-        new ResourceLocation(_SpecialMobs.TEXTURE_PATH + "spider/pale.png"),
-        new ResourceLocation(_SpecialMobs.TEXTURE_PATH + "spider/pale_eyes.png")
+            new ResourceLocation( _SpecialMobs.TEXTURE_PATH + "spider/pale.png" ),
+            new ResourceLocation( _SpecialMobs.TEXTURE_PATH + "spider/pale_eyes.png" )
     };
-
-    public EntityPaleSpider(World world) {
-        super(world);
-        this.getSpecialData().setTextures(EntityPaleSpider.TEXTURES);
-        this.experienceValue += 2;
+    
+    public EntityPaleSpider( World world ) {
+        super( world );
+        getSpecialData().setTextures( EntityPaleSpider.TEXTURES );
+        experienceValue += 2;
     }
-
+    
     /// Overridden to modify inherited attributes.
     @Override
     public void adjustTypeAttributes() {
-        this.getSpecialData().armor += 15;
+        getSpecialData().armor += 15;
     }
-
+    
     /// Overridden to modify attack effects.
     @Override
-    public void onTypeAttack(Entity target) {
-        if (target instanceof EntityLivingBase) {
+    public void onTypeAttack( Entity target ) {
+        if( target instanceof EntityLivingBase ) {
             int time;
-            switch (target.worldObj.difficultySetting) {
+            switch( target.worldObj.difficultySetting ) {
                 case PEACEFUL:
                     return;
                 case EASY:
@@ -47,16 +47,16 @@ public class EntityPaleSpider extends Entity_SpecialSpider
                     time = 15;
             }
             time *= 20;
-            ((EntityLivingBase)target).addPotionEffect(new PotionEffect(Potion.weakness.id, time, 2));
+            ((EntityLivingBase) target).addPotionEffect( new PotionEffect( Potion.weakness.id, time, 2 ) );
         }
     }
-
+    
     /// Called when this entity is killed.
     @Override
-    protected void dropFewItems(boolean hit, int looting) {
-        super.dropFewItems(hit, looting);
-        if (hit && (this.rand.nextInt(5) == 0 || this.rand.nextInt(1 + looting) > 0)) {
-            this.dropItem(Items.fermented_spider_eye, 1);
+    protected void dropFewItems( boolean hit, int looting ) {
+        super.dropFewItems( hit, looting );
+        if( hit && (rand.nextInt( 5 ) == 0 || rand.nextInt( 1 + looting ) > 0) ) {
+            dropItem( Items.fermented_spider_eye, 1 );
         }
     }
 }

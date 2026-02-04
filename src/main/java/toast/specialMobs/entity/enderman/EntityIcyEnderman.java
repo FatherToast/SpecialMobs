@@ -11,33 +11,33 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import toast.specialMobs._SpecialMobs;
 
-public class EntityIcyEnderman extends Entity_SpecialEnderman
-{
-    @SuppressWarnings("hiding")
+public class EntityIcyEnderman extends Entity_SpecialEnderman {
+    
+    @SuppressWarnings( "hiding" )
     public static final ResourceLocation[] TEXTURES = new ResourceLocation[] {
-        new ResourceLocation(_SpecialMobs.TEXTURE_PATH + "enderman/icy.png"),
-        new ResourceLocation(_SpecialMobs.TEXTURE_PATH + "enderman/icy_eyes.png")
+            new ResourceLocation( _SpecialMobs.TEXTURE_PATH + "enderman/icy.png" ),
+            new ResourceLocation( _SpecialMobs.TEXTURE_PATH + "enderman/icy_eyes.png" )
     };
-
-    public EntityIcyEnderman(World world) {
-        super(world);
-        this.getSpecialData().setTextures(EntityIcyEnderman.TEXTURES);
-        this.getSpecialData().isImmuneToBurning = true;
-        this.experienceValue += 1;
+    
+    public EntityIcyEnderman( World world ) {
+        super( world );
+        getSpecialData().setTextures( EntityIcyEnderman.TEXTURES );
+        getSpecialData().isImmuneToBurning = true;
+        experienceValue += 1;
     }
-
+    
     /// Overridden to modify inherited attributes.
     @Override
     public void adjustTypeAttributes() {
-        this.getSpecialData().armor += 10;
+        getSpecialData().armor += 10;
     }
-
+    
     /// Overridden to modify attack effects.
     @Override
-    protected void onTypeAttack(Entity target) {
-        if (target instanceof EntityLivingBase) {
+    protected void onTypeAttack( Entity target ) {
+        if( target instanceof EntityLivingBase ) {
             int time;
-            switch (target.worldObj.difficultySetting) {
+            switch( target.worldObj.difficultySetting ) {
                 case PEACEFUL:
                     return;
                 case EASY:
@@ -50,24 +50,24 @@ public class EntityIcyEnderman extends Entity_SpecialEnderman
                     time = 12;
             }
             time *= 20;
-            ((EntityLivingBase)target).addPotionEffect(new PotionEffect(Potion.moveSlowdown.id, time, 5));
+            ((EntityLivingBase) target).addPotionEffect( new PotionEffect( Potion.moveSlowdown.id, time, 5 ) );
         }
     }
-
+    
     /// Called when this entity is killed.
     @Override
-    protected void dropFewItems(boolean hit, int looting) {
-        super.dropFewItems(hit, looting);
-        if (hit && (this.rand.nextInt(3) == 0 || this.rand.nextInt(1 + looting) > 0)) {
-            for (int i = this.rand.nextInt(8 + looting) + 1; i-- > 0;) {
-                this.dropItem(Items.snowball, 1);
+    protected void dropFewItems( boolean hit, int looting ) {
+        super.dropFewItems( hit, looting );
+        if( hit && (rand.nextInt( 3 ) == 0 || rand.nextInt( 1 + looting ) > 0) ) {
+            for( int i = rand.nextInt( 8 + looting ) + 1; i-- > 0; ) {
+                dropItem( Items.snowball, 1 );
             }
         }
     }
-
+    
     /// Called 2.5% of the time when this entity is killed. 20% chance that superRare == 1, otherwise superRare == 0.
     @Override
-    protected void dropRareDrop(int superRare) {
-        this.dropItem(Item.getItemFromBlock(Blocks.ice), 1);
+    protected void dropRareDrop( int superRare ) {
+        dropItem( Item.getItemFromBlock( Blocks.ice ), 1 );
     }
 }

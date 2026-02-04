@@ -15,29 +15,29 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import toast.specialMobs._SpecialMobs;
 
-public class EntityWitchSpider extends Entity_SpecialSpider
-{
-    @SuppressWarnings("hiding")
+public class EntityWitchSpider extends Entity_SpecialSpider {
+    
+    @SuppressWarnings( "hiding" )
     public static final ResourceLocation[] TEXTURES = new ResourceLocation[] {
-        new ResourceLocation(_SpecialMobs.TEXTURE_PATH + "spider/witch.png"),
-        new ResourceLocation(_SpecialMobs.TEXTURE_PATH + "spider/witch_eyes.png")
+            new ResourceLocation( _SpecialMobs.TEXTURE_PATH + "spider/witch.png" ),
+            new ResourceLocation( _SpecialMobs.TEXTURE_PATH + "spider/witch_eyes.png" )
     };
-
-    public EntityWitchSpider(World world) {
-        super(world);
-        this.getSpecialData().setTextures(EntityWitchSpider.TEXTURES);
-        for (int id = Potion.potionTypes.length; id-- > 0;) {
-            this.getSpecialData().immuneToPotions.add(id);
+    
+    public EntityWitchSpider( World world ) {
+        super( world );
+        getSpecialData().setTextures( EntityWitchSpider.TEXTURES );
+        for( int id = Potion.potionTypes.length; id-- > 0; ) {
+            getSpecialData().immuneToPotions.add( id );
         }
-        this.experienceValue += 2;
+        experienceValue += 2;
     }
-
+    
     /// Overridden to modify attack effects.
     @Override
-    public void onTypeAttack(Entity target) {
-        if (target instanceof EntityLivingBase) {
+    public void onTypeAttack( Entity target ) {
+        if( target instanceof EntityLivingBase ) {
             int time;
-            switch (target.worldObj.difficultySetting) {
+            switch( target.worldObj.difficultySetting ) {
                 case PEACEFUL:
                     return;
                 case EASY:
@@ -50,15 +50,15 @@ public class EntityWitchSpider extends Entity_SpecialSpider
                     time = 75;
             }
             time *= 20;
-            ((EntityLivingBase)target).addPotionEffect(new PotionEffect(Potion.resistance.id, time, -3));
+            ((EntityLivingBase) target).addPotionEffect( new PotionEffect( Potion.resistance.id, time, -3 ) );
         }
     }
-
+    
     /// Called 2.5% of the time when this entity is killed. 20% chance that superRare == 1, otherwise superRare == 0.
     @Override
-    protected void dropRareDrop(int superRare) {
+    protected void dropRareDrop( int superRare ) {
         Item drop = null;
-        switch (this.rand.nextInt(5)) {
+        switch( rand.nextInt( 5 ) ) {
             case 0:
                 drop = Items.redstone;
                 break;
@@ -75,48 +75,48 @@ public class EntityWitchSpider extends Entity_SpecialSpider
                 drop = Items.magma_cream;
                 break;
         }
-        if (drop != null) {
-            this.dropItem(drop, 1);
+        if( drop != null ) {
+            dropItem( drop, 1 );
         }
     }
-
+    
     /// Damages this entity from the damageSource by the given amount. Returns true if this entity is damaged.
     @Override
-    public boolean attackEntityFrom(DamageSource damageSource, float damage) {
+    public boolean attackEntityFrom( DamageSource damageSource, float damage ) {
         Entity entity = damageSource.getSourceOfDamage();
-        if (damageSource.isProjectile() && entity != null) {
+        if( damageSource.isProjectile() && entity != null ) {
             Entity deflected = null;
-            String entityName = EntityList.getEntityString(entity);
-            if (entityName != null) {
-                deflected = EntityList.createEntityByName(entityName, this.worldObj);
+            String entityName = EntityList.getEntityString( entity );
+            if( entityName != null ) {
+                deflected = EntityList.createEntityByName( entityName, worldObj );
             }
-            if (deflected != null) {
+            if( deflected != null ) {
                 NBTTagCompound tag = new NBTTagCompound();
-                entity.writeToNBT(tag);
-                deflected.readFromNBT(tag);
-
-                if (entity instanceof EntityArrow) {
-                    ((EntityArrow)deflected).shootingEntity = this;
+                entity.writeToNBT( tag );
+                deflected.readFromNBT( tag );
+                
+                if( entity instanceof EntityArrow ) {
+                    ((EntityArrow) deflected).shootingEntity = this;
                 }
-                else if (entity instanceof EntityFireball) {
-                    ((EntityFireball)deflected).shootingEntity = this;
-                    ((EntityFireball)deflected).accelerationX *= -1.0;
-                    ((EntityFireball)deflected).accelerationY *= -1.0;
-                    ((EntityFireball)deflected).accelerationZ *= -1.0;
+                else if( entity instanceof EntityFireball ) {
+                    ((EntityFireball) deflected).shootingEntity = this;
+                    ((EntityFireball) deflected).accelerationX *= -1.0;
+                    ((EntityFireball) deflected).accelerationY *= -1.0;
+                    ((EntityFireball) deflected).accelerationZ *= -1.0;
                 }
-                deflected.setLocationAndAngles(deflected.posX, deflected.posY, deflected.posZ, -deflected.rotationYaw, -deflected.rotationPitch);
+                deflected.setLocationAndAngles( deflected.posX, deflected.posY, deflected.posZ, -deflected.rotationYaw, -deflected.rotationPitch );
                 deflected.motionX *= -1.0;
                 deflected.motionY *= -1.0;
                 deflected.motionZ *= -1.0;
-
-                this.worldObj.playSoundAtEntity(this, "random.orb", 0.3F, 1.0F);
-                if (!this.worldObj.isRemote) {
-                    this.worldObj.spawnEntityInWorld(deflected);
+                
+                worldObj.playSoundAtEntity( this, "random.orb", 0.3F, 1.0F );
+                if( !worldObj.isRemote ) {
+                    worldObj.spawnEntityInWorld( deflected );
                 }
                 entity.setDead();
                 return false;
             }
         }
-        return super.attackEntityFrom(damageSource, damage);
+        return super.attackEntityFrom( damageSource, damage );
     }
 }

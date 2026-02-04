@@ -2,22 +2,21 @@ package toast.specialMobs.entity;
 
 /**
  * A mob must implement this interface to shoot EntitySpecialFishHook.
- * This allows get and set methods for the fish hook so that the entity and hook can
+ * This allows get and set methods for the fishhook so that the entity and hook can
  * keep track of each other.
  */
-public interface IAngler
-{
+public interface IAngler {
     /**
-     * Sets this angler's fish hook.
-     * 
-     * @param hook the angler's new fish hook
+     * Sets this angler's fishhook.
+     *
+     * @param hook the angler's new fishhook
      */
-    public void setFishHook(EntitySpecialFishHook hook);
-
+    void setFishHook( EntitySpecialFishHook hook );
+    
     /**
-     * Gets this angler's fish hook.
-     * 
-     * @return the angler's current fish hook, null if the angler does not have one out
+     * Gets this angler's fishhook.
+     *
+     * @return the angler's current fishhook, null if the angler does not have one out
      */
-    public EntitySpecialFishHook getFishHook();
+    EntitySpecialFishHook getFishHook();
 }

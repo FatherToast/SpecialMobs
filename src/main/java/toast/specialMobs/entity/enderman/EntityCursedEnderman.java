@@ -11,32 +11,32 @@ import net.minecraft.world.World;
 import toast.specialMobs.EffectHelper;
 import toast.specialMobs._SpecialMobs;
 
-public class EntityCursedEnderman extends Entity_SpecialEnderman
-{
-    @SuppressWarnings("hiding")
+public class EntityCursedEnderman extends Entity_SpecialEnderman {
+    
+    @SuppressWarnings( "hiding" )
     public static final ResourceLocation[] TEXTURES = new ResourceLocation[] {
-        new ResourceLocation(_SpecialMobs.TEXTURE_PATH + "enderman/cursed.png"),
-        new ResourceLocation(_SpecialMobs.TEXTURE_PATH + "enderman/cursed_eyes.png")
+            new ResourceLocation( _SpecialMobs.TEXTURE_PATH + "enderman/cursed.png" ),
+            new ResourceLocation( _SpecialMobs.TEXTURE_PATH + "enderman/cursed_eyes.png" )
     };
-
-    public EntityCursedEnderman(World world) {
-        super(world);
-        this.getSpecialData().setTextures(EntityCursedEnderman.TEXTURES);
-        this.experienceValue += 1;
+    
+    public EntityCursedEnderman( World world ) {
+        super( world );
+        getSpecialData().setTextures( EntityCursedEnderman.TEXTURES );
+        experienceValue += 1;
     }
-
+    
     /// Overridden to modify inherited attributes.
     @Override
     public void adjustTypeAttributes() {
-        this.getSpecialData().addAttribute(SharedMonsterAttributes.maxHealth, 20.0);
+        getSpecialData().addAttribute( SharedMonsterAttributes.maxHealth, 20.0 );
     }
-
+    
     /// Overridden to modify attack effects.
     @Override
-    protected void onTypeAttack(Entity target) {
-        if (target instanceof EntityLivingBase) {
+    protected void onTypeAttack( Entity target ) {
+        if( target instanceof EntityLivingBase ) {
             int time;
-            switch (target.worldObj.difficultySetting) {
+            switch( target.worldObj.difficultySetting ) {
                 case PEACEFUL:
                     return;
                 case EASY:
@@ -49,18 +49,18 @@ public class EntityCursedEnderman extends Entity_SpecialEnderman
                     time = 120;
             }
             time *= 20;
-            EffectHelper.stackEffect((EntityLivingBase)target, Potion.weakness, time, 0, 4);
-            EffectHelper.stackEffect((EntityLivingBase)target, Potion.digSlowdown, time, 0, 4);
+            EffectHelper.stackEffect( (EntityLivingBase) target, Potion.weakness, time, 0, 4 );
+            EffectHelper.stackEffect( (EntityLivingBase) target, Potion.digSlowdown, time, 0, 4 );
         }
     }
-
+    
     /// Called when this entity is killed.
     @Override
-    protected void dropFewItems(boolean hit, int looting) {
-        super.dropFewItems(hit, looting);
-        if (hit && (this.rand.nextInt(3) == 0 || this.rand.nextInt(1 + looting) > 0)) {
+    protected void dropFewItems( boolean hit, int looting ) {
+        super.dropFewItems( hit, looting );
+        if( hit && (rand.nextInt( 3 ) == 0 || rand.nextInt( 1 + looting ) > 0) ) {
             Item drop = null;
-            switch (this.rand.nextInt(5)) {
+            switch( rand.nextInt( 5 ) ) {
                 case 0:
                     drop = Items.gunpowder;
                     break;
@@ -77,8 +77,8 @@ public class EntityCursedEnderman extends Entity_SpecialEnderman
                     drop = Items.speckled_melon;
                     break;
             }
-            if (drop != null) {
-                this.dropItem(drop, 1);
+            if( drop != null ) {
+                dropItem( drop, 1 );
             }
         }
     }

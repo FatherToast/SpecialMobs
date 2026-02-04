@@ -1,7 +1,5 @@
 package toast.specialMobs.entity.creeper;
 
-import java.util.List;
-
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -12,50 +10,56 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import toast.specialMobs._SpecialMobs;
 
+import java.util.List;
+
 public class EntityGravityCreeper extends Entity_SpecialCreeper {
-
-    @SuppressWarnings("hiding")
+    
+    @SuppressWarnings( "hiding" )
     public static final ResourceLocation[] TEXTURES = new ResourceLocation[] {
-        new ResourceLocation(_SpecialMobs.TEXTURE_PATH + "creeper/gravity.png")
+            new ResourceLocation( _SpecialMobs.TEXTURE_PATH + "creeper/gravity.png" )
     };
-
-    public EntityGravityCreeper(World world) {
-        super(world);
-        this.getSpecialData().setTextures(EntityGravityCreeper.TEXTURES);
-        this.getSpecialData().isImmuneToFalling = true;
-        this.getSpecialData().ignorePressurePlates = true;
-        this.getSpecialData().immuneToPotions.add(Potion.jump.id);
-        this.experienceValue += 1;
+    
+    public EntityGravityCreeper( World world ) {
+        super( world );
+        getSpecialData().setTextures( EntityGravityCreeper.TEXTURES );
+        getSpecialData().isImmuneToFalling = true;
+        getSpecialData().ignorePressurePlates = true;
+        getSpecialData().immuneToPotions.add( Potion.jump.id );
+        experienceValue += 1;
     }
-
+    
     // Overridden to modify inherited attribites.
     @Override
     protected void adjustTypeAttributes() {
-        this.getSpecialData().addAttribute(SharedMonsterAttributes.maxHealth, 20.0);
+        getSpecialData().addAttribute( SharedMonsterAttributes.maxHealth, 20.0 );
     }
-
+    
     @Override
     public void onExplodingUpdate() {
-        if (!this.worldObj.isRemote) {
-        	boolean powered = this.getPowered();
-        	float radius = powered ? this.explosionRadius * 3.0F : this.explosionRadius * 1.5F;
+        if( !worldObj.isRemote ) {
+            boolean powered = getPowered();
+            float radius = powered ? explosionRadius * 3.0F : explosionRadius * 1.5F;
             Entity entityHit;
             double vX, vZ, v;
-            List entitiesInRange = this.worldObj.getEntitiesWithinAABBExcludingEntity(this, this.boundingBox.expand(radius * 2.0, radius * 2.0, radius * 2.0));
-            for (int i = 0; i < entitiesInRange.size(); i++) {
-            	entityHit = (Entity) entitiesInRange.get(i);
-                if (this.getDistanceSqToEntity(entityHit) <= radius * radius) {
-                    vX = this.posX - entityHit.posX;
-                    vZ = this.posZ - entityHit.posZ;
-                    v = Math.sqrt(vX * vX + vZ * vZ);
+            List entitiesInRange = worldObj.getEntitiesWithinAABBExcludingEntity( this, boundingBox.expand( radius * 2.0, radius * 2.0, radius * 2.0 ) );
+            
+            for( Object o : entitiesInRange ) {
+                entityHit = (Entity) o;
+                
+                if( getDistanceSqToEntity( entityHit ) <= radius * radius ) {
+                    vX = posX - entityHit.posX;
+                    vZ = posZ - entityHit.posZ;
+                    v = Math.sqrt( vX * vX + vZ * vZ );
                     entityHit.motionX = vX * radius * 0.05 / (v * v);
                     entityHit.motionZ = vZ * radius * 0.05 / (v * v);
                     entityHit.onGround = false;
-                    if (entityHit instanceof EntityPlayerMP) {
+                    
+                    if( entityHit instanceof EntityPlayerMP ) {
                         try {
-                            ((EntityPlayerMP) entityHit).playerNetServerHandler.sendPacket(new S12PacketEntityVelocity(entityHit));
+                            ((EntityPlayerMP) entityHit).playerNetServerHandler.sendPacket( new S12PacketEntityVelocity( entityHit ) );
                         }
-                        catch (Exception ex) {
+                        catch( Exception ex ) {
+                            // noinspection all
                             ex.printStackTrace();
                         }
                     }
@@ -63,29 +67,29 @@ public class EntityGravityCreeper extends Entity_SpecialCreeper {
             }
         }
     }
-
+    
     // The explosion caused by this creeper.
     @Override
-    public void explodeByType(boolean powered, boolean griefing) {
-        float power = powered ? (this.explosionRadius + 2) * 2.0F : (float)(this.explosionRadius + 2);
-        this.worldObj.createExplosion(this, this.posX, this.posY, this.posZ, power, griefing);
+    public void explodeByType( boolean powered, boolean griefing ) {
+        float power = powered ? (explosionRadius + 2) * 2.0F : (float) (explosionRadius + 2);
+        worldObj.createExplosion( this, posX, posY, posZ, power, griefing );
     }
-
+    
     // Called when this entity is killed.
     @Override
-    protected void dropFewItems(boolean hit, int looting) {
-        super.dropFewItems(hit, looting);
-        for (int i = this.rand.nextInt(3 + looting); i-- > 0;) {
-            this.dropItem(Items.gunpowder, 1);
+    protected void dropFewItems( boolean hit, int looting ) {
+        super.dropFewItems( hit, looting );
+        for( int i = rand.nextInt( 3 + looting ); i-- > 0; ) {
+            dropItem( Items.gunpowder, 1 );
         }
-        if (hit && (this.rand.nextInt(3) == 0 || this.rand.nextInt(1 + looting) > 0)) {
-            this.dropItem(Items.gold_nugget, 1);
+        if( hit && (rand.nextInt( 3 ) == 0 || rand.nextInt( 1 + looting ) > 0) ) {
+            dropItem( Items.gold_nugget, 1 );
         }
     }
-
+    
     // Called 2.5% of the time when this entity is killed. 20% chance that superRare == 1, otherwise superRare == 0.
     @Override
-    protected void dropRareDrop(int superRare) {
-        this.dropItem(Items.apple, 1);
+    protected void dropRareDrop( int superRare ) {
+        dropItem( Items.apple, 1 );
     }
 }

@@ -5,7 +5,6 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.IEntityLivingData;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.monster.EntityBlaze;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.projectile.EntitySmallFireball;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.potion.Potion;
@@ -19,244 +18,244 @@ import toast.specialMobs.entity.SpecialMobData;
 public class Entity_SpecialBlaze extends EntityBlaze implements ISpecialMob {
     /// Useful properties for this class.
     //private static final double HOSTILE_CHANCE = Properties.getDouble(Properties.STATS, "hostile_pigzombies");
-
-    public static final ResourceLocation[] TEXTURES = new ResourceLocation[] { new ResourceLocation("textures/entity/blaze.png") };
-
+    
+    public static final ResourceLocation[] TEXTURES = new ResourceLocation[] { new ResourceLocation( "textures/entity/blaze.png" ) };
+    
     /// This mob's special mob data.
     private SpecialMobData specialData;
-
+    
     /// The state of this blaze's attack.
-	public int attackState;
+    public int attackState;
     /// The amount of fireballs in each burst.
-	public short fireballBurstCount;
+    public short fireballBurstCount;
     /// The ticks between each shot in a burst.
-	public short fireballBurstDelay;
-
-    public Entity_SpecialBlaze(World world) {
-        super(world);
-        this.getSpecialData().isImmuneToFire = this.isImmuneToFire;
-        this.setRangedAI(3, 6, 60, 100, 30.0F);
-        this.getSpecialData().arrowSpread = 0.5F;
+    public short fireballBurstDelay;
+    
+    public Entity_SpecialBlaze( World world ) {
+        super( world );
+        getSpecialData().isImmuneToFire = isImmuneToFire;
+        setRangedAI( 3, 6, 60, 100, 30.0F );
+        getSpecialData().arrowSpread = 0.5F;
     }
-
+    
     /// Used to initialize data watcher variables.
     @Override
     protected void entityInit() {
-        this.specialData = new SpecialMobData(this, Entity_SpecialBlaze.TEXTURES);
+        specialData = new SpecialMobData( this, Entity_SpecialBlaze.TEXTURES );
         super.entityInit();
     }
-
+    
     /// Helper method to set the attack AI more easily.
-    protected void setRangedAI(int burstCount, int burstDelay, int chargeTime, int cooldownTime, float range) {
-    	this.fireballBurstCount = (short) burstCount;
-    	this.fireballBurstDelay = (short) burstDelay;
-
-        SpecialMobData data = this.getSpecialData();
+    protected void setRangedAI( int burstCount, int burstDelay, int chargeTime, int cooldownTime, float range ) {
+        fireballBurstCount = (short) burstCount;
+        fireballBurstDelay = (short) burstDelay;
+        
+        SpecialMobData data = getSpecialData();
         data.arrowRefireMin = (short) chargeTime;
         data.arrowRefireMax = (short) (chargeTime + cooldownTime);
         data.arrowRange = range;
     }
-
+    
     /// Returns this mob's special data.
     @Override
     /// ISpecialMob
     public SpecialMobData getSpecialData() {
-        return this.specialData;
+        return specialData;
     }
-
+    
     /// Called to modify inherited attributes.
     @Override
     /// ISpecialMob
     public void adjustEntityAttributes() {
-        float prevMax = this.getMaxHealth();
-        this.adjustTypeAttributes();
-        this.setHealth(this.getMaxHealth() + this.getHealth() - prevMax);
+        float prevMax = getMaxHealth();
+        adjustTypeAttributes();
+        setHealth( getMaxHealth() + getHealth() - prevMax );
     }
-
+    
     /// Overridden to modify inherited attribites.
     protected void adjustTypeAttributes() {
         /// Override to alter attributes.
     }
-
+    
     /// Called each tick while this entity is alive.
     @Override
     public void onLivingUpdate() {
         super.onLivingUpdate();
-        this.getSpecialData().onUpdate();
+        getSpecialData().onUpdate();
     }
-
+    
     /// Called when this entity is first spawned to initialize it.
     @Override
-    public IEntityLivingData onSpawnWithEgg(IEntityLivingData data) {
-        return this.getSpecialData().onSpawnWithEgg(data, new EntityBlaze(this.worldObj));
+    public IEntityLivingData onSpawnWithEgg( IEntityLivingData data ) {
+        return getSpecialData().onSpawnWithEgg( data, new EntityBlaze( worldObj ) );
     }
-
+    
     /// Called each tick this entity's attack target can be seen.
     @Override
-    protected void attackEntity(Entity target, float distance) {
-    	SpecialMobData data = this.getSpecialData();
-        if (this.attackTime <= 0 && distance < 2.0F && target.boundingBox.maxY > this.boundingBox.minY && target.boundingBox.minY < this.boundingBox.maxY) {
-            this.attackTime = 20;
-            this.attackEntityAsMob(target);
+    protected void attackEntity( Entity target, float distance ) {
+        SpecialMobData data = getSpecialData();
+        if( attackTime <= 0 && distance < 2.0F && target.boundingBox.maxY > boundingBox.minY && target.boundingBox.minY < boundingBox.maxY ) {
+            attackTime = 20;
+            attackEntityAsMob( target );
         }
-        else if (this.canBeHurtByFire(target) && distance < data.arrowRange) {
-            if (this.attackTime == 0) {
-                this.attackState++;
-                if (this.attackState == 1) {
-                    this.attackTime = data.arrowRefireMin;
-                    this.func_70844_e(true); // setRenderBurning
+        else if( canBeHurtByFire( target ) && distance < data.arrowRange ) {
+            if( attackTime == 0 ) {
+                attackState++;
+                if( attackState == 1 ) {
+                    attackTime = data.arrowRefireMin;
+                    func_70844_e( true ); // setRenderBurning
                 }
-                else if (this.attackState <= this.fireballBurstCount + 1) {
-                    this.attackTime = this.fireballBurstDelay;
+                else if( attackState <= fireballBurstCount + 1 ) {
+                    attackTime = fireballBurstDelay;
                 }
                 else {
-                    this.attackTime = data.arrowRefireMax - data.arrowRefireMin;
-                    this.attackState = 0;
-                    this.func_70844_e(false); // setRenderBurning
+                    attackTime = data.arrowRefireMax - data.arrowRefireMin;
+                    attackState = 0;
+                    func_70844_e( false ); // setRenderBurning
                 }
-
-                if (this.attackState > 1) {
-					this.shootFireballAtEntity(target, distance);
+                
+                if( attackState > 1 ) {
+                    shootFireballAtEntity( target, distance );
                 }
             }
-            this.rotationYaw = (float) (Math.atan2(target.posZ - this.posZ, target.posX - this.posX) * 180.0 / Math.PI) - 90.0F;
-            this.hasAttacked = true;
+            rotationYaw = (float) (Math.atan2( target.posZ - posZ, target.posX - posX ) * 180.0 / Math.PI) - 90.0F;
+            hasAttacked = true;
         }
         else {
-        	if (this.onGround) {
-        		this.moveEntityWithHeading(0.0F, (float) this.getEntityAttribute(SharedMonsterAttributes.movementSpeed).getAttributeValue() * 7.0F);
-        	}
-        	else {
-        		this.moveFlying(0.0F, (float) this.getEntityAttribute(SharedMonsterAttributes.movementSpeed).getAttributeValue() * 7.0F, 0.03F);
-        	}
+            if( onGround ) {
+                moveEntityWithHeading( 0.0F, (float) getEntityAttribute( SharedMonsterAttributes.movementSpeed ).getAttributeValue() * 7.0F );
+            }
+            else {
+                moveFlying( 0.0F, (float) getEntityAttribute( SharedMonsterAttributes.movementSpeed ).getAttributeValue() * 7.0F, 0.03F );
+            }
         }
     }
-
+    
     // Returns true if the target can be hurt by fireballs.
-    protected boolean canBeHurtByFire(Entity entity) {
-    	return !entity.isImmuneToFire() && (!(entity instanceof EntityLivingBase) || !((EntityLivingBase) entity).isPotionActive(Potion.fireResistance));
+    protected boolean canBeHurtByFire( Entity entity ) {
+        return !entity.isImmuneToFire() && (!(entity instanceof EntityLivingBase) || !((EntityLivingBase) entity).isPotionActive( Potion.fireResistance ));
     }
-
+    
     // Called to attack the target entity with a fireball.
-    public void shootFireballAtEntity(Entity target, float distance) {
-        double dX = target.posX - this.posX;
-        double dY = target.boundingBox.minY + target.height / 2.0F - this.posY - this.height / 2.0F;
-        double dZ = target.posZ - this.posZ;
-        float spread = (float) Math.sqrt(distance) * this.getSpecialData().arrowSpread;
-        this.worldObj.playAuxSFXAtEntity((EntityPlayer) null, 1009, (int) this.posX, (int) this.posY, (int) this.posZ, 0);
-        EntitySmallFireball fireball = new EntitySmallFireball(this.worldObj, this, dX + this.rand.nextGaussian() * spread, dY, dZ + this.rand.nextGaussian() * spread);
-        fireball.posY = this.posY + this.height / 2.0F + 0.5;
-        this.worldObj.spawnEntityInWorld(fireball);
+    public void shootFireballAtEntity( Entity target, float distance ) {
+        double dX = target.posX - posX;
+        double dY = target.boundingBox.minY + target.height / 2.0F - posY - height / 2.0F;
+        double dZ = target.posZ - posZ;
+        float spread = (float) Math.sqrt( distance ) * getSpecialData().arrowSpread;
+        worldObj.playAuxSFXAtEntity( null, 1009, (int) posX, (int) posY, (int) posZ, 0 );
+        EntitySmallFireball fireball = new EntitySmallFireball( worldObj, this, dX + rand.nextGaussian() * spread, dY, dZ + rand.nextGaussian() * spread );
+        fireball.posY = posY + height / 2.0F + 0.5;
+        worldObj.spawnEntityInWorld( fireball );
     }
-
+    
     /// Called to attack the target.
     @Override
-    public boolean attackEntityAsMob(Entity target) {
-        if (super.attackEntityAsMob(target)) {
-            this.onTypeAttack(target);
+    public boolean attackEntityAsMob( Entity target ) {
+        if( super.attackEntityAsMob( target ) ) {
+            onTypeAttack( target );
             return true;
         }
         return false;
     }
-
+    
     /// Overridden to modify attack effects.
-    protected void onTypeAttack(Entity target) {
+    protected void onTypeAttack( Entity target ) {
         /// Override to alter attack.
     }
-
+    
     /// Saves this entity to NBT.
     @Override
-    public void writeEntityToNBT(NBTTagCompound tag) {
-        super.writeEntityToNBT(tag);
-        NBTTagCompound saveTag = SpecialMobData.getSaveLocation(tag);
-        saveTag.setShort("SMFireballBurstCount", this.fireballBurstCount);
-        saveTag.setShort("SMFireballBurstDelay", this.fireballBurstDelay);
-
-        this.getSpecialData().isImmuneToFire = this.isImmuneToFire;
-        this.getSpecialData().writeToNBT(saveTag);
+    public void writeEntityToNBT( NBTTagCompound tag ) {
+        super.writeEntityToNBT( tag );
+        NBTTagCompound saveTag = SpecialMobData.getSaveLocation( tag );
+        saveTag.setShort( "SMFireballBurstCount", fireballBurstCount );
+        saveTag.setShort( "SMFireballBurstDelay", fireballBurstDelay );
+        
+        getSpecialData().isImmuneToFire = isImmuneToFire;
+        getSpecialData().writeToNBT( saveTag );
     }
-
+    
     /// Reads this entity from NBT.
     @Override
-    public void readEntityFromNBT(NBTTagCompound tag) {
-        super.readEntityFromNBT(tag);
-        NBTTagCompound saveTag = SpecialMobData.getSaveLocation(tag);
-        if (saveTag.hasKey("SMFireballBurstCount")) {
-            this.fireballBurstCount = saveTag.getShort("SMFireballBurstCount");
+    public void readEntityFromNBT( NBTTagCompound tag ) {
+        super.readEntityFromNBT( tag );
+        NBTTagCompound saveTag = SpecialMobData.getSaveLocation( tag );
+        if( saveTag.hasKey( "SMFireballBurstCount" ) ) {
+            fireballBurstCount = saveTag.getShort( "SMFireballBurstCount" );
         }
-        else if (tag.hasKey("SMFireballBurstCount")) {
-            this.fireballBurstCount = tag.getShort("SMFireballBurstCount");
+        else if( tag.hasKey( "SMFireballBurstCount" ) ) {
+            fireballBurstCount = tag.getShort( "SMFireballBurstCount" );
         }
-        if (saveTag.hasKey("SMFireballBurstDelay")) {
-            this.fireballBurstDelay = saveTag.getShort("SMFireballBurstDelay");
+        if( saveTag.hasKey( "SMFireballBurstDelay" ) ) {
+            fireballBurstDelay = saveTag.getShort( "SMFireballBurstDelay" );
         }
-        else if (tag.hasKey("SMFireballBurstDelay")) {
-            this.fireballBurstDelay = tag.getShort("SMFireballBurstDelay");
+        else if( tag.hasKey( "SMFireballBurstDelay" ) ) {
+            fireballBurstDelay = tag.getShort( "SMFireballBurstDelay" );
         }
-
-        this.getSpecialData().readFromNBT(tag);
-        this.getSpecialData().readFromNBT(saveTag);
-        this.isImmuneToFire = this.getSpecialData().isImmuneToFire;
+        
+        getSpecialData().readFromNBT( tag );
+        getSpecialData().readFromNBT( saveTag );
+        isImmuneToFire = getSpecialData().isImmuneToFire;
     }
-
+    
     /// Called when this entity is killed.
     @Override
-    protected void dropFewItems(boolean hit, int looting) {
-        super.dropFewItems(hit, looting);
-        if (_SpecialMobs.debug) {
-            this.dropRareDrop(Math.max(0, this.rand.nextInt(5) - 3));
+    protected void dropFewItems( boolean hit, int looting ) {
+        super.dropFewItems( hit, looting );
+        if( _SpecialMobs.debug ) {
+            dropRareDrop( Math.max( 0, rand.nextInt( 5 ) - 3 ) );
         }
     }
-
+    
     /// Returns the current armor level of this mob.
     @Override
     public int getTotalArmorValue() {
-        return Math.min(20, super.getTotalArmorValue() + this.getSpecialData().armor);
+        return Math.min( 20, super.getTotalArmorValue() + getSpecialData().armor );
     }
-
+    
     /// Sets this entity on fire.
     @Override
-    public void setFire(int time) {
-        if (!this.getSpecialData().isImmuneToBurning) {
-            super.setFire(time);
+    public void setFire( int time ) {
+        if( !getSpecialData().isImmuneToBurning ) {
+            super.setFire( time );
         }
     }
-
+    
     /// Returns the current armor level of this mob.
     @Override
     public boolean allowLeashing() {
-        return !this.getLeashed() && this.getSpecialData().allowLeashing;
+        return !getLeashed() && getSpecialData().allowLeashing;
     }
-
+    
     /// Sets the entity inside a web block.
     @Override
     public void setInWeb() {
-        if (!this.getSpecialData().isImmuneToWebs) {
+        if( !getSpecialData().isImmuneToWebs ) {
             super.setInWeb();
         }
     }
-
+    
     /// Return whether this entity should NOT trigger a pressure plate or a tripwire.
     @Override
     public boolean doesEntityNotTriggerPressurePlate() {
-        return this.getSpecialData().ignorePressurePlates;
+        return getSpecialData().ignorePressurePlates;
     }
-
+    
     /// True if the entity can breathe underwater.
     @Override
     public boolean canBreatheUnderwater() {
-        return this.getSpecialData().canBreatheInWater;
+        return getSpecialData().canBreatheInWater;
     }
-
+    
     /// True if the entity can be pushed by flowing water.
     @Override
     public boolean isPushedByWater() {
-        return !this.getSpecialData().ignoreWaterPush;
+        return !getSpecialData().ignoreWaterPush;
     }
-
+    
     /// Returns true if the potion can be applied.
     @Override
-    public boolean isPotionApplicable(PotionEffect effect) {
-        return this.getSpecialData().isPotionApplicable(effect);
+    public boolean isPotionApplicable( PotionEffect effect ) {
+        return getSpecialData().isPotionApplicable( effect );
     }
 }
