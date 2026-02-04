@@ -1,3 +1,5 @@
+4.2.3
+    - Added Polish translation by DarkKnightComes
 3.2.2
     - Added special witches.
     - All additional special mob data is now stored in the SMData compound in ForgeData to better support spawning vanilla mobs with nbt.
