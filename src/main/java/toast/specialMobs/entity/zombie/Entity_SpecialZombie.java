@@ -90,15 +90,13 @@ public class Entity_SpecialZombie extends EntityZombie implements ISpecialMob, I
     }
     
     /// Returns this mob's special data.
-    @Override
-    /// ISpecialMob
+    @Override // ISpecialMob
     public SpecialMobData getSpecialData() {
         return specialData;
     }
     
     /// Called to modify inherited attributes.
-    @Override
-    /// ISpecialMob
+    @Override // ISpecialMob
     public void adjustEntityAttributes() {
         if( rand.nextDouble() < Entity_SpecialZombie.BOW_CHANCE ) {
             ItemStack itemStack = new ItemStack( Items.bow );
@@ -122,7 +120,7 @@ public class Entity_SpecialZombie extends EntityZombie implements ISpecialMob, I
     
     /// Overridden to modify inherited attribites.
     protected void adjustTypeAttributes() {
-        /// Override to alter attributes.
+        // Override to alter attributes.
     }
     
     /// Attack the specified entity using a ranged attack.
