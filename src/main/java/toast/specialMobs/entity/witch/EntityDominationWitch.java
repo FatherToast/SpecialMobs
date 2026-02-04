@@ -95,7 +95,7 @@ public class EntityDominationWitch extends Entity_SpecialWitch {
                 // noinspection unchecked
                 for( PotionEffect effect : (Collection<PotionEffect>) livingTarget.getActivePotionEffects() ) {
                     try {
-                        if( !Potion.potionTypes[effect.getPotionID()].isBadEffect() ) {
+                        if( !Potion.potionTypes[effect.getPotionID()].isBadEffect ) {
                             stolenEffect = effect;
                             break;
                         }
