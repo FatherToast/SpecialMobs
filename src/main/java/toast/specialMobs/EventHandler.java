@@ -113,9 +113,6 @@ public class EventHandler {
                 if( heldItem != null && EnchantmentSpecial.painSword != null ) {
                     pain = EnchantmentHelper.getEnchantmentLevel( EnchantmentSpecial.painSword.effectId, heldItem );
                 }
-                else {
-                    pain = 0;
-                }
                 // Plague
                 if( heldItem != null && EnchantmentSpecial.plagueSword != null ) {
                     plague = EnchantmentHelper.getEnchantmentLevel( EnchantmentSpecial.plagueSword.effectId, heldItem );

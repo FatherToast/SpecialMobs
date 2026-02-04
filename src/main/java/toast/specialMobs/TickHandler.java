@@ -9,6 +9,7 @@ import net.minecraft.entity.EntityLiving;
 import java.util.ArrayDeque;
 
 public class TickHandler {
+    
     // Stack of entities that need to be spawned.
     public static ArrayDeque<ReplacementEntry> entityStack = new ArrayDeque<>();
     
@@ -18,9 +19,6 @@ public class TickHandler {
     
     /**
      * Called each tick.
-     * TickEvent.Type type = the type of tick.
-     * Side side = the side this tick is on.
-     * TickEvent.Phase phase = the phase of this tick (START, END).
      *
      * @param event The event being triggered.
      */

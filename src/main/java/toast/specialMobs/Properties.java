@@ -82,17 +82,18 @@ public abstract class Properties {
         Properties.add( config, Properties.STATS, "villager_infection", 1.0, 0.0, 1.0, "(0 <= x <= 1) Chance that a villager will be infected when killed by a zombie. Default is 100%." );
         Properties.add( config, Properties.STATS, "xray_ghosts", false, "(True/false) If false, ghost spiders and faint ghasts will require line of sight to aggro, unlike their normal counterparts. Default is false." );
         
-        Properties.init( config, "monster", _SpecialMobs.MONSTER_KEY, _SpecialMobs.MONSTER_TYPES, Properties.monsterVanilla, Properties.monsterSpawn, Properties.monsterWeights );
+        Properties.init( config, _SpecialMobs.MONSTER_KEY, _SpecialMobs.MONSTER_TYPES, Properties.monsterVanilla, Properties.monsterSpawn, Properties.monsterWeights );
         
         config.addCustomCategoryComment( Properties.ENCHANTS, "Ids for all enchantments added by this mod. Set the id to -1 to disable any specific enchantment." );
         config.addCustomCategoryComment( Properties.SPAWNING, "Weighted chances for each additional spawn. Set the weight to 0 to disable the spawn." );
         config.addCustomCategoryComment( Properties.GENERAL, "Spawn rates for each mob type and miscellaneous options." );
-        config.addCustomCategoryComment( Properties.STATS, "Additional options for mobs\' stats, such as the chance for the mob to have a bow or to be unusually hostile." );
+        config.addCustomCategoryComment( Properties.STATS, "Additional options for mobs' stats, such as the chance for the mob to have a bow or to be unusually hostile." );
         
         config.save();
     }
     
     /// Initializes an integer hash set property.
+    @SuppressWarnings( "SameParameterValue" )
     private static void loadIntSet( Configuration config, String category, String field, String defaultValue, String comment, HashSet<Integer> intSet ) {
         intSet.clear();
         String[] intArray = { config.get( category, field, defaultValue, comment ).getString() };
@@ -112,7 +113,8 @@ public abstract class Properties {
     }
     
     /// Initializes specific monster properties.
-    private static void init( Configuration config, String category, String[] key, String[][] types, boolean[] keyVanilla, boolean[] keyValues, int[][] typeWeights ) {
+    @SuppressWarnings( "SameParameterValue" )
+    private static void init( Configuration config, String[] key, String[][] types, boolean[] keyVanilla, boolean[] keyValues, int[][] typeWeights ) {
         String pluralKey;
         String MOB_CATEGORY;
         
@@ -120,10 +122,10 @@ public abstract class Properties {
             pluralKey = key[i].toLowerCase();
             MOB_CATEGORY = pluralKey + "_rates";
             
-            if( key[i] == "Enderman" ) {
+            if( key[i].equals( "Enderman" ) ) {
                 pluralKey = "endermen";
             }
-            else if( key[i] == "Witch" ) {
+            else if( key[i].equals( "Witch" ) ) {
                 pluralKey = "witches";
             }
             else {
@@ -173,39 +175,39 @@ public abstract class Properties {
     }
     
     public static void add( Configuration config, String category, String field, int defaultValue ) {
-        Properties.map.put( category + "@" + field, Integer.valueOf( config.get( category, field, defaultValue ).getInt( defaultValue ) ) );
+        Properties.map.put( category + "@" + field, config.get( category, field, defaultValue ).getInt( defaultValue ) );
     }
     
     public static void add( Configuration config, String category, String field, int defaultValue, String comment ) {
-        Properties.map.put( category + "@" + field, Integer.valueOf( config.get( category, field, defaultValue, comment ).getInt( defaultValue ) ) );
+        Properties.map.put( category + "@" + field, config.get( category, field, defaultValue, comment ).getInt( defaultValue ) );
     }
     
     public static void add( Configuration config, String category, String field, int defaultValue, int minValue, int maxValue ) {
-        Properties.map.put( category + "@" + field, Integer.valueOf( Math.max( minValue, Math.min( maxValue, config.get( category, field, defaultValue ).getInt( defaultValue ) ) ) ) );
+        Properties.map.put( category + "@" + field, Math.max( minValue, Math.min( maxValue, config.get( category, field, defaultValue ).getInt( defaultValue ) ) ) );
     }
     
     public static void add( Configuration config, String category, String field, int defaultValue, int minValue, int maxValue, String comment ) {
-        Properties.map.put( category + "@" + field, Integer.valueOf( Math.max( minValue, Math.min( maxValue, config.get( category, field, defaultValue, comment ).getInt( defaultValue ) ) ) ) );
+        Properties.map.put( category + "@" + field, Math.max( minValue, Math.min( maxValue, config.get( category, field, defaultValue, comment ).getInt( defaultValue ) ) ) );
     }
     
     public static void add( Configuration config, String category, String field, boolean defaultValue ) {
-        Properties.map.put( category + "@" + field, Boolean.valueOf( config.get( category, field, defaultValue ).getBoolean( defaultValue ) ) );
+        Properties.map.put( category + "@" + field, config.get( category, field, defaultValue ).getBoolean( defaultValue ) );
     }
     
     public static void add( Configuration config, String category, String field, boolean defaultValue, String comment ) {
-        Properties.map.put( category + "@" + field, Boolean.valueOf( config.get( category, field, defaultValue, comment ).getBoolean( defaultValue ) ) );
+        Properties.map.put( category + "@" + field, config.get( category, field, defaultValue, comment ).getBoolean( defaultValue ) );
     }
     
     public static void add( Configuration config, String category, String field, double defaultValue ) {
-        Properties.map.put( category + "@" + field, Double.valueOf( config.get( category, field, defaultValue ).getDouble( defaultValue ) ) );
+        Properties.map.put( category + "@" + field, config.get( category, field, defaultValue ).getDouble( defaultValue ) );
     }
     
     public static void add( Configuration config, String category, String field, double defaultValue, String comment ) {
-        Properties.map.put( category + "@" + field, Double.valueOf( config.get( category, field, defaultValue, comment ).getDouble( defaultValue ) ) );
+        Properties.map.put( category + "@" + field, config.get( category, field, defaultValue, comment ).getDouble( defaultValue ) );
     }
     
     public static void add( Configuration config, String category, String field, double defaultValue, double minValue, double maxValue, String comment ) {
-        Properties.map.put( category + "@" + field, Double.valueOf( Math.max( minValue, Math.min( maxValue, config.get( category, field, defaultValue, comment ).getDouble( defaultValue ) ) ) ) );
+        Properties.map.put( category + "@" + field, Math.max( minValue, Math.min( maxValue, config.get( category, field, defaultValue, comment ).getDouble( defaultValue ) ) ) );
     }
     
     /// Gets the Object property.
@@ -225,7 +227,7 @@ public abstract class Properties {
     public static boolean getBoolean( String category, String field, Random random ) {
         Object property = Properties.getProperty( category, field );
         if( property instanceof Boolean )
-            return ((Boolean) property).booleanValue();
+            return (Boolean) property;
         if( property instanceof Integer )
             return random.nextInt( ((Number) property).intValue() ) == 0;
         if( property instanceof Double )
@@ -239,7 +241,7 @@ public abstract class Properties {
         if( property instanceof Number )
             return ((Number) property).intValue();
         if( property instanceof Boolean )
-            return ((Boolean) property).booleanValue() ? 1 : 0;
+            return (Boolean) property ? 1 : 0;
         Properties.debugException( "Tried to get int for invalid property! @" + property.getClass().getName() );
         return 0;
     }
@@ -249,7 +251,7 @@ public abstract class Properties {
         if( property instanceof Number )
             return ((Number) property).doubleValue();
         if( property instanceof Boolean )
-            return ((Boolean) property).booleanValue() ? 1.0 : 0.0;
+            return (Boolean) property ? 1.0 : 0.0;
         Properties.debugException( "Tried to get double for invalid property! @" + property.getClass().getName() );
         return 0.0;
     }

@@ -113,6 +113,7 @@ public class EntitySpecialSpitball extends Entity {
                 motionVec = Vec3.createVectorHelper( object.hitVec.xCoord, object.hitVec.yCoord, object.hitVec.zCoord );
             }
             Entity entityHit = null;
+            // noinspection rawtypes
             List entitiesInPath = worldObj.getEntitiesWithinAABBExcludingEntity( this, boundingBox.addCoord( motionX, motionY, motionZ ).expand( 1.0, 1.0, 1.0 ) );
             double d = Double.POSITIVE_INFINITY;
             
@@ -140,9 +141,11 @@ public class EntitySpecialSpitball extends Entity {
         posX += motionX;
         posY += motionY;
         posZ += motionZ;
-        float var16 = MathHelper.sqrt_double( motionX * motionX + motionZ * motionZ );
+        float sqrt = MathHelper.sqrt_double( motionX * motionX + motionZ * motionZ );
         rotationYaw = (float) (Math.atan2( motionX, motionZ ) * 180.0 / Math.PI);
-        for( rotationPitch = (float) (Math.atan2( motionY, var16 ) * 180.0 / Math.PI); rotationPitch - prevRotationPitch < -180.0F; prevRotationPitch -= 360.0F ) {
+        
+        // noinspection all
+        for( rotationPitch = (float) (Math.atan2( motionY, sqrt ) * 180.0 / Math.PI); rotationPitch - prevRotationPitch < -180.0F; prevRotationPitch -= 360.0F ) {
             // Do nothing
         }
         while( rotationPitch - prevRotationPitch >= 180.0F ) {

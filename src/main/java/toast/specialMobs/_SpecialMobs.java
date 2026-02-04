@@ -167,6 +167,7 @@ public class _SpecialMobs {
     };
     
     /** Registers the entities in this mod and adds mob spawns. */
+    @SuppressWarnings( { "unchecked", "rawtypes" } )
     private void registerMobs() {
         DataWatcherHelper.init();
         
@@ -248,6 +249,7 @@ public class _SpecialMobs {
         // Register main mobs
         String name;
         Class entityClass;
+        
         for( int i = 0; i < _SpecialMobs.MONSTER_KEY.length; i++ ) {
             // Register vanilla replacement
             try {
@@ -282,14 +284,14 @@ public class _SpecialMobs {
                         eggId = EntityRegistry.findGlobalUniqueEntityId();
                         try {
                             if( eggIdClaimer != null ) {
-                                eggId = ((Integer) eggIdClaimer.invoke( EntityRegistry.instance(), Integer.valueOf( eggId ) )).intValue();
+                                eggId = (Integer) eggIdClaimer.invoke( EntityRegistry.instance(), eggId );
                             }
                         }
                         catch( Exception ex ) {
                             // Do nothing
                         }
-                        EntityList.IDtoClassMapping.put( Integer.valueOf( eggId ), entityClass );
-                        EntityList.entityEggs.put( Integer.valueOf( eggId ), new EntityEggInfo( eggId, _SpecialMobs.MONSTER_KEY_COLORS[i], _SpecialMobs.MONSTER_TYPE_COLORS[i][j] ) );
+                        EntityList.IDtoClassMapping.put( eggId, entityClass );
+                        EntityList.entityEggs.put( eggId, new EntityEggInfo( eggId, _SpecialMobs.MONSTER_KEY_COLORS[i], _SpecialMobs.MONSTER_TYPE_COLORS[i][j] ) );
                     }
                     
                     // Advanced Genetics compatibility
