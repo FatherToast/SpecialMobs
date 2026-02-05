@@ -3,6 +3,7 @@
     - Fixed Witch of Domination crashing dedicated servers.
     - Fixed Dark Creeper playing explosion FX twice.
     - Hopefully fixed rare crash related to SpecialMobs' explosion FX packet.
+    - Fixed spider spitball projectile having a weird render offset.
 1.7.10-3.2.2
     - Added special witches.
     - All additional special mob data is now stored in the SMData compound in ForgeData to better support spawning vanilla mobs with nbt.
