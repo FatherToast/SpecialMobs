@@ -37,6 +37,7 @@ public class EntitySpecialSpitball extends Entity {
         motionY = (target.posY + target.getEyeHeight() - 0.7 - posY) * 0.7;
         motionZ = (target.posZ - entity.posZ) * 0.7;
         double vH = MathHelper.sqrt_double( motionX * motionX + motionZ * motionZ );
+        
         if( vH >= 1E-7 ) {
             rotationYaw = (float) (Math.atan2( motionZ, motionX ) * 180.0 / Math.PI) - 90.0F;
             rotationPitch = (float) (-Math.atan2( motionY, vH ) * 180.0 / Math.PI);
@@ -189,11 +190,12 @@ public class EntitySpecialSpitball extends Entity {
         setDead();
     }
     
-    /// Get/set functions for the damage this attack deals.
+    /** @return The damage this projectile deals. */
     public float getDamage() {
         return damage;
     }
     
+    /** Sets the damage this projectile should deal. */
     public void setDamage( float value ) {
         damage = value;
     }
