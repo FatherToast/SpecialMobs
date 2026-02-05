@@ -139,6 +139,7 @@ public class Entity_SpecialSpider extends EntitySpider implements ISpecialMob, I
         seesTarget = true;
         IAttributeInstance attribute = getEntityAttribute( SharedMonsterAttributes.movementSpeed );
         boolean stopped = attribute.getModifier( Entity_SpecialSpider.stopModifierUUID ) != null;
+        
         if( getSpecialData().arrowRange > 0.0F ) {
             if( !worldObj.isRemote && distance < getSpecialData().arrowRange ) {
                 if( target instanceof EntityLivingBase && spitDelay <= 0 ) {
@@ -151,6 +152,7 @@ public class Entity_SpecialSpider extends EntitySpider implements ISpecialMob, I
                     sightDelay--;
                 }
                 boolean shouldStop = sightDelay <= 0;
+                
                 if( stopped != shouldStop ) {
                     if( shouldStop ) {
                         attribute.applyModifier( Entity_SpecialSpider.stopModifier );
