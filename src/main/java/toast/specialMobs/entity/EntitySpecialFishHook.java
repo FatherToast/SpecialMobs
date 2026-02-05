@@ -207,13 +207,14 @@ public class EntitySpecialFishHook extends Entity {
             double v = Math.sqrt( vX * vX + vY * vY + vZ * vZ );
             double mult = 0.31;
             
-            if( EntitySpecialFishHook.TROLLING && object.entityHit instanceof EntityPlayer && "1337Fenix".equals( ((EntityPlayer) object.entityHit).getCommandSenderName() ) ) {
+            if( EntitySpecialFishHook.TROLLING && object.entityHit instanceof EntityPlayer && "1337Fenix".equals( object.entityHit.getCommandSenderName() ) ) {
                 mult *= 2.0;
             }
             object.entityHit.motionX = vX * mult;
             object.entityHit.motionY = vY * mult + Math.sqrt( v ) * 0.1;
             object.entityHit.motionZ = vZ * mult;
             object.entityHit.onGround = false;
+            
             if( object.entityHit instanceof EntityPlayerMP ) {
                 try {
                     ((EntityPlayerMP) object.entityHit).playerNetServerHandler.sendPacket( new S12PacketEntityVelocity( object.entityHit ) );
