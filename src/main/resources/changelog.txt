@@ -1,19 +1,19 @@
-4.2.3
+1.7.10-4.2.3
     - Added Polish translation by DarkKnightComes.
     - Fixed Witch of Domination crashing dedicated servers.
     - Fixed Dark Creeper playing explosion FX twice.
     - Hopefully fixed rare crash related to SpecialMobs' explosion FX packet.
-3.2.2
+1.7.10-3.2.2
     - Added special witches.
     - All additional special mob data is now stored in the SMData compound in ForgeData to better support spawning vanilla mobs with nbt.
     - Fixed wither skeletons not being immune to fire.
     - Jolt blazes no longer teleport or strike lightning from a killing blow.
     - Blinding endermen and silverfish now remove night vision.
     - Data Watcher indexes are now automatically generated.
-3.2.1
+1.7.10-3.2.1
     - Fixed hungry spiders crashing when hitting a player with no items.
     - Fixed Advanced Genetics support crashing.
-3.2.0
+1.7.10-3.2.0
     - Added special blazes and slimes.
     - Added ninja skeleton and gravel creeper.
     - Implemented SMTex (NBT-defined textures) tag.
@@ -34,30 +34,30 @@
         - Baby skeletons are now half height.
         - Removed sketchy method to force drops from baby monsters.
         - Fixed giant zombies and pigzombie hitboxes being identical to normal sized versions.
-3.1.1
+1.7.10-3.1.1
     - Added gravity creeper.
     - Drowning creeper now drops gold nuggets (presumably from wrecked ships) and ignore water push.
     - Ghasts now have appropriate default ranged attack data (meaning they should actually shoot again).
     - Ghasts now use the SMArrowRange tag for their max shooting range.
-3.1.0
+1.7.10-3.1.0
     - The NBT update! Added many NBT tags for many things.
     - Rewrote a lot of internal things, just makes the mod easier for me to work with.
     - Hostile spiders/cave spiders/pig zombies now look around very quickly when still, instead of directly at the player.
     - Spiders (and cave spiders) may now spawn with a ranged spitting attack.
     - Hungry spiders can now only gain maximum health 127 times (up to 528 health under normal circumstances).
-3.0.3
+1.7.10-3.0.3
     - Fixed crash caused when an unregistered monster spawns (major bug in whatever causes that, but oh well).
     - Fixed hungry spider graphical "bug".
     - Special versions of vanilla mobs spawned directly are now replaced just like vanilla mobs.
-3.0.2
+1.7.10-3.0.2
     - Fixed server crash bug.
     - Fixed broken creeper fuse sound.
-3.0.1
+1.7.10-3.0.1
     - No longer forces babies to drop items (in vanilla now, yay!).
     - Rebalanced drop table.
     - Mirage endermen now only create copies when they have a target.
     - Charged lightning creepers now cause thunderstorms.
-3.0
+1.7.10-3.0
     - Complete code rewrite.
     - Fixed insane server lag caused by special zombies.
     - Mobs now properly apply their attribute changes.
@@ -92,7 +92,7 @@
     - Removed most NBT capability tags.
     - Random sizing is now persistent among saves and across different clients.
     - Probably a lot of other things I forgot.
-2.6
+2-2.6
     - Added fighter ghast, giant zombie, giant skeleton, and giant zombie pigman.
     - Skeletons (all types, except giant) may now be babies.
     - Fishing zombies pull players again! Be afraid.
