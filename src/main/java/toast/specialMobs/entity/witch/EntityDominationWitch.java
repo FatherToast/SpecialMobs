@@ -71,6 +71,7 @@ public class EntityDominationWitch extends Entity_SpecialWitch {
                 target.motionY = vY * mult + Math.sqrt( v ) * 0.1;
                 target.motionZ = vZ * mult;
                 target.onGround = false;
+                
                 if( target instanceof EntityPlayerMP ) {
                     try {
                         ((EntityPlayerMP) target).playerNetServerHandler.sendPacket( new S12PacketEntityVelocity( target ) );
@@ -91,6 +92,7 @@ public class EntityDominationWitch extends Entity_SpecialWitch {
         if( target instanceof EntityLivingBase ) {
             EntityLivingBase livingTarget = (EntityLivingBase) target;
             PotionEffect stolenEffect = null;
+            
             if( EntityDominationWitch.canAffectMind( livingTarget ) ) {
                 // noinspection unchecked
                 for( PotionEffect effect : (Collection<PotionEffect>) livingTarget.getActivePotionEffects() ) {
@@ -109,10 +111,9 @@ public class EntityDominationWitch extends Entity_SpecialWitch {
             
             if( stolenEffect != null ) {
                 livingTarget.removePotionEffect( stolenEffect.getPotionID() );
-                int duration = Math.max( 200, stolenEffect.getDuration() );
-                // noinspection lossy-conversions
+                double duration = Math.max( 200, stolenEffect.getDuration() );
                 duration *= 1.3;
-                addPotionEffect( new PotionEffect( stolenEffect.getPotionID(), duration, stolenEffect.getAmplifier() ) );
+                addPotionEffect( new PotionEffect( stolenEffect.getPotionID(), (int) duration, stolenEffect.getAmplifier() ) );
                 livingTarget.addPotionEffect( new PotionEffect( Potion.wither.id, 110, Math.max( 0, stolenEffect.getAmplifier() ) ) );
             }
             else {
