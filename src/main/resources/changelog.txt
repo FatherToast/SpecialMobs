@@ -1,5 +1,8 @@
 4.2.3
-    - Added Polish translation by DarkKnightComes
+    - Added Polish translation by DarkKnightComes.
+    - Fixed Witch of Domination crashing dedicated servers.
+    - Fixed Dark Creeper playing explosion FX twice.
+    - Hopefully fixed rare crash related to SpecialMobs' explosion FX packet.
 3.2.2
     - Added special witches.
     - All additional special mob data is now stored in the SMData compound in ForgeData to better support spawning vanilla mobs with nbt.
