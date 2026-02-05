@@ -38,10 +38,9 @@ public class EntitySpecialFishHook extends Entity {
         posY -= 0.1;
         posZ -= MathHelper.sin( rotationYaw / 180.0F * (float) Math.PI ) * 0.16F;
         setPosition( posX, posY, posZ );
-        motionX = (posX - entity.posX) * 0.7;
-        motionY = (posY + target.getEyeHeight() - 0.7 - posY) * 0.7;
-        motionZ = (posZ - entity.posZ) * 0.7;
-        
+        motionX = (target.posX - entity.posX) * 0.7;
+        motionY = (target.posY + target.getEyeHeight() - 0.7 - posY) * 0.7;
+        motionZ = (target.posZ - entity.posZ) * 0.7;
         double vH = MathHelper.sqrt_double( motionX * motionX + motionZ * motionZ );
         
         if( vH >= 1E-7 ) {
@@ -134,7 +133,7 @@ public class EntitySpecialFishHook extends Entity {
                 motionVec = Vec3.createVectorHelper( object.hitVec.xCoord, object.hitVec.yCoord, object.hitVec.zCoord );
             }
             Entity entityHit = null;
-            // noinspection all
+            // noinspection rawtypes
             List entitiesInPath = worldObj.getEntitiesWithinAABBExcludingEntity( this, boundingBox.addCoord( motionX, motionY, motionZ ).expand( 1.0, 1.0, 1.0 ) );
             double d = Double.POSITIVE_INFINITY;
             
@@ -147,6 +146,7 @@ public class EntitySpecialFishHook extends Entity {
                     
                     if( object1 != null ) {
                         double d1 = posVec.distanceTo( object1.hitVec );
+                        
                         if( d1 < d ) {
                             entityHit = entityInPath;
                             d = d1;
@@ -163,6 +163,7 @@ public class EntitySpecialFishHook extends Entity {
         }
         else if( angler == null ) {
             Entity entity = worldObj.getEntityByID( getAnglerId() );
+            
             if( entity instanceof EntityLiving ) {
                 angler = (EntityLiving) entity;
             }
