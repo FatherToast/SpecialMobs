@@ -88,6 +88,7 @@ public class MessageTexture implements IMessage {
                 // noinspection all
                 ex.printStackTrace();
             }
+            // No reply message
             return null;
         }
         

@@ -45,6 +45,7 @@ public class EntityKingGhast extends Entity_SpecialGhast {
     @Override
     protected void dropFewItems( boolean hit, int looting ) {
         super.dropFewItems( hit, looting );
+        
         for( int i = rand.nextInt( 2 + looting ); i-- > 0; ) {
             dropItem( Items.gold_ingot, 1 );
         }

@@ -92,6 +92,7 @@ public class EntityFaintGhast extends EntityMeleeGhast {
     @Override
     protected void dropFewItems( boolean hit, int looting ) {
         super.dropFewItems( hit, looting );
+        
         for( int i = rand.nextInt( 2 + looting ); i-- > 0; ) {
             dropItem( Items.slime_ball, 1 );
         }

@@ -83,6 +83,7 @@ public class EntityUnholyGhast extends EntityMeleeGhast {
     @Override
     protected void dropFewItems( boolean hit, int looting ) {
         super.dropFewItems( hit, looting );
+        
         for( int i = rand.nextInt( 3 + looting ); i-- > 0; ) {
             dropItem( Items.gold_ingot, 1 );
         }
