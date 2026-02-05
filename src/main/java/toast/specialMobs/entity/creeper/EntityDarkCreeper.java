@@ -23,7 +23,7 @@ public class EntityDarkCreeper extends Entity_SpecialCreeper {
         experienceValue += 1;
     }
     
-    /// Overridden to modify inherited attribites.
+    /// Overridden to modify inherited attributes.
     @Override
     protected void adjustTypeAttributes() {
         getSpecialData().armor += 6;
@@ -33,7 +33,11 @@ public class EntityDarkCreeper extends Entity_SpecialCreeper {
     @Override
     public void explodeByType( boolean powered, boolean griefing ) {
         float power = powered ? explosionRadius * 2.0F : (float) explosionRadius;
+        
+        // Damage entities and make boom effects.
         worldObj.createExplosion( this, posX, posY, posZ, power, false );
+        
+        // Destroy light sources.
         if( griefing ) {
             MobHelper.darkExplode( this, (int) power );
         }
@@ -42,6 +46,7 @@ public class EntityDarkCreeper extends Entity_SpecialCreeper {
             long time = worldObj.getWorldTime();
             int dayTime = (int) (time % 24000L);
             time -= dayTime;
+            
             if( dayTime < 13000 ) {
                 time += 13000L;
             }

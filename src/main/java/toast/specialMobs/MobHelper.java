@@ -4,6 +4,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockFire;
 import net.minecraft.block.BlockLiquid;
 import net.minecraft.block.BlockOre;
+import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
@@ -13,13 +14,16 @@ import net.minecraft.entity.ai.EntityAITasks.EntityAITaskEntry;
 import net.minecraft.entity.effect.EntityLightningBolt;
 import net.minecraft.entity.item.EntityFallingBlock;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.projectile.EntityArrow;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemBow;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.play.server.S27PacketExplosion;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.MathHelper;
+import net.minecraft.util.Vec3;
 import net.minecraft.world.ChunkPosition;
 import net.minecraft.world.Explosion;
 import toast.specialMobs.entity.ISpecialMob;
@@ -30,7 +34,7 @@ import java.util.HashSet;
 
 public abstract class MobHelper {
     
-    // Clears all melee attack AIs.
+    /** Clears all melee attack AIs. */
     @SuppressWarnings( "unchecked" )
     public static void clearMeleeAttackAI( EntityLiving entity ) {
         for( EntityAITaskEntry entry : (EntityAITaskEntry[]) entity.tasks.taskEntries.toArray( new EntityAITaskEntry[0] ) )
@@ -39,7 +43,7 @@ public abstract class MobHelper {
             }
     }
     
-    // Clears all ranged attack AIs.
+    /** Clears all ranged attack AIs. */
     @SuppressWarnings( "unchecked" )
     public static void clearRangedAttackAI( EntityLiving entity ) {
         for( EntityAITaskEntry entry : (EntityAITaskEntry[]) entity.tasks.taskEntries.toArray( new EntityAITaskEntry[0] ) )
@@ -48,7 +52,7 @@ public abstract class MobHelper {
             }
     }
     
-    // Returns true if the mob has a recognized ranged attack AI.
+    /** Returns true if the mob has a recognized ranged attack AI. */
     @SuppressWarnings( "unchecked" )
     public static boolean hasRangedAttack( EntityLiving entity ) {
         for( EntityAITaskEntry entry : (EntityAITaskEntry[]) entity.tasks.taskEntries.toArray( new EntityAITaskEntry[0] ) )
@@ -60,22 +64,22 @@ public abstract class MobHelper {
                 && entity.getHeldItem() != null
                 && entity.getHeldItem().getItem() instanceof ItemBow;
     }
-
-    /*
-    // Clears the entity's AI tasks.
-    public static void clearAI(EntityLiving entity) {
-        for (EntityAITaskEntry entry : (EntityAITaskEntry[])entity.tasks.taskEntries.toArray(new EntityAITaskEntry[0]))
-            entity.tasks.removeTask(entry.action);
-    }
-
-    // Clears the entity's AI target tasks.
-    public static void clearTargetAI(EntityLiving entity) {
-        for (EntityAITaskEntry entry : (EntityAITaskEntry[])entity.targetTasks.taskEntries.toArray(new EntityAITaskEntry[0]))
-            entity.targetTasks.removeTask(entry.action);
-    }
-     */
     
-    // Drops arrows from the entity if it should drop arrows.
+    /** Clears the entity's AI tasks. */
+    public static void clearAI( EntityLiving entity ) {
+        // noinspection unchecked
+        for( EntityAITaskEntry entry : (EntityAITaskEntry[]) entity.tasks.taskEntries.toArray( new EntityAITaskEntry[0] ) )
+            entity.tasks.removeTask( entry.action );
+    }
+    
+    /** Clears the entity's AI target tasks. */
+    public static void clearTargetAI( EntityLiving entity ) {
+        // noinspection unchecked
+        for( EntityAITaskEntry entry : (EntityAITaskEntry[]) entity.targetTasks.taskEntries.toArray( new EntityAITaskEntry[0] ) )
+            entity.targetTasks.removeTask( entry.action );
+    }
+    
+    /** Drops arrows from the entity if it should drop arrows. */
     public static void dropFewArrows( EntityLivingBase entity, boolean recentlyHit, int looting ) {
         if( entity.getHeldItem() == null || !(entity.getHeldItem().getItem() instanceof ItemBow) )
             return;
@@ -84,15 +88,20 @@ public abstract class MobHelper {
         }
     }
     
-    // Causes a creeper explosion that places dirt instead of destroying blocks.
+    /**
+     * Causes a creeper explosion that only destroys light sources.
+     */
     public static void darkExplode( Entity exploder, int radius ) {
         Explosion explosion = new Explosion( exploder.worldObj, exploder, exploder.posX, exploder.posY, exploder.posZ, radius );
         float blastPower = explosion.explosionSize * (0.7F + exploder.worldObj.rand.nextFloat() * 0.6F);
+        // Note: not actually used as chunk positions, but block positions
         HashSet<ChunkPosition> affectedBlocks = new HashSet<>();
         radius <<= 2;
-        int bX = (int) exploder.posX;
-        int bY = (int) exploder.posY;
-        int bZ = (int) exploder.posZ;
+        
+        int eX = (int) exploder.posX;
+        int eY = (int) exploder.posY;
+        int eZ = (int) exploder.posZ;
+        
         float resistance;
         Block block;
         
@@ -102,11 +111,24 @@ public abstract class MobHelper {
                     if( Math.sqrt( x * x + y * y + z * z ) > radius ) {
                         continue;
                     }
-                    block = exploder.worldObj.getBlock( bX + x, bY + y, bZ + z );
+                    int blockX = eX + x;
+                    int blockY = eY + y;
+                    int blockZ = eZ + z;
+                    
+                    block = exploder.worldObj.getBlock( blockX, blockY, blockZ );
+                    
                     if( block != null && block.getLightValue() > 1 && !(block instanceof BlockLiquid) && !(block instanceof BlockFire) && block != Blocks.lit_redstone_ore && !(block instanceof BlockOre) ) {
-                        resistance = exploder.func_145772_a( explosion, exploder.worldObj, bX + x, bY + y, bZ + z, block ) + 0.3F;
-                        if( blastPower - resistance * 0.3F > 0.0F && exploder.func_145774_a( explosion, exploder.worldObj, bX + x, bY + y, bZ + z, block, blastPower ) ) {
-                            affectedBlocks.add( new ChunkPosition( bX + x, bY + y, bZ + z ) );
+                        resistance = exploder.func_145772_a( explosion, exploder.worldObj, blockX, blockY, blockZ, block ) + 0.3F;
+                        
+                        if( blastPower - resistance * 0.3F > 0.0F && exploder.func_145774_a( explosion, exploder.worldObj, blockX, blockY, blockZ, block, blastPower ) ) {
+                            affectedBlocks.add( new ChunkPosition( blockX, blockY, blockZ ) );
+                            
+                            if( block.getMaterial() != Material.air ) {
+                                if( block.canDropFromExplosion( explosion ) ) {
+                                    block.dropBlockAsItemWithChance( exploder.worldObj, blockX, blockY, blockZ, exploder.worldObj.getBlockMetadata( blockX, blockY, blockZ ), 1.0F / explosion.explosionSize, 0 );
+                                }
+                                block.onBlockExploded( exploder.worldObj, blockX, blockY, blockZ, explosion );
+                            }
                         }
                     }
                 }
@@ -114,11 +136,27 @@ public abstract class MobHelper {
         }
         // noinspection unchecked
         explosion.affectedBlockPositions.addAll( affectedBlocks );
-        explosion.doExplosionB( false );
-        _SpecialMobs.CHANNEL.sendToDimension( new MessageExplosion( explosion ), exploder.dimension );
+        
+        // Send explosion FX packet to nearby players.
+        if( !exploder.worldObj.isRemote ) {
+            for( Object o : exploder.worldObj.playerEntities ) {
+                EntityPlayer entityplayer = (EntityPlayer) o;
+                
+                if( entityplayer.getDistanceSq( exploder.posX, exploder.posY, exploder.posZ ) < 4096.0D ) {
+                    ((EntityPlayerMP) entityplayer).playerNetServerHandler.sendPacket( new S27PacketExplosion(
+                            exploder.posX,
+                            exploder.posY,
+                            exploder.posZ,
+                            blastPower,
+                            explosion.affectedBlockPositions,
+                            (Vec3) explosion.func_77277_b().get( entityplayer )
+                    ) );
+                }
+            }
+        }
     }
     
-    // Causes a creeper explosion that places dirt instead of destroying blocks.
+    /** Causes a creeper explosion that places dirt instead of destroying blocks. */
     public static void dirtExplode( Entity exploder, int radius ) {
         int bX = (int) exploder.posX;
         int bY = (int) exploder.posY;
@@ -138,7 +176,7 @@ public abstract class MobHelper {
         }
     }
     
-    // Causes a creeper explosion that places dirt instead of destroying blocks.
+    /** Causes a creeper explosion that places dirt instead of destroying blocks. */
     public static void drowningExplode( Entity exploder, int radius ) {
         radius += 3;
         int bX = (int) exploder.posX;
@@ -170,7 +208,7 @@ public abstract class MobHelper {
         }
     }
     
-    // Causes a creeper explosion that shoots out falling gravel.
+    /** Causes a creeper explosion that shoots out falling gravel. */
     public static void gravelExplode( Entity exploder, float power ) {
         power += 4.0F;
         int count = (int) Math.ceil( power * power * 3.5F );
@@ -181,7 +219,7 @@ public abstract class MobHelper {
         for( int i = 0; i < count; i++ ) {
             gravel = new EntityFallingBlock( exploder.worldObj, exploder.posX, exploder.posY + exploder.height / 2.0F, exploder.posZ, Blocks.gravel );
             gravel.field_145812_b = 1; // time alive, if it starts at 0, the entity will normally die instantly
-            gravel.field_145813_c = false; // drop item if can't place
+            gravel.field_145813_c = false; // drop as item if we can't place
             gravel.func_145806_a( true ); // setHurtEntities
             gravel.fallDistance = 3.0F;
             
@@ -195,7 +233,7 @@ public abstract class MobHelper {
         }
     }
     
-    // Causes a creeper explosion that spawns lightning.
+    /** Causes a creeper explosion that spawns lightning. */
     public static void lightningExplode( Entity exploder, int radius ) {
         MobHelper.lightningExplode( exploder, exploder.posX, exploder.posY, exploder.posZ, radius );
     }
@@ -207,21 +245,22 @@ public abstract class MobHelper {
                 exploder.worldObj.spawnEntityInWorld( new EntityLightningBolt( exploder.worldObj, posX + x, posY, posZ + z ) );
             }
         }
-        _SpecialMobs.CHANNEL.sendToDimension( new MessageExplosion( posX, posY, posZ, radius, "lightning" ), exploder.dimension );
+        _SpecialMobs.CHANNEL.sendToDimension( new MessageExplosion( posX, posY, posZ, radius, MessageExplosion.Type.LIGHTNING ), exploder.dimension );
     }
     
-    // Removes the player's currently held item and returns it.
+    /** Removes the player's currently held item and returns it. */
     public static ItemStack removeHeldItem( EntityPlayer player ) {
         ItemStack heldItem = player.inventory.getCurrentItem();
         if( heldItem != null ) {
-            player.inventory.setInventorySlotContents( player.inventory.currentItem, (ItemStack) null );
+            player.inventory.setInventorySlotContents( player.inventory.currentItem, null );
         }
         return heldItem;
     }
     
-    // Removes a random item stack from the player's inventory and returns it.
+    /** Removes a random item stack from the player's inventory and returns it. */
     public static ItemStack removeRandomItem( EntityPlayer player ) {
         int count = 0;
+        
         for( int i = 0; i < player.inventory.getSizeInventory(); i++ ) {
             if( player.inventory.getStackInSlot( i ) != null ) {
                 count++;
@@ -230,10 +269,12 @@ public abstract class MobHelper {
         if( count > 0 ) {
             count = _SpecialMobs.random.nextInt( count );
             ItemStack item;
+            
             for( int i = 0; i < player.inventory.getSizeInventory(); i++ ) {
                 item = player.inventory.getStackInSlot( i );
+                
                 if( item != null && --count < 0 ) {
-                    player.inventory.setInventorySlotContents( i, (ItemStack) null );
+                    player.inventory.setInventorySlotContents( i, null );
                     return item;
                 }
             }
@@ -241,7 +282,7 @@ public abstract class MobHelper {
         return null;
     }
     
-    // Returns true if the damage from a source is a critical hit.
+    /** @return True if the damage from a source is a critical hit. */
     public static boolean isCritical( DamageSource damageSource ) {
         if( damageSource.getSourceOfDamage() instanceof EntityArrow )
             return ((EntityArrow) damageSource.getSourceOfDamage()).getIsCritical();
@@ -249,7 +290,7 @@ public abstract class MobHelper {
         return damageSource.getEntity() != null && !damageSource.getEntity().isInWater() && damageSource.getEntity().fallDistance > 0.0F;
     }
     
-    // Returns true if the entity can be replaced by a special version.
+    /** @return True if the entity can be replaced by a special version. */
     public static boolean canReplace( EntityLiving entity ) {
         return !entity.isNoDespawnRequired() && !(entity instanceof ISpecialMob) && entity.getEntityData().getByte( "smi" ) == 0;
     }

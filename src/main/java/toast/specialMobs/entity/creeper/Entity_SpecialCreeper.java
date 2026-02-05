@@ -151,6 +151,7 @@ public class Entity_SpecialCreeper extends EntityCreeper implements ISpecialMob 
             }
             if( timeSinceIgnited >= fuseTime ) {
                 timeSinceIgnited = fuseTime;
+                
                 if( !worldObj.isRemote ) {
                     explodeByType( getPowered(), worldObj.getGameRules().getGameRuleBooleanValue( "mobGriefing" ) );
                     setDead();
