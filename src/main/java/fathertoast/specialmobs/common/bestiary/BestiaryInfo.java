@@ -4,11 +4,11 @@ import fathertoast.crust.api.config.common.ConfigManager;
 import fathertoast.crust.api.config.common.ConfigUtil;
 import fathertoast.crust.api.config.common.field.DoubleField;
 import fathertoast.crust.api.config.common.value.*;
-import fathertoast.crust.api.config.common.value.environment.biome.BiomeCategory;
 import fathertoast.specialmobs.common.config.Config;
 import fathertoast.specialmobs.common.core.SpecialMobs;
 import fathertoast.specialmobs.common.util.References;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.BiomeTags;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EntityType;
@@ -17,9 +17,9 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraftforge.common.Tags;
 import net.minecraftforge.registries.ForgeRegistries;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,6 +30,7 @@ import java.util.function.Function;
  * This class serves solely to store data for mob species in an organized way, providing builder methods as applicable.
  * The bulk of bestiary info is default config settings.
  */
+@SuppressWarnings( "ClassCanBeRecord" )
 public class BestiaryInfo {
     
     public enum DefaultWeight {
@@ -90,10 +91,10 @@ public class BestiaryInfo {
                 EnvironmentEntry.builder( cfgManager, DefaultWeight.HIGH.value ).aboveHalfMoonLight().build()
         ) ),
         FOREST( ( cfgManager ) -> new EnvironmentList(
-                EnvironmentEntry.builder( cfgManager, DefaultWeight.HIGHEST.value ).inBiomeCategory( BiomeCategory.TAIGA ).build(),
-                EnvironmentEntry.builder( cfgManager, DefaultWeight.HIGHEST.value ).inBiomeCategory( BiomeCategory.JUNGLE ).build(),
-                EnvironmentEntry.builder( cfgManager, DefaultWeight.HIGHEST.value ).inBiomeCategory( BiomeCategory.FOREST ).build(),
-                //EnvironmentEntry.builder( DefaultWeight.HIGHEST.value ).inBiomeTag( BiomeTags.IS_SWAMP ).build(),
+                EnvironmentEntry.builder( cfgManager, DefaultWeight.HIGHEST.value ).inBiome( BiomeTags.IS_TAIGA ).build(),
+                EnvironmentEntry.builder( cfgManager, DefaultWeight.HIGHEST.value ).inBiome( BiomeTags.IS_JUNGLE ).build(),
+                EnvironmentEntry.builder( cfgManager, DefaultWeight.HIGHEST.value ).inBiome( BiomeTags.IS_FOREST ).build(),
+                EnvironmentEntry.builder( cfgManager, DefaultWeight.HIGHEST.value ).inBiome( Tags.Biomes.IS_SWAMP ).build(),
                 EnvironmentEntry.builder( cfgManager, DefaultWeight.HIGHEST.value ).inBiome( Biomes.CRIMSON_FOREST ).build(),
                 EnvironmentEntry.builder( cfgManager, DefaultWeight.HIGH.value ).atMaxMoonLight().build()
         ) ),
@@ -462,25 +463,25 @@ public class BestiaryInfo {
         public Builder noAnimationTexture() { return animationTexture( null ); }
         
         /** Sets the species default base texture, under the Special Mobs namespace. */
-        public Builder modBaseTexture( @Nonnull String tex ) {
+        public Builder modBaseTexture( String tex ) {
             texture = SpecialMobs.rl( tex );
             return this;
         }
         
         /** Sets the species default glowing eyes texture, under the Special Mobs namespace. */
-        public Builder modEyesTexture( @Nonnull String eyesTex ) {
+        public Builder modEyesTexture( String eyesTex ) {
             eyesTexture = SpecialMobs.rl( eyesTex );
             return this;
         }
         
         /** Sets the species default overlay texture, under the Special Mobs namespace. */
-        public Builder modOverlayTexture( @Nonnull String ovrTex ) {
+        public Builder modOverlayTexture( String ovrTex ) {
             overlayTexture = SpecialMobs.rl( ovrTex );
             return this;
         }
         
         /** Sets the species default animation texture, under the Special Mobs namespace. */
-        public Builder modAnimationTexture( @Nonnull String aniTex ) {
+        public Builder modAnimationTexture( String aniTex ) {
             animationTexture = SpecialMobs.rl( aniTex );
             return this;
         }
