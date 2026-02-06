@@ -49,14 +49,12 @@ minecraft {
 
         client {
             property "mixin.debug.export", "true"
-            property 'mixin.env.disableRefMap', 'true'
 
             arg "-mixin.config=specialmobs.mixins.json"
         }
 
         server {
             property "mixin.debug.export", "true"
-            property 'mixin.env.disableRefMap', 'true'
 
             arg "-mixin.config=specialmobs.mixins.json"
         }
@@ -103,6 +101,11 @@ dependencies {
     // Tinker's Construct
     implementation fg.deobf("curse.maven:tc-74072:${tc_version}")
     implementation fg.deobf("curse.maven:mantle-74924:${mantle_version}")
+
+    // Ryomic Lights
+    implementation fg.deobf("curse.maven:ryoamiclights-913587:${ryoamic_version}")
+    compileOnly "curse.maven:ryoamiclights_src-913587:${ryoamic_src_version}"
+    implementation fg.deobf("curse.maven:obsidianui-684718:${obsidianui_version}")
 
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 }

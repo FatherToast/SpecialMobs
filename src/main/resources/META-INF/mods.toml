@@ -44,3 +44,10 @@ mandatory = true
 versionRange = "[4.9.15,)"
 ordering = "AFTER"
 side = "BOTH"
+
+[[dependencies.specialmobs]]
+modId = "ryoamiclights"
+mandatory = false
+versionRange = "[0.2.3,)"
+ordering = "NONE"
+side = "BOTH"

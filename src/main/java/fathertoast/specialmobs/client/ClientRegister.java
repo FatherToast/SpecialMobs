@@ -12,6 +12,7 @@ import fathertoast.specialmobs.client.renderer.entity.projectile.BugSpitRenderer
 import fathertoast.specialmobs.client.renderer.entity.projectile.SpecialFishingBobberRenderer;
 import fathertoast.specialmobs.client.renderer.entity.species.*;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
+import fathertoast.specialmobs.common.compat.ryoamic.RyoamicCompat;
 import fathertoast.specialmobs.common.config.Config;
 import fathertoast.specialmobs.common.core.SpecialMobs;
 import fathertoast.specialmobs.common.core.register.SMEntities;
@@ -60,6 +61,7 @@ public class ClientRegister {
             event.enqueueWork( () -> ItemProperties.register( Items.FISHING_ROD,
                     ResourceLocation.withDefaultNamespace( "cast" ), new FishingRodItemPropertyGetter() ) );
         }
+        RyoamicCompat.init();
         
         // Tell Forge to open the config editor when our mod's "Config" button is clicked in the Mods screen
         ClientConfigUtil.registerConfigButtonAsEditScreen();
