@@ -88,16 +88,16 @@ public class RyoamicCompat {
         DynamicLightHandlers.registerDynamicLightHandler( FireZombieEntity.SPECIES.entityType.get(),
                 DynamicLightHandler.makeHandler( ( fireZombie ) -> 5, ( fireZombie ) -> true ) );
         
-        // DROWNED
+        // DROWNED (Uses living entity handler by default)
         DynamicLightHandlers.registerDynamicLightHandler( AbyssalDrownedEntity.SPECIES.entityType.get(), DynamicLightHandler.makeLivingEntityHandler( ( abyssalDrowned ) -> 4 ) );
         
-        // SKELETONS
+        // SKELETONS (Uses living entity handler by default)
         DynamicLightHandlers.registerDynamicLightHandler( FireSkeletonEntity.SPECIES.entityType.get(), DynamicLightHandler.makeLivingEntityHandler(
                 DynamicLightHandler.makeHandler( ( fireSkeleton ) -> 5, ( fireSkeleton ) -> true ) ) );
         DynamicLightHandlers.registerDynamicLightHandler( SpitfireSkeletonEntity.SPECIES.entityType.get(), DynamicLightHandler.makeLivingEntityHandler(
                 DynamicLightHandler.makeHandler( ( spitfireSkeleton ) -> 5, ( spitfireSkeleton ) -> true ) ) );
         
-        // WITHER SKELETONS
+        // WITHER SKELETONS (Uses living entity handler by default)
         DynamicLightHandlers.registerDynamicLightHandler( SpitfireWitherSkeletonEntity.SPECIES.entityType.get(), DynamicLightHandler.makeLivingEntityHandler(
                 DynamicLightHandler.makeHandler( ( spitfireWitherSkeleton ) -> 5, ( spitfireWitherSkeleton ) -> true ) ) );
         
