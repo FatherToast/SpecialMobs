@@ -12,6 +12,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.ServerLevelData;
 
 @SpecialMob
+@SuppressWarnings( "resource" )
 public class LightningCreeperEntity extends _SpecialCreeperEntity {
     
     //--------------- Static Special Mob Hooks ----------------

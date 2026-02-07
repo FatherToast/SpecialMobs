@@ -134,6 +134,7 @@ public class SpecialMobs {
         SMCreativeTabs.REGISTRY.register( modEventBus );
         SMEntities.REGISTRY.register( modEventBus );
         SMEffects.REGISTRY.register( modEventBus );
+        SMSounds.REGISTRY.register( modEventBus );
         SMBiomeMods.REGISTRY.register( modEventBus );
         
         modEventBus.addListener( SMEntities::createAttributes );

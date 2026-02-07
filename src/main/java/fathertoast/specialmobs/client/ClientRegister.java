@@ -18,6 +18,7 @@ import fathertoast.specialmobs.common.core.SpecialMobs;
 import fathertoast.specialmobs.common.core.register.SMEntities;
 import fathertoast.specialmobs.common.entity.blaze.ArmoredBlazeEntity;
 import fathertoast.specialmobs.common.entity.creeper.EnderCreeperEntity;
+import fathertoast.specialmobs.common.entity.creeper.ImplodingCreeperEntity;
 import fathertoast.specialmobs.common.entity.creeper.ScopeCreeperEntity;
 import fathertoast.specialmobs.common.entity.enderman.RunicEndermanEntity;
 import fathertoast.specialmobs.common.entity.ghast.CorporealShiftGhastEntity;
@@ -128,6 +129,7 @@ public class ClientRegister {
         registerSpeciesRenderer( event, ArmoredBlazeEntity.SPECIES, ArmoredBlazeRenderer::new );
         
         registerSpeciesRenderer( event, EnderCreeperEntity.SPECIES, EnderCreeperRenderer::new );
+        registerSpeciesRenderer( event, ImplodingCreeperEntity.SPECIES, ImplodingCreeperRenderer::new );
         registerSpeciesRenderer( event, ScopeCreeperEntity.SPECIES, ScopeCreeperRenderer::new );
         
         registerSpeciesRenderer( event, MadScientistZombieEntity.SPECIES, SpecialZombieVillagerRenderer::new );

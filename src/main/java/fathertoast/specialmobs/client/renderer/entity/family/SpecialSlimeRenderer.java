@@ -28,11 +28,15 @@ public class SpecialSlimeRenderer extends SlimeRenderer {
     }
     
     @Override
-    protected void scale(Slime entity, PoseStack poseStack, float partialTick ) {
+    protected void scale( Slime entity, PoseStack poseStack, float partialTick ) {
         super.scale( entity, poseStack, partialTick );
         
         final float scale = ((ISpecialMob<?>) entity).getSpecialData().getRenderScale();
         shadowRadius = baseShadowRadius * scale * entity.getSize(); // Factor slime size into shadow
         poseStack.scale( scale, scale, scale );
+    }
+    
+    public float getBaseShadowRadius() {
+        return baseShadowRadius;
     }
 }

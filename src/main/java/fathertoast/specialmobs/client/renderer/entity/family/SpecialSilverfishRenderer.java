@@ -28,11 +28,15 @@ public class SpecialSilverfishRenderer extends SilverfishRenderer {
     }
     
     @Override
-    protected void scale(Silverfish entity, PoseStack poseStack, float partialTick ) {
+    protected void scale( Silverfish entity, PoseStack poseStack, float partialTick ) {
         super.scale( entity, poseStack, partialTick );
         
         final float scale = ((ISpecialMob<?>) entity).getSpecialData().getRenderScale();
         shadowRadius = baseShadowRadius * scale;
         poseStack.scale( scale, scale, scale );
+    }
+    
+    public float getBaseShadowRadius() {
+        return baseShadowRadius;
     }
 }

@@ -258,7 +258,7 @@ public class _SpecialCreeperEntity extends Creeper implements IExplodingMob, ISp
     /** Sets this creeper's charged state to the given value. */
     private void setPowered( boolean charged ) { entityData.set( DATA_IS_POWERED, charged ); }
     
-    /** @return True if this creeper is super charged. */
+    /** @return True if this creeper is supercharged. */
     public boolean isSupercharged() { return getExplodeFlag( EXPLODE_FLAG_SUPERCHARGED ); }
     
     /** Sets this creeper's supercharged state to the given value. */

@@ -3,7 +3,6 @@ package fathertoast.specialmobs.common.entity.creeper;
 import fathertoast.crust.api.config.common.ConfigManager;
 import fathertoast.crust.api.config.common.value.EnvironmentEntry;
 import fathertoast.crust.api.config.common.value.EnvironmentList;
-import fathertoast.crust.api.config.common.value.environment.biome.BiomeCategory;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
@@ -49,6 +48,7 @@ import net.minecraft.world.level.pathfinder.BlockPathTypes;
 import net.minecraft.world.phys.Vec3;
 
 @SpecialMob
+@SuppressWarnings( "resource" )
 public class DrowningCreeperEntity extends _SpecialCreeperEntity implements IAmphibiousMob {
     
     //--------------- Static Special Mob Hooks ----------------
@@ -68,9 +68,9 @@ public class DrowningCreeperEntity extends _SpecialCreeperEntity implements IAmp
     public static SpeciesConfig createConfig( ConfigManager manager, MobFamily.Species<?> species ) {
         SpeciesConfig.NEXT_NATURAL_SPAWN_CHANCE_EXCEPTIONS = new EnvironmentList(
                 EnvironmentEntry.builder( manager, 0.06F ).inBiome( Biomes.WARM_OCEAN ).build(),
-                EnvironmentEntry.builder( manager, 0.06F ).inBiomeCategory( BiomeCategory.RIVER ).build(),
-                EnvironmentEntry.builder( manager, 0.02F ).inBiomeCategory( BiomeCategory.OCEAN ).belowSeaDepths().build(),
-                EnvironmentEntry.builder( manager, 0.0F ).inBiomeCategory( BiomeCategory.OCEAN ).build() );
+                EnvironmentEntry.builder( manager, 0.06F ).inBiome( BiomeTags.IS_RIVER ).build(),
+                EnvironmentEntry.builder( manager, 0.02F ).inBiome( BiomeTags.IS_OCEAN ).belowSeaDepths().build(),
+                EnvironmentEntry.builder( manager, 0.0F ).inBiome( BiomeTags.IS_OCEAN ).build() );
         return new DrowningCreeperSpeciesConfig( manager, species, false, false, false,
                 0.25, 2, 4 );
     }

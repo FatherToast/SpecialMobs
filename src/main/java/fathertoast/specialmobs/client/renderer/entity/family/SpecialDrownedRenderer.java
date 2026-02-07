@@ -32,11 +32,15 @@ public class SpecialDrownedRenderer extends DrownedRenderer {
     }
     
     @Override
-    protected void scale(Drowned entity, PoseStack poseStack, float partialTick ) {
+    protected void scale( Drowned entity, PoseStack poseStack, float partialTick ) {
         super.scale( entity, poseStack, partialTick );
         
         final float scale = ((ISpecialMob<?>) entity).getSpecialData().getRenderScale();
         shadowRadius = baseShadowRadius * scale;
         poseStack.scale( scale, scale, scale );
+    }
+    
+    public float getBaseShadowRadius() {
+        return baseShadowRadius;
     }
 }

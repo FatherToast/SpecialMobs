@@ -29,6 +29,7 @@ import net.minecraft.world.level.storage.ServerLevelData;
 import java.util.List;
 
 @SpecialMob
+@SuppressWarnings( "resource" )
 public class SandCreeperEntity extends _SpecialCreeperEntity {
     
     //--------------- Static Special Mob Hooks ----------------
@@ -124,7 +125,7 @@ public class SandCreeperEntity extends _SpecialCreeperEntity {
             return;
         }
         
-        if( block.is(BlockTags.REPLACEABLE ) ) {
+        if( block.is( BlockTags.REPLACEABLE ) ) {
             final BlockEntity blockEntity = block.hasBlockEntity() ? level().getExistingBlockEntity( pos ) : null;
             Block.dropResources( block, level(), pos, blockEntity );
             level().setBlock( pos, Blocks.AIR.defaultBlockState(), References.SetBlockFlags.DEFAULTS );

@@ -116,7 +116,7 @@ public class SMLanguageProvider extends LanguageProvider {
             final int k = key.ordinal() + 1;
             boolean missedAny = false;
             for( String[] translationArray : TRANSLATIONS ) {
-                if( translationArray[k] == null || translationArray[k].isEmpty()) {
+                if( translationArray[k] == null || translationArray[k].isEmpty() ) {
                     SpecialMobs.LOG.error( "Translation key {} is missing a translation for lang key \"{}\"!",
                             key.name(), translationArray[0] );
                     missedAny = true;
@@ -147,7 +147,7 @@ public class SMLanguageProvider extends LanguageProvider {
     private final TranslationKey translationKey;
     
     /** Creates a language provider for a specific locale. This correlates to exactly one .json file. */
-    public SMLanguageProvider(PackOutput output, String locale, TranslationKey translateKey ) {
+    public SMLanguageProvider( PackOutput output, String locale, TranslationKey translateKey ) {
         super( output, SpecialMobs.MOD_ID, locale );
         translationKey = translateKey;
     }
@@ -164,11 +164,14 @@ public class SMLanguageProvider extends LanguageProvider {
             if( translationArray[k] != null && !translationArray[k].isEmpty() )
                 add( translationArray[0], translationArray[k] );
         }
-
+        
         // Doing creative mode tabs manually for now since there is only one
-        add("itemGroup.magical_relics.spawn_eggs", "Special Mobs - Spawn Eggs");
-
+        add( "itemGroup.magical_relics.spawn_eggs", "Special Mobs - Spawn Eggs" );
+        
+        // Sound event subtitles
+        add( "sound_event.specialmobs.subtitle.imploding_creeper.implode", "Creeper implodes" );
+        
         // Some other stuff
-        add("config.jade.plugin_specialmobs.display_ninja_disguises", "Display Ninja Disguises");
+        add( "config.jade.plugin_specialmobs.display_ninja_disguises", "Display Ninja Disguises" );
     }
 }

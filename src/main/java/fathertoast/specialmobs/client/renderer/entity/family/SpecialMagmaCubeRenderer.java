@@ -21,18 +21,22 @@ public class SpecialMagmaCubeRenderer extends MagmaCubeRenderer {
         //addLayer( new SpecialMobEyesLayer<>( this ) );
         addLayer( new SpecialMobOverlayLayer<>( this, new LavaSlimeModel<>( context.bakeLayer( SMModelLayers.MAGMA_CUBE_OUTER_LAYER ) ) ) );
     }
-
+    
     @Override
     public ResourceLocation getTextureLocation( MagmaCube entity ) {
         return ((ISpecialMob<?>) entity).getSpecialData().getTexture();
     }
     
     @Override
-    protected void scale(MagmaCube entity, PoseStack poseStack, float partialTick ) {
+    protected void scale( MagmaCube entity, PoseStack poseStack, float partialTick ) {
         super.scale( entity, poseStack, partialTick );
         
         final float scale = ((ISpecialMob<?>) entity).getSpecialData().getRenderScale();
         shadowRadius = baseShadowRadius * scale * entity.getSize(); // Factor slime size into shadow
         poseStack.scale( scale, scale, scale );
+    }
+    
+    public float getBaseShadowRadius() {
+        return baseShadowRadius;
     }
 }

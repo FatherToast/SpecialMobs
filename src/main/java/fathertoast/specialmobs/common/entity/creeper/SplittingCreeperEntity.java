@@ -23,6 +23,7 @@ import net.minecraftforge.event.ForgeEventFactory;
 import javax.annotation.Nullable;
 
 @SpecialMob
+@SuppressWarnings( "resource" )
 public class SplittingCreeperEntity extends _SpecialCreeperEntity {
     
     //--------------- Static Special Mob Hooks ----------------
@@ -114,7 +115,7 @@ public class SplittingCreeperEntity extends _SpecialCreeperEntity {
                 0.3 + 0.3 * random.nextDouble(), // Used to cause floor clip bug; remove if it happens again
                 (random.nextDouble() - 0.5) * speed );
         baby.setOnGround( false );
-
+        
         level().addFreshEntity( baby );
         return groupData;
     }

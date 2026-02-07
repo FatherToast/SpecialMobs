@@ -22,6 +22,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import java.util.List;
 
 @SpecialMob
+@SuppressWarnings( "resource" )
 public class DarkCreeperEntity extends _SpecialCreeperEntity {
     
     //--------------- Static Special Mob Hooks ----------------
@@ -95,7 +96,8 @@ public class DarkCreeperEntity extends _SpecialCreeperEntity {
         explosion.finalizeExplosion();
         
         // Move the time forward to next night if powered
-        if( isPowered() && level() instanceof ServerLevel serverLevel ) {;
+        if( isPowered() && level() instanceof ServerLevel serverLevel ) {
+            ;
             
             // Days are 24k ticks long; find how far along we are in the current day (0-23,999)
             long time = serverLevel.getDayTime();

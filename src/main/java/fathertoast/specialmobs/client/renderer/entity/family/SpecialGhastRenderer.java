@@ -37,4 +37,8 @@ public class SpecialGhastRenderer extends GhastRenderer {
         shadowRadius = baseShadowRadius * scale;
         poseStack.scale( scale, scale, scale );
     }
+    
+    public float getBaseShadowRadius() {
+        return baseShadowRadius;
+    }
 }

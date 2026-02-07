@@ -21,7 +21,7 @@ public class SpecialCreeperRenderer extends CreeperRenderer {
         super( context );
         // Get rid of this one since we have our own implementation
         layers.removeIf( ( layer ) -> layer instanceof CreeperPowerLayer );
-
+        
         baseShadowRadius = shadowRadius;
         addLayer( new SpecialMobEyesLayer<>( this ) );
         addLayer( new SpecialMobOverlayLayer<>( this, new CreeperModel<>( context.bakeLayer( SMModelLayers.CREEPER_OUTER_LAYER ) ) ) );
@@ -40,5 +40,9 @@ public class SpecialCreeperRenderer extends CreeperRenderer {
         final float scale = ((ISpecialMob<?>) entity).getSpecialData().getRenderScale();
         shadowRadius = baseShadowRadius * scale;
         poseStack.scale( scale, scale, scale );
+    }
+    
+    public float getBaseShadowRadius() {
+        return baseShadowRadius;
     }
 }

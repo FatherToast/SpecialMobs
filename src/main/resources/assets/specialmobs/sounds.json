@@ -1,0 +1,8 @@
+{
+  "entity.imploding_creeper.implode": {
+    "subtitle": "sound_event.specialmobs.subtitle.imploding_creeper.implode",
+    "sounds": [
+      "specialmobs:entity/creeper/implode"
+    ]
+  }
+}

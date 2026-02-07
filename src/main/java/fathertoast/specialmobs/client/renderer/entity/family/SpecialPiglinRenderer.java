@@ -33,14 +33,14 @@ public class SpecialPiglinRenderer extends HumanoidMobRenderer<Mob, SpecialPigli
         super( context, createModel( context, isZombie ? SMModelLayers.ZOMBIFIED_PIGLIN : SMModelLayers.PIGLIN, missingRightEar ), 0.5F, 1.0019531F, 1.0F, 1.0019531F );
         baseShadowRadius = shadowRadius;
         addLayer(
-                new HumanoidArmorLayer<>(this,
-                new HumanoidArmorModel<>( context.bakeLayer( isZombie ? SMModelLayers.ZOMBIFIED_PIGLIN_INNER_ARMOR : SMModelLayers.PIGLIN_INNER_ARMOR ) ),
-                new HumanoidArmorModel<>( context.bakeLayer( isZombie ? SMModelLayers.ZOMBIFIED_PIGLIN_OUTER_ARMOR : SMModelLayers.PIGLIN_OUTER_ARMOR ) ),
-                context.getModelManager() )
+                new HumanoidArmorLayer<>( this,
+                        new HumanoidArmorModel<>( context.bakeLayer( isZombie ? SMModelLayers.ZOMBIFIED_PIGLIN_INNER_ARMOR : SMModelLayers.PIGLIN_INNER_ARMOR ) ),
+                        new HumanoidArmorModel<>( context.bakeLayer( isZombie ? SMModelLayers.ZOMBIFIED_PIGLIN_OUTER_ARMOR : SMModelLayers.PIGLIN_OUTER_ARMOR ) ),
+                        context.getModelManager() )
         );
         addLayer( new SpecialMobEyesLayer<>( this ) );
-
-        final SpecialPiglinModel<Mob> overlayModel = new SpecialPiglinModel<>( context.bakeLayer( isZombie ? SMModelLayers.ZOMBIFIED_PIGLIN_OUTER_LAYER: SMModelLayers.PIGLIN_OUTER_LAYER ) );
+        
+        final SpecialPiglinModel<Mob> overlayModel = new SpecialPiglinModel<>( context.bakeLayer( isZombie ? SMModelLayers.ZOMBIFIED_PIGLIN_OUTER_LAYER : SMModelLayers.PIGLIN_OUTER_LAYER ) );
         if( missingRightEar )
             overlayModel.rightEar.visible = false; // This is "stage left" - actually on the piglin's right side
         addLayer( new SpecialMobOverlayLayer<>( this, overlayModel ) );
@@ -59,17 +59,21 @@ public class SpecialPiglinRenderer extends HumanoidMobRenderer<Mob, SpecialPigli
         shadowRadius = baseShadowRadius * scale;
         poseStack.scale( scale, scale, scale );
     }
-
+    
     private static SpecialPiglinModel<Mob> createModel( EntityRendererProvider.Context context, ModelLayerLocation layerLocation, boolean missingRightEar ) {
         SpecialPiglinModel<Mob> model = new SpecialPiglinModel<>( context.bakeLayer( layerLocation ) );
-
-        if ( missingRightEar ) {
+        
+        if( missingRightEar ) {
             model.rightEar.visible = false;
         }
         return model;
     }
-
+    
     protected boolean isShaking( Mob mob ) {
-        return super.isShaking( mob ) || mob instanceof AbstractPiglin && ( (AbstractPiglin) mob ).isConverting();
+        return super.isShaking( mob ) || mob instanceof AbstractPiglin && ((AbstractPiglin) mob).isConverting();
+    }
+    
+    public float getBaseShadowRadius() {
+        return baseShadowRadius;
     }
 }

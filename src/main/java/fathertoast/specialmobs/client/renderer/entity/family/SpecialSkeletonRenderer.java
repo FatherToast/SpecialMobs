@@ -35,4 +35,8 @@ public class SpecialSkeletonRenderer extends SkeletonRenderer {
         shadowRadius = baseShadowRadius * scale;
         poseStack.scale( scale, scale, scale );
     }
+    
+    public float getBaseShadowRadius() {
+        return baseShadowRadius;
+    }
 }

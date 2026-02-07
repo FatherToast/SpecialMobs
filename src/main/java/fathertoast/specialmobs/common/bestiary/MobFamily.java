@@ -44,7 +44,7 @@ public class MobFamily<T extends Mob, V extends FamilyConfig> {
     
     public static final MobFamily<Creeper, CreeperFamilyConfig> CREEPER = new MobFamily<>( CreeperFamilyConfig::new,
             "Creeper", "creepers", 0x0DA70B, new EntityType[] { EntityType.CREEPER },
-            "Dark", "Death", "Dirt", "Doom", "Drowning", "Ender", "Fire", "Gravel", "Jumping", "Lightning",
+            "Dark", "Death", "Dirt", "Doom", "Drowning", "Ender", "Fire", "Gravel", "Imploding", "Jumping", "Lightning",
             "Mini", "Sand", "Scope", "Snow", "Skeleton", "Splitting"
     );
     

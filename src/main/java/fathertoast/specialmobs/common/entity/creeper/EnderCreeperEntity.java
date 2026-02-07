@@ -47,10 +47,11 @@ import java.util.UUID;
 import java.util.function.Predicate;
 
 @SpecialMob
+@SuppressWarnings( "resource" )
 public class EnderCreeperEntity extends _SpecialCreeperEntity implements NeutralMob {
     
     //--------------- Static Special Mob Hooks ----------------
-
+    
     @SpecialMob.SpeciesReference
     public static MobFamily.Species<EnderCreeperEntity> SPECIES;
     
@@ -247,7 +248,7 @@ public class EnderCreeperEntity extends _SpecialCreeperEntity implements Neutral
     @Override
     public boolean hurt( DamageSource source, float amount ) {
         if( isInvulnerableTo( source ) ) return false;
-
+        
         if( source.is( DamageTypeTags.IS_PROJECTILE ) ) {
             for( int i = 0; i < 64; ++i ) {
                 if( teleport() ) return true;
@@ -356,7 +357,7 @@ public class EnderCreeperEntity extends _SpecialCreeperEntity implements Neutral
             creeper = entity;
             startAggroTargetConditions = TargetingConditions.forCombat().range( getFollowDistance() ).selector(
                     // Safe cast, we should only be searching for players anyways
-                    ( target ) -> entity.isLookingAtMe( (Player) target) );
+                    ( target ) -> entity.isLookingAtMe( (Player) target ) );
         }
         
         /** @return Returns true if this AI can be activated. */
