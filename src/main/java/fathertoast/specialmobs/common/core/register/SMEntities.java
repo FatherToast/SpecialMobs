@@ -17,8 +17,8 @@ import net.minecraftforge.registries.RegistryObject;
 public class SMEntities {
     
     public static final DeferredRegister<EntityType<?>> REGISTRY = DeferredRegister.create( ForgeRegistries.ENTITY_TYPES, SpecialMobs.MOD_ID );
-
-
+    
+    
     // Misc entities
     public static final RegistryObject<EntityType<BoneShrapnelEntity>> BONE_SHRAPNEL = register( "bone_shrapnel",
             EntityType.Builder.<BoneShrapnelEntity>of( BoneShrapnelEntity::new, MobCategory.MISC )
@@ -31,22 +31,22 @@ public class SMEntities {
     public static final RegistryObject<EntityType<IncorporealFireballEntity>> INCORPOREAL_FIREBALL = register( "incorporeal_fireball",
             EntityType.Builder.<IncorporealFireballEntity>of( IncorporealFireballEntity::new, MobCategory.MISC )
                     .sized( 1.0F, 1.0F ).clientTrackingRange( 4 ).updateInterval( 2 ) );
-
+    
     public static final RegistryObject<EntityType<SlabFireballEntity>> SLAB_FIREBALL = register( "slab_fireball",
             EntityType.Builder.<SlabFireballEntity>of( SlabFireballEntity::new, MobCategory.MISC )
                     .sized( 1.0F, 1.0F ).clientTrackingRange( 4 ).updateInterval( 2 ) );
-
+    
     public static final RegistryObject<EntityType<SpecialFishingBobberEntity>> FISHING_BOBBER = register( "fishing_bobber",
             EntityType.Builder.<SpecialFishingBobberEntity>of( SpecialFishingBobberEntity::new, MobCategory.MISC ).noSave().noSummon()
                     .sized( 0.25F, 0.25F ).clientTrackingRange( 4 ).updateInterval( 5 ) );
-
+    
     public static final RegistryObject<EntityType<MobBoat>> MOB_BOAT = register( "mob_boat",
             EntityType.Builder.<MobBoat>of( MobBoat::new, MobCategory.MISC )
                     .sized( 1.375F, 0.5625F ).clientTrackingRange( 10 ).noSummon() );
     
     
     /** Registers an entity type to the deferred register. */
-    public static <T extends Entity> RegistryObject<EntityType<T>> register(String name, EntityType.Builder<T> builder ) {
+    public static <T extends Entity> RegistryObject<EntityType<T>> register( String name, EntityType.Builder<T> builder ) {
         return REGISTRY.register( name, () -> builder.build( name ) );
     }
     

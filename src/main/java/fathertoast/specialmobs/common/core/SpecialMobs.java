@@ -124,7 +124,7 @@ public class SpecialMobs {
     
     public SpecialMobs( FMLJavaModLoadingContext context ) {
         Config.initialize();
-
+        
         packetHandler.registerMessages();
         
         final IEventBus modEventBus = context.getModEventBus();
@@ -135,25 +135,25 @@ public class SpecialMobs {
         SMEntities.REGISTRY.register( modEventBus );
         SMEffects.REGISTRY.register( modEventBus );
         SMBiomeMods.REGISTRY.register( modEventBus );
-
+        
         modEventBus.addListener( SMEntities::createAttributes );
         modEventBus.addListener( SMCreativeTabs::buildCreativeContents );
-        modEventBus.addListener( this::setup );
+        modEventBus.addListener( this::commonSetup );
         modEventBus.addListener( this::sendIMCMessages );
         modEventBus.addListener( NaturalSpawnManager::registerSpawnPlacements );
-
+        
         MinecraftForge.EVENT_BUS.register( new GameEvents() );
         MinecraftForge.EVENT_BUS.register( new AdvancementFixer() );
     }
     
-    public void setup( FMLCommonSetupEvent event ) {
-        event.enqueueWork(() -> {
+    public void commonSetup( FMLCommonSetupEvent event ) {
+        event.enqueueWork( () -> {
             SMDispenserBehavior.registerBehaviors();
-        });
+        } );
     }
     
     public void sendIMCMessages( InterModEnqueueEvent event ) {
-
+    
     }
     
     /** @return A ResourceLocation with the mod's namespace. */
@@ -161,9 +161,9 @@ public class SpecialMobs {
     
     /** @return Returns a Forge registry entry as a string, or "null" if it is null. */
     public static <T> String toString( @Nullable T regEntry, IForgeRegistry<T> registry ) {
-        return regEntry == null || !registry.containsValue(regEntry)
+        return regEntry == null || !registry.containsValue( regEntry )
                 ? "null"
-                : toString( registry.getKey(regEntry) );
+                : toString( registry.getKey( regEntry ) );
     }
     
     /** @return Returns the resource location as a string, or "null" if it is null. */
