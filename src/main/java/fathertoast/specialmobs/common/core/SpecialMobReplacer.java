@@ -27,8 +27,6 @@ import javax.annotation.Nullable;
 import java.util.*;
 import java.util.function.Predicate;
 
-import static com.mojang.text2speech.Narrator.LOGGER;
-
 @Mod.EventBusSubscriber( modid = SpecialMobs.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE )
 public final class SpecialMobReplacer {
     /** List of data for mobs needing replacement. */
@@ -51,19 +49,13 @@ public final class SpecialMobReplacer {
      *
      * @param event The event data.
      */
-    @SubscribeEvent( priority = EventPriority.HIGH )
+    @SubscribeEvent( priority = EventPriority.LOWEST )
     public static void onFinalizeSpawn( MobSpawnEvent.FinalizeSpawn event ) {
         // Check if replacement is even enabled.
         if( !Config.MAIN.GENERAL.enableMobReplacement.get() )
             return;
         
         final ServerLevel level = event.getLevel().getLevel();
-        
-        // Log a warning if we are not on the main server thread.
-        if( !level.getServer().isSameThread() ) {
-            LOGGER.warn( "FinalizeSpawn event fired outside main server thread! This is bad! Offending thread: {}", Thread.currentThread() );
-        }
-        
         final MobSpawnType spawnType = event.getSpawnType();
         
         // Check if the spawn type is one that should be skipped.
@@ -87,14 +79,14 @@ public final class SpecialMobReplacer {
                 
                 if( shouldReplace( mobFamily, isSpecial ) ) {
                     level.getServer().execute(
-                            () -> TO_REPLACE.addLast( new MobReplacementEntry( mobFamily, isSpecial, entity, level, entityPos ) )
+                            () -> TO_REPLACE.addLast( new MobReplacementEntry( mobFamily, isSpecial, spawnType, entity, level, entityPos ) )
                     );
                     event.setSpawnCancelled( true );
                 }
             }
             else {
                 level.getServer().execute( () ->
-                        DELAYED_REPLACE.add( new DelayedMobReplacementEntry( mobFamily, entity, level, entityPos ) )
+                        DELAYED_REPLACE.add( new DelayedMobReplacementEntry( mobFamily, spawnType, entity, level, entityPos ) )
                 );
             }
         }
@@ -116,7 +108,7 @@ public final class SpecialMobReplacer {
             
             while( !TO_REPLACE.isEmpty() ) {
                 final MobReplacementEntry replacement = TO_REPLACE.removeFirst();
-                replace( replacement.mobFamily, replacement.isSpecial, replacement.entityToReplace, replacement.entityWorld, replacement.entityPos );
+                replace( replacement.mobFamily, replacement.isSpecial, replacement.mobSpawnType, replacement.entityToReplace, replacement.entityWorld, replacement.entityPos );
             }
         }
     }
@@ -161,7 +153,7 @@ public final class SpecialMobReplacer {
     }
     
     /** Replaces a mob, copying over all its data to the replacement. */
-    private static void replace( MobFamily<?, ?> mobFamily, boolean isSpecial, Entity entityToReplace, Level level, BlockPos entityPos ) {
+    private static void replace( MobFamily<?, ?> mobFamily, boolean isSpecial, MobSpawnType spawnType, Entity entityToReplace, Level level, BlockPos entityPos ) {
         // Make sure the chunk the entity is in is loaded
         if( !EnvironmentHelper.isLoaded( level, entityPos ) ) return;
         
@@ -176,14 +168,15 @@ public final class SpecialMobReplacer {
                 mobFamily.vanillaReplacement;
         
         final LivingEntity replacement = species.entityType.get().create( level );
+        
         if( replacement == null ) {
             SpecialMobs.LOG.error( "Failed to create replacement entity '{}'", species.entityType.getId() );
             return;
         }
-        
         replacement.load( tag );
         replacement.setHealth( (float) replacement.getAttributeValue( Attributes.MAX_HEALTH ) );
-        MobHelper.finalizeSpawn( replacement, (ServerLevelAccessor) level, level.getCurrentDifficultyAt( entityPos ), null, null );
+        
+        MobHelper.finalizeSpawn( replacement, (ServerLevelAccessor) level, level.getCurrentDifficultyAt( entityPos ), spawnType, null );
         
         level.addFreshEntity( replacement );
         
@@ -196,7 +189,6 @@ public final class SpecialMobReplacer {
             entityToReplace.stopRiding();
             replacement.startRiding( vehicle, true );
         }
-        
         entityToReplace.discard();
     }
     
@@ -216,28 +208,31 @@ public final class SpecialMobReplacer {
         if( mobFamily.hasAnyGiants() ) {
             final AABB bb = entityToReplace.getBoundingBox();
             final int y = Mth.ceil( bb.maxY );
+            
             // Only check the FULL block above current collision - not a perfect representation, but keeps things simple
             if( !level.isUnobstructed( entityToReplace, Shapes.create(
                     new AABB( bb.minX, y, bb.minZ, bb.maxX, y + 1, bb.maxZ ) ) ) ) {
                 selector = selector == null ? NO_GIANTS_SELECTOR : selector.and( NO_GIANTS_SELECTOR );
             }
         }
-        
         return selector;
     }
     
     /** All data needed for a single mob we want to replace. */
+    @SuppressWarnings( "ClassCanBeRecord" )
     private static class MobReplacementEntry {
         final MobFamily<?, ?> mobFamily;
         final boolean isSpecial;
+        final MobSpawnType mobSpawnType;
         
         final LivingEntity entityToReplace;
         final Level entityWorld;
         final BlockPos entityPos;
         
-        MobReplacementEntry( MobFamily<?, ?> family, boolean special, Entity entity, Level level, BlockPos pos ) {
+        MobReplacementEntry( MobFamily<?, ?> family, boolean special, MobSpawnType spawnType, Entity entity, Level level, BlockPos pos ) {
             mobFamily = family;
             isSpecial = special;
+            mobSpawnType = spawnType;
             
             entityToReplace = (LivingEntity) entity;
             entityWorld = level;
@@ -248,6 +243,7 @@ public final class SpecialMobReplacer {
     /** All data needed for a single mob we are waiting to replace. */
     private static class DelayedMobReplacementEntry {
         final MobFamily<?, ?> mobFamily;
+        final MobSpawnType mobSpawnType;
         
         final LivingEntity entityToReplace;
         final Level entityLevel;
@@ -255,8 +251,9 @@ public final class SpecialMobReplacer {
         
         int ticksRemaining = 6;
         
-        DelayedMobReplacementEntry( MobFamily<?, ?> family, Entity entity, Level level, BlockPos pos ) {
+        DelayedMobReplacementEntry( MobFamily<?, ?> family, MobSpawnType spawnType, Entity entity, Level level, BlockPos pos ) {
             mobFamily = family;
+            mobSpawnType = spawnType;
             
             entityToReplace = (LivingEntity) entity;
             entityLevel = level;
@@ -275,7 +272,7 @@ public final class SpecialMobReplacer {
                 // It is time to decide!
                 final boolean isSpecial = shouldMakeNextSpecial( mobFamily, entityLevel, entityPos );
                 if( shouldReplace( mobFamily, isSpecial ) ) {
-                    TO_REPLACE.addLast( new MobReplacementEntry( mobFamily, isSpecial, entityToReplace, entityLevel, entityPos ) );
+                    TO_REPLACE.addLast( new MobReplacementEntry( mobFamily, isSpecial, mobSpawnType, entityToReplace, entityLevel, entityPos ) );
                     entityToReplace.discard();
                 }
                 return true;
