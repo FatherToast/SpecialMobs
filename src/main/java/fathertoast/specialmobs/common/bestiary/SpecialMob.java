@@ -42,7 +42,7 @@ public @interface SpecialMob {
     
     /**
      * REQUIRED. This is called during registration to collect static properties of the mob needed for the bestiary
-     * and for building the species's entity type.
+     * and for building the species' entity type.
      * This is not 'overridable' because all species must have unique info in the bestiary, however some info in the
      * builder is automatically inherited.
      * <p>
@@ -89,7 +89,7 @@ public @interface SpecialMob {
     @interface AttributeSupplier { }
     
     /**
-     * OVERRIDABLE. This is called during registration to register the species's spawn placement.
+     * OVERRIDABLE. This is called during registration to register the species' spawn placement.
      * 'Overridable' static methods inherit from their superclass if not defined in a subclass, but must be defined somewhere.
      * This is 'overridable' because some species may have a different natural spawn placement from the rest of their family.
      * <p>
@@ -112,7 +112,7 @@ public @interface SpecialMob {
      * {@code public static String[] METHOD_NAME( String langKey )}
      * <p>
      * The returned string array should be created by References#translations using the given lang key as the first
-     * argument. Always be sure that any non-ASCII characters used are properly handled by the translations method.
+     * argument. Always be sure that any non-ASCII characters used are properly handled by the "translations" method.
      *
      * @see fathertoast.specialmobs.common.util.References#translations(String, String, String, String, String, String, String, String)
      */
@@ -134,7 +134,7 @@ public @interface SpecialMob {
     @Retention( RetentionPolicy.RUNTIME )
     @Target( ElementType.METHOD )
     @interface LootTableProvider { }
-
+    
     /**
      * OPTIONAL-OVERRIDABLE. This is called during data generation to add the mob's entity type to any
      * desired entity type tags.
