@@ -42,8 +42,8 @@ public class SpecialMobs {
      *          ? warped/crimson mobs
      *      + phantom spawns
      *  - potions
-     *      - vulnerability (opposite of resistance)
-     *      - weight (opposite of levitation)
+     *      - vulnerability (moved to Crust)
+     *      - weight (moved to Crust)
      *  - blocks
      *      - infested coral (spawns puffer silverfish)
      *      - melting ice (similar to frosted ice)
@@ -54,7 +54,7 @@ public class SpecialMobs {
      *      - bone shrapnel
      *      - bug spit
      *      - fish hook
-     *      + Vanishing boat (for pirate skeleton)
+     *      - Vanishing boat (for pirate skeleton)
      *  - monster families (see doc for specifics)
      *      - creepers
      *          - Scope creeper
@@ -73,7 +73,6 @@ public class SpecialMobs {
      *          + ranged attack AI (using crossbow)
      *          - use shields
      *      - skeletons
-     *          + Pirate skeleton
      *          - use shields
      *          - melee chance
      *          - babies
@@ -96,7 +95,6 @@ public class SpecialMobs {
      *          - ability to equip held items (wonky)
      *          - use splash speed instead of regular
      *      - ghasts
-     *          + Slab ghast
      *          - melee attack AI
      *          - remove vertical targeting restriction
      *      - blazes
