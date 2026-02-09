@@ -107,6 +107,12 @@ dependencies {
     compileOnly "curse.maven:ryoamiclights_src-913587:${ryoamic_src_version}"
     implementation fg.deobf("curse.maven:obsidianui-684718:${obsidianui_version}")
 
+    // MixinExtras
+    compileOnly(annotationProcessor("io.github.llamalad7:mixinextras-common:${mixinextras_version}"))
+    implementation(jarJar("io.github.llamalad7:mixinextras-forge:${mixinextras_version}")) {
+        jarJar.ranged(it, "[${mixinextras_version},)")
+    }
+
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 }
 
