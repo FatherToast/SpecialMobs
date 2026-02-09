@@ -10,6 +10,7 @@ import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
@@ -75,6 +76,10 @@ public class ImplodingCreeperEntity extends _SpecialCreeperEntity {
         
         // Pull nearby entities
         for( Entity entity : nearbyEntities ) {
+            // Skip players in creative mode
+            if( entity instanceof Player player && player.isCreative() )
+                continue;
+            
             final HitResult bottomHit = level().clip(
                     new ClipContext( new Vec3( position().x, position().y, position().z ), entity.position(),
                             ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, null ) );
@@ -97,6 +102,7 @@ public class ImplodingCreeperEntity extends _SpecialCreeperEntity {
                 serverPlayer.connection.send( new ClientboundSetEntityMotionPacket( entity ) );
             }
         }
+        // Play funnie implosion sound
         playSound( SMSounds.IMPLODING_CREEPER_IMPLODE.get(), 4.0F, 1.0F + random.nextFloat() * 0.2F );
     }
 }
