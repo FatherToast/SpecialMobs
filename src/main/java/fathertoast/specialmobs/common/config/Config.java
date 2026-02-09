@@ -16,22 +16,18 @@ public class Config {
     public static final ConfigManager MANAGER;
     public static final MainConfig MAIN;
     public static final ReadMeConfig README;
-
-
+    
+    
     static {
         MANAGER = ConfigManager.create( "SpecialMobs", SpecialMobs.MOD_ID );
         MAIN = new MainConfig( MANAGER, "main" );
         README = new ReadMeConfig( MANAGER );
-
-        MANAGER.freezeFileWatcher = true;
-
+        
         README.SPEC.initialize();
         MAIN.SPEC.initialize();
         MobFamily.initBestiary(); // Just make sure this class gets loaded
-
-        MANAGER.freezeFileWatcher = false;
     }
-
+    
     /** Called from {@link SpecialMobs#SpecialMobs(FMLJavaModLoadingContext)} to load this class. */
-    public static void initialize() {}
+    public static void initialize() { }
 }
