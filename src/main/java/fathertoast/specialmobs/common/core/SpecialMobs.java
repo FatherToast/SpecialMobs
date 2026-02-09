@@ -112,7 +112,6 @@ public class SpecialMobs {
      */
     
     /** Our mod ID. */
-    @SuppressWarnings( "SpellCheckingInspection" )
     public static final String MOD_ID = "specialmobs";
     
     /** Logger instance for the mod. */
