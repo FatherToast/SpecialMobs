@@ -25,11 +25,8 @@ public class UndeadWitchSpeciesConfig extends SpeciesConfig {
             super( parent, ConfigUtil.camelCaseToLowerUnderscore( species.specialVariantName ),
                     "Options specific to " + speciesName + "." );
             
-            summons = new IntField.RandomRange(
-                    SPEC.define( new IntField( "summons.min", minSummons, IntField.Range.NON_NEGATIVE,
-                            "The minimum and maximum (inclusive) number of times " + speciesName + " can summon minions." ) ),
-                    SPEC.define( new IntField( "summons.max", maxSummons, IntField.Range.NON_NEGATIVE ) )
-            );
+            summons = new IntField.RandomRange( SPEC, "summons", minSummons, maxSummons, IntField.Range.NON_NEGATIVE,
+                    "The minimum and maximum (inclusive) number of times " + speciesName + " can summon minions." );
         }
     }
 }

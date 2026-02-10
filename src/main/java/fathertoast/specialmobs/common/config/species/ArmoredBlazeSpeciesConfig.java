@@ -28,11 +28,8 @@ public class ArmoredBlazeSpeciesConfig extends BlazeSpeciesConfig {
             super( parent, ConfigUtil.camelCaseToLowerUnderscore( species.specialVariantName ),
                     "Options specific to " + speciesName + "." );
             
-            armor = new IntField.RandomRange(
-                    SPEC.define( new IntField( "armor.min", minArmor, IntField.Range.NON_NEGATIVE,
-                            "The minimum and maximum (inclusive) number of hits " + speciesName + " can absorb before their super armor breaks." ) ),
-                    SPEC.define( new IntField( "armor.max", maxArmor, IntField.Range.NON_NEGATIVE ) )
-            );
+            armor = new IntField.RandomRange( SPEC, "armor", minArmor, maxArmor, IntField.Range.NON_NEGATIVE,
+                    "The minimum and maximum (inclusive) number of hits " + speciesName + " can absorb before their super armor breaks." );
         }
     }
 }

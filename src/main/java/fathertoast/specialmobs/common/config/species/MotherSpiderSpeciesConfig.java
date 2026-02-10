@@ -13,7 +13,7 @@ public class MotherSpiderSpeciesConfig extends SpiderSpeciesConfig {
     
     /** Builds the config spec that should be used for this config. */
     public MotherSpiderSpeciesConfig( ConfigManager manager, MobFamily.Species<?> species, double spitChance,
-                                     int minBabies, int maxBabies, int minExtraBabies, int maxExtraBabies ) {
+                                      int minBabies, int maxBabies, int minExtraBabies, int maxExtraBabies ) {
         super( manager, species, spitChance );
         
         MOTHER = new Mother( this, species, species.getConfigName(), minBabies, maxBabies, minExtraBabies, maxExtraBabies );
@@ -30,21 +30,15 @@ public class MotherSpiderSpeciesConfig extends SpiderSpeciesConfig {
             super( parent, ConfigUtil.camelCaseToLowerUnderscore( species.specialVariantName ),
                     "Options specific to " + speciesName + "." );
             
-            babies = new IntField.RandomRange(
-                    SPEC.define( new IntField( "babies.min", minBabies, IntField.Range.NON_NEGATIVE,
-                            "The minimum and maximum (inclusive) number of babies " + speciesName + " spawn on death.",
-                            "Any remaining 'extra babies' will added to the amount spawned on death (see below)." ) ),
-                    SPEC.define( new IntField( "babies.max", maxBabies, IntField.Range.NON_NEGATIVE ) )
-            );
+            babies = new IntField.RandomRange( SPEC, "babies", minBabies, maxBabies, IntField.Range.NON_NEGATIVE,
+                    "The minimum and maximum (inclusive) number of babies " + speciesName + " spawn on death.",
+                    "Any remaining 'extra babies' will added to the amount spawned on death (see below)." );
             
             SPEC.newLine();
             
-            extraBabies = new IntField.RandomRange(
-                    SPEC.define( new IntField( "extra_babies.min", minExtraBabies, IntField.Range.NON_NEGATIVE,
-                            "The minimum and maximum (inclusive) number of babies that " + speciesName + " can spawn from hits before death.",
-                            "Any remaining 'extra babies' will added to the amount spawned on death (see above)." ) ),
-                    SPEC.define( new IntField( "extra_babies.max", maxExtraBabies, IntField.Range.NON_NEGATIVE ) )
-            );
+            extraBabies = new IntField.RandomRange( SPEC, "extra_babies", minExtraBabies, maxExtraBabies, IntField.Range.NON_NEGATIVE,
+                    "The minimum and maximum (inclusive) number of babies that " + speciesName + " can spawn from hits before death.",
+                    "Any remaining 'extra babies' will added to the amount spawned on death (see above)." );
         }
     }
 }

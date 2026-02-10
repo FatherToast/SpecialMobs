@@ -13,7 +13,7 @@ public class WildsWitchSpeciesConfig extends SpeciesConfig {
     
     /** Builds the config spec that should be used for this config. */
     public WildsWitchSpeciesConfig( ConfigManager manager, MobFamily.Species<?> species, int minMounts, int maxMounts,
-                                   int minSwarms, int maxSwarms, int minSwarmSize, int maxSwarmSize ) {
+                                    int minSwarms, int maxSwarms, int minSwarmSize, int maxSwarmSize ) {
         super( manager, species );
         
         WILDS = new Wilds( this, species, species.getConfigName(), minMounts, maxMounts, minSwarms, maxSwarms, minSwarmSize, maxSwarmSize );
@@ -32,28 +32,19 @@ public class WildsWitchSpeciesConfig extends SpeciesConfig {
             super( parent, ConfigUtil.camelCaseToLowerUnderscore( species.specialVariantName ),
                     "Options specific to " + speciesName + "." );
             
-            mounts = new IntField.RandomRange(
-                    SPEC.define( new IntField( "mounts.min", minMounts, IntField.Range.NON_NEGATIVE,
-                            "The minimum and maximum (inclusive) number of times " + speciesName + " can summon a spider mount." ) ),
-                    SPEC.define( new IntField( "mounts.max", maxMounts, IntField.Range.NON_NEGATIVE ) )
-            );
+            mounts = new IntField.RandomRange( SPEC, "mounts", minMounts, maxMounts, IntField.Range.NON_NEGATIVE,
+                    "The minimum and maximum (inclusive) number of times " + speciesName + " can summon a spider mount." );
             
             SPEC.newLine();
             
-            swarms = new IntField.RandomRange(
-                    SPEC.define( new IntField( "swarms.min", minSwarms, IntField.Range.NON_NEGATIVE,
-                            "The minimum and maximum (inclusive) number of times " + speciesName + " can summon a spider swarm." ) ),
-                    SPEC.define( new IntField( "swarms.max", maxSwarms, IntField.Range.NON_NEGATIVE ) )
-            );
+            swarms = new IntField.RandomRange( SPEC, "swarms", minSwarms, maxSwarms, IntField.Range.NON_NEGATIVE,
+                    "The minimum and maximum (inclusive) number of times " + speciesName + " can summon a spider swarm." );
             
             SPEC.newLine();
             
-            swarmSize = new IntField.RandomRange(
-                    SPEC.define( new IntField( "swarm_size.min", minSwarmSize, IntField.Range.NON_NEGATIVE,
-                            "The minimum and maximum (inclusive) number of spiders " + speciesName + " spawn with each swarm.",
-                            "Note that this is rolled on the summoner's spawn, not each time a swarm is summoned." ) ),
-                    SPEC.define( new IntField( "swarm_size.max", maxSwarmSize, IntField.Range.NON_NEGATIVE ) )
-            );
+            swarmSize = new IntField.RandomRange( SPEC, "swarm_size", minSwarmSize, maxSwarmSize, IntField.Range.NON_NEGATIVE,
+                    "The minimum and maximum (inclusive) number of spiders " + speciesName + " spawn with each swarm.",
+                    "Note that this is rolled on the summoner's spawn, not each time a swarm is summoned." );
         }
     }
 }

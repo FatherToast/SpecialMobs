@@ -25,11 +25,8 @@ public class WebSpiderSpeciesConfig extends SpiderSpeciesConfig {
             super( parent, ConfigUtil.camelCaseToLowerUnderscore( species.specialVariantName ),
                     "Options specific to " + speciesName + "." );
             
-            webCount = new IntField.RandomRange(
-                    SPEC.define( new IntField( "webs.min", minWebs, IntField.Range.NON_NEGATIVE,
-                            "The minimum and maximum (inclusive) number of cobwebs " + speciesName + " can place." ) ),
-                    SPEC.define( new IntField( "webs.max", maxWebs, IntField.Range.NON_NEGATIVE ) )
-            );
+            webCount = new IntField.RandomRange( SPEC, "webs", minWebs, maxWebs, IntField.Range.NON_NEGATIVE,
+                    "The minimum and maximum (inclusive) number of cobwebs " + speciesName + " can place." );
         }
     }
 }

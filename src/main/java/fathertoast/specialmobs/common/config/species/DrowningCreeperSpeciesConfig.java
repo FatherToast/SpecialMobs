@@ -38,11 +38,8 @@ public class DrowningCreeperSpeciesConfig extends CreeperSpeciesConfig {
             
             SPEC.newLine();
             
-            puffPuffs = new IntField.RandomRange(
-                    SPEC.define( new IntField( "pufferfish.min", minPuffPuffs, IntField.Range.NON_NEGATIVE,
-                            "The minimum and maximum (inclusive) limit on the number of pufferfish that " + speciesName + " spawn with their explosion." ) ),
-                    SPEC.define( new IntField( "pufferfish.max", maxPuffPuffs, IntField.Range.NON_NEGATIVE ) )
-            );
+            puffPuffs = new IntField.RandomRange( SPEC, "pufferfish", minPuffPuffs, maxPuffPuffs, IntField.Range.NON_NEGATIVE,
+                    "The minimum and maximum (inclusive) limit on the number of pufferfish that " + speciesName + " spawn with their explosion." );
         }
     }
 }

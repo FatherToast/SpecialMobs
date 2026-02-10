@@ -25,11 +25,8 @@ public class MadScientistZombieSpeciesConfig extends ZombieSpeciesConfig {
             super( parent, ConfigUtil.camelCaseToLowerUnderscore( species.specialVariantName ),
                     "Options specific to " + speciesName + "." );
             
-            chargeCount = new IntField.RandomRange(
-                    SPEC.define( new IntField( "charges.min", minCharges, IntField.Range.NON_NEGATIVE,
-                            "The minimum and maximum (inclusive) number of creepers a " + speciesName + " can charge." ) ),
-                    SPEC.define( new IntField( "charges.max", maxCharges, IntField.Range.NON_NEGATIVE ) )
-            );
+            chargeCount = new IntField.RandomRange( SPEC, "charges", minCharges, maxCharges, IntField.Range.NON_NEGATIVE,
+                    "The minimum and maximum (inclusive) number of creepers a " + speciesName + " can charge." );
         }
     }
 }

@@ -28,19 +28,13 @@ public class QueenGhastSpeciesConfig extends SpeciesConfig {
             super( parent, ConfigUtil.camelCaseToLowerUnderscore( species.specialVariantName ),
                     "Options specific to " + speciesName + "." );
             
-            babies = new IntField.RandomRange(
-                    SPEC.define( new IntField( "babies.min", minBabies, IntField.Range.NON_NEGATIVE,
-                            "The minimum and maximum (inclusive) number of babies " + speciesName + " spawn on death." ) ),
-                    SPEC.define( new IntField( "babies.max", maxBabies, IntField.Range.NON_NEGATIVE ) )
-            );
+            babies = new IntField.RandomRange( SPEC, "babies", minBabies, maxBabies, IntField.Range.NON_NEGATIVE,
+                    "The minimum and maximum (inclusive) number of babies " + speciesName + " spawn on death." );
             
             SPEC.newLine();
             
-            summons = new IntField.RandomRange(
-                    SPEC.define( new IntField( "summons.min", minSummons, IntField.Range.NON_NEGATIVE,
-                            "The minimum and maximum (inclusive) number of times " + speciesName + " can summon minions." ) ),
-                    SPEC.define( new IntField( "summons.max", maxSummons, IntField.Range.NON_NEGATIVE ) )
-            );
+            summons = new IntField.RandomRange( SPEC, "summons", minSummons, maxSummons, IntField.Range.NON_NEGATIVE,
+                    "The minimum and maximum (inclusive) number of times " + speciesName + " can summon minions." );
         }
     }
 }

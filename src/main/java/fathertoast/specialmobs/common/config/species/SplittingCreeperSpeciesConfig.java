@@ -13,8 +13,8 @@ public class SplittingCreeperSpeciesConfig extends CreeperSpeciesConfig {
     
     /** Builds the config spec that should be used for this config. */
     public SplittingCreeperSpeciesConfig( ConfigManager manager, MobFamily.Species<?> species,
-                                         boolean cannotExplodeWhileWet, boolean explodeWhileBurning, boolean explodeWhenShot,
-                                         int minExtraBabies, int maxExtraBabies ) {
+                                          boolean cannotExplodeWhileWet, boolean explodeWhileBurning, boolean explodeWhenShot,
+                                          int minExtraBabies, int maxExtraBabies ) {
         super( manager, species, cannotExplodeWhileWet, explodeWhileBurning, explodeWhenShot );
         
         SPLITTING = new Splitting( this, species, species.getConfigName(), minExtraBabies, maxExtraBabies );
@@ -28,12 +28,9 @@ public class SplittingCreeperSpeciesConfig extends CreeperSpeciesConfig {
             super( parent, ConfigUtil.camelCaseToLowerUnderscore( species.specialVariantName ),
                     "Options specific to " + speciesName + "." );
             
-            extraBabies = new IntField.RandomRange(
-                    SPEC.define( new IntField( "extra_babies.min", minExtraBabies, IntField.Range.NON_NEGATIVE,
-                            "The minimum and maximum (inclusive) number of extra babies that " + speciesName + " spawn with their explosion.",
-                            "This is in addition to the number spawned based on explosion power." ) ),
-                    SPEC.define( new IntField( "extra_babies.max", maxExtraBabies, IntField.Range.NON_NEGATIVE ) )
-            );
+            extraBabies = new IntField.RandomRange( SPEC, "extra_babies", minExtraBabies, maxExtraBabies, IntField.Range.NON_NEGATIVE,
+                    "The minimum and maximum (inclusive) number of extra babies that " + speciesName + " spawn with their explosion.",
+                    "This is in addition to the number spawned based on explosion power." );
         }
     }
 }

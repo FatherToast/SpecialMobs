@@ -25,11 +25,8 @@ public class DesiccatedSilverfishSpeciesConfig extends SilverfishSpeciesConfig {
             super( parent, ConfigUtil.camelCaseToLowerUnderscore( species.specialVariantName ),
                     "Options specific to " + speciesName + "." );
             
-            absorbCount = new IntField.RandomRange(
-                    SPEC.define( new IntField( "water_absorbed.min", minAbsorb, IntField.Range.NON_NEGATIVE,
-                            "The minimum and maximum (inclusive) number of water blocks " + speciesName + " can absorb." ) ),
-                    SPEC.define( new IntField( "water_absorbed.max", maxAbsorb, IntField.Range.NON_NEGATIVE ) )
-            );
+            absorbCount = new IntField.RandomRange( SPEC, "water_absorbed", minAbsorb, maxAbsorb, IntField.Range.NON_NEGATIVE,
+                    "The minimum and maximum (inclusive) number of water blocks " + speciesName + " can absorb." );
         }
     }
 }
