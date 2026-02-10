@@ -19,10 +19,10 @@ public class SMEffects {
     }
     
     /** Registers a custom effect to the deferred register. */
-    public static <T extends MobEffect> RegistryObject<T> register(String name, Supplier<T> effect ) { return REGISTRY.register( name, effect ); }
+    public static <T extends MobEffect> RegistryObject<T> register( String name, Supplier<T> effect ) { return REGISTRY.register( name, effect ); }
     
     /** Really just here to allow access to the Effect::new. */
     private static class SimpleEffect extends MobEffect {
-        SimpleEffect(MobEffectCategory category, int color ) { super( category, color ); }
+        SimpleEffect( MobEffectCategory category, int color ) { super( category, color ); }
     }
 }
