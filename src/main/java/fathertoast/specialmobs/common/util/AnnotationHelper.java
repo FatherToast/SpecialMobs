@@ -54,7 +54,7 @@ public final class AnnotationHelper {
     }
     
     /** Gets bestiary info from a special mob species. Throws an exception if anything goes wrong. */
-    public static <T extends Mob> BestiaryInfo.Builder getBestiaryInfo(MobFamily.Species<T> species, BestiaryInfo.Builder bestiaryInfo ) {
+    public static <T extends Mob> BestiaryInfo.Builder getBestiaryInfo( MobFamily.Species<T> species, BestiaryInfo.Builder bestiaryInfo ) {
         try {
             getMethod( species.entityClass, SpecialMob.BestiaryInfoSupplier.class ).invoke( null, bestiaryInfo );
             return bestiaryInfo;
@@ -79,7 +79,7 @@ public final class AnnotationHelper {
     }
     
     /** Creates an attribute modifier map from a special mob species. Throws an exception if anything goes wrong. */
-    public static AttributeSupplier.Builder createAttributes(MobFamily.Species<?> species ) {
+    public static AttributeSupplier.Builder createAttributes( MobFamily.Species<?> species ) {
         try {
             return (AttributeSupplier.Builder) getMethodOrSuper( species.entityClass, SpecialMob.AttributeSupplier.class )
                     .invoke( null );
@@ -123,7 +123,7 @@ public final class AnnotationHelper {
                     .invoke( null, key );
         }
         catch( NoSuchMethodException | InvocationTargetException | IllegalAccessException ex ) {
-            throw new RuntimeException( "Class for " + registry.getKey(entry) + " has invalid language provider method", ex );
+            throw new RuntimeException( "Class for " + registry.getKey( entry ) + " has invalid language provider method", ex );
         }
     }
     
@@ -138,22 +138,23 @@ public final class AnnotationHelper {
             throw new RuntimeException( "Entity class for " + species.name + " has invalid loot table builder method", ex );
         }
     }
-
-    @SuppressWarnings("unchecked")
+    
+    @SuppressWarnings( "unchecked" )
     @Nullable
-    public static List<TagKey<EntityType<?>>> getEntityTags(Class<? extends LivingEntity> entityClass ) {
+    public static List<TagKey<EntityType<?>>> getEntityTags( Class<? extends LivingEntity> entityClass ) {
         try {
             Method method = getMethodOrSuperOptional( entityClass, SpecialMob.EntityTagProvider.class );
-
-            if (method != null) {
+            
+            if( method != null ) {
                 Object ret = method.invoke( null );
-
-                if (ret != null)
+                
+                if( ret != null )
                     return (List<TagKey<EntityType<?>>>) ret;
             }
             return null;
         }
-        catch (InvocationTargetException | IllegalAccessException e) {
+        catch( InvocationTargetException | IllegalAccessException e ) {
+            // noinspection CallToPrintStackTrace
             e.printStackTrace();
             return null;
         }

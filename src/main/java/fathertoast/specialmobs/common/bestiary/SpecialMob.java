@@ -141,7 +141,7 @@ public @interface SpecialMob {
      * <p>
      * The annotated method must have a signature that follows the pattern:
      * <p>
-     * {@code public static List<ITag.INamedTag<EntityType<?>> METHOD_NAME( )}
+     * {@code public static List<TagKey<EntityType<?>>> METHOD_NAME( )}
      */
     @Retention( RetentionPolicy.RUNTIME )
     @Target( ElementType.METHOD )
