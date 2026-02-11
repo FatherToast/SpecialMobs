@@ -72,8 +72,8 @@ public class _SpecialGhastEntity extends Ghast implements RangedAttackMob, ISpec
         NaturalSpawnManager.registerSpawnPlacement( species, _SpecialGhastEntity::checkFamilySpawnRules );
     }
     
-    public static boolean checkFamilySpawnRules(EntityType<? extends Ghast> type, ServerLevelAccessor level,
-                                                MobSpawnType spawnType, BlockPos pos, RandomSource random ) {
+    public static boolean checkFamilySpawnRules( EntityType<? extends Ghast> type, ServerLevelAccessor level,
+                                                 MobSpawnType spawnType, BlockPos pos, RandomSource random ) {
         //noinspection unchecked
         return Ghast.checkGhastSpawnRules( (EntityType<Ghast>) type, level, spawnType, pos, random ) &&
                 NaturalSpawnManager.checkSpawnRulesConfigured( type, level, spawnType, pos, random );
@@ -89,7 +89,7 @@ public class _SpecialGhastEntity extends Ghast implements RangedAttackMob, ISpec
     public static void addBaseLoot( LootTableBuilder loot ) {
         loot.addLootTable( "main", EntityType.GHAST.getDefaultLootTable() );
     }
-
+    
     @SpecialMob.EntityTagProvider
     public static List<TagKey<EntityType<?>>> getEntityTags() {
         return Collections.singletonList( SMTags.EntityTypes.GHASTS );
@@ -131,7 +131,7 @@ public class _SpecialGhastEntity extends Ghast implements RangedAttackMob, ISpec
     
     /** Called to attack the target with a ranged attack. */
     @Override
-    public void performRangedAttack(LivingEntity target, float damageMulti ) {
+    public void performRangedAttack( LivingEntity target, float damageMulti ) {
         References.LevelEvent.GHAST_SHOOT.play( this );
         
         final float accelVariance = Mth.sqrt( distanceTo( target ) ) * 0.5F * getSpecialData().getRangedAttackSpread();
@@ -241,7 +241,7 @@ public class _SpecialGhastEntity extends Ghast implements RangedAttackMob, ISpec
     @Nullable
     @Override
     public final SpawnGroupData finalizeSpawn( ServerLevelAccessor level, DifficultyInstance difficulty, MobSpawnType spawnType,
-                                                  @Nullable SpawnGroupData groupData, @Nullable CompoundTag eggTag ) {
+                                               @Nullable SpawnGroupData groupData, @Nullable CompoundTag eggTag ) {
         return MobHelper.finalizeSpawn( this, level, difficulty, spawnType,
                 super.finalizeSpawn( level, difficulty, spawnType, groupData, eggTag ) );
     }
@@ -295,7 +295,7 @@ public class _SpecialGhastEntity extends Ghast implements RangedAttackMob, ISpec
     
     /** Sets this entity 'stuck' inside a block, such as a cobweb or sweet berry bush. Mod blocks could use this as a speed boost. */
     @Override
-    public void makeStuckInBlock(BlockState block, Vec3 speedMulti ) {
+    public void makeStuckInBlock( BlockState block, Vec3 speedMulti ) {
         if( getSpecialData().canBeStuckIn( block ) ) super.makeStuckInBlock( block, speedMulti );
     }
     
