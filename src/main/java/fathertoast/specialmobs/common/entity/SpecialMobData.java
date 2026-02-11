@@ -120,7 +120,8 @@ public class SpecialMobData<T extends Mob & ISpecialMob<T>> {
     public SpecialMobData( T entity, EntityDataAccessor<Float> scale ) {
         theEntity = entity;
         renderScale = scale;
-        entity.getEntityData().define( renderScale, nextScale() );
+        entity.getEntityData().define( renderScale, 1.0F );
+        entity.getEntityData().set( renderScale, nextScale() );
         
         final SpeciesConfig.General config = theEntity.getSpecies().config.GENERAL;
         setRangedAttackDamage( config.rangedAttackDamage == null ? -1.0F : (float) config.rangedAttackDamage.get() );
