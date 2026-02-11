@@ -2,6 +2,7 @@ package fathertoast.specialmobs.common.entity.projectile;
 
 import fathertoast.specialmobs.common.core.register.SMEntities;
 import fathertoast.specialmobs.common.core.register.SMItems;
+import fathertoast.specialmobs.common.core.register.SMTags;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.world.entity.Entity;
@@ -15,59 +16,69 @@ import net.minecraft.world.phys.HitResult;
 import net.minecraftforge.event.ForgeEventFactory;
 
 public class SlabFireballEntity extends Fireball {
-
+    
     public int explosionPower = 1;
-
+    
     public SlabFireballEntity( EntityType<? extends SlabFireballEntity> entityType, Level level ) {
         super( entityType, level );
     }
-
-    public SlabFireballEntity( Level level, LivingEntity shooter, double x, double y, double z ) {
-        super( SMEntities.SLAB_FIREBALL.get(), shooter, x, y, z, level );
-        setDeltaMovement( getDeltaMovement().multiply( 1.5D, 1.5D, 1.5D ) );
+    
+    public SlabFireballEntity( Level level, LivingEntity shooter, double dx, double dy, double dz ) {
+        super( SMEntities.SLAB_FIREBALL.get(), shooter, dx, dy, dz, level );
     }
-
+    
     @Override
     protected void onHit( HitResult hitResult ) {
         super.onHit( hitResult );
-
-        if (!level().isClientSide) {
+        
+        if( !level().isClientSide ) {
             boolean flag = ForgeEventFactory.getMobGriefingEvent( level(), getOwner() );
             level().explode( this, getX(), getY(), getZ(), (float) explosionPower, flag, Level.ExplosionInteraction.MOB );
             discard();
         }
     }
-
+    
     @Override
     protected void onHitEntity( EntityHitResult hitResult ) {
         super.onHitEntity( hitResult );
-
-        if ( !level().isClientSide ) {
+        
+        if( !level().isClientSide ) {
             Entity entity = hitResult.getEntity();
             Entity shooter = getOwner();
-            entity.hurt( damageSources().fireball( this, shooter ), 3.0F );
-
-            if ( shooter instanceof LivingEntity livingEntity ) {
+            
+            // Mega-explode ghasts
+            if( entity.getType().is( SMTags.EntityTypes.GHASTS ) ) {
+                // Assume entities tagged as forge:ghasts are actually at least living entities but who knows
+                LivingEntity livingEntity = (LivingEntity) entity;
+                
+                // Deals 50% of max health as damage to ghasts.
+                entity.hurt( damageSources().mobProjectile( this, livingEntity ), livingEntity.getMaxHealth() / 2 );
+            }
+            else {
+                entity.hurt( damageSources().fireball( this, shooter ), 3.0F );
+            }
+            
+            if( shooter instanceof LivingEntity livingEntity ) {
                 doEnchantDamageEffects( livingEntity, entity );
             }
         }
     }
-
+    
     @Override
     public void addAdditionalSaveData( CompoundTag compoundTag ) {
         super.addAdditionalSaveData( compoundTag );
         compoundTag.putByte( "ExplosionPower", (byte) explosionPower );
     }
-
+    
     @Override
     public void readAdditionalSaveData( CompoundTag compoundTag ) {
         super.readAdditionalSaveData( compoundTag );
-
-        if ( compoundTag.contains( "ExplosionPower", Tag.TAG_ANY_NUMERIC ) ) {
+        
+        if( compoundTag.contains( "ExplosionPower", Tag.TAG_ANY_NUMERIC ) ) {
             explosionPower = compoundTag.getByte( "ExplosionPower" );
         }
     }
-
+    
     @Override
     public ItemStack getItem() {
         ItemStack itemStack = getItemRaw();
