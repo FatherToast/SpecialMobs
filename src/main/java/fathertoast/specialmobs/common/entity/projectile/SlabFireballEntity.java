@@ -24,7 +24,13 @@ public class SlabFireballEntity extends Fireball {
     }
     
     public SlabFireballEntity( Level level, LivingEntity shooter, double dx, double dy, double dz ) {
-        super( SMEntities.SLAB_FIREBALL.get(), shooter, dx, dy, dz, level );
+        // noinspection ConstantConditions
+        this( level, shooter.getX(), shooter.getY(), shooter.getZ(), dx, dy, dz );
+    }
+    
+    public SlabFireballEntity( Level level, double x, double y, double z, double dx, double dy, double dz ) {
+        // noinspection ConstantConditions
+        super( SMEntities.SLAB_FIREBALL.get(), x, y, z, dx, dy, dz, level );
     }
     
     @Override

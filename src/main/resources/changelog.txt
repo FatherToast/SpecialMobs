@@ -8,6 +8,7 @@
     - Fixed Slab Fireball not dealing damage to ghasts.
         - If reflected, damages the target for 50% of their max health.
     - Increased Slab Ghast move speed modifier from 1.5 to 2.0.
+    - Added dispenser behavior for Slab Fireball item.
     - Rebalanced the Syringe item.
         - Reduced use cooldown from 1200 ticks to 600 ticks.
         - Reduced nausea effect duration from 400 ticks to 200 ticks.

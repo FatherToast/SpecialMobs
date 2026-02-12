@@ -37,10 +37,11 @@ public class IncorporealFireChargeItem extends Item {
         if( player.getCooldowns().isOnCooldown( item.getItem() ) ) return InteractionResultHolder.pass( item );
         
         final Entity target = pickEntity( player, 127.0 );
-        if( target instanceof LivingEntity) {
+        
+        if( target instanceof LivingEntity ) {
             if( !level.isClientSide() ) {
-                level.addFreshEntity( new IncorporealFireballEntity( level, player, (LivingEntity) target,
-                        player.getX(), player.getEyeY(), player.getZ() ) );
+                IncorporealFireballEntity fireball = new IncorporealFireballEntity( level, player, (LivingEntity) target, player.getX(), player.getEyeY(), player.getZ() );
+                level.addFreshEntity( fireball );
                 level.playSound( null, player.blockPosition(), SoundEvents.FIRECHARGE_USE, SoundSource.BLOCKS, 1.0F, (level.random.nextFloat() - level.random.nextFloat()) * 0.2F + 1.0F );
                 
                 if( !player.getAbilities().instabuild ) {
@@ -66,7 +67,7 @@ public class IncorporealFireChargeItem extends Item {
         
         return result == null ? null : result.getEntity();
     }
-
+    
     @Override
     public Rarity getRarity( ItemStack itemStack ) {
         return Rarity.UNCOMMON;

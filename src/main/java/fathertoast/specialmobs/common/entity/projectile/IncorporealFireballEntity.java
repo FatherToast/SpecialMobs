@@ -43,8 +43,8 @@ public class IncorporealFireballEntity extends AbstractHurtingProjectile impleme
         super( entityType, level );
     }
     
-    public IncorporealFireballEntity( Level level, CorporealShiftGhastEntity ghast, double x, double y, double z ) {
-        super( SMEntities.INCORPOREAL_FIREBALL.get(), ghast, x, y, z, level );
+    public IncorporealFireballEntity( Level level, CorporealShiftGhastEntity ghast, double dx, double dy, double dz ) {
+        super( SMEntities.INCORPOREAL_FIREBALL.get(), ghast, dx, dy, dz, level );
         explosionPower = ghast.getExplosionPower();
         target = ghast.getTarget();
     }
