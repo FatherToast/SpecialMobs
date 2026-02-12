@@ -2,12 +2,12 @@ package fathertoast.specialmobs.common.entity.projectile;
 
 import fathertoast.specialmobs.common.core.register.SMEntities;
 import fathertoast.specialmobs.common.core.register.SMItems;
-import fathertoast.specialmobs.common.core.register.SMTags;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Fireball;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -46,12 +46,10 @@ public class SlabFireballEntity extends Fireball {
             Entity entity = hitResult.getEntity();
             Entity shooter = getOwner();
             
-            // Mega-explode ghasts
-            if( entity.getType().is( SMTags.EntityTypes.GHASTS ) ) {
-                // Assume entities tagged as forge:ghasts are actually at least living entities but who knows
-                LivingEntity livingEntity = (LivingEntity) entity;
-                
-                // Deals 50% of max health as damage to ghasts.
+            // Check if this is a reflected fireball and the target is a living entity.
+            if( shooter instanceof Player && entity instanceof LivingEntity livingEntity ) {
+                // Damage the target for 50% of their max health.
+                // MOB_PROJECTILE damage type is used so we can actually damage ghasts.
                 entity.hurt( damageSources().mobProjectile( this, livingEntity ), livingEntity.getMaxHealth() / 2 );
             }
             else {
