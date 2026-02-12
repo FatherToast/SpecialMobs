@@ -31,7 +31,7 @@ import net.minecraftforge.network.NetworkHooks;
 import javax.annotation.Nullable;
 
 public class IncorporealFireballEntity extends AbstractHurtingProjectile implements IEntityAdditionalSpawnData, ItemSupplier {
-
+    
     public int explosionPower = 1;
     private boolean shouldExplode = false;
     
@@ -49,52 +49,52 @@ public class IncorporealFireballEntity extends AbstractHurtingProjectile impleme
         target = ghast.getTarget();
     }
     
-    public IncorporealFireballEntity(Level level, @Nullable Player owner, @Nullable LivingEntity target, double x, double y, double z ) {
+    public IncorporealFireballEntity( Level level, @Nullable Player owner, @Nullable LivingEntity target, double x, double y, double z ) {
         this( SMEntities.INCORPOREAL_FIREBALL.get(), level );
         setPos( x, y, z );
         this.target = target;
-
+        
         moveTo( x, y, z, getYRot(), getXRot() );
         reapplyPosition();
         double d = Mth.sqrt( (float) (x * x + y * y + z * z) );
-
-        if ( d != 0.0D ) {
+        
+        if( d != 0.0D ) {
             xPower = x / d * 0.1D;
             yPower = y / d * 0.1D;
             zPower = z / d * 0.1D;
         }
-
-        if ( owner != null ) {
+        
+        if( owner != null ) {
             setOwner( owner );
             setRot( owner.getYRot(), owner.getXRot() );
         }
     }
     
-
+    
     @Override
     public void tick() {
         super.tick();
-
+        
         // Fizzle out and die when the target is dead or lost,
         // or else the fireball goes bonkers.
         if( target == null || !target.isAlive() ) {
             playSound( SoundEvents.FIRE_EXTINGUISH, 1.0F, 1.0F );
-
-            if ( !level().isClientSide ) discard();
+            
+            if( !level().isClientSide ) discard();
             return;
         }
         // Follow target
         Vec3 vec3 = new Vec3( target.getX() - this.getX(), (target.getY() + (target.getEyeHeight() / 2)) - this.getY(), target.getZ() - this.getZ() );
         setDeltaMovement( vec3.normalize().scale( 0.5 ) );
-
+        
         // Boof
-        if ( !level().isClientSide && shouldExplode ) explode();
+        if( !level().isClientSide && shouldExplode ) explode();
     }
     
     private void explode() {
         boolean mobGrief = ForgeEventFactory.getMobGriefingEvent( level(), getOwner() );
         Level.ExplosionInteraction mode = mobGrief ? Level.ExplosionInteraction.MOB : Level.ExplosionInteraction.NONE;
-
+        
         level().explode( null, this.getX(), this.getY(), this.getZ(), (float) explosionPower, mobGrief, mode );
         target = null;
         discard();
@@ -116,9 +116,9 @@ public class IncorporealFireballEntity extends AbstractHurtingProjectile impleme
         
         if( !this.level().isClientSide ) {
             Entity target = hitResult.getEntity();
-
+            
             if( target instanceof Player player ) {
-                if (PlayerVelocityWatcher.get(player).isMoving()) {
+                if( PlayerVelocityWatcher.get( player ).isMoving() ) {
                     explode();
                     return;
                 }
@@ -175,22 +175,22 @@ public class IncorporealFireballEntity extends AbstractHurtingProjectile impleme
     public Packet<ClientGamePacketListener> getAddEntityPacket() {
         return NetworkHooks.getEntitySpawningPacket( this );
     }
-
+    
     @Override
     public void writeSpawnData( FriendlyByteBuf buffer ) {
         final Entity owner = getOwner();
         buffer.writeInt( owner == null ? 0 : owner.getId() );
         buffer.writeInt( target == null ? 0 : target.getId() );
     }
-
+    
     @Override
     public void readSpawnData( FriendlyByteBuf additionalData ) {
         final int ownerId = additionalData.readInt();
         final int targetId = additionalData.readInt();
-
+        
         setOwner( level().getEntity( ownerId ) );
-
-        if ( level().getEntity( targetId ) instanceof LivingEntity ) {
+        
+        if( level().getEntity( targetId ) instanceof LivingEntity ) {
             target = (LivingEntity) level().getEntity( targetId );
         }
     }

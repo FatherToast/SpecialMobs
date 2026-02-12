@@ -29,5 +29,5 @@ public interface ISpecialMob<T extends Mob & ISpecialMob<T>> {
     
     /** Called on spawn to initialize properties based on the world, difficulty, and the group it spawns with. */
     void finalizeSpecialSpawn( ServerLevelAccessor level, DifficultyInstance difficulty, @Nullable MobSpawnType spawnType,
-                              @Nullable SpawnGroupData groupData );
+                               @Nullable SpawnGroupData groupData );
 }

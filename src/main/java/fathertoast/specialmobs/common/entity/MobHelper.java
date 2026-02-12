@@ -51,7 +51,7 @@ import net.minecraftforge.fluids.FluidType;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 
-@SuppressWarnings("JavadocReference")
+@SuppressWarnings( "JavadocReference" )
 public final class MobHelper {
     
     /** Pool of effects to choose from for plague-type mobs to apply on hit. Duration is a multiplier. */
@@ -77,11 +77,11 @@ public final class MobHelper {
             new MobEffectInstance( MobEffects.LEVITATION, 1, 1 ),
             new MobEffectInstance( MobEffects.POISON, 1, 0 ) // Keep this option last for easy disable (by cave spiders)
     };
-
+    
     /** Called on spawn to initialize properties based on the world, difficulty, and the group it spawns with. */
     @Nullable
-    public static SpawnGroupData finalizeSpawn(LivingEntity entity, ServerLevelAccessor levelAccessor, DifficultyInstance difficulty,
-                                               @Nullable MobSpawnType spawnType, @Nullable SpawnGroupData groupData ) {
+    public static SpawnGroupData finalizeSpawn( LivingEntity entity, ServerLevelAccessor levelAccessor, DifficultyInstance difficulty,
+                                                @Nullable MobSpawnType spawnType, @Nullable SpawnGroupData groupData ) {
         final ItemStack[] startingEquipment = captureEquipment( entity );
         ((ISpecialMob<?>) entity).finalizeSpecialSpawn( levelAccessor, difficulty, spawnType, groupData );
         processSpawnEquipmentChanges( entity, startingEquipment, difficulty );
@@ -125,7 +125,8 @@ public final class MobHelper {
     
     /** @return True if the damage source can deal normal damage to vampire-type mobs (e.g., wooden or smiting weapons). */
     public static boolean isDamageSourceIneffectiveAgainstVampires( DamageSource source ) {
-        if( source.is( DamageTypeTags.BYPASSES_ARMOR ) || source.is( DamageTypeTags.BYPASSES_INVULNERABILITY ) ) return false;
+        if( source.is( DamageTypeTags.BYPASSES_ARMOR ) || source.is( DamageTypeTags.BYPASSES_INVULNERABILITY ) )
+            return false;
         
         final Entity attacker = source.getEntity();
         if( attacker instanceof LivingEntity ) {
@@ -134,14 +135,14 @@ public final class MobHelper {
         }
         return true;
     }
-
+    
     /** @return The amount of extra damage to inflict on vampire-like mobs depending on the damage source. */
     public static float getVampireDamageBonus( DamageSource source ) {
         final Entity attacker = source.getEntity();
-
+        
         if( attacker instanceof LivingEntity ) {
-            final ItemStack weapon = ( (LivingEntity) attacker ).getMainHandItem();
-            return weapon.is( SMTags.Items.GARLIC) ? 6.0F : 0.0F;
+            final ItemStack weapon = ((LivingEntity) attacker).getMainHandItem();
+            return weapon.is( SMTags.Items.GARLIC ) ? 6.0F : 0.0F;
         }
         return 0.0F;
     }
@@ -287,7 +288,7 @@ public final class MobHelper {
         final ArrayList<Integer> foodSlots = new ArrayList<>();
         for( int slot = 0; slot < player.getInventory().getContainerSize(); slot++ ) {
             final ItemStack item = player.getInventory().getItem( slot );
-            if( !item.isEmpty() && item.getItem().getFoodProperties(item, null) != null ) foodSlots.add( slot );
+            if( !item.isEmpty() && item.getItem().getFoodProperties( item, null ) != null ) foodSlots.add( slot );
         }
         if( !foodSlots.isEmpty() ) {
             return player.getInventory().removeItem( foodSlots.get( player.getRandom().nextInt( foodSlots.size() ) ), 1 );
@@ -353,7 +354,7 @@ public final class MobHelper {
     }
     
     /** Applies a potion effect to the target with a specified level (amplifier + 1) and duration. */
-    public static void applyEffect(LivingEntity target, MobEffect effect, int level, int duration ) {
+    public static void applyEffect( LivingEntity target, MobEffect effect, int level, int duration ) {
         target.addEffect( new MobEffectInstance( effect, duration, level - 1 ) );
     }
     
@@ -369,7 +370,7 @@ public final class MobHelper {
     }
     
     /** Applies a random 'plague' potion effect to the arrow. */
-    public static AbstractArrow tipPlagueArrow(AbstractArrow arrow, RandomSource random ) {
+    public static AbstractArrow tipPlagueArrow( AbstractArrow arrow, RandomSource random ) {
         return tipArrowFromTemplate( arrow, PLAGUE_EFFECTS[random.nextInt( PLAGUE_EFFECTS.length -
                 (Config.MAIN.GENERAL.enableNausea.get() ? 0 : 1) )] );
     }
@@ -419,7 +420,7 @@ public final class MobHelper {
                     baseDuration * template.getDuration(), template.getAmplifier() ) );
         return arrow;
     }
-
+    
     /**
      * Creates a new trident ItemStack and writes the desired potion effect to it,
      * which applies the effect on ranged attack.
@@ -429,16 +430,16 @@ public final class MobHelper {
         CompoundTag stackTag = trident.getOrCreateTag();
         CompoundTag modTag = new CompoundTag();
         CompoundTag effectTag = new CompoundTag();
-
+        
         MobEffectInstance instance = new MobEffectInstance( effect, duration, level - 1 );
-
+        
         instance.save( effectTag );
         modTag.put( "TridentEffect", effectTag );
         stackTag.put( "special_mobs_ModData", modTag );
-
+        
         return trident;
     }
-
+    
     /**
      * Checks the given trident ItemStack for ranged potion effect and
      * returns it if it exists.<br>
@@ -446,12 +447,12 @@ public final class MobHelper {
      */
     @Nullable
     public static MobEffectInstance getTridentEffect( ItemStack tridentStack ) {
-        if ( tridentStack.getItem() != Items.TRIDENT ) return null;
-
-        if ( tridentStack.hasTag() && tridentStack.getTag().contains( "special_mobs_ModData", Tag.TAG_COMPOUND ) ) {
+        if( tridentStack.getItem() != Items.TRIDENT ) return null;
+        
+        if( tridentStack.hasTag() && tridentStack.getTag().contains( "special_mobs_ModData", Tag.TAG_COMPOUND ) ) {
             CompoundTag modTag = tridentStack.getTag().getCompound( "special_mobs_ModData" );
-
-            if ( modTag.contains( "TridentEffect", Tag.TAG_COMPOUND ) ) {
+            
+            if( modTag.contains( "TridentEffect", Tag.TAG_COMPOUND ) ) {
                 return MobEffectInstance.load( modTag.getCompound( "TridentEffect" ) );
             }
         }
@@ -460,7 +461,7 @@ public final class MobHelper {
     
     /** @return The base debuff duration. */
     public static int defaultEffectDuration( Difficulty difficulty ) {
-        return switch (difficulty) {
+        return switch( difficulty ) {
             case PEACEFUL, EASY -> 60;
             case NORMAL -> 140;
             default -> 300;
@@ -477,7 +478,8 @@ public final class MobHelper {
      * @return True if the block was successful.
      */
     public static boolean tryBlockAttack( LivingEntity blocker, DamageSource source, boolean needsShield ) {
-        if( blocker.level().isClientSide() || blocker.isInvulnerableTo( source ) || source.is( DamageTypeTags.BYPASSES_ARMOR ) ) return false;
+        if( blocker.level().isClientSide() || blocker.isInvulnerableTo( source ) || source.is( DamageTypeTags.BYPASSES_ARMOR ) )
+            return false;
         
         // Block everything coming from entities at least 6 blocks away, otherwise 33% block chance
         if( blocker.getRandom().nextFloat() >= 0.33F ) {
@@ -487,14 +489,14 @@ public final class MobHelper {
         
         // Cannot block piercing arrows
         final Entity entity = source.getDirectEntity();
-        if(entity instanceof final AbstractArrow arrow) {
+        if( entity instanceof final AbstractArrow arrow ) {
             if( arrow.getPierceLevel() > 0 ) return false;
         }
         
         // Make sure we actually have a shield
         InteractionHand shieldHand = InteractionHand.OFF_HAND;
         ItemStack shield = blocker.getItemInHand( shieldHand );
-        if( needsShield && (shield.isEmpty() || !shield.canPerformAction( ToolActions.SHIELD_BLOCK ) ) ) {
+        if( needsShield && (shield.isEmpty() || !shield.canPerformAction( ToolActions.SHIELD_BLOCK )) ) {
             shieldHand = InteractionHand.MAIN_HAND;
             shield = blocker.getItemInHand( shieldHand );
             if( shield.isEmpty() || !shield.canPerformAction( ToolActions.SHIELD_BLOCK ) ) return false;
@@ -544,7 +546,7 @@ public final class MobHelper {
      * @param fluidType    The FluidType of the fluid to float in.
      */
     public static void floatInFluid( Entity entity, double acceleration, FluidType fluidType ) {
-        if( entity.tickCount > 1 && entity.getFluidTypeHeight(fluidType) > 0.0 ) {
+        if( entity.tickCount > 1 && entity.getFluidTypeHeight( fluidType ) > 0.0 ) {
             if( CollisionContext.of( entity ).isAbove( LiquidBlock.STABLE_SHAPE, entity.blockPosition(), true ) &&
                     entity.level().getFluidState( entity.blockPosition().above() ).getFluidType() != fluidType ) {
                 entity.setOnGround( true );
@@ -563,7 +565,7 @@ public final class MobHelper {
      * @param entity The entity.
      * @param pos    The block pos argument from #onChangedBlock.
      */
-    public static void updateFrostWalker(LivingEntity entity, BlockPos pos ) { updateFrostWalker( entity, pos, 1 ); }
+    public static void updateFrostWalker( LivingEntity entity, BlockPos pos ) { updateFrostWalker( entity, pos, 1 ); }
     
     /**
      * Manually provides the frost walker enchantment's effects without any equipment requirements.
@@ -593,10 +595,10 @@ public final class MobHelper {
             if( CollisionContext.of( entity ).isAbove( LiquidBlock.STABLE_SHAPE, entity.blockPosition(), true ) &&
                     entity.level().getFluidState( entity.blockPosition() ).is( FluidTags.WATER )
                     && !entity.level().getFluidState( entity.blockPosition().above() ).is( FluidTags.WATER ) ) {
-
+                
                 // Break water plants and other waterlogged things, otherwise frost walker will not work
                 final BlockState block = entity.level().getBlockState( entity.blockPosition() );
-
+                
                 if( !block.isAir() && !block.isSolid() && !block.getFluidState().isEmpty() ) {
                     final BlockEntity blockEntity = block.hasBlockEntity() ? entity.level().getExistingBlockEntity( entity.blockPosition() ) : null;
                     Block.dropResources( block, entity.level(), entity.blockPosition(), blockEntity );
@@ -606,7 +608,7 @@ public final class MobHelper {
             }
         }
     }
-
+    
     /**
      * Pops the entity upward if they are right next to a solid block when floating in a fluid.
      * <p>
@@ -618,11 +620,11 @@ public final class MobHelper {
         if( entity.tickCount > 1 && entity.level().random.nextInt( 10 ) == 0 ) {
             if( CollisionContext.of( entity ).isAbove( LiquidBlock.STABLE_SHAPE, entity.blockPosition(), true ) &&
                     !entity.level().getFluidState( entity.blockPosition().above() ).is( fluidTag ) ) {
-
-                for ( Direction dir : Direction.Plane.HORIZONTAL ) {
+                
+                for( Direction dir : Direction.Plane.HORIZONTAL ) {
                     BlockState neighborState = entity.level().getBlockState( entity.blockPosition().relative( dir ) );
-
-                    if ( neighborState.isSolid() && entity.getDirection() == dir ) {
+                    
+                    if( neighborState.isSolid() && entity.getDirection() == dir ) {
                         entity.setDeltaMovement( entity.getDeltaMovement().scale( 0.5 ).add( 0.0, 0.4, 0.0 ) );
                     }
                 }

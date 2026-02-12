@@ -44,9 +44,9 @@ public class BugSpitEntity extends Projectile {
         
         final Vec3 lookVec = shooter.getViewVector( 1.0F ).scale( shooter.getBbWidth() );
         setPos( shooter.getX() + lookVec.x, shooter.getEyeY() - 0.1, shooter.getZ() + lookVec.z );
-
+        
         float spread = 14 - 4 * level().getDifficulty().getId();
-        if(shooter instanceof final ISpecialMob<?> specialShooter) {
+        if( shooter instanceof final ISpecialMob<?> specialShooter ) {
             setDamage( specialShooter.getSpecialData().getRangedAttackDamage() );
             
             if( getDamage() < 0.0F ) {
@@ -67,7 +67,7 @@ public class BugSpitEntity extends Projectile {
         final double dH = Mth.sqrt( (float) (dX * dX + dZ * dZ) );
         shoot( dX, dY + dH * 0.2, dZ, 1.2F, spread );
     }
-
+    
     /** Called from the Entity.class constructor to define data watcher variables. */
     @Override
     protected void defineSynchedData() { entityData.define( COLOR, 0xFFFFFF ); }

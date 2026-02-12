@@ -18,7 +18,7 @@ public class BoneShrapnelEntity extends AbstractArrow {
     /** Ticks in ground remaining before de-spawning. */
     public int life = 150 + random.nextInt( 16 );
     
-    public BoneShrapnelEntity(EntityType<? extends BoneShrapnelEntity> entityType, Level level ) { super( entityType, level ); }
+    public BoneShrapnelEntity( EntityType<? extends BoneShrapnelEntity> entityType, Level level ) { super( entityType, level ); }
     
     //public BoneShrapnelEntity( World world, double x, double y, double z ) { super( SMEntities.BONE_SHRAPNEL.get(), x, y, z, world ); }
     

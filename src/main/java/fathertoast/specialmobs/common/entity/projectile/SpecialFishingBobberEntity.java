@@ -46,8 +46,8 @@ public class SpecialFishingBobberEntity extends Projectile implements IEntityAdd
         setPos( angler.getX() + lookVec.x, angler.getEyeY() - 0.1, angler.getZ() + lookVec.z );
         
         float spread = 18 - 4 * level().getDifficulty().getId();
-        if(angler instanceof final ISpecialMob<?> specialShooter) {
-
+        
+        if( angler instanceof final ISpecialMob<?> specialShooter ) {
             if( specialShooter.getSpecialData().getRangedAttackMaxRange() >= 0.0F ) {
                 maxRangeSq = 2.0F * specialShooter.getSpecialData().getRangedAttackMaxRange();
                 maxRangeSq *= maxRangeSq;
@@ -129,7 +129,7 @@ public class SpecialFishingBobberEntity extends Projectile implements IEntityAdd
             discard();
             return;
         }
-
+        
         final HitResult hitResult = ProjectileUtil.getHitResultOnMoveVector( this, this::canHitEntity );
         if( hitResult.getType() != HitResult.Type.MISS && !ForgeEventFactory.onProjectileImpact( this, hitResult ) ) {
             onHit( hitResult );
