@@ -43,13 +43,13 @@ public class FamilyConfig extends AbstractConfigFile {
         super( manager, ConfigUtil.noSpaces( family.configName ) + "/" + fileName( family ),
                 "This config contains options that apply to the family of " + family.configName + " as a whole; " +
                         "that is, the vanilla replacement and all special variants." );
-
+        
         SPEC.fileOnlyNewLine();
         SPEC.describeEnvironmentListPart1of2();
         SPEC.fileOnlyNewLine();
         
         GENERAL = new General( this, family, variantChance );
-
+        
         SPEC.fileOnlyNewLine();
         SPEC.describeEnvironmentListPart2of2();
         SPEC.fileOnlyNewLine();
@@ -84,8 +84,7 @@ public class FamilyConfig extends AbstractConfigFile {
             
             specialVariantChance = new DoubleField.EnvironmentSensitive(
                     SPEC.define( new DoubleField( "special_variant_chance.base", variantChance, DoubleField.Range.PERCENT,
-                            "The chance for " + family.configName + " to spawn as special variants.",
-                            "NOTE: Some environment check types can cause deadlocks on servers currently, so be careful!" ) ),
+                            "The chance for " + family.configName + " to spawn as special variants." ) ),
                     SPEC.define( new EnvironmentListField( "special_variant_chance.exceptions", new EnvironmentList(
                             EnvironmentEntry.builder( SPEC, (float) variantChance * 0.5F ).beforeDays( 5 ).build(), // Also skips first night's full moon
                             EnvironmentEntry.builder( SPEC, (float) variantChance * 2.0F ).atMaxMoonLight().aboveDifficulty( 0.5F ).build(),
