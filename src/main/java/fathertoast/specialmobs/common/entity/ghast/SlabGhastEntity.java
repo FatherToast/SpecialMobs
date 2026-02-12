@@ -43,8 +43,8 @@ public class SlabGhastEntity extends _SpecialGhastEntity {
     
     @SpecialMob.LootTableProvider
     public static void buildLootTable( LootTableBuilder loot ) {
-        addBaseLoot( loot );
-        loot.addSemicommonDrop( "semicommon", SMItems.SLAB_FIREBALL.get() );
+        loot.addCommonDrop( "common_0", Items.GUNPOWDER );
+        loot.addCommonDrop( "common_1", SMItems.SLAB_FIREBALL.get() );
         loot.addUncommonDrop( "uncommon", Items.QUARTZ_SLAB );
     }
     

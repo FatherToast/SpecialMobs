@@ -3,6 +3,7 @@
     - Added back spawn weight for biome tag forge#is_swamp to BestiaryInfo.Theme.FOREST.
     - Tweaked Tropical Drowned overlay texture (necklace now looks more like a necklace).
     - Recycled old Gravity Creeper into new variant "Imploding Creeper".
+    - Fixed Slab Ghast dropping incorrect loot.
     - Fixed random render scale not being synced when a mob initially spawns.
     - Fixed Slab Fireball not dealing damage to ghasts.
         - If reflected, damages the target for 50% of their max health.
