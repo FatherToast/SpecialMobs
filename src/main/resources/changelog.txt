@@ -6,6 +6,8 @@
     - Fixed random render scale not being synced when a mob initially spawns.
     - Fixed Slab Fireball not dealing damage to ghasts.
         - If reflected, damages the target for 50% of their max health.
+    - Increased Slab Ghast move speed modifier from 1.5 to 2.0.
+
 1.20.1-4.1.19
     - Fixed comod crash happening if FinalizeSpawn event is fired outside the main server thread.
     - Added config blacklist for mob spawn types that the special mobs replacer should skip.

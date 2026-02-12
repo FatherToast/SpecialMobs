@@ -32,7 +32,7 @@ public class SlabGhastEntity extends _SpecialGhastEntity {
                 .fireballAttack( 0.0, 20, 20, 64.0 )
                 .addToAttribute( Attributes.MAX_HEALTH, 5.0 )
                 .addToAttribute( Attributes.ATTACK_DAMAGE, 4.0 )
-                .multiplyAttribute( Attributes.MOVEMENT_SPEED, 1.5 );
+                .multiplyAttribute( Attributes.MOVEMENT_SPEED, 2.0 );
     }
     
     @SpecialMob.LanguageProvider
