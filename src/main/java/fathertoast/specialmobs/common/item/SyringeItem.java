@@ -23,7 +23,12 @@ import java.util.function.Supplier;
 public class SyringeItem extends Item {
     
     public SyringeItem() {
-        super( new Item.Properties().stacksTo( 1 ).rarity( Rarity.UNCOMMON ).defaultDurability( 5 ).setNoRepair() );
+        super( new Item.Properties()
+                .stacksTo( 1 )
+                .rarity( Rarity.UNCOMMON )
+                .defaultDurability( 5 )
+                .setNoRepair()
+        );
     }
     
     @SpecialMob.LanguageProvider
@@ -33,7 +38,7 @@ public class SyringeItem extends Item {
     }
     
     @Override
-    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand ) {
+    public InteractionResultHolder<ItemStack> use( Level level, Player player, InteractionHand hand ) {
         ItemStack usedItem = player.getItemInHand( hand );
         
         if( !level.isClientSide ) {
@@ -43,12 +48,13 @@ public class SyringeItem extends Item {
             else {
                 MobHelper.applyEffect( player, MobEffects.MOVEMENT_SPEED, 3, 300 );
                 MobHelper.applyEffect( player, MobEffects.DOLPHINS_GRACE, 1, 300 );
-                if( Config.MAIN.GENERAL.enableNausea.get() ) MobHelper.applyEffect( player, MobEffects.CONFUSION, 1, 400 );
+                if( Config.MAIN.GENERAL.enableNausea.get() )
+                    MobHelper.applyEffect( player, MobEffects.CONFUSION, 1, 200 );
                 
                 level.playSound( null, player.getX(), player.getY(), player.getZ(), SoundEvents.BEE_STING, SoundSource.PLAYERS, 0.9F, 1.0F );
                 usedItem.hurtAndBreak( 1, player, ( entity ) -> entity.broadcastBreakEvent( hand ) );
                 if( !player.isCreative() ) {
-                    player.getCooldowns().addCooldown( usedItem.getItem(), 1200 );
+                    player.getCooldowns().addCooldown( usedItem.getItem(), 600 );
                 }
                 return InteractionResultHolder.success( usedItem );
             }
@@ -57,7 +63,7 @@ public class SyringeItem extends Item {
     }
     
     @Override
-    public InteractionResult interactLivingEntity(ItemStack itemStack, Player player, LivingEntity livingEntity, InteractionHand hand ) {
+    public InteractionResult interactLivingEntity( ItemStack itemStack, Player player, LivingEntity livingEntity, InteractionHand hand ) {
         if( livingEntity instanceof Creeper creeper && !creeper.isPowered() ) {
             if( player.getCooldowns().isOnCooldown( itemStack.getItem() ) ) {
                 return InteractionResult.PASS;
@@ -67,7 +73,7 @@ public class SyringeItem extends Item {
             livingEntity.level().playSound( null, player.getX(), player.getY(), player.getZ(), SoundEvents.BEE_STING, SoundSource.PLAYERS, 0.9F, 1.0F );
             itemStack.hurtAndBreak( 1, player, ( entity ) -> entity.broadcastBreakEvent( hand ) );
             if( !player.isCreative() ) {
-                player.getCooldowns().addCooldown( itemStack.getItem(), 1200 );
+                player.getCooldowns().addCooldown( itemStack.getItem(), 600 );
             }
             return InteractionResult.sidedSuccess( player.level().isClientSide );
         }
