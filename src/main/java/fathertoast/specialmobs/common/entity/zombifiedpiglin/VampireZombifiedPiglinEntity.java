@@ -6,7 +6,6 @@ import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
-import net.minecraft.tags.EntityTypeTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffects;
@@ -42,7 +41,7 @@ public class VampireZombifiedPiglinEntity extends _SpecialZombifiedPiglinEntity 
         return References.translations( langKey, "Vampire Piglin",
                 "", "", "", "", "", "" );//TODO
     }
-
+    
     @SpecialMob.LootTableProvider
     public static void buildLootTable( LootTableBuilder loot ) {
         addBaseLoot( loot );
@@ -52,7 +51,7 @@ public class VampireZombifiedPiglinEntity extends _SpecialZombifiedPiglinEntity 
         stake.enchant( Enchantments.SMITE, Enchantments.SMITE.getMaxLevel() * 2 );
         loot.addRareDrop( "rare", stake );
     }
-
+    
     // Override default - vampire is not really zombified
     @SpecialMob.EntityTagProvider
     public static List<TagKey<EntityType<?>>> getEntityTags() {
@@ -90,6 +89,7 @@ public class VampireZombifiedPiglinEntity extends _SpecialZombifiedPiglinEntity 
         if( MobHelper.isDamageSourceIneffectiveAgainstVampires( source ) ) {
             amount = Math.min( 2.0F, amount );
         }
+        amount += MobHelper.getVampireDamageBonus( source );
         return super.hurt( source, amount );
     }
 }
