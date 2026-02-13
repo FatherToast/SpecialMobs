@@ -103,7 +103,7 @@ dependencies {
     implementation fg.deobf("curse.maven:mantle-74924:${mantle_version}")
 
     // Ryomic Lights - NOTE: comment out this when testing dedi server or crash
-    compileOnly fg.deobf("curse.maven:ryoamiclights-913587:${ryoamic_version}")
+    implementation fg.deobf("curse.maven:ryoamiclights-913587:${ryoamic_version}")
     compileOnly "curse.maven:ryoamiclights_src-913587:${ryoamic_src_version}"
     implementation fg.deobf("curse.maven:obsidianui-684718:${obsidianui_version}")
 

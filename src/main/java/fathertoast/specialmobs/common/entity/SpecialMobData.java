@@ -101,8 +101,8 @@ public class SpecialMobData<T extends Mob & ISpecialMob<T>> {
      */
     private int rangedAttackMaxCooldown;
     /**
-     * The maximum distance (in blocks) the entity can fire ranged attacks from. Requires an ai reload to take effect.
-     * Ranged ai can only be used if this stat is greater than 0. Does not change aggro range.
+     * The maximum distance (in blocks) the entity can fire ranged attacks from. Requires an AI reload to take effect.
+     * Ranged AI can only be used if this stat is greater than 0. Does not change aggro range.
      */
     private float rangedAttackMaxRange;
     
@@ -221,7 +221,7 @@ public class SpecialMobData<T extends Mob & ISpecialMob<T>> {
     
     /**
      * @return The height scale, including baby modifier if applicable. Used to calculate eye height for families that are not auto-scaled.
-     * Note: Baby scale is derived from {@link net.minecraft.entity.monster.ZombieEntity#getStandingEyeHeight(Pose, EntitySize)}.
+     * Note: Baby scale is derived from {@link net.minecraft.world.entity.monster.Zombie#getStandingEyeHeight(net.minecraft.world.entity.Pose, net.minecraft.world.entity.EntityDimensions)}.
      */
     @SuppressWarnings( "JavadocReference" )
     public float getHeightScaleByAge() { return getHeightScale() * (theEntity.isBaby() ? 0.53448F : 1.0F); }

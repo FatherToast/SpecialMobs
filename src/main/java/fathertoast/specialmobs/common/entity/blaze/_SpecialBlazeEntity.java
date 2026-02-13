@@ -41,7 +41,6 @@ import net.minecraft.world.level.pathfinder.BlockPathTypes;
 import net.minecraft.world.phys.Vec3;
 
 import javax.annotation.Nullable;
-import java.util.Collections;
 import java.util.List;
 
 @SpecialMob
@@ -89,7 +88,7 @@ public class _SpecialBlazeEntity extends Blaze implements RangedAttackMob, ISpec
     public static void addBaseLoot( LootTableBuilder loot ) {
         loot.addLootTable( "main", EntityType.BLAZE.getDefaultLootTable() );
     }
-
+    
     @SpecialMob.EntityTagProvider
     public static List<TagKey<EntityType<?>>> getEntityTags() {
         return List.of( SMTags.EntityTypes.BLAZES, EntityTypeTags.FREEZE_HURTS_EXTRA_TYPES );
@@ -118,7 +117,7 @@ public class _SpecialBlazeEntity extends Blaze implements RangedAttackMob, ISpec
     /** Override to change starting equipment or stats. */
     @SuppressWarnings( "unused" )
     public void finalizeVariantSpawn( ServerLevelAccessor level, DifficultyInstance difficulty, @Nullable MobSpawnType spawnType,
-                                     @Nullable SpawnGroupData groupData ) { }
+                                      @Nullable SpawnGroupData groupData ) { }
     
     /** Called when this entity successfully damages a target to apply on-hit effects. */
     @Override
@@ -176,8 +175,8 @@ public class _SpecialBlazeEntity extends Blaze implements RangedAttackMob, ISpec
         super.defineSynchedData();
         specialData = new SpecialMobData<>( this, SCALE );
     }
-
-
+    
+    
     //--------------- ISpecialMob Implementation ----------------
     
     private SpecialMobData<_SpecialBlazeEntity> specialData;
@@ -215,7 +214,7 @@ public class _SpecialBlazeEntity extends Blaze implements RangedAttackMob, ISpec
     @Nullable
     @Override
     public final SpawnGroupData finalizeSpawn( ServerLevelAccessor level, DifficultyInstance difficulty, MobSpawnType spawnType,
-                                                  @Nullable SpawnGroupData groupData, @Nullable CompoundTag eggTag ) {
+                                               @Nullable SpawnGroupData groupData, @Nullable CompoundTag eggTag ) {
         return MobHelper.finalizeSpawn( this, level, difficulty, spawnType,
                 super.finalizeSpawn( level, difficulty, spawnType, groupData, eggTag ) );
     }
@@ -248,7 +247,7 @@ public class _SpecialBlazeEntity extends Blaze implements RangedAttackMob, ISpec
     
     //    /** @return The eye height of this entity when standing. */
     //    @Override
-    //    protected float getStandingEyeHeight( Pose pose, EntitySize size ) {
+    //    protected float getStandingEyeHeight( Pose pose, EntityDimensions size ) {
     //        return super.getStandingEyeHeight( pose, size ) * getSpecialData().getHeightScaleByAge();
     //    }
     
