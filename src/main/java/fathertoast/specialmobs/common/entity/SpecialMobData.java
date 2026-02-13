@@ -1,5 +1,6 @@
 package fathertoast.specialmobs.common.entity;
 
+import fathertoast.crust.api.lib.NBTHelper;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.config.Config;
 import fathertoast.specialmobs.common.config.species.SpeciesConfig;
@@ -23,9 +24,11 @@ import net.minecraftforge.registries.ForgeRegistries;
 import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 
 import static fathertoast.specialmobs.common.util.References.*;
 
+@SuppressWarnings( "resource" )
 public class SpecialMobData<T extends Mob & ISpecialMob<T>> {
     
     /**
@@ -33,15 +36,8 @@ public class SpecialMobData<T extends Mob & ISpecialMob<T>> {
      * @return The nbt tag to save special mob data to.
      */
     public static CompoundTag getSaveLocation( CompoundTag tag ) {
-        if( !tag.contains( TAG_FORGE_DATA, NBT_TYPE_COMPOUND ) ) {
-            tag.put( TAG_FORGE_DATA, new CompoundTag() );
-        }
-        final CompoundTag forgeTag = tag.getCompound( TAG_FORGE_DATA );
-        
-        if( !forgeTag.contains( TAG_SPECIAL_MOB_DATA, NBT_TYPE_COMPOUND ) ) {
-            forgeTag.put( TAG_SPECIAL_MOB_DATA, new CompoundTag() );
-        }
-        return forgeTag.getCompound( TAG_SPECIAL_MOB_DATA );
+        CompoundTag forgeTag = NBTHelper.getOrCreateCompound( tag, TAG_FORGE_DATA );
+        return NBTHelper.getOrCreateCompound( forgeTag, TAG_SPECIAL_MOB_DATA );
     }
     
     
@@ -70,7 +66,7 @@ public class SpecialMobData<T extends Mob & ISpecialMob<T>> {
     private boolean isImmuneToFire;
     /** Whether the entity is immune to being set on fire. */
     private boolean isImmuneToBurning;
-    /** Whether the entity can breathe under water. */
+    /** Whether the entity can breathe underwater. */
     private boolean canBreatheInWater;
     /** Whether the entity can ignore pushing from flowing water. */
     private boolean ignoreWaterPush;
@@ -232,6 +228,7 @@ public class SpecialMobData<T extends Mob & ISpecialMob<T>> {
     /** @return A random render scale based on config settings. */
     private float nextScale() {
         // Don't do random on client side stuff
+        // noinspection ConstantConditions
         if( theEntity.level() == null || theEntity.level().isClientSide() ) return getBaseScale();
         
         // Prioritize most specific value available
@@ -305,7 +302,9 @@ public class SpecialMobData<T extends Mob & ISpecialMob<T>> {
     
     private void setDamagedByWater( boolean value ) {
         isDamagedByWater = value;
-        theEntity.setSpecialPathfindingMalus( BlockPathTypes.WATER, value ? BlockPathTypes.LAVA.getMalus() : BlockPathTypes.WATER.getMalus() );
+        theEntity.setSpecialPathfindingMalus( BlockPathTypes.WATER, value
+                ? BlockPathTypes.LAVA.getMalus()
+                : BlockPathTypes.WATER.getMalus() );
     }
     
     /**
@@ -425,77 +424,77 @@ public class SpecialMobData<T extends Mob & ISpecialMob<T>> {
      * @param tag The tag to load from.
      */
     public void readFromNBT( CompoundTag tag ) {
-        if( tag.contains( TAG_RENDER_SCALE, NBT_TYPE_NUMERICAL ) ) {
+        if( NBTHelper.containsNumber( tag, TAG_RENDER_SCALE ) ) {
             setRenderScale( tag.getFloat( TAG_RENDER_SCALE ) );
         }
         
         // Capabilities
-        if( tag.contains( TAG_EXPERIENCE, NBT_TYPE_NUMERICAL ) ) {
+        if( NBTHelper.containsNumber( tag, TAG_EXPERIENCE ) ) {
             theEntity.setExperience( tag.getInt( TAG_EXPERIENCE ) );
         }
-        if( tag.contains( TAG_REGENERATION, NBT_TYPE_NUMERICAL ) ) {
+        if( NBTHelper.containsNumber( tag, TAG_REGENERATION ) ) {
             healTimeMax = tag.getByte( TAG_REGENERATION );
         }
-        if( tag.contains( TAG_FALL_MULTI, NBT_TYPE_NUMERICAL ) ) {
+        if( NBTHelper.containsNumber( tag, TAG_FALL_MULTI ) ) {
             setFallDamageMultiplier( tag.getFloat( TAG_FALL_MULTI ) );
         }
-        if( tag.contains( TAG_FIRE_IMMUNE, NBT_TYPE_NUMERICAL ) ) {
+        if( NBTHelper.containsNumber( tag, TAG_FIRE_IMMUNE ) ) {
             setImmuneToFire( tag.getBoolean( TAG_FIRE_IMMUNE ) );
         }
-        if( tag.contains( TAG_BURN_IMMUNE, NBT_TYPE_NUMERICAL ) ) {
+        if( NBTHelper.containsNumber( tag, TAG_BURN_IMMUNE ) ) {
             setImmuneToBurning( tag.getBoolean( TAG_BURN_IMMUNE ) );
         }
-        if( tag.contains( TAG_DROWN_IMMUNE, NBT_TYPE_NUMERICAL ) ) {
+        if( NBTHelper.containsNumber( tag, TAG_DROWN_IMMUNE ) ) {
             setCanBreatheInWater( tag.getBoolean( TAG_DROWN_IMMUNE ) );
         }
-        if( tag.contains( TAG_WATER_PUSH_IMMUNE, NBT_TYPE_NUMERICAL ) ) {
+        if( NBTHelper.containsNumber( tag, TAG_WATER_PUSH_IMMUNE ) ) {
             setIgnoreWaterPush( tag.getBoolean( TAG_WATER_PUSH_IMMUNE ) );
         }
-        if( tag.contains( TAG_WATER_DAMAGE, NBT_TYPE_NUMERICAL ) ) {
+        if( NBTHelper.containsNumber( tag, TAG_WATER_DAMAGE ) ) {
             setDamagedByWater( tag.getBoolean( TAG_WATER_DAMAGE ) );
         }
-        if( tag.contains( TAG_LEASHABLE, NBT_TYPE_NUMERICAL ) ) {
+        if( NBTHelper.containsNumber( tag, TAG_LEASHABLE ) ) {
             setAllowLeashing( tag.getBoolean( TAG_LEASHABLE ) );
         }
-        if( tag.contains( TAG_TRAP_IMMUNE, NBT_TYPE_NUMERICAL ) ) {
+        if( NBTHelper.containsNumber( tag, TAG_TRAP_IMMUNE ) ) {
             setIgnorePressurePlates( tag.getBoolean( TAG_TRAP_IMMUNE ) );
         }
-        if( tag.contains( TAG_STICKY_IMMUNE, NBT_TYPE_LIST ) ) {
-            final ListTag stickyBlocksTag = tag.getList( TAG_STICKY_IMMUNE, NBT_TYPE_STRING );
+        if( NBTHelper.containsList( tag, TAG_STICKY_IMMUNE ) ) {
+            final List<String> blockIds = NBTHelper.getStringList( tag, TAG_STICKY_IMMUNE );
             immuneToStickyBlocks.clear();
-            for( int i = 0; i < stickyBlocksTag.size(); i++ ) {
-                final Block block = ForgeRegistries.BLOCKS.getValue( ResourceLocation.tryParse( stickyBlocksTag.getString( i ) ) );
+            for( String id : blockIds ) {
+                final Block block = ForgeRegistries.BLOCKS.getValue( ResourceLocation.tryParse( id ) );
                 if( block != null && !block.defaultBlockState().is( Blocks.AIR ) )
                     immuneToStickyBlocks.add( block );
             }
         }
-        if( tag.contains( TAG_POTION_IMMUNE, NBT_TYPE_LIST ) ) {
-            final ListTag potionsTag = tag.getList( TAG_POTION_IMMUNE, NBT_TYPE_STRING );
+        if( NBTHelper.containsList( tag, TAG_POTION_IMMUNE ) ) {
+            final List<String> mobEffectIds = NBTHelper.getStringList( tag, TAG_POTION_IMMUNE );
             immuneToPotions.clear();
-            for( int i = 0; i < potionsTag.size(); i++ ) {
-                final MobEffect effect = ForgeRegistries.MOB_EFFECTS.getValue( ResourceLocation.tryParse( potionsTag.getString( i ) ) );
+            for( String id : mobEffectIds ) {
+                final MobEffect effect = ForgeRegistries.MOB_EFFECTS.getValue( ResourceLocation.tryParse( id ) );
                 if( effect != null )
                     immuneToPotions.add( effect );
             }
         }
         
         // Ranged attack stats
-        if( tag.contains( TAG_RANGED_DAMAGE, NBT_TYPE_NUMERICAL ) ) {
+        if( NBTHelper.containsNumber( tag, TAG_RANGED_DAMAGE ) ) {
             setRangedAttackDamage( tag.getFloat( TAG_RANGED_DAMAGE ) );
         }
-        if( tag.contains( TAG_RANGED_SPREAD, NBT_TYPE_NUMERICAL ) ) {
+        if( NBTHelper.containsNumber( tag, TAG_RANGED_SPREAD ) ) {
             setRangedAttackSpread( tag.getFloat( TAG_RANGED_SPREAD ) );
         }
-        if( tag.contains( TAG_RANGED_WALK_SPEED, NBT_TYPE_NUMERICAL ) ) {
+        if( NBTHelper.containsNumber( tag, TAG_RANGED_WALK_SPEED ) ) {
             setRangedWalkSpeed( tag.getFloat( TAG_RANGED_WALK_SPEED ) );
         }
-        if( tag.contains( TAG_RANGED_COOLDOWN_MIN, NBT_TYPE_NUMERICAL ) ) {
+        if( NBTHelper.containsNumber( tag, TAG_RANGED_COOLDOWN_MIN ) ) {
             setRangedAttackCooldown( tag.getShort( TAG_RANGED_COOLDOWN_MIN ) );
         }
-        if( tag.contains( TAG_RANGED_COOLDOWN_MAX, NBT_TYPE_NUMERICAL ) ) {
+        if( NBTHelper.containsNumber( tag, TAG_RANGED_COOLDOWN_MAX ) ) {
             setRangedAttackMaxCooldown( tag.getShort( TAG_RANGED_COOLDOWN_MAX ) );
         }
-        if( tag.contains( TAG_MAX_RANGE, NBT_TYPE_NUMERICAL ) ) {
+        if( NBTHelper.containsNumber( tag, TAG_MAX_RANGE ) ) {
             setRangedAttackMaxRange( tag.getFloat( TAG_MAX_RANGE ) );
         }
     }
