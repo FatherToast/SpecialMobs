@@ -142,7 +142,7 @@ public final class MobHelper {
         
         if( attacker instanceof LivingEntity ) {
             final ItemStack weapon = ((LivingEntity) attacker).getMainHandItem();
-            return weapon.is( SMTags.Items.GARLIC ) ? 6.0F : 0.0F;
+            return weapon.is( SMTags.Items.GARLIC ) ? 4.0F : 0.0F;
         }
         return 0.0F;
     }
