@@ -1,5 +1,6 @@
 package fathertoast.specialmobs.common.entity.enderman;
 
+import fathertoast.crust.api.lib.EntityEventHelper;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
@@ -13,11 +14,9 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.sounds.SoundEvents;
-import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.tags.EntityTypeTags;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.tags.TagKey;
-import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -32,10 +31,10 @@ import net.minecraft.world.level.pathfinder.BlockPathTypes;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.entity.EntityTeleportEvent;
 
-import java.util.Collections;
 import java.util.List;
 
 @SpecialMob
+@SuppressWarnings( "resource" )
 public class IcyEndermanEntity extends _SpecialEndermanEntity {
     
     //--------------- Static Special Mob Hooks ----------------
@@ -63,7 +62,7 @@ public class IcyEndermanEntity extends _SpecialEndermanEntity {
         loot.addClusterDrop( "common", Items.SNOWBALL );
         loot.addUncommonDrop( "uncommon", Blocks.BLUE_ICE );
     }
-
+    
     @SpecialMob.EntityTagProvider
     public static List<TagKey<EntityType<?>>> getEntityTags() {
         return List.of( SMTags.EntityTypes.ENDERMEN, EntityTypeTags.FREEZE_IMMUNE_ENTITY_TYPES );
@@ -123,8 +122,8 @@ public class IcyEndermanEntity extends _SpecialEndermanEntity {
         while( pos.getY() > 0 ) {
             // Allow icy endermen to teleport on top of water
             final BlockState block = level().getBlockState( pos );
+            // noinspection deprecation
             if( block.blocksMotion() || block.getFluidState().is( FluidTags.WATER ) ) {
-                
                 final EntityTeleportEvent.EnderEntity event = ForgeEventFactory.onEnderTeleport( this, x, y + 1, z );
                 if( event.isCanceled() ) return false;
                 
@@ -151,8 +150,8 @@ public class IcyEndermanEntity extends _SpecialEndermanEntity {
     @SuppressWarnings( "SameParameterValue" ) // Don't care; maintain vanilla's method signature
     private boolean uncheckedTeleport( double x, double y, double z, boolean spawnParticles ) {
         // Can't teleport if in a vehicle
-        if ( this.isPassenger() ) return false;
-
+        if( this.isPassenger() ) return false;
+        
         final double xI = getX();
         final double yI = getY();
         final double zI = getZ();
@@ -162,7 +161,7 @@ public class IcyEndermanEntity extends _SpecialEndermanEntity {
             teleportTo( x, y, z );
             
             if( level().noCollision( this ) && !level().containsAnyLiquid( getBoundingBox() ) ) {
-                if( spawnParticles ) References.EntityEvent.TELEPORT_TRAIL_PARTICLES.broadcast( this );
+                if( spawnParticles ) EntityEventHelper.TELEPORT_TRAIL_PARTICLES.broadcast( this );
                 getNavigation().stop();
                 return true;
             }
