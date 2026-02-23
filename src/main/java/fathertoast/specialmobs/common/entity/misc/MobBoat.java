@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import fathertoast.crust.api.lib.NBTHelper;
 import fathertoast.specialmobs.common.core.register.SMEntities;
 import fathertoast.specialmobs.common.entity.ai.IBoatRider;
+import fathertoast.specialmobs.common.util.References;
 import net.minecraft.BlockUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -836,8 +837,8 @@ public class MobBoat extends Entity implements IEntityAdditionalSpawnData {
     
     @Override
     protected void readAdditionalSaveData( CompoundTag saveTag ) {
-        if( NBTHelper.containsString( saveTag, "Type" ) ) {
-            setVariant( Boat.Type.byName( saveTag.getString( "Type" ) ) );
+        if( NBTHelper.containsString( saveTag, References.TAG_BOAT_TYPE ) ) {
+            setVariant( Boat.Type.byName( saveTag.getString( References.TAG_BOAT_TYPE ) ) );
         }
     }
     

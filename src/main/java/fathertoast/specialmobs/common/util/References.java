@@ -57,9 +57,6 @@ public final class References {
     
     //--------------- NBT STUFF ----------------
     
-    // Projectiles
-    public static final String TAG_KNOCKBACK = "Knockback";
-    
     // Forge data
     public static final String TAG_FORGE_DATA = "ForgeData";
     public static final String TAG_INIT = "SpecialMobsInit";
@@ -88,6 +85,12 @@ public final class References {
     public static final String TAG_RANGED_COOLDOWN_MIN = "RangedCDMin";
     public static final String TAG_RANGED_COOLDOWN_MAX = "RangedCDMax";
     public static final String TAG_MAX_RANGE = "MaxRange";
+    
+    // Misc entities
+    public static final String TAG_BOAT_TYPE = "Type";
+    
+    // Projectiles
+    public static final String TAG_KNOCKBACK = "Knockback";
     
     // Creepers
     public static final String TAG_SUPERCHARGED = "Supercharged";
