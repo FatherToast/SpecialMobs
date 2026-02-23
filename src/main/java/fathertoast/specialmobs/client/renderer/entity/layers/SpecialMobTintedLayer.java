@@ -1,6 +1,7 @@
 package fathertoast.specialmobs.client.renderer.entity.layers;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import fathertoast.crust.api.lib.CrustMath;
 import fathertoast.specialmobs.common.entity.ISpecialMob;
 import fathertoast.specialmobs.common.util.References;
 import net.minecraft.client.model.EntityModel;
@@ -18,8 +19,8 @@ public abstract class SpecialMobTintedLayer<T extends LivingEntity, M extends En
     protected abstract int getColor( T entity );
     
     @Override
-    public void render(PoseStack poseStack, MultiBufferSource buffer, int packedLight, T entity, float limbSwing,
-                       float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch ) {
+    public void render( PoseStack poseStack, MultiBufferSource buffer, int packedLight, T entity, float limbSwing,
+                        float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch ) {
         if( entity.isInvisible() ) return;
         
         final ResourceLocation overlayTexture = ((ISpecialMob<?>) entity).getSpecialData().getTextureOverlay();
@@ -27,6 +28,6 @@ public abstract class SpecialMobTintedLayer<T extends LivingEntity, M extends En
         
         final int color = getColor( entity );
         renderColoredCutoutModel( getParentModel(), overlayTexture, poseStack, buffer, packedLight, entity,
-                References.getRed( color ), References.getGreen( color ), References.getBlue( color ) );
+                CrustMath.getRed( color ), CrustMath.getGreen( color ), CrustMath.getBlue( color ) );
     }
 }

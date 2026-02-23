@@ -1,5 +1,6 @@
 package fathertoast.specialmobs.common.entity;
 
+import fathertoast.crust.api.lib.NBTHelper;
 import fathertoast.specialmobs.common.config.Config;
 import fathertoast.specialmobs.common.core.register.SMTags;
 import fathertoast.specialmobs.common.entity.creeper._SpecialCreeperEntity;
@@ -7,7 +8,6 @@ import fathertoast.specialmobs.common.util.References;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.DamageTypeTags;
@@ -51,7 +51,7 @@ import net.minecraftforge.fluids.FluidType;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 
-@SuppressWarnings( "JavadocReference" )
+@SuppressWarnings( { "JavadocReference", "resource" } )
 public final class MobHelper {
     
     /** Pool of effects to choose from for plague-type mobs to apply on hit. Duration is a multiplier. */
@@ -435,24 +435,26 @@ public final class MobHelper {
         
         instance.save( effectTag );
         modTag.put( "TridentEffect", effectTag );
-        stackTag.put( "special_mobs_ModData", modTag );
+        stackTag.put( References.TAG_SPECIAL_MOB_DATA, modTag );
         
         return trident;
     }
     
     /**
      * Checks the given trident ItemStack for ranged potion effect and
-     * returns it if it exists.<br>
-     * Also returns null if the item is not a trident.
+     * returns it if it exists.
+     * <br>
+     * Also returns null if the item is not {@link Items#TRIDENT}.
      */
     @Nullable
     public static MobEffectInstance getTridentEffect( ItemStack tridentStack ) {
         if( tridentStack.getItem() != Items.TRIDENT ) return null;
         
-        if( tridentStack.hasTag() && tridentStack.getTag().contains( "special_mobs_ModData", Tag.TAG_COMPOUND ) ) {
-            CompoundTag modTag = tridentStack.getTag().getCompound( "special_mobs_ModData" );
+        if( tridentStack.hasTag() && NBTHelper.containsCompound( tridentStack.getOrCreateTag(), References.TAG_SPECIAL_MOB_DATA ) ) {
+            // noinspection ConstantConditions
+            CompoundTag modTag = tridentStack.getTag().getCompound( References.TAG_SPECIAL_MOB_DATA );
             
-            if( modTag.contains( "TridentEffect", Tag.TAG_COMPOUND ) ) {
+            if( NBTHelper.containsCompound( modTag, "TridentEffect" ) ) {
                 return MobEffectInstance.load( modTag.getCompound( "TridentEffect" ) );
             }
         }
@@ -599,6 +601,7 @@ public final class MobHelper {
                 // Break water plants and other waterlogged things, otherwise frost walker will not work
                 final BlockState block = entity.level().getBlockState( entity.blockPosition() );
                 
+                // noinspection deprecation
                 if( !block.isAir() && !block.isSolid() && !block.getFluidState().isEmpty() ) {
                     final BlockEntity blockEntity = block.hasBlockEntity() ? entity.level().getExistingBlockEntity( entity.blockPosition() ) : null;
                     Block.dropResources( block, entity.level(), entity.blockPosition(), blockEntity );
@@ -624,6 +627,7 @@ public final class MobHelper {
                 for( Direction dir : Direction.Plane.HORIZONTAL ) {
                     BlockState neighborState = entity.level().getBlockState( entity.blockPosition().relative( dir ) );
                     
+                    // noinspection deprecation
                     if( neighborState.isSolid() && entity.getDirection() == dir ) {
                         entity.setDeltaMovement( entity.getDeltaMovement().scale( 0.5 ).add( 0.0, 0.4, 0.0 ) );
                     }
@@ -634,12 +638,12 @@ public final class MobHelper {
     
     /** @return Attempts to place a block, firing the appropriate Forge event. Returns true if successful. */
     public static boolean placeBlock( Entity entity, BlockPos pos, BlockState block ) {
-        return placeBlock( entity, pos, block, References.SetBlockFlags.DEFAULTS );
+        return placeBlock( entity, pos, block, Block.UPDATE_ALL );
     }
     
     /** @return Attempts to place a block, firing the appropriate Forge event. Returns true if successful. */
     public static boolean placeBlock( Entity entity, BlockPos pos, Direction direction, BlockState block ) {
-        return placeBlock( entity, pos, direction, block, References.SetBlockFlags.DEFAULTS );
+        return placeBlock( entity, pos, direction, block, Block.UPDATE_ALL );
     }
     
     /** @return Attempts to place a block, firing the appropriate Forge event. Returns true if successful. */

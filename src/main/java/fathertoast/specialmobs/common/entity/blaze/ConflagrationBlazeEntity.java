@@ -1,5 +1,6 @@
 package fathertoast.specialmobs.common.entity.blaze;
 
+import fathertoast.crust.api.lib.NBTHelper;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
@@ -84,10 +85,10 @@ public class ConflagrationBlazeEntity extends _SpecialBlazeEntity {
     /** @return Attempts to damage this entity; returns true if the hit was successful. */
     @Override
     public boolean hurt( DamageSource source, float amount ) {
-        if( isInvulnerableTo( source ) || fireImmune() && source.is(DamageTypeTags.IS_FIRE) ) return false;
+        if( isInvulnerableTo( source ) || fireImmune() && source.is( DamageTypeTags.IS_FIRE ) ) return false;
         
         if( !source.is( DamageTypeTags.IS_EXPLOSION ) && !source.is( SMTags.DamageTypes.IS_MAGIC ) && !source.is( DamageTypeTags.IS_DROWNING ) &&
-                !(source.getDirectEntity() instanceof Snowball ) ) {
+                !(source.getDirectEntity() instanceof Snowball) ) {
             
             if( !level().isClientSide() && growthLevel < 7 ) {
                 growthLevel++;
@@ -128,7 +129,7 @@ public class ConflagrationBlazeEntity extends _SpecialBlazeEntity {
     /** Override to load data from this entity's NBT data. */
     @Override
     public void readVariantSaveData( CompoundTag saveTag ) {
-        if( saveTag.contains( References.TAG_GROWTH_LEVEL, References.NBT_TYPE_NUMERICAL ) )
+        if( NBTHelper.containsNumber( saveTag, References.TAG_GROWTH_LEVEL ) )
             growthLevel = saveTag.getByte( References.TAG_GROWTH_LEVEL );
         updateFeedingLevels();
     }

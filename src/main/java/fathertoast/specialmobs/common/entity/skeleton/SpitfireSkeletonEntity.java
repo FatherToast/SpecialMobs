@@ -1,6 +1,7 @@
 package fathertoast.specialmobs.common.entity.skeleton;
 
 import fathertoast.crust.api.config.common.ConfigManager;
+import fathertoast.crust.api.lib.LevelEventHelper;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
@@ -85,7 +86,7 @@ public class SpitfireSkeletonEntity extends _SpecialSkeletonEntity {
     /** Called to attack the target with a ranged attack. */
     @Override
     public void performRangedAttack( LivingEntity target, float damageMulti ) {
-        References.LevelEvent.BLAZE_SHOOT.play( this );
+        LevelEventHelper.BLAZE_SHOOT.play( this );
         
         final float accelVariance = Mth.sqrt( distanceTo( target ) ) * 0.5F * getSpecialData().getRangedAttackSpread();
         
@@ -96,6 +97,7 @@ public class SpitfireSkeletonEntity extends _SpecialSkeletonEntity {
             
             final SmallFireball fireball = new SmallFireball( level(), this, dX, dY, dZ );
             fireball.setPos( fireball.getX(), getEyeY() - 0.1, fireball.getZ() );
+            // noinspection resource
             level().addFreshEntity( fireball );
         }
     }

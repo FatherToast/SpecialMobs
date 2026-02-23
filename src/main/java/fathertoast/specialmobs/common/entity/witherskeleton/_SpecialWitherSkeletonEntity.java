@@ -1,6 +1,7 @@
 package fathertoast.specialmobs.common.entity.witherskeleton;
 
 import fathertoast.crust.api.config.common.ConfigManager;
+import fathertoast.crust.api.lib.NBTHelper;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
@@ -98,7 +99,7 @@ public class _SpecialWitherSkeletonEntity extends WitherSkeleton implements ISpe
     public static void addBaseLoot( LootTableBuilder loot ) {
         loot.addLootTable( "main", EntityType.WITHER_SKELETON.getDefaultLootTable() );
     }
-
+    
     @SpecialMob.EntityTagProvider
     public static List<TagKey<EntityType<?>>> getEntityTags() {
         return List.of( EntityTypeTags.SKELETONS, SMTags.EntityTypes.WITHER_SKELETONS );
@@ -125,7 +126,7 @@ public class _SpecialWitherSkeletonEntity extends WitherSkeleton implements ISpe
     
     /** Override to change starting equipment or stats. */
     public void finalizeVariantSpawn( ServerLevelAccessor level, DifficultyInstance difficulty, @Nullable MobSpawnType spawnReason,
-                                     @Nullable SpawnGroupData groupData ) { }
+                                      @Nullable SpawnGroupData groupData ) { }
     
     /** Called to attack the target with a ranged attack. */
     @Override
@@ -252,11 +253,11 @@ public class _SpecialWitherSkeletonEntity extends WitherSkeleton implements ISpe
     
     /** @return The amount of experience to drop from this entity. */
     @Override
-    public int getExperienceReward( ) {
+    public int getExperienceReward() {
         if( isBaby() ) {
             xpReward = (int) ((float) xpReward * 2.5F);
         }
-        return super.getExperienceReward( );
+        return super.getExperienceReward();
     }
     
     //TODO make sure this works for differing base-scale variants
@@ -301,7 +302,7 @@ public class _SpecialWitherSkeletonEntity extends WitherSkeleton implements ISpe
     @Nullable
     @Override
     public final SpawnGroupData finalizeSpawn( ServerLevelAccessor level, DifficultyInstance difficulty, MobSpawnType spawnType,
-                                                  @Nullable SpawnGroupData groupData, @Nullable CompoundTag eggTag ) {
+                                               @Nullable SpawnGroupData groupData, @Nullable CompoundTag eggTag ) {
         return MobHelper.finalizeSpawn( this, level, difficulty, spawnType,
                 super.finalizeSpawn( level, difficulty, spawnType, groupData, eggTag ) );
     }
@@ -427,7 +428,7 @@ public class _SpecialWitherSkeletonEntity extends WitherSkeleton implements ISpe
         
         final CompoundTag saveTag = SpecialMobData.getSaveLocation( tag );
         
-        if( saveTag.contains( References.TAG_IS_BABY, References.NBT_TYPE_NUMERICAL ) )
+        if( NBTHelper.containsString( saveTag, References.TAG_IS_BABY ) )
             setBaby( saveTag.getBoolean( References.TAG_IS_BABY ) );
         
         getSpecialData().readFromNBT( saveTag );

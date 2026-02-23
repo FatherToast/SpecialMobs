@@ -121,14 +121,14 @@ public class SandCreeperEntity extends _SpecialCreeperEntity {
         }
         
         if( block.getBlock() instanceof LiquidBlock ) {
-            level().setBlock( pos, Blocks.AIR.defaultBlockState(), References.SetBlockFlags.DEFAULTS );
+            level().setBlock( pos, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL );
             return;
         }
         
         if( block.is( BlockTags.REPLACEABLE ) ) {
             final BlockEntity blockEntity = block.hasBlockEntity() ? level().getExistingBlockEntity( pos ) : null;
             Block.dropResources( block, level(), pos, blockEntity );
-            level().setBlock( pos, Blocks.AIR.defaultBlockState(), References.SetBlockFlags.DEFAULTS );
+            level().setBlock( pos, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL );
         }
     }
     

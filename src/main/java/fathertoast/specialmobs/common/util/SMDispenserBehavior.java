@@ -1,5 +1,6 @@
 package fathertoast.specialmobs.common.util;
 
+import fathertoast.crust.api.lib.LevelEventHelper;
 import fathertoast.specialmobs.common.core.register.SMItems;
 import fathertoast.specialmobs.common.entity.projectile.IncorporealFireballEntity;
 import fathertoast.specialmobs.common.entity.projectile.SlabFireballEntity;
@@ -36,7 +37,7 @@ public class SMDispenserBehavior {
             
             @Override
             protected void playSound( BlockSource source ) {
-                References.LevelEvent.BLAZE_SHOOT.play( source.getLevel(), source.getPos() );
+                LevelEventHelper.BLAZE_SHOOT.play( source.getLevel(), source.getPos() );
             }
         } );
         
@@ -68,7 +69,7 @@ public class SMDispenserBehavior {
             
             @Override
             protected void playSound( BlockSource source ) {
-                References.LevelEvent.BLAZE_SHOOT.play( source.getLevel(), source.getPos() );
+                LevelEventHelper.BLAZE_SHOOT.play( source.getLevel(), source.getPos() );
             }
         } );
     }

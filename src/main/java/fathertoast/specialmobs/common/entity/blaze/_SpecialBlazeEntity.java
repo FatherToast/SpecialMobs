@@ -1,6 +1,8 @@
 package fathertoast.specialmobs.common.entity.blaze;
 
 import fathertoast.crust.api.config.common.ConfigManager;
+import fathertoast.crust.api.lib.LevelEventHelper;
+import fathertoast.crust.api.lib.NBTHelper;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
@@ -132,7 +134,7 @@ public class _SpecialBlazeEntity extends Blaze implements RangedAttackMob, ISpec
     /** Called to attack the target with a ranged attack. */
     @Override
     public void performRangedAttack( LivingEntity target, float damageMulti ) {
-        References.LevelEvent.BLAZE_SHOOT.play( this );
+        LevelEventHelper.BLAZE_SHOOT.play( this );
         
         final float accelVariance = Mth.sqrt( distanceTo( target ) ) * 0.5F * getSpecialData().getRangedAttackSpread();
         final double dX = target.getX() - getX() + getRandom().nextGaussian() * accelVariance;
@@ -328,9 +330,9 @@ public class _SpecialBlazeEntity extends Blaze implements RangedAttackMob, ISpec
         
         final CompoundTag saveTag = SpecialMobData.getSaveLocation( tag );
         
-        if( saveTag.contains( References.TAG_BURST_COUNT, References.NBT_TYPE_NUMERICAL ) )
+        if( NBTHelper.containsNumber( saveTag, References.TAG_BURST_COUNT ) )
             fireballBurstCount = saveTag.getByte( References.TAG_BURST_COUNT );
-        if( saveTag.contains( References.TAG_BURST_DELAY, References.NBT_TYPE_NUMERICAL ) )
+        if( NBTHelper.containsNumber( saveTag, References.TAG_BURST_DELAY ) )
             fireballBurstDelay = saveTag.getByte( References.TAG_BURST_DELAY );
         
         getSpecialData().readFromNBT( saveTag );

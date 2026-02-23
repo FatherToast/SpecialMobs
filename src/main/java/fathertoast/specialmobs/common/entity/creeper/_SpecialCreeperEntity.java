@@ -1,6 +1,7 @@
 package fathertoast.specialmobs.common.entity.creeper;
 
 import fathertoast.crust.api.config.common.ConfigManager;
+import fathertoast.crust.api.lib.NBTHelper;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
@@ -477,14 +478,13 @@ public class _SpecialCreeperEntity extends Creeper implements IExplodingMob, ISp
         
         final CompoundTag saveTag = SpecialMobData.getSaveLocation( tag );
         
-        if( saveTag.contains( References.TAG_SUPERCHARGED, References.NBT_TYPE_NUMERICAL ) )
+        if( NBTHelper.containsNumber( saveTag, References.TAG_SUPERCHARGED ) )
             setSupercharged( saveTag.getBoolean( References.TAG_SUPERCHARGED ) );
-        
-        if( saveTag.contains( References.TAG_DRY_EXPLODE, References.NBT_TYPE_NUMERICAL ) )
+        if( NBTHelper.containsNumber( saveTag, References.TAG_DRY_EXPLODE ) )
             setCannotExplodeWhileWet( saveTag.getBoolean( References.TAG_DRY_EXPLODE ) );
-        if( saveTag.contains( References.TAG_WHILE_BURNING_EXPLODE, References.NBT_TYPE_NUMERICAL ) )
+        if( NBTHelper.containsNumber( saveTag, References.TAG_WHILE_BURNING_EXPLODE ) )
             setExplodesWhileBurning( saveTag.getBoolean( References.TAG_WHILE_BURNING_EXPLODE ) );
-        if( saveTag.contains( References.TAG_WHEN_SHOT_EXPLODE, References.NBT_TYPE_NUMERICAL ) )
+        if( NBTHelper.containsNumber( saveTag, References.TAG_WHEN_SHOT_EXPLODE ) )
             setExplodesWhenShot( saveTag.getBoolean( References.TAG_WHEN_SHOT_EXPLODE ) );
         
         getSpecialData().readFromNBT( saveTag );

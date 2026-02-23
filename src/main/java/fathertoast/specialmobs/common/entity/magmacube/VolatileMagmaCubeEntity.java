@@ -1,5 +1,6 @@
 package fathertoast.specialmobs.common.entity.magmacube;
 
+import fathertoast.crust.api.lib.NBTHelper;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
@@ -137,15 +138,15 @@ public class VolatileMagmaCubeEntity extends _SpecialMagmaCubeEntity implements 
     @Override
     public boolean causeFallDamage( float distance, float damageMultiplier, DamageSource damageSource ) {
         boolean success = super.causeFallDamage( distance, damageMultiplier, damageSource );
-
-        if ( calculateFallDamage( distance, damageMultiplier ) > 0 ) {
+        
+        if( calculateFallDamage( distance, damageMultiplier ) > 0 ) {
             // Speed up fuse from falling like creepers
-            changeFuse((int) (distance * 1.5F));
-            if (fuse > MAX_FUSE - 5) changeFuse(MAX_FUSE - 5 - fuse);
+            changeFuse( (int) (distance * 1.5F) );
+            if( fuse > MAX_FUSE - 5 ) changeFuse( MAX_FUSE - 5 - fuse );
         }
         return success;
     }
-
+    
     /** @return Interacts (right click) with this entity and returns the result. */
     @Override
     public InteractionResult mobInteract( Player player, InteractionHand hand ) {
@@ -172,7 +173,7 @@ public class VolatileMagmaCubeEntity extends _SpecialMagmaCubeEntity implements 
     /** Override to load data from this entity's NBT data. */
     @Override
     public void readVariantSaveData( CompoundTag saveTag ) {
-        if( saveTag.contains( References.TAG_FUSE_TIME, References.NBT_TYPE_NUMERICAL ) )
+        if( NBTHelper.containsNumber( saveTag, References.TAG_FUSE_TIME ) )
             fuse = saveTag.getByte( References.TAG_FUSE_TIME );
     }
     

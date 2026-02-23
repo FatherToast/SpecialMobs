@@ -1,5 +1,6 @@
 package fathertoast.specialmobs.common.entity.ghast;
 
+import fathertoast.crust.api.lib.LevelEventHelper;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
@@ -132,7 +133,7 @@ public class _SpecialGhastEntity extends Ghast implements RangedAttackMob, ISpec
     /** Called to attack the target with a ranged attack. */
     @Override
     public void performRangedAttack( LivingEntity target, float damageMulti ) {
-        References.LevelEvent.GHAST_SHOOT.play( this );
+        LevelEventHelper.GHAST_SHOOT.play( this );
         
         final float accelVariance = Mth.sqrt( distanceTo( target ) ) * 0.5F * getSpecialData().getRangedAttackSpread();
         final Vec3 lookVec = getViewVector( 1.0F ).scale( getBbWidth() );

@@ -1,6 +1,7 @@
 package fathertoast.specialmobs.common.entity.zombie;
 
 import fathertoast.crust.api.config.common.ConfigManager;
+import fathertoast.crust.api.lib.LevelEventHelper;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
@@ -98,12 +99,12 @@ public class _SpecialZombieEntity extends Zombie implements RangedAttackMob, ISp
     public static void addBaseLoot( LootTableBuilder loot ) {
         loot.addLootTable( "main", EntityType.ZOMBIE.getDefaultLootTable() );
     }
-
+    
     @SpecialMob.EntityTagProvider
     public static List<TagKey<EntityType<?>>> getEntityTags() {
         return Collections.singletonList( SMTags.EntityTypes.ZOMBIES );
     }
-
+    
     @SpecialMob.Factory
     public static EntityType.EntityFactory<_SpecialZombieEntity> getFactory() { return _SpecialZombieEntity::new; }
     
@@ -129,13 +130,13 @@ public class _SpecialZombieEntity extends Zombie implements RangedAttackMob, ISp
     
     /** Override to change starting equipment or stats. */
     public void finalizeVariantSpawn( ServerLevelAccessor level, DifficultyInstance difficulty, @Nullable MobSpawnType spawnType,
-                                     @Nullable SpawnGroupData groupData ) { }
+                                      @Nullable SpawnGroupData groupData ) { }
     
     /** Performs this zombie's drowning conversion. */
     @Override
     protected void doUnderWaterConversion() {
         convertToZombieType( getVariantConversionType() );
-        References.LevelEvent.ZOMBIE_CONVERTED_TO_DROWNED.play( this );
+        LevelEventHelper.ZOMBIE_CONVERTED_TO_DROWNED.play( this );
     }
     
     /** Override to change the entity this converts to when drowned. */
@@ -145,7 +146,7 @@ public class _SpecialZombieEntity extends Zombie implements RangedAttackMob, ISp
     @Override
     public void performRangedAttack( LivingEntity target, float damageMulti ) {
         final ItemStack arrowItem = getProjectile( getItemInHand( ProjectileUtil.getWeaponHoldingHand(
-                this, item -> item instanceof BowItem) ) );
+                this, item -> item instanceof BowItem ) ) );
         AbstractArrow arrow = getArrow( arrowItem, damageMulti );
         if( getMainHandItem().getItem() instanceof BowItem )
             arrow = ((BowItem) getMainHandItem().getItem()).customArrow( arrow );
@@ -279,7 +280,7 @@ public class _SpecialZombieEntity extends Zombie implements RangedAttackMob, ISp
     @Nullable
     @Override
     public final SpawnGroupData finalizeSpawn( ServerLevelAccessor level, DifficultyInstance difficulty, MobSpawnType spawnType,
-                                                  @Nullable SpawnGroupData groupData, @Nullable CompoundTag eggTag ) {
+                                               @Nullable SpawnGroupData groupData, @Nullable CompoundTag eggTag ) {
         return MobHelper.finalizeSpawn( this, level, difficulty, spawnType,
                 super.finalizeSpawn( level, difficulty, spawnType, groupData, eggTag ) );
     }
@@ -374,7 +375,7 @@ public class _SpecialZombieEntity extends Zombie implements RangedAttackMob, ISp
     @Override
     public boolean hurt( DamageSource source, float amount ) {
         final Entity entity = source.getDirectEntity();
-        if( isSensitiveToWater() && entity instanceof Snowball) {
+        if( isSensitiveToWater() && entity instanceof Snowball ) {
             amount = Math.max( 3.0F, amount );
         }
         
@@ -391,9 +392,9 @@ public class _SpecialZombieEntity extends Zombie implements RangedAttackMob, ISp
     @Override
     public void addAdditionalSaveData( CompoundTag tag ) {
         super.addAdditionalSaveData( tag );
-
+        
         final CompoundTag saveTag = SpecialMobData.getSaveLocation( tag );
-
+        
         getSpecialData().writeToNBT( saveTag );
         addVariantSaveData( saveTag );
     }

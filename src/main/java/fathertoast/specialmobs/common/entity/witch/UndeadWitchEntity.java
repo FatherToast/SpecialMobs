@@ -1,6 +1,7 @@
 package fathertoast.specialmobs.common.entity.witch;
 
 import fathertoast.crust.api.config.common.ConfigManager;
+import fathertoast.crust.api.lib.NBTHelper;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
@@ -100,7 +101,7 @@ public class UndeadWitchEntity extends _SpecialWitchEntity {
                         0.4, // Used to cause floor clip bug; remove if it happens again
                         vZ / vH * 0.7 + getDeltaMovement().z * 0.2 );
                 skeleton.setOnGround( false );
-
+                
                 level().addFreshEntity( skeleton );
                 playSound( SoundEvents.BLAZE_SHOOT, 1.0F, 2.0F / (random.nextFloat() * 0.4F + 0.8F) );
                 skeleton.spawnAnim();
@@ -131,7 +132,7 @@ public class UndeadWitchEntity extends _SpecialWitchEntity {
     /** Override to load data from this entity's NBT data. */
     @Override
     public void readVariantSaveData( CompoundTag saveTag ) {
-        if( saveTag.contains( References.TAG_SUMMONS, References.NBT_TYPE_NUMERICAL ) )
+        if( NBTHelper.containsString( saveTag, References.TAG_SUMMONS ) )
             summons = saveTag.getByte( References.TAG_SUMMONS );
     }
 }

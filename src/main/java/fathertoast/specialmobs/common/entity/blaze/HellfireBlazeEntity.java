@@ -1,6 +1,8 @@
 package fathertoast.specialmobs.common.entity.blaze;
 
 import fathertoast.crust.api.config.common.ConfigManager;
+import fathertoast.crust.api.lib.LevelEventHelper;
+import fathertoast.crust.api.lib.NBTHelper;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
@@ -72,7 +74,7 @@ public class HellfireBlazeEntity extends _SpecialBlazeEntity {
     /** Called to attack the target with a ranged attack. */
     @Override
     public void performRangedAttack( LivingEntity target, float damageMulti ) {
-        References.LevelEvent.BLAZE_SHOOT.play( this );
+        LevelEventHelper.BLAZE_SHOOT.play( this );
         
         final float accelVariance = Mth.sqrt( distanceTo( target ) ) * 0.5F * getSpecialData().getRangedAttackSpread();
         final double dX = target.getX() - getX() + getRandom().nextGaussian() * accelVariance;
@@ -81,6 +83,7 @@ public class HellfireBlazeEntity extends _SpecialBlazeEntity {
         
         final Fireball fireball = new LargeFireball( level(), this, dX, dY, dZ, explosionPower );
         fireball.setPos( fireball.getX(), getY( 0.5 ) + 0.5, fireball.getZ() );
+        // noinspection resource
         level().addFreshEntity( fireball );
     }
     
@@ -93,7 +96,7 @@ public class HellfireBlazeEntity extends _SpecialBlazeEntity {
     /** Override to load data from this entity's NBT data. */
     @Override
     public void readVariantSaveData( CompoundTag saveTag ) {
-        if( saveTag.contains( References.TAG_EXPLOSION_POWER, References.NBT_TYPE_NUMERICAL ) )
+        if( NBTHelper.containsNumber( saveTag, References.TAG_EXPLOSION_POWER ) )
             explosionPower = saveTag.getByte( References.TAG_EXPLOSION_POWER );
     }
 }

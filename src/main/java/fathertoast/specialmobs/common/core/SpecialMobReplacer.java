@@ -1,6 +1,7 @@
 package fathertoast.specialmobs.common.core;
 
 import fathertoast.crust.api.lib.EnvironmentHelper;
+import fathertoast.crust.api.lib.NBTHelper;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.config.Config;
 import fathertoast.specialmobs.common.entity.MobHelper;
@@ -59,9 +60,8 @@ public final class SpecialMobReplacer {
         final MobSpawnType spawnType = event.getSpawnType();
         
         // Check if the spawn type is one that should be skipped.
-        if( Config.MAIN.GENERAL.skippedSpawnTypes.get().contains( spawnType.name().toLowerCase( Locale.ROOT ) ) ) {
+        if( Config.MAIN.GENERAL.skippedSpawnTypes.get().contains( spawnType.name().toLowerCase( Locale.ROOT ) ) )
             return;
-        }
         
         final Entity entity = event.getEntity();
         final MobFamily<?, ?> mobFamily = getReplacingMobFamily( entity );
@@ -69,7 +69,6 @@ public final class SpecialMobReplacer {
         if( mobFamily != null ) {
             final BlockPos entityPos = BlockPos.containing( entity.position() );
             
-            // Do this regardless of replacement, should help prevent bizarre save glitches.
             // FinalizeSpawn should never be called multiple times on an entity, but who knows.
             setInitFlag( entity );
             
@@ -85,8 +84,8 @@ public final class SpecialMobReplacer {
                 }
             }
             else {
-                level.getServer().execute( () ->
-                        DELAYED_REPLACE.add( new DelayedMobReplacementEntry( mobFamily, spawnType, entity, level, entityPos ) )
+                level.getServer().execute(
+                        () -> DELAYED_REPLACE.add( new DelayedMobReplacementEntry( mobFamily, spawnType, entity, level, entityPos ) )
                 );
             }
         }
@@ -119,9 +118,9 @@ public final class SpecialMobReplacer {
      */
     private static boolean getInitFlag( Entity entity ) {
         final CompoundTag forgeData = entity.getPersistentData();
-        if( forgeData.contains( References.TAG_INIT, References.NBT_TYPE_NUMERICAL ) ) {
+        
+        if( NBTHelper.containsNumber( forgeData, References.TAG_INIT ) )
             return forgeData.getBoolean( References.TAG_INIT );
-        }
         return false;
     }
     

@@ -1,5 +1,6 @@
 package fathertoast.specialmobs.common.entity.witch;
 
+import fathertoast.crust.api.lib.NBTHelper;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
@@ -98,15 +99,15 @@ public class _SpecialWitchEntity extends Witch implements ISpecialMob<_SpecialWi
     
     @SpecialMob.LootTableProvider
     public static void addBaseLoot( LootTableBuilder loot ) {
-        loot.addLootTable("main", EntityType.WITCH.getDefaultLootTable());
+        loot.addLootTable( "main", EntityType.WITCH.getDefaultLootTable() );
     }
-
-
+    
+    
     @SpecialMob.EntityTagProvider
     public static List<TagKey<EntityType<?>>> getEntityTags() {
         return List.of( EntityTypeTags.RAIDERS, SMTags.EntityTypes.WITCHES );
     }
-
+    
     @SpecialMob.Factory
     public static EntityType.EntityFactory<_SpecialWitchEntity> getFactory() { return _SpecialWitchEntity::new; }
     
@@ -126,7 +127,7 @@ public class _SpecialWitchEntity extends Witch implements ISpecialMob<_SpecialWi
     /** Override to change starting equipment or stats. */
     @SuppressWarnings( "unused" )
     public void finalizeVariantSpawn( ServerLevelAccessor level, DifficultyInstance difficulty, @Nullable MobSpawnType spawnType,
-                                     @Nullable SpawnGroupData groupData ) { }
+                                      @Nullable SpawnGroupData groupData ) { }
     
     /** Called when this entity successfully damages a target to apply on-hit effects. */
     @Override
@@ -155,7 +156,7 @@ public class _SpecialWitchEntity extends Witch implements ISpecialMob<_SpecialWi
         
         final ThrownPotion thrownPotion = new ThrownPotion( level(), this );
         thrownPotion.setItem( potion );
-        thrownPotion.setXRot(thrownPotion.getXRot() + 20.0F);
+        thrownPotion.setXRot( thrownPotion.getXRot() + 20.0F );
         thrownPotion.shoot( dX, dY + (double) (dH * 0.2F), dZ, 0.75F, 8.0F * getSpecialData().getRangedAttackSpread() );
         if( !isSilent() ) {
             level().playSound( null, getX(), getY(), getZ(), SoundEvents.WITCH_THROW, getSoundSource(),
@@ -358,7 +359,7 @@ public class _SpecialWitchEntity extends Witch implements ISpecialMob<_SpecialWi
             
             final ThrownPotion thrownPotion = new ThrownPotion( level(), this );
             thrownPotion.setItem( potion );
-            thrownPotion.setXRot(thrownPotion.getXRot() + 20.0F);
+            thrownPotion.setXRot( thrownPotion.getXRot() + 20.0F );
             thrownPotion.shoot( 0.0, -1.0, 0.0, 0.2F, 0.0F );
             if( !isSilent() ) {
                 level().playSound( null, getX(), getY(), getZ(), SoundEvents.WITCH_THROW, getSoundSource(),
@@ -439,7 +440,7 @@ public class _SpecialWitchEntity extends Witch implements ISpecialMob<_SpecialWi
     @Nullable
     @Override
     public final SpawnGroupData finalizeSpawn( ServerLevelAccessor level, DifficultyInstance difficulty, MobSpawnType spawnType,
-                                                  @Nullable SpawnGroupData groupData, @Nullable CompoundTag eggTag ) {
+                                               @Nullable SpawnGroupData groupData, @Nullable CompoundTag eggTag ) {
         return MobHelper.finalizeSpawn( this, level, difficulty, spawnType,
                 super.finalizeSpawn( level, difficulty, spawnType, groupData, eggTag ) );
     }
@@ -569,9 +570,9 @@ public class _SpecialWitchEntity extends Witch implements ISpecialMob<_SpecialWi
         
         final CompoundTag saveTag = SpecialMobData.getSaveLocation( tag );
         
-        if( saveTag.contains( References.TAG_SHEATHED_ITEM, References.NBT_TYPE_COMPOUND ) )
+        if( NBTHelper.containsNumber( saveTag, References.TAG_SHEATHED_ITEM ) )
             sheathedItem = ItemStack.of( saveTag.getCompound( References.TAG_SHEATHED_ITEM ) );
-        if( saveTag.contains( References.TAG_POTION_USE_TIME, References.NBT_TYPE_NUMERICAL ) )
+        if( NBTHelper.containsNumber( saveTag, References.TAG_POTION_USE_TIME ) )
             potionDrinkTimer = saveTag.getShort( References.TAG_POTION_USE_TIME );
         
         getSpecialData().readFromNBT( saveTag );

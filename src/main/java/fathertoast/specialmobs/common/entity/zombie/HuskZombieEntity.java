@@ -1,6 +1,7 @@
 package fathertoast.specialmobs.common.entity.zombie;
 
 import fathertoast.crust.api.config.common.ConfigManager;
+import fathertoast.crust.api.lib.LevelEventHelper;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
@@ -47,7 +48,7 @@ public class HuskZombieEntity extends _SpecialZombieEntity {
                 .size( 1.0625F, 0.6F, 1.95F )
                 .addExperience( 1 );
     }
-
+    
     @SpecialMob.ConfigSupplier
     public static SpeciesConfig createConfig( ConfigManager manager, MobFamily.Species<?> species ) {
         return new HuskZombieSpeciesConfig( manager, species, DEFAULT_BOW_CHANCE, DEFAULT_SHIELD_CHANCE );
@@ -68,7 +69,7 @@ public class HuskZombieEntity extends _SpecialZombieEntity {
     /**
      * We cannot call the actual husk method because our husk variant does not extend the vanilla husk.
      *
-     * @see net.minecraft.world.entity.monster.Husk#checkHuskSpawnRules(EntityType, ServerLevelAccessor, MobSpawnType, BlockPos, RandomSource) 
+     * @see net.minecraft.world.entity.monster.Husk#checkHuskSpawnRules(EntityType, ServerLevelAccessor, MobSpawnType, BlockPos, RandomSource)
      */
     public static boolean checkSpeciesSpawnRules( EntityType<? extends HuskZombieEntity> type, ServerLevelAccessor world,
                                                   MobSpawnType spawnType, BlockPos pos, RandomSource random ) {
@@ -120,7 +121,7 @@ public class HuskZombieEntity extends _SpecialZombieEntity {
     @Override
     protected void doUnderWaterConversion() {
         convertToZombieType( getVariantConversionType() );
-        References.LevelEvent.HUSK_CONVERTED_TO_ZOMBIE.play( this );
+        LevelEventHelper.HUSK_CONVERTED_TO_ZOMBIE.play( this );
     }
     
     /** Override to change the entity this converts to when drowned. */

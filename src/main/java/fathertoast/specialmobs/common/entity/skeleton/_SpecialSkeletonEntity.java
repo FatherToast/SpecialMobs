@@ -1,6 +1,7 @@
 package fathertoast.specialmobs.common.entity.skeleton;
 
 import fathertoast.crust.api.config.common.ConfigManager;
+import fathertoast.crust.api.lib.NBTHelper;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
@@ -98,7 +99,7 @@ public class _SpecialSkeletonEntity extends AbstractSkeleton implements ISpecial
     public static void addBaseLoot( LootTableBuilder loot ) {
         loot.addLootTable( "main", EntityType.SKELETON.getDefaultLootTable() );
     }
-
+    
     @SpecialMob.EntityTagProvider
     public static List<TagKey<EntityType<?>>> getEntityTags() {
         return Collections.singletonList( EntityTypeTags.SKELETONS );
@@ -205,7 +206,7 @@ public class _SpecialSkeletonEntity extends AbstractSkeleton implements ISpecial
             
             final SpecialMobData<_SpecialSkeletonEntity> data = getSpecialData();
             final ItemStack weapon = getItemInHand( ProjectileUtil.getWeaponHoldingHand(
-                    this, item -> item instanceof BowItem) );
+                    this, item -> item instanceof BowItem ) );
             if( data.getRangedAttackMaxRange() > 0.0F && weapon.getItem() == Items.BOW ) {
                 currentAttackAI = new RangedBowAttackGoal<>( this, data.getRangedWalkSpeed(),
                         data.getRangedAttackCooldown(), data.getRangedAttackMaxRange() );
@@ -283,7 +284,7 @@ public class _SpecialSkeletonEntity extends AbstractSkeleton implements ISpecial
         }
         super.onSyncedDataUpdated( parameter );
     }
-
+    
     /** @return The amount of experience to drop from this entity. */
     @Override
     public int getExperienceReward() {
@@ -335,7 +336,7 @@ public class _SpecialSkeletonEntity extends AbstractSkeleton implements ISpecial
     @Nullable
     @Override
     public final SpawnGroupData finalizeSpawn( ServerLevelAccessor level, DifficultyInstance difficulty, MobSpawnType spawnType,
-                                                 @Nullable SpawnGroupData groupData, @Nullable CompoundTag eggTag ) {
+                                               @Nullable SpawnGroupData groupData, @Nullable CompoundTag eggTag ) {
         return MobHelper.finalizeSpawn( this, level, difficulty, spawnType,
                 super.finalizeSpawn( level, difficulty, spawnType, groupData, eggTag ) );
     }
@@ -399,7 +400,7 @@ public class _SpecialSkeletonEntity extends AbstractSkeleton implements ISpecial
     
     /** Sets this entity 'stuck' inside a block, such as a cobweb or sweet berry bush. Mod blocks could use this as a speed boost. */
     @Override
-    public void makeStuckInBlock(BlockState block, Vec3 speedMulti ) {
+    public void makeStuckInBlock( BlockState block, Vec3 speedMulti ) {
         if( getSpecialData().canBeStuckIn( block ) ) super.makeStuckInBlock( block, speedMulti );
     }
     
@@ -462,7 +463,7 @@ public class _SpecialSkeletonEntity extends AbstractSkeleton implements ISpecial
         
         final CompoundTag saveTag = SpecialMobData.getSaveLocation( tag );
         
-        if( saveTag.contains( References.TAG_IS_BABY, References.NBT_TYPE_NUMERICAL ) )
+        if( NBTHelper.containsNumber( saveTag, References.TAG_IS_BABY ) )
             setBaby( saveTag.getBoolean( References.TAG_IS_BABY ) );
         
         getSpecialData().readFromNBT( saveTag );

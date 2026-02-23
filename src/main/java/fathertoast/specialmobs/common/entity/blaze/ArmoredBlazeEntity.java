@@ -1,6 +1,7 @@
 package fathertoast.specialmobs.common.entity.blaze;
 
 import fathertoast.crust.api.config.common.ConfigManager;
+import fathertoast.crust.api.lib.NBTHelper;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
@@ -147,7 +148,7 @@ public class ArmoredBlazeEntity extends _SpecialBlazeEntity {
     /** Override to load data from this entity's NBT data. */
     @Override
     public void readVariantSaveData( CompoundTag saveTag ) {
-        if( saveTag.contains( References.TAG_AMMO, References.NBT_TYPE_NUMERICAL ) )
+        if( NBTHelper.containsNumber( saveTag, References.TAG_AMMO ) )
             entityData.set( ARMOR_LEVEL, saveTag.getInt( References.TAG_AMMO ) );
     }
 }

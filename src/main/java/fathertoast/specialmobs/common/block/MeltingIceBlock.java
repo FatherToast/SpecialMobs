@@ -36,7 +36,7 @@ public class MeltingIceBlock extends IceBlock {
     }
     
     /** @return The state that should be placed. */
-    public static BlockState getState(Level level, BlockPos pos ) {
+    public static BlockState getState( Level level, BlockPos pos ) {
         final BlockState currentBlock = level.getBlockState( pos );
         return SMBlocks.MELTING_ICE.get().defaultBlockState().setValue( HAS_WATER,
                 currentBlock.is( Blocks.FROSTED_ICE ) ||
@@ -91,15 +91,15 @@ public class MeltingIceBlock extends IceBlock {
     protected void createBlockStateDefinition( StateDefinition.Builder<Block, BlockState> builder ) {
         builder.add( AGE ).add( HAS_WATER );
     }
-
+    
     @Override
-    public ItemStack getCloneItemStack(BlockState state, HitResult target, BlockGetter level, BlockPos pos, Player player) {
+    public ItemStack getCloneItemStack( BlockState state, HitResult target, BlockGetter level, BlockPos pos, Player player ) {
         return ItemStack.EMPTY;
     }
-
+    
     @Override
     public void playerDestroy( Level level, Player player, BlockPos pos, BlockState state,
-                              @Nullable BlockEntity blockEntity, ItemStack tool ) {
+                               @Nullable BlockEntity blockEntity, ItemStack tool ) {
         player.awardStat( Stats.BLOCK_MINED.get( this ) );
         player.causeFoodExhaustion( 0.005F );
         dropResources( state, level, pos, blockEntity, player, tool );
@@ -155,7 +155,7 @@ public class MeltingIceBlock extends IceBlock {
     private boolean slightlyMelt( BlockState state, Level level, BlockPos pos, RandomSource random ) {
         int age = state.getValue( AGE );
         if( age < 3 ) {
-            level.setBlock( pos, state.setValue( AGE, age + 1 ), References.SetBlockFlags.UPDATE_CLIENT );
+            level.setBlock( pos, state.setValue( AGE, age + 1 ), Block.UPDATE_CLIENTS );
             scheduleTick( level, pos, random );
             return false;
         }

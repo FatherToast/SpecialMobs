@@ -1,5 +1,6 @@
 package fathertoast.specialmobs.common.entity.enderman;
 
+import fathertoast.crust.api.lib.NBTHelper;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
@@ -146,7 +147,7 @@ public class MirageEndermanEntity extends _SpecialEndermanEntity {
     /** Override to load data from this entity's NBT data. */
     @Override
     public void readVariantSaveData( CompoundTag saveTag ) {
-        if( saveTag.contains( References.TAG_IS_FAKE, References.NBT_TYPE_NUMERICAL ) )
+        if( NBTHelper.containsNumber( saveTag, References.TAG_IS_FAKE ) )
             isFake = saveTag.getBoolean( References.TAG_IS_FAKE );
     }
 }

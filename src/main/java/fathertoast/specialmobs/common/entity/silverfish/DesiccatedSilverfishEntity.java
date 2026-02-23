@@ -1,6 +1,7 @@
 package fathertoast.specialmobs.common.entity.silverfish;
 
 import fathertoast.crust.api.config.common.ConfigManager;
+import fathertoast.crust.api.lib.NBTHelper;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
@@ -33,6 +34,7 @@ import java.util.ArrayDeque;
 import java.util.Queue;
 
 @SpecialMob
+@SuppressWarnings( "resource" )
 public class DesiccatedSilverfishEntity extends _SpecialSilverfishEntity {
     
     //--------------- Static Special Mob Hooks ----------------
@@ -138,14 +140,14 @@ public class DesiccatedSilverfishEntity extends _SpecialSilverfishEntity {
                 ((BucketPickup) block.getBlock()).pickupBlock( level(), pos, block ) != ItemStack.EMPTY ) {
             onAbsorb( posToCheckAround, rootDistance, pos );
         }
-        else if( block.getBlock() instanceof LiquidBlock) {
-            level().setBlock( pos, Blocks.AIR.defaultBlockState(), References.SetBlockFlags.DEFAULTS );
+        else if( block.getBlock() instanceof LiquidBlock ) {
+            level().setBlock( pos, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL );
             onAbsorb( posToCheckAround, rootDistance, pos );
         }
         else if( block.is( BlockTags.REPLACEABLE ) ) {
             final BlockEntity blockEntity = block.hasBlockEntity() ? level().getExistingBlockEntity( pos ) : null;
             Block.dropResources( block, level(), pos, blockEntity );
-            level().setBlock( pos, Blocks.AIR.defaultBlockState(), References.SetBlockFlags.DEFAULTS );
+            level().setBlock( pos, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL );
             onAbsorb( posToCheckAround, rootDistance, pos );
         }
     }
@@ -167,7 +169,7 @@ public class DesiccatedSilverfishEntity extends _SpecialSilverfishEntity {
     /** Override to load data from this entity's NBT data. */
     @Override
     public void readVariantSaveData( CompoundTag saveTag ) {
-        if( saveTag.contains( References.TAG_AMMO, References.NBT_TYPE_NUMERICAL ) )
+        if( NBTHelper.containsNumber( saveTag, References.TAG_AMMO ) )
             absorbCount = saveTag.getByte( References.TAG_AMMO );
     }
 }

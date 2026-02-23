@@ -1,8 +1,8 @@
 package fathertoast.specialmobs.common.entity.ai.goal;
 
+import fathertoast.crust.api.lib.LevelEventHelper;
 import fathertoast.specialmobs.common.entity.SpecialMobData;
 import fathertoast.specialmobs.common.entity.ghast._SpecialGhastEntity;
-import fathertoast.specialmobs.common.util.References;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.goal.Goal;
 
@@ -29,7 +29,7 @@ public class SpecialGhastFireballAttackGoal extends Goal {
     /** Called when this AI is deactivated. */
     @Override
     public void stop() { ghast.setCharging( false ); }
-
+    
     /** Called each tick while this AI is active. */
     @Override
     public void tick() {
@@ -41,7 +41,7 @@ public class SpecialGhastFireballAttackGoal extends Goal {
         if( target.distanceToSqr( ghast ) < data.getRangedAttackMaxRange() * data.getRangedAttackMaxRange() && ghast.hasLineOfSight( target ) ) {
             chargeTime++;
             if( chargeTime == (data.getRangedAttackCooldown() >> 1) && !ghast.isSilent() ) {
-                References.LevelEvent.GHAST_WARN.play( ghast );
+                LevelEventHelper.GHAST_WARN.play( ghast );
             }
             if( chargeTime >= data.getRangedAttackCooldown() ) {
                 ghast.performRangedAttack( target, 1.0F );
@@ -53,10 +53,10 @@ public class SpecialGhastFireballAttackGoal extends Goal {
         }
         ghast.setCharging( chargeTime > (data.getRangedAttackCooldown() >> 1) );
     }
-
+    
     @Override
     public boolean requiresUpdateEveryTick() {
         return true;
     }
-
+    
 }

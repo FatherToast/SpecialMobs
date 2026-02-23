@@ -1,6 +1,7 @@
 package fathertoast.specialmobs.common.entity.witch;
 
 import fathertoast.crust.api.config.common.ConfigManager;
+import fathertoast.crust.api.lib.NBTHelper;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
@@ -126,10 +127,10 @@ public class WildsWitchEntity extends _SpecialWitchEntity {
         baby.copyPosition( this );
         baby.yHeadRot = getYRot();
         baby.yBodyRot = getYRot();
-
+        
         groupData = ForgeEventFactory.onFinalizeSpawn( baby, (ServerLevelAccessor) level(), level().getCurrentDifficultyAt( blockPosition() ),
                 MobSpawnType.MOB_SUMMONED, groupData, null );
-
+        
         baby.setTarget( getTarget() );
         
         baby.setDeltaMovement(
@@ -174,7 +175,7 @@ public class WildsWitchEntity extends _SpecialWitchEntity {
                 if( level().noCollision( spider.getBoundingBox() ) ) {
                     spiderMounts--;
                     potionUseCooldownTimer = 40;
-
+                    
                     spider.setTarget( getTarget() );
                     ForgeEventFactory.onFinalizeSpawn( spider, (ServerLevelAccessor) level(), level().getCurrentDifficultyAt( blockPosition() ),
                             MobSpawnType.MOB_SUMMONED, null, null );
@@ -213,11 +214,11 @@ public class WildsWitchEntity extends _SpecialWitchEntity {
     /** Override to load data from this entity's NBT data. */
     @Override
     public void readVariantSaveData( CompoundTag saveTag ) {
-        if( saveTag.contains( References.TAG_SUMMONS, References.NBT_TYPE_NUMERICAL ) )
+        if( NBTHelper.containsString( saveTag, References.TAG_SUMMONS ) )
             spiderMounts = saveTag.getByte( References.TAG_SUMMONS );
-        if( saveTag.contains( References.TAG_BABIES, References.NBT_TYPE_NUMERICAL ) )
+        if( NBTHelper.containsString( saveTag, References.TAG_BABIES ) )
             spiderSwarms = saveTag.getByte( References.TAG_BABIES );
-        if( saveTag.contains( References.TAG_EXTRA_BABIES, References.NBT_TYPE_NUMERICAL ) )
+        if( NBTHelper.containsString( saveTag, References.TAG_EXTRA_BABIES ) )
             spiderSwarmSize = saveTag.getByte( References.TAG_EXTRA_BABIES );
     }
 }

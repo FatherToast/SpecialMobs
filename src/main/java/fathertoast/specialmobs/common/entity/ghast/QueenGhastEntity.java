@@ -1,6 +1,8 @@
 package fathertoast.specialmobs.common.entity.ghast;
 
 import fathertoast.crust.api.config.common.ConfigManager;
+import fathertoast.crust.api.lib.LevelEventHelper;
+import fathertoast.crust.api.lib.NBTHelper;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
@@ -22,6 +24,7 @@ import net.minecraftforge.event.ForgeEventFactory;
 import javax.annotation.Nullable;
 
 @SpecialMob
+@SuppressWarnings( "resource" )
 public class QueenGhastEntity extends _SpecialGhastEntity {
     
     //--------------- Static Special Mob Hooks ----------------
@@ -95,7 +98,7 @@ public class QueenGhastEntity extends _SpecialGhastEntity {
             final double vH = Math.sqrt( vX * vX + vZ * vZ );
             spawnBaby( vX / vH + getDeltaMovement().x * 0.2, vZ / vH + getDeltaMovement().z * 0.2, null );
             spawnAnim();
-            References.LevelEvent.GHAST_SHOOT.play( this );
+            LevelEventHelper.GHAST_SHOOT.play( this );
         }
         else {
             super.performRangedAttack( target, damageMulti );
@@ -109,7 +112,6 @@ public class QueenGhastEntity extends _SpecialGhastEntity {
     /** Called to remove this entity from the world. Includes death, unloading, interdimensional travel, etc. */
     @Override
     public void remove( RemovalReason reason ) {
-        //noinspection deprecation
         if( isDeadOrDying() && !isRemoved() && level() instanceof ServerLevelAccessor ) { // Same conditions as slime splitting
             // Spawn babies on death
             SpawnGroupData groupData = null;
@@ -117,7 +119,7 @@ public class QueenGhastEntity extends _SpecialGhastEntity {
                 groupData = spawnBaby( (random.nextDouble() - 0.5) * 0.3, (random.nextDouble() - 0.5) * 0.3, groupData );
             }
             spawnAnim();
-            References.LevelEvent.BLAZE_SHOOT.play( this );
+            LevelEventHelper.BLAZE_SHOOT.play( this );
         }
         super.remove( reason );
     }
@@ -137,7 +139,7 @@ public class QueenGhastEntity extends _SpecialGhastEntity {
         
         baby.setDeltaMovement( vX, 0.0, vZ );
         baby.setOnGround( false );
-
+        
         level().addFreshEntity( baby );
         return groupData;
     }
@@ -152,9 +154,9 @@ public class QueenGhastEntity extends _SpecialGhastEntity {
     /** Override to load data from this entity's NBT data. */
     @Override
     public void readVariantSaveData( CompoundTag saveTag ) {
-        if( saveTag.contains( References.TAG_BABIES, References.NBT_TYPE_NUMERICAL ) )
+        if( NBTHelper.containsNumber( saveTag, References.TAG_BABIES ) )
             babies = saveTag.getByte( References.TAG_BABIES );
-        if( saveTag.contains( References.TAG_SUMMONS, References.NBT_TYPE_NUMERICAL ) )
+        if( NBTHelper.containsNumber( saveTag, References.TAG_SUMMONS ) )
             summons = saveTag.getByte( References.TAG_SUMMONS );
     }
 }

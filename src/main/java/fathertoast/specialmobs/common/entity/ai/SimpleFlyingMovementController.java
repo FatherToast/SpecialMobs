@@ -76,6 +76,7 @@ public class SimpleFlyingMovementController extends MoveControl {
         AABB boundingBox = mob.getBoundingBox();
         for( int i = 1; i < distance; i++ ) {
             boundingBox = boundingBox.move( direction );
+            // noinspection resource
             if( !mob.level().noCollision( mob, boundingBox ) ) return false;
         }
         return true;

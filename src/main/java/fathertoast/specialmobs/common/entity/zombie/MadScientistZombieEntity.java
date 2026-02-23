@@ -1,6 +1,7 @@
 package fathertoast.specialmobs.common.entity.zombie;
 
 import fathertoast.crust.api.config.common.ConfigManager;
+import fathertoast.crust.api.lib.NBTHelper;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
@@ -72,7 +73,7 @@ public class MadScientistZombieEntity extends _SpecialZombieEntity implements IA
     
     //--------------- Variant-Specific Implementations ----------------
     
-    private static final BiPredicate<MadScientistZombieEntity, ? super Creeper> CHARGE_CREEPER_TARGET = (madman, creeper ) ->
+    private static final BiPredicate<MadScientistZombieEntity, ? super Creeper> CHARGE_CREEPER_TARGET = ( madman, creeper ) ->
             creeper.isAlive() && !creeper.isPowered() && madman.getSensing().hasLineOfSight( creeper );
     
     /** The number of creepers this madman can charge. */
@@ -96,7 +97,7 @@ public class MadScientistZombieEntity extends _SpecialZombieEntity implements IA
     /** Override to change starting equipment or stats. */
     @Override
     public void finalizeVariantSpawn( ServerLevelAccessor level, DifficultyInstance difficulty, @Nullable MobSpawnType spawnType,
-                                     @Nullable SpawnGroupData groupData ) {
+                                      @Nullable SpawnGroupData groupData ) {
         setItemSlot( EquipmentSlot.MAINHAND, new ItemStack( SMItems.SYRINGE.get() ) );
         setDropChance( EquipmentSlot.MAINHAND, 0.0F );
     }
@@ -138,7 +139,7 @@ public class MadScientistZombieEntity extends _SpecialZombieEntity implements IA
     /** Override to load data from this entity's NBT data. */
     @Override
     public void readVariantSaveData( CompoundTag saveTag ) {
-        if( saveTag.contains( References.TAG_AMMO, References.NBT_TYPE_NUMERICAL ) )
+        if( NBTHelper.containsString( saveTag, References.TAG_AMMO ) )
             chargeCount = saveTag.getByte( References.TAG_AMMO );
     }
 }

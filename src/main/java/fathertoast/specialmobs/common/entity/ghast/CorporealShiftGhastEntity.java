@@ -1,6 +1,8 @@
 package fathertoast.specialmobs.common.entity.ghast;
 
 import fathertoast.crust.api.config.common.ConfigManager;
+import fathertoast.crust.api.lib.LevelEventHelper;
+import fathertoast.crust.api.lib.NBTHelper;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
@@ -114,7 +116,7 @@ public class CorporealShiftGhastEntity extends _SpecialGhastEntity {
     /** @return Attempts to damage this entity; returns true if the hit was successful. */
     @Override
     public boolean hurt( DamageSource source, float amount ) {
-        if ( !isCorporeal() ) {
+        if( !isCorporeal() ) {
             return source.is( DamageTypeTags.BYPASSES_INVULNERABILITY ) && super.hurt( source, amount );
         }
         return super.hurt( source, amount );
@@ -134,8 +136,7 @@ public class CorporealShiftGhastEntity extends _SpecialGhastEntity {
             super.performRangedAttack( target, damageMulti );
             return;
         }
-        
-        References.LevelEvent.GHAST_SHOOT.play( this );
+        LevelEventHelper.GHAST_SHOOT.play( this );
         
         final float accelVariance = Mth.sqrt( distanceTo( target ) ) * 0.5F * getSpecialData().getRangedAttackSpread();
         final Vec3 lookVec = getViewVector( 1.0F ).scale( getBbWidth() );
@@ -162,9 +163,9 @@ public class CorporealShiftGhastEntity extends _SpecialGhastEntity {
     /** Override to load data from this entity's NBT data. */
     @Override
     public void readVariantSaveData( CompoundTag saveTag ) {
-        if( saveTag.contains( References.TAG_IS_SHIFTED, References.NBT_TYPE_NUMERICAL ) )
+        if( NBTHelper.containsNumber( saveTag, References.TAG_IS_SHIFTED ) )
             setCorporeal( saveTag.getBoolean( References.TAG_IS_SHIFTED ) );
-        if( saveTag.contains( References.TAG_SHIFT_TIME, References.NBT_TYPE_NUMERICAL ) )
+        if( NBTHelper.containsNumber( saveTag, References.TAG_SHIFT_TIME ) )
             shiftTime = saveTag.getShort( References.TAG_SHIFT_TIME );
     }
 }

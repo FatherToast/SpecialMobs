@@ -1,6 +1,8 @@
 package fathertoast.specialmobs.common.entity.slime;
 
 import fathertoast.crust.api.config.common.ConfigManager;
+import fathertoast.crust.api.lib.CrustMath;
+import fathertoast.crust.api.lib.NBTHelper;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
@@ -36,9 +38,6 @@ import net.minecraftforge.registries.ForgeRegistries;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Set;
-
-import static fathertoast.specialmobs.common.util.References.NBT_TYPE_STRING;
-import static fathertoast.specialmobs.common.util.References.TAG_AMMO;
 
 @SpecialMob
 public class PotionSlimeEntity extends _SpecialSlimeEntity {
@@ -121,11 +120,11 @@ public class PotionSlimeEntity extends _SpecialSlimeEntity {
     /** Sets the potion fill of this slime to a random effect based on config settings. */
     private void setRandomPotionFill() {
         final Set<MobEffect> allowedPotions = getConfig().POTION.allowedPotions.get().getEntries();
-        if( allowedPotions.size() > 0 ) {
+        if( !allowedPotions.isEmpty() ) {
             final ArrayList<MobEffect> effects = new ArrayList<>( allowedPotions );
             if( !Config.MAIN.GENERAL.enableNausea.get() ) effects.remove( MobEffects.CONFUSION );
             
-            if( effects.size() > 0 ) {
+            if( !effects.isEmpty() ) {
                 setPotionFill( effects.get( random.nextInt( effects.size() ) ) );
                 return;
             }
@@ -156,14 +155,15 @@ public class PotionSlimeEntity extends _SpecialSlimeEntity {
     @Override
     protected boolean spawnCustomParticles() {
         final int color = getPotionColor();
-        final float r = References.getRed( color );
-        final float g = References.getGreen( color );
-        final float b = References.getBlue( color );
+        final float r = CrustMath.getRed( color );
+        final float g = CrustMath.getGreen( color );
+        final float b = CrustMath.getBlue( color );
         
         final int size = getSize();
         for( int i = 0; i < size * 8; i++ ) {
             final float angle = random.nextFloat() * 2.0F * (float) Math.PI;
             final float distance = (random.nextFloat() * 0.25F + 0.25F) * size;
+            // noinspection resource
             level().addParticle( getParticleType(),
                     getX() + Mth.sin( angle ) * distance,
                     getY(),
@@ -187,13 +187,13 @@ public class PotionSlimeEntity extends _SpecialSlimeEntity {
     /** Override to save data to this entity's NBT data. */
     @Override
     public void addVariantSaveData( CompoundTag saveTag ) {
-        saveTag.putString( TAG_AMMO, SpecialMobs.toString( ForgeRegistries.MOB_EFFECTS.getKey( potionEffect ) ) );
+        saveTag.putString( References.TAG_AMMO, SpecialMobs.toString( ForgeRegistries.MOB_EFFECTS.getKey( potionEffect ) ) );
     }
     
     /** Override to load data from this entity's NBT data. */
     @Override
     public void readVariantSaveData( CompoundTag saveTag ) {
-        if( saveTag.contains( TAG_AMMO, NBT_TYPE_STRING ) )
-            setPotionFill( ForgeRegistries.MOB_EFFECTS.getValue( ResourceLocation.tryParse( saveTag.getString( TAG_AMMO ) ) ) );
+        if( NBTHelper.containsString( saveTag, References.TAG_FUSE_TIME ) )
+            setPotionFill( ForgeRegistries.MOB_EFFECTS.getValue( ResourceLocation.tryParse( saveTag.getString( References.TAG_AMMO ) ) ) );
     }
 }

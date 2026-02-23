@@ -1,6 +1,7 @@
 package fathertoast.specialmobs.common.entity.misc;
 
 import com.google.common.collect.Lists;
+import fathertoast.crust.api.lib.NBTHelper;
 import fathertoast.specialmobs.common.core.register.SMEntities;
 import fathertoast.specialmobs.common.entity.ai.IBoatRider;
 import net.minecraft.BlockUtil;
@@ -829,14 +830,14 @@ public class MobBoat extends Entity implements IEntityAdditionalSpawnData {
     }
     
     @Override
-    protected void addAdditionalSaveData( CompoundTag compoundTag ) {
-        compoundTag.putString( "Type", getVariant().getSerializedName() );
+    protected void addAdditionalSaveData( CompoundTag saveTag ) {
+        saveTag.putString( "Type", getVariant().getSerializedName() );
     }
     
     @Override
-    protected void readAdditionalSaveData( CompoundTag compoundTag ) {
-        if( compoundTag.contains( "Type", CompoundTag.TAG_STRING ) ) {
-            setVariant( Boat.Type.byName( compoundTag.getString( "Type" ) ) );
+    protected void readAdditionalSaveData( CompoundTag saveTag ) {
+        if( NBTHelper.containsString( saveTag, "Type" ) ) {
+            setVariant( Boat.Type.byName( saveTag.getString( "Type" ) ) );
         }
     }
     

@@ -1,6 +1,7 @@
 package fathertoast.specialmobs.common.entity.cavespider;
 
 import fathertoast.crust.api.config.common.ConfigManager;
+import fathertoast.crust.api.lib.NBTHelper;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
@@ -94,7 +95,7 @@ public class WebCaveSpiderEntity extends _SpecialCaveSpiderEntity {
     
     /** Called when this entity dies to add drops regardless of loot table. */
     @Override
-    protected void dropCustomDeathLoot(DamageSource source, int looting, boolean killedByPlayer ) {
+    protected void dropCustomDeathLoot( DamageSource source, int looting, boolean killedByPlayer ) {
         super.dropCustomDeathLoot( source, looting, killedByPlayer );
         tryPlaceWeb( blockPosition() );
     }
@@ -118,7 +119,7 @@ public class WebCaveSpiderEntity extends _SpecialCaveSpiderEntity {
     /** Override to load data from this entity's NBT data. */
     @Override
     public void readVariantSaveData( CompoundTag saveTag ) {
-        if( saveTag.contains( References.TAG_AMMO, References.NBT_TYPE_NUMERICAL ) )
+        if( NBTHelper.containsNumber( saveTag, References.TAG_AMMO ) )
             webCount = saveTag.getByte( References.TAG_AMMO );
     }
 }

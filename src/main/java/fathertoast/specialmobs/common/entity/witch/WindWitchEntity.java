@@ -1,5 +1,6 @@
 package fathertoast.specialmobs.common.entity.witch;
 
+import fathertoast.crust.api.lib.EntityEventHelper;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
@@ -86,7 +87,7 @@ public class WindWitchEntity extends _SpecialWitchEntity {
     
     /** @return A new path navigator for this entity to use. */
     @Override
-    protected PathNavigation createNavigation(Level level ) {
+    protected PathNavigation createNavigation( Level level ) {
         return new FluidPathNavigator( this, level, true, false );
     }
     
@@ -133,7 +134,7 @@ public class WindWitchEntity extends _SpecialWitchEntity {
     public boolean hurt( DamageSource source, float amount ) {
         if( isInvulnerableTo( source ) || fireImmune() && source.is( DamageTypeTags.IS_FIRE ) ) return false;
         
-        if( source.is(DamageTypeTags.IS_PROJECTILE) ) {
+        if( source.is( DamageTypeTags.IS_PROJECTILE ) ) {
             for( int i = 0; i < 64; i++ ) {
                 if( teleport() ) return true;
             }
@@ -142,7 +143,7 @@ public class WindWitchEntity extends _SpecialWitchEntity {
         
         final boolean success = super.hurt( source, amount );
         if( !level().isClientSide() && getHealth() > 0.0F ) {
-            if( source.getEntity() instanceof LivingEntity) {
+            if( source.getEntity() instanceof LivingEntity ) {
                 teleportDelay -= 15;
                 if( teleportDelay <= 0 && random.nextFloat() < 0.5F ) {
                     for( int i = 0; i < 16; i++ ) {
@@ -224,7 +225,8 @@ public class WindWitchEntity extends _SpecialWitchEntity {
             teleportTo( x, y, z );
             
             if( level().noCollision( this ) && !level().containsAnyLiquid( getBoundingBox() ) ) {
-                if( spawnParticles ) References.EntityEvent.TELEPORT_TRAIL_PARTICLES.broadcast( this );
+                if( spawnParticles )
+                    EntityEventHelper.TELEPORT_TRAIL_PARTICLES.broadcast( this );
                 getNavigation().stop();
                 return true;
             }

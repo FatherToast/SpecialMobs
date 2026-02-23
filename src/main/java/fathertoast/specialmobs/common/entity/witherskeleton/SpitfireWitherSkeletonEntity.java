@@ -1,6 +1,7 @@
 package fathertoast.specialmobs.common.entity.witherskeleton;
 
 import fathertoast.crust.api.config.common.ConfigManager;
+import fathertoast.crust.api.lib.LevelEventHelper;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
@@ -56,7 +57,7 @@ public class SpitfireWitherSkeletonEntity extends _SpecialWitherSkeletonEntity {
         addBaseLoot( loot );
         loot.addCommonDrop( "common", Items.FIRE_CHARGE );
     }
-
+    
     @SpecialMob.EntityTagProvider
     public static List<TagKey<EntityType<?>>> getEntityTags() {
         return List.of( SMTags.EntityTypes.WITHER_SKELETONS, EntityTypeTags.FREEZE_HURTS_EXTRA_TYPES );
@@ -76,12 +77,12 @@ public class SpitfireWitherSkeletonEntity extends _SpecialWitherSkeletonEntity {
     public SpitfireWitherSkeletonEntity( EntityType<? extends _SpecialWitherSkeletonEntity> entityType, Level level ) {
         super( entityType, level );
     }
-
+    
     @Override
     public float getStepHeight() {
         return 1.0F;
     }
-
+    
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override
     protected void onVariantAttack( LivingEntity target ) {
@@ -92,7 +93,7 @@ public class SpitfireWitherSkeletonEntity extends _SpecialWitherSkeletonEntity {
     /** Called to attack the target with a ranged attack. */
     @Override
     public void performRangedAttack( LivingEntity target, float damageMulti ) {
-        References.LevelEvent.BLAZE_SHOOT.play( this );
+        LevelEventHelper.BLAZE_SHOOT.play( this );
         
         final float accelVariance = Mth.sqrt( distanceTo( target ) ) * 0.5F * getSpecialData().getRangedAttackSpread();
         
@@ -103,6 +104,7 @@ public class SpitfireWitherSkeletonEntity extends _SpecialWitherSkeletonEntity {
             
             final SmallFireball fireball = new SmallFireball( level(), this, dX, dY, dZ );
             fireball.setPos( fireball.getX(), getEyeY() - 0.1, fireball.getZ() );
+            // noinspection resource
             level().addFreshEntity( fireball );
         }
     }

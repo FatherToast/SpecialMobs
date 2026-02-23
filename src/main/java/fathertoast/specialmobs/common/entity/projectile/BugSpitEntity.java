@@ -1,5 +1,6 @@
 package fathertoast.specialmobs.common.entity.projectile;
 
+import fathertoast.crust.api.lib.NBTHelper;
 import fathertoast.specialmobs.common.core.SpecialMobs;
 import fathertoast.specialmobs.common.core.register.SMEntities;
 import fathertoast.specialmobs.common.entity.ISpecialMob;
@@ -174,21 +175,21 @@ public class BugSpitEntity extends Projectile {
     
     /** Saves data to this entity's base NBT compound that is specific to its subclass. */
     @Override
-    public void addAdditionalSaveData( CompoundTag tag ) {
-        super.addAdditionalSaveData( tag );
+    public void addAdditionalSaveData( CompoundTag saveTag ) {
+        super.addAdditionalSaveData( saveTag );
         
-        tag.putFloat( References.TAG_RANGED_DAMAGE, getDamage() );
-        tag.putInt( References.TAG_KNOCKBACK, getKnockback() );
+        saveTag.putFloat( References.TAG_RANGED_DAMAGE, getDamage() );
+        saveTag.putInt( References.TAG_KNOCKBACK, getKnockback() );
     }
     
     /** Loads data from this entity's base NBT compound that is specific to its subclass. */
     @Override
-    public void readAdditionalSaveData( CompoundTag tag ) {
-        super.readAdditionalSaveData( tag );
+    public void readAdditionalSaveData( CompoundTag saveTag ) {
+        super.readAdditionalSaveData( saveTag );
         
-        if( tag.contains( References.TAG_RANGED_DAMAGE, References.NBT_TYPE_NUMERICAL ) )
-            setDamage( tag.getFloat( References.TAG_RANGED_DAMAGE ) );
-        if( tag.contains( References.TAG_KNOCKBACK, References.NBT_TYPE_NUMERICAL ) )
-            setKnockback( tag.getInt( References.TAG_KNOCKBACK ) );
+        if( NBTHelper.containsNumber( saveTag, References.TAG_RANGED_DAMAGE ) )
+            setDamage( saveTag.getFloat( References.TAG_RANGED_DAMAGE ) );
+        if( NBTHelper.containsNumber( saveTag, References.TAG_KNOCKBACK ) )
+            setKnockback( saveTag.getInt( References.TAG_KNOCKBACK ) );
     }
 }

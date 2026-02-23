@@ -3,6 +3,7 @@ package fathertoast.specialmobs.common.entity.creeper;
 import fathertoast.crust.api.config.common.ConfigManager;
 import fathertoast.crust.api.config.common.value.EnvironmentEntry;
 import fathertoast.crust.api.config.common.value.EnvironmentList;
+import fathertoast.crust.api.lib.NBTHelper;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
@@ -293,7 +294,7 @@ public class DrowningCreeperEntity extends _SpecialCreeperEntity implements IAmp
     /** Override to load data from this entity's NBT data. */
     @Override
     public void readVariantSaveData( CompoundTag saveTag ) {
-        if( saveTag.contains( References.TAG_SUMMONS, References.NBT_TYPE_NUMERICAL ) )
+        if( NBTHelper.containsNumber( saveTag, References.TAG_SUMMONS ) )
             pufferfish = saveTag.getByte( References.TAG_SUMMONS );
         
         setPathfindingMalus( BlockPathTypes.WATER, BlockPathTypes.WALKABLE.getMalus() );

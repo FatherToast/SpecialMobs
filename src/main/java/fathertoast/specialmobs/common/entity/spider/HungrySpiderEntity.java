@@ -1,5 +1,6 @@
 package fathertoast.specialmobs.common.entity.spider;
 
+import fathertoast.crust.api.lib.NBTHelper;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
@@ -133,9 +134,9 @@ public class HungrySpiderEntity extends _SpecialSpiderEntity {
     /** Override to load data from this entity's NBT data. */
     @Override
     public void readVariantSaveData( CompoundTag saveTag ) {
-        if( saveTag.contains( References.TAG_HEALTH_STACKS, References.NBT_TYPE_NUMERICAL ) )
+        if( NBTHelper.containsNumber( saveTag, References.TAG_HEALTH_STACKS ) )
             maxHealthStacks = saveTag.getByte( References.TAG_HEALTH_STACKS );
-        if( saveTag.contains( References.TAG_GROWTH_LEVEL, References.NBT_TYPE_NUMERICAL ) )
+        if( NBTHelper.containsNumber( saveTag, References.TAG_GROWTH_LEVEL ) )
             growthLevel = saveTag.getByte( References.TAG_GROWTH_LEVEL );
         updateFeedingLevels();
     }

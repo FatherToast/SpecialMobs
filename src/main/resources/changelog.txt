@@ -1,3 +1,7 @@
+1.20.1-4.1.21
+    - Reduced bonus damage against vampire/unholy mobs from items tagged as "forge:vegetables/garlic".
+    - Fixed Vampire Piglin not taking bonus damage from garlic items.
+    - Now utilizing more helper stuff from Crust internally.
 1.20.1-4.1.20
     - Added compat for RyoamicLights.
     - Added back spawn weight for biome tag forge#is_swamp to BestiaryInfo.Theme.FOREST.

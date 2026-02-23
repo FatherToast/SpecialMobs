@@ -3,6 +3,7 @@ package fathertoast.specialmobs.client.renderer.entity.projectile;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
+import fathertoast.crust.api.lib.CrustMath;
 import fathertoast.specialmobs.common.entity.projectile.BugSpitEntity;
 import fathertoast.specialmobs.common.util.References;
 import net.minecraft.client.model.LlamaSpitModel;
@@ -21,12 +22,12 @@ public class BugSpitRenderer extends EntityRenderer<BugSpitEntity> {
     
     public BugSpitRenderer( EntityRendererProvider.Context context ) {
         super( context );
-        model  = new LlamaSpitModel<>( context.bakeLayer( ModelLayers.LLAMA_SPIT ));
+        model = new LlamaSpitModel<>( context.bakeLayer( ModelLayers.LLAMA_SPIT ) );
     }
     
     @Override
-    public void render(BugSpitEntity entity, float rotation, float partialTicks,
-                       PoseStack poseStack, MultiBufferSource buffer, int packedLight ) {
+    public void render( BugSpitEntity entity, float rotation, float partialTicks,
+                        PoseStack poseStack, MultiBufferSource buffer, int packedLight ) {
         poseStack.pushPose();
         poseStack.translate( 0.0, 0.15, 0.0 );
         poseStack.mulPose( Axis.YP.rotationDegrees( Mth.lerp( partialTicks, entity.yRotO, entity.getYRot() ) - 90.0F ) );
@@ -36,7 +37,7 @@ public class BugSpitRenderer extends EntityRenderer<BugSpitEntity> {
         final int color = entity.getColor();
         final VertexConsumer vertexConsumer = buffer.getBuffer( model.renderType( TEXTURE_LOCATION ) );
         model.renderToBuffer( poseStack, vertexConsumer, packedLight, OverlayTexture.NO_OVERLAY,
-                References.getRed( color ), References.getGreen( color ), References.getBlue( color ), 1.0F ); // RGBA
+                CrustMath.getRed( color ), CrustMath.getGreen( color ), CrustMath.getBlue( color ), 1.0F ); // RGBA
         poseStack.popPose();
         
         super.render( entity, rotation, partialTicks, poseStack, buffer, packedLight );
