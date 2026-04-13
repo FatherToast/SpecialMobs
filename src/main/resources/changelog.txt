@@ -1,6 +1,7 @@
 1.20.1-4.1.22
     - Fixed a mob-replacement check not being strictly executed on the server thread.
     - SpecialMobReplacer now soft-fails replacing if a mob family config is broken for whatever reason.
+    - Configs are now loaded on the main thread.
 1.20.1-4.1.21
     - Reduced bonus damage against vampire/unholy mobs from items tagged as "forge:vegetables/garlic".
     - Fixed Vampire Piglin not taking bonus damage from garlic items.

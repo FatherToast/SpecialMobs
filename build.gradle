@@ -1,12 +1,12 @@
 buildscript {
     repositories {
         maven { url = 'https://maven.minecraftforge.net' }
-        maven { url = "https://repo.spongepowered.org/repository/maven-public/" }
+        maven { url = 'https://repo.spongepowered.org/repository/maven-public/' }
         mavenCentral()
     }
     dependencies {
         classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '[6.0,6.2)', changing: true
-        classpath group: "org.spongepowered", name: "mixingradle", version: "0.7-SNAPSHOT"
+        classpath group: 'org.spongepowered', name: 'mixingradle', version: '0.7-SNAPSHOT'
     }
 }
 plugins {
@@ -15,7 +15,7 @@ plugins {
     id 'idea'
 }
 apply plugin: 'net.minecraftforge.gradle'
-apply plugin: "org.spongepowered.mixin"
+apply plugin: 'org.spongepowered.mixin'
 
 mixin {
     add sourceSets.main, "specialmobs.mixins.refmap.json"
@@ -106,7 +106,7 @@ dependencies {
     runtimeOnly fg.deobf("curse.maven:harvestcraft_crops-361385:${hvcraft_cr_version}")
     runtimeOnly fg.deobf("curse.maven:harvestcraft_foodcore-372534:${hvcraft_fc_version}")
 
-    // Ryomic Lights - NOTE: comment out this when testing dedi server or crash
+    // Ryomic Lights - NOTE: remove Ryoamic from runtime mods when testing dedi server. Will crash!
     implementation fg.deobf("curse.maven:ryoamiclights-913587:${ryoamic_version}")
     compileOnly "curse.maven:ryoamiclights_src-913587:${ryoamic_src_version}"
     implementation fg.deobf("curse.maven:obsidianui-684718:${obsidianui_version}")
