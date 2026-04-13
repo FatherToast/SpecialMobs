@@ -10,6 +10,7 @@ import fathertoast.specialmobs.common.util.SMDispenserBehavior;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.fml.ModLoadingStage;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.InterModEnqueueEvent;
@@ -120,7 +121,8 @@ public class SpecialMobs {
     private final PacketHandler packetHandler = new PacketHandler();
     
     public SpecialMobs( FMLJavaModLoadingContext context ) {
-        Config.initialize();
+        // Load config on main thread
+        ModLoadingStage.CONSTRUCT.getDeferredWorkQueue().enqueueWork( context.getContainer(), Config::initialize );
         
         packetHandler.registerMessages();
         
