@@ -67,27 +67,27 @@ public final class SpecialMobReplacer {
         final MobFamily<?, ?> mobFamily = getReplacingMobFamily( entity );
         
         if( mobFamily != null ) {
-            final BlockPos entityPos = BlockPos.containing( entity.position() );
-            
-            // FinalizeSpawn should never be called multiple times on an entity, but who knows.
-            setInitFlag( entity );
-            
-            // If we for whatever reason are not in a loaded chunk, delay replacement.
-            if( EnvironmentHelper.isLoaded( level, entityPos ) ) {
-                final boolean isSpecial = shouldMakeNextSpecial( mobFamily, level, entityPos );
+            // Make sure we handle the rest on the server thread.
+            // Checking any level-related stuff off-thread is unsafe,
+            // and other mods may fire the MobSpawnEvent from other threads.
+            level.getServer().execute( () -> {
+                final BlockPos entityPos = BlockPos.containing( entity.position() );
                 
-                if( shouldReplace( mobFamily, isSpecial ) ) {
-                    level.getServer().execute(
-                            () -> TO_REPLACE.addLast( new MobReplacementEntry( mobFamily, isSpecial, spawnType, entity, level, entityPos ) )
-                    );
-                    event.setSpawnCancelled( true );
+                // FinalizeSpawn should never be called multiple times on an entity, but who knows.
+                setInitFlag( entity );
+                
+                // If we for whatever reason are not in a loaded chunk, delay replacement.
+                if( EnvironmentHelper.isLoaded( level, entityPos ) ) {
+                    final boolean isSpecial = shouldMakeNextSpecial( mobFamily, level, entityPos );
+                    
+                    if( shouldReplace( mobFamily, isSpecial ) ) {
+                        TO_REPLACE.addLast( new MobReplacementEntry( mobFamily, isSpecial, spawnType, entity, level, entityPos ) );
+                    }
                 }
-            }
-            else {
-                level.getServer().execute(
-                        () -> DELAYED_REPLACE.add( new DelayedMobReplacementEntry( mobFamily, spawnType, entity, level, entityPos ) )
-                );
-            }
+                else {
+                    DELAYED_REPLACE.add( new DelayedMobReplacementEntry( mobFamily, spawnType, entity, level, entityPos ) );
+                }
+            } );
         }
     }
     
@@ -141,9 +141,18 @@ public final class SpecialMobReplacer {
         return MobFamily.getReplacementFamily( entity );
     }
     
-    /** @return True if the next mob should be made a special variant. */
+    /**
+     * @return True if the next mob should be made a special variant.
+     * Returns false if something goes wrong.
+     */
     private static boolean shouldMakeNextSpecial( MobFamily<?, ?> mobFamily, Level level, BlockPos entityPos ) {
-        return level.random.nextDouble() < mobFamily.config.GENERAL.specialVariantChance.get( level, entityPos );
+        try {
+            return level.random.nextDouble() < mobFamily.config.GENERAL.specialVariantChance.get( level, entityPos );
+        }
+        catch( Exception e ) {
+            SpecialMobs.LOG.warn( "Could not get special variant chance for mob family '{}'! Is the family's config broken?", mobFamily.name );
+            return false;
+        }
     }
     
     /** @return True if a mob should be replaced. */
