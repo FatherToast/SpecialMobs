@@ -81,8 +81,9 @@ public final class SpecialMobReplacer {
                 checkShouldReplace( level, entity, mobFamily, spawnType );
                 event.setSpawnCancelled( true );
             }
-            else
+            else {
                 level.getServer().execute( () -> checkShouldReplace( level, entity, mobFamily, spawnType ) );
+            }
         }
     }
     
