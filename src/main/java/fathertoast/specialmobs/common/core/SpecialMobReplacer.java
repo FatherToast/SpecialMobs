@@ -30,15 +30,23 @@ import java.util.function.Predicate;
 
 @Mod.EventBusSubscriber( modid = SpecialMobs.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE )
 public final class SpecialMobReplacer {
-    /** List of data for mobs needing replacement. */
+    /**
+     * List of data for mobs needing replacement.
+     */
     private static final Deque<MobReplacementEntry> TO_REPLACE = new ArrayDeque<>();
-    /** List of data for mobs waiting to check for mob replacement. */
+    /**
+     * List of data for mobs waiting to check for mob replacement.
+     */
     private static final List<DelayedMobReplacementEntry> DELAYED_REPLACE = new ArrayList<>();
     
-    /** Returns true if the species is not damaged by water. */
+    /**
+     * Returns true if the species is not damaged by water.
+     */
     private static final Predicate<MobFamily.Species<?>> WATER_INSENSITIVE_SELECTOR =
             ( species ) -> !species.config.GENERAL.isDamagedByWater.get();
-    /** Returns true if the species' block height is less than or equal to the base vanilla entity's. */
+    /**
+     * Returns true if the species' block height is less than or equal to the base vanilla entity's.
+     */
     private static final Predicate<MobFamily.Species<?>> NO_GIANTS_SELECTOR = MobFamily.Species::isNotGiant;
     
     
@@ -67,27 +75,41 @@ public final class SpecialMobReplacer {
         final MobFamily<?, ?> mobFamily = getReplacingMobFamily( entity );
         
         if( mobFamily != null ) {
-            // Make sure we handle the rest on the server thread.
-            // Checking any level-related stuff off-thread is unsafe,
-            // and other mods may fire the MobSpawnEvent from other threads.
-            level.getServer().execute( () -> {
-                final BlockPos entityPos = BlockPos.containing( entity.position() );
-                
-                // FinalizeSpawn should never be called multiple times on an entity, but who knows.
-                setInitFlag( entity );
-                
-                // If we for whatever reason are not in a loaded chunk, delay replacement.
-                if( EnvironmentHelper.isLoaded( level, entityPos ) ) {
-                    final boolean isSpecial = shouldMakeNextSpecial( mobFamily, level, entityPos );
-                    
-                    if( shouldReplace( mobFamily, isSpecial ) ) {
-                        TO_REPLACE.addLast( new MobReplacementEntry( mobFamily, isSpecial, spawnType, entity, level, entityPos ) );
-                    }
-                }
-                else {
-                    DELAYED_REPLACE.add( new DelayedMobReplacementEntry( mobFamily, spawnType, entity, level, entityPos ) );
-                }
-            } );
+            // If we are on the server thread, execute immediately so we can cancel the original spawn.
+            // If not, schedule the check to be done on the server thread.
+            if( level.getServer().isSameThread() ) {
+                checkShouldReplace( level, entity, mobFamily, spawnType );
+                event.setSpawnCancelled( true );
+            }
+            else
+                level.getServer().execute( () -> checkShouldReplace( level, entity, mobFamily, spawnType ) );
+        }
+    }
+    
+    /**
+     * Checks if the given entity should be replaced.
+     *
+     * @param level     The level the entity is spawning in.
+     * @param entity    The entity to consider replacing.
+     * @param mobFamily The mob family to use for replacement.
+     * @param spawnType The spawn type of the entity we are replacing.
+     */
+    private static void checkShouldReplace( Level level, Entity entity, MobFamily<?, ?> mobFamily, MobSpawnType spawnType ) {
+        final BlockPos entityPos = BlockPos.containing( entity.position() );
+        
+        // FinalizeSpawn should never be called multiple times on an entity, but who knows.
+        setInitFlag( entity );
+        
+        // If we for whatever reason are not in a loaded chunk, delay replacement.
+        if( EnvironmentHelper.isLoaded( level, entityPos ) ) {
+            final boolean isSpecial = shouldMakeNextSpecial( mobFamily, level, entityPos );
+            
+            if( shouldReplace( mobFamily, isSpecial ) ) {
+                TO_REPLACE.addLast( new MobReplacementEntry( mobFamily, isSpecial, spawnType, entity, level, entityPos ) );
+            }
+        }
+        else {
+            DELAYED_REPLACE.add( new DelayedMobReplacementEntry( mobFamily, spawnType, entity, level, entityPos ) );
         }
     }
     
@@ -134,7 +156,9 @@ public final class SpecialMobReplacer {
         forgeData.putBoolean( References.TAG_INIT, true );
     }
     
-    /** @return The mob family to replace with, or null if the mob is not replaceable. */
+    /**
+     * @return The mob family to replace with, or null if the mob is not replaceable.
+     */
     @Nullable
     private static MobFamily<?, ?> getReplacingMobFamily( @Nullable Entity entity ) {
         if( entity == null || getInitFlag( entity ) ) return null;
@@ -155,12 +179,16 @@ public final class SpecialMobReplacer {
         }
     }
     
-    /** @return True if a mob should be replaced. */
+    /**
+     * @return True if a mob should be replaced.
+     */
     private static boolean shouldReplace( MobFamily<?, ?> mobFamily, boolean isSpecial ) {
         return isSpecial || Config.MAIN.GENERAL.masterVanillaReplacement.get() && mobFamily.config.GENERAL.vanillaReplacement.get();
     }
     
-    /** Replaces a mob, copying over all its data to the replacement. */
+    /**
+     * Replaces a mob, copying over all its data to the replacement.
+     */
     private static void replace( MobFamily<?, ?> mobFamily, boolean isSpecial, MobSpawnType spawnType, Entity entityToReplace, Level level, BlockPos entityPos ) {
         // Make sure the chunk the entity is in is loaded
         if( !EnvironmentHelper.isLoaded( level, entityPos ) ) return;
@@ -200,7 +228,9 @@ public final class SpecialMobReplacer {
         entityToReplace.discard();
     }
     
-    /** @return A selector that filters out variants that are likely to die a stupid death if chosen. */
+    /**
+     * @return A selector that filters out variants that are likely to die a stupid death if chosen.
+     */
     @Nullable
     private static Predicate<MobFamily.Species<?>> getVariantFilter( MobFamily<?, ?> mobFamily, Entity entityToReplace,
                                                                      Level level, BlockPos entityPos ) {
@@ -226,7 +256,9 @@ public final class SpecialMobReplacer {
         return selector;
     }
     
-    /** All data needed for a single mob we want to replace. */
+    /**
+     * All data needed for a single mob we want to replace.
+     */
     @SuppressWarnings( "ClassCanBeRecord" )
     private static class MobReplacementEntry {
         final MobFamily<?, ?> mobFamily;
@@ -248,7 +280,9 @@ public final class SpecialMobReplacer {
         }
     }
     
-    /** All data needed for a single mob we are waiting to replace. */
+    /**
+     * All data needed for a single mob we are waiting to replace.
+     */
     private static class DelayedMobReplacementEntry {
         final MobFamily<?, ?> mobFamily;
         final MobSpawnType mobSpawnType;
@@ -268,7 +302,9 @@ public final class SpecialMobReplacer {
             entityPos = pos;
         }
         
-        /** Called each server tick to see if the mob is ready to be replaced. Return true when done. */
+        /**
+         * Called each server tick to see if the mob is ready to be replaced. Return true when done.
+         */
         boolean update() {
             if( ticksRemaining > 0 ) {
                 ticksRemaining--;
