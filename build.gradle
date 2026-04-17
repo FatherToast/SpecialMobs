@@ -107,7 +107,7 @@ dependencies {
     runtimeOnly fg.deobf("curse.maven:harvestcraft_foodcore-372534:${hvcraft_fc_version}")
 
     // Ryomic Lights - NOTE: remove Ryoamic from runtime mods when testing dedi server. Will crash!
-    compileOnly fg.deobf("curse.maven:ryoamiclights-913587:${ryoamic_version}")
+    implementation fg.deobf("curse.maven:ryoamiclights-913587:${ryoamic_version}")
     compileOnly "curse.maven:ryoamiclights_src-913587:${ryoamic_src_version}"
     implementation fg.deobf("curse.maven:obsidianui-684718:${obsidianui_version}")
 
