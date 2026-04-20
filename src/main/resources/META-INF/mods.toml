@@ -6,7 +6,7 @@ issueTrackerURL = "https://github.com/FatherToast/SpecialMobs/issues/"
 [[mods]]
 logoFile = "banner.png"
 authors = "Father Toast"
-credits = "Sarinsa.instance().getCredits().toString(), Tutta (glorious textures), Mother Toast & Baby Toast"
+credits = "Sarinsa.instance().toString(), Tutta (glorious textures), Mother Toast & Baby Toast"
 version = "${file.jarVersion}"
 displayName = "Special Mobs"
 modId = "specialmobs"
@@ -41,7 +41,7 @@ side = "BOTH"
 [[dependencies.specialmobs]]
 modId = "crust"
 mandatory = true
-versionRange = "[4.9.15,)"
+versionRange = "[4.13,)"
 ordering = "AFTER"
 side = "BOTH"
 
