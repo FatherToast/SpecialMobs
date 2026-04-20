@@ -1,23 +1,22 @@
 package fathertoast.specialmobs.common.event;
 
-import fathertoast.crust.api.event.AdvancementLoadEvent;
+import fathertoast.crust.api.event.advancement.AdvancementLoadEvent;
+import fathertoast.crust.api.event.advancement.IModifiableAdvancement;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
+import fathertoast.specialmobs.common.core.register.SMTags;
 import fathertoast.specialmobs.common.entity.ISpecialMob;
-import fathertoast.specialmobs.common.entity.ghast._SpecialGhastEntity;
-import fathertoast.specialmobs.common.entity.skeleton._SpecialSkeletonEntity;
 import net.minecraft.advancements.Advancement;
-import net.minecraft.advancements.critereon.EntityPredicate;
-import net.minecraft.advancements.critereon.KilledTrigger;
+import net.minecraft.advancements.CriterionTriggerInstance;
+import net.minecraft.advancements.RequirementsStrategy;
+import net.minecraft.advancements.critereon.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.ServerAdvancementManager;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.util.Mth;
+import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.projectile.AbstractHurtingProjectile;
-import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
@@ -32,7 +31,6 @@ import java.util.Objects;
  * Helper class for granting players various vanilla advancements that are
  * impossible to obtain normally because of SM replacing vanilla mobs.
  */
-// TODO - Once Crust has been ported, use AdvancementLoadEvent instead of this clunky stuff
 public class AdvancementFixer {
     
     private static final ResourceLocation KILL_A_MOB_ADV = ResourceLocation.withDefaultNamespace( "adventure/kill_a_mob" );
@@ -41,6 +39,7 @@ public class AdvancementFixer {
     private static final ResourceLocation RETURN_TO_SENDER_ADV = ResourceLocation.withDefaultNamespace( "nether/return_to_sender" );
     private static final ResourceLocation UNEASY_ALLIANCE_ADV = ResourceLocation.withDefaultNamespace( "nether/uneasy_alliance" );
     
+    /** The current server's {@link ServerAdvancementManager} instance. */
     private ServerAdvancementManager manager;
     
     
@@ -51,59 +50,83 @@ public class AdvancementFixer {
     
     @SubscribeEvent
     public void onAdvancementLoad( AdvancementLoadEvent event ) {
-        ResourceLocation id = event.getId();
+        final ResourceLocation id = event.getId();
+        final IModifiableAdvancement advancement = event.getAdvancement();
         
+        // Killing any Special Mobs mob grants the "kill a mob" advancement.
         if( id.equals( KILL_A_MOB_ADV ) ) {
+            advancement.setRequirementsStrategy( RequirementsStrategy.OR );
+            
             for( MobFamily.Species<?> species : MobFamily.getAllSpecies() ) {
                 EntityType<?> entityType = species.entityType.get();
+                // noinspection ConstantConditions
                 String entityId = species.entityType.getId().toString();
                 
-                event.getBuilder().addCriterion( entityId, KilledTrigger.TriggerInstance.playerKilledEntity( EntityPredicate.Builder.entity().of( entityType ) ) );
+                advancement.addCriterion( entityId, KilledTrigger.TriggerInstance.playerKilledEntity( EntityPredicate.Builder.entity().of( entityType ) ), false );
+                advancement.setRequirementsStrategy( RequirementsStrategy.OR );
             }
+        }
+        // Make it so Special Mob's replacement skeleton can grant the "sniper duel" advancement.
+        else if( id.equals( SNIPER_DUEL_ADV ) ) {
+            final CriterionTriggerInstance criterion = KilledTrigger.TriggerInstance.playerKilledEntity(
+                    EntityPredicate.Builder.entity()
+                            .of( MobFamily.SKELETON.vanillaReplacement.entityType.get() )
+                            .distance( DistancePredicate.horizontal( MinMaxBounds.Doubles.atLeast( 50.0D ) ) ),
+                    DamageSourcePredicate.Builder.damageType()
+                            .tag( TagPredicate.is( DamageTypeTags.IS_PROJECTILE ) ) );
+            
+            advancement.addCriterion( "killed_special_skeleton", criterion, false );
+            advancement.setRequirementsStrategy( RequirementsStrategy.OR );
+        }
+        // Make it so Special Mob's replacement ghast can grant the "return to sender" advancement.
+        else if( id.equals( RETURN_TO_SENDER_ADV ) ) {
+            final CriterionTriggerInstance criterion = KilledTrigger.TriggerInstance.playerKilledEntity(
+                    EntityPredicate.Builder.entity()
+                            .of( MobFamily.GHAST.vanillaReplacement.entityType.get() ),
+                    DamageSourcePredicate.Builder.damageType()
+                            .tag( TagPredicate.is( DamageTypeTags.IS_PROJECTILE ) )
+                            .direct( EntityPredicate.Builder.entity().of( EntityType.FIREBALL ) ) );
+            
+            advancement.addCriterion( "killed_special_ghast", criterion, false );
+            advancement.setRequirementsStrategy( RequirementsStrategy.OR );
+        }
+        // Make it so any ghast variant in the Forge ghast tag can grant the "uneasy alliance" advancement.
+        else if( id.equals( UNEASY_ALLIANCE_ADV ) ) {
+            final CriterionTriggerInstance criterion = KilledTrigger.TriggerInstance.playerKilledEntity(
+                    EntityPredicate.Builder.entity()
+                            .of( SMTags.EntityTypes.GHASTS )
+                            .located( LocationPredicate.inDimension( Level.OVERWORLD ) ) );
+            
+            advancement.addCriterion( "killed_any_ghast", criterion, false );
+            advancement.setRequirementsStrategy( RequirementsStrategy.OR );
         }
     }
     
+    /**
+     * Called when a living entity dies.
+     */
     @SubscribeEvent( priority = EventPriority.LOWEST )
     public void onLivingDeath( LivingDeathEvent event ) {
         LivingEntity livingEntity = event.getEntity();
         DamageSource source = event.getSource();
         
+        // noinspection resource
         if( !livingEntity.level().isClientSide && source.getEntity() instanceof ServerPlayer player ) {
             if( livingEntity instanceof ISpecialMob<?> ) {
-                Advancement killAMob = getFromId( KILL_A_MOB_ADV );
-                if( notCompleted( player, killAMob ) ) {
-                    maybeGrantKillAMob( (LivingEntity & ISpecialMob<?>) livingEntity, player, source, killAMob );
-                }
                 Advancement killAllMob = getFromId( KILL_ALL_MOBS_ADV );
                 if( notCompleted( player, killAllMob ) ) {
                     maybeGrantKillAllMobs( (LivingEntity & ISpecialMob<?>) livingEntity, player, source, killAllMob );
-                }
-                Advancement sniperDuel = getFromId( SNIPER_DUEL_ADV );
-                if( notCompleted( player, sniperDuel ) ) {
-                    maybeGrantSniperDuel( (LivingEntity & ISpecialMob<?>) livingEntity, player, source, sniperDuel );
-                }
-                Advancement returnToSender = getFromId( RETURN_TO_SENDER_ADV );
-                if( notCompleted( player, returnToSender ) ) {
-                    maybeGrantReturnToSender( (LivingEntity & ISpecialMob<?>) livingEntity, player, source, returnToSender );
-                }
-                Advancement uneasyAlliance = getFromId( UNEASY_ALLIANCE_ADV );
-                if( notCompleted( player, uneasyAlliance ) ) {
-                    maybeGrantUneasyAlliance( (LivingEntity & ISpecialMob<?>) livingEntity, player, source, uneasyAlliance );
                 }
             }
         }
     }
     
-    /** Checks if a player has killed a Special Mobs mob, and grants the "Monster Hunter" advancement if so. */
-    private <T extends LivingEntity & ISpecialMob<?>> void maybeGrantKillAMob( T dead, ServerPlayer player, DamageSource damageSource, Advancement advancement ) {
-        if( damageSource.getEntity() instanceof Player && !dead.level().isClientSide ) {
-            // Second parameter doesn't matter, just has to be the reg name of an EntityType
-            // that is one of the criteria for the advancement. If only it was EntityType tag based :(((
-            player.getAdvancements().award( advancement, "minecraft:creeper" );
-        }
-    }
-    
+    /**
+     * "Manual" patch for the "kill all mobs" advancement,
+     * as it is a bit awkward to try and modify its criteria.
+     */
     private <T extends LivingEntity & ISpecialMob<?>> void maybeGrantKillAllMobs( T dead, ServerPlayer player, DamageSource damageSource, Advancement advancement ) {
+        // noinspection resource
         if( damageSource.getEntity() instanceof Player && !dead.level().isClientSide ) {
             for( EntityType<?> type : dead.getSpecies().family.replaceableTypes ) {
                 player.getAdvancements().award( advancement, Objects.requireNonNull( ForgeRegistries.ENTITY_TYPES.getKey( type ) ).toString() );
@@ -111,38 +134,19 @@ public class AdvancementFixer {
         }
     }
     
-    private <T extends LivingEntity & ISpecialMob<?>> void maybeGrantSniperDuel( T dead, ServerPlayer player, DamageSource damageSource, Advancement advancement ) {
-        if( dead instanceof _SpecialSkeletonEntity && damageSource.getDirectEntity() instanceof Projectile ) {
-            float x = (float) (dead.getX() - player.getX());
-            float z = (float) (dead.getZ() - player.getZ());
-            float dist = Mth.sqrt( x * x + z * z );
-            
-            if( dist >= 50.0F ) {
-                player.getAdvancements().award( advancement, "killed_skeleton" );
-            }
-        }
-    }
-    
-    private <T extends LivingEntity & ISpecialMob<?>> void maybeGrantReturnToSender( T dead, ServerPlayer player, DamageSource damageSource, Advancement advancement ) {
-        if( dead instanceof _SpecialGhastEntity && damageSource.getDirectEntity() instanceof AbstractHurtingProjectile ) {
-            player.getAdvancements().award( advancement, "killed_ghast" );
-        }
-    }
-    
-    private static <T extends LivingEntity & ISpecialMob<?>> void maybeGrantUneasyAlliance( T dead, ServerPlayer player, DamageSource damageSource, Advancement advancement ) {
-        if( dead instanceof _SpecialGhastEntity && dead.level().dimension().equals( Level.OVERWORLD ) ) {
-            player.getAdvancements().award( advancement, "killed_ghast" );
-        }
-    }
-    
+    /** @return True if the player has not yet completed the given advancement. */
     private boolean notCompleted( ServerPlayer player, @Nullable Advancement advancement ) {
-        if( advancement == null ) {
-            return false;
-        }
+        if( advancement == null ) return false;
         return !player.getAdvancements().getOrStartProgress( advancement ).isDone();
     }
     
+    /**
+     * @return The advancement mapped to the given ID.
+     * Returns null if the advancement manager does not
+     * contain the advancement.
+     */
     @Nullable
+    @SuppressWarnings( "SameParameterValue" )
     private Advancement getFromId( ResourceLocation advancementId ) {
         return manager.getAdvancement( advancementId );
     }
