@@ -59,6 +59,8 @@ public class MainConfig extends AbstractConfigFile {
         public final BooleanField enableNausea;
         public final BooleanField fancyFishingMobs;
         
+        public final BooleanField patchAdvancements;
+        
         General( MainConfig parent ) {
             super( parent, "general",
                     "Options that apply to the Special Mobs mod as a whole. Also includes several " +
@@ -100,6 +102,12 @@ public class MainConfig extends AbstractConfigFile {
                     "Overrides the default fishing rod item animation so that it is compatible with fishing mobs " +
                             "from this mod. Set to false if it causes problems with another mod. Fishing mobs will instead " +
                             "render a stick while casting." ), RestartNote.GAME );
+            
+            SPEC.newLine();
+            
+            patchAdvancements = SPEC.define( new BooleanField( "patch_advancements", true,
+                    "If vanilla replacements are enabled, some vanilla advancements usually either become unobtainable or just very hard to get.",
+                    "If this is enabled, Special Mobs will tweak said advancements' criteria during server startup so it becomes possible to obtain them." ), RestartNote.WORLD );
         }
         
         private List<String> makeDefaultSkippedSpawnTypes() {

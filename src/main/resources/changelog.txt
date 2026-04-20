@@ -1,3 +1,6 @@
+1.20.1-4.1.24
+    - Updated min required Crust version to 4.13.+.
+    - Added config option to general config for whether Special Mobs should patch the vanilla advancements it usually breaks.
 1.20.1-4.1.23
     - Mob replacements now cancel the original spawn when possible to avoid weird visuals.
 1.20.1-4.1.22

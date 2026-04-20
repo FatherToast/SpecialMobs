@@ -3,6 +3,7 @@ package fathertoast.specialmobs.common.event;
 import fathertoast.crust.api.event.advancement.AdvancementLoadEvent;
 import fathertoast.crust.api.event.advancement.IModifiableAdvancement;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
+import fathertoast.specialmobs.common.config.Config;
 import fathertoast.specialmobs.common.core.register.SMTags;
 import fathertoast.specialmobs.common.entity.ISpecialMob;
 import net.minecraft.advancements.Advancement;
@@ -50,6 +51,9 @@ public class AdvancementFixer {
     
     @SubscribeEvent
     public void onAdvancementLoad( AdvancementLoadEvent event ) {
+        // Check if advancement patching is enabled
+        if( !Config.MAIN.GENERAL.patchAdvancements.get() ) return;
+        
         final ResourceLocation id = event.getId();
         final IModifiableAdvancement advancement = event.getAdvancement();
         
