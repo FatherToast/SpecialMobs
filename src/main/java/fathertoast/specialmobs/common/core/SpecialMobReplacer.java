@@ -78,8 +78,9 @@ public final class SpecialMobReplacer {
             // If we are on the server thread, execute immediately so we can cancel the original spawn.
             // If not, schedule the check to be done on the server thread.
             if( level.getServer().isSameThread() ) {
-                checkShouldReplace( level, entity, mobFamily, spawnType );
-                event.setSpawnCancelled( true );
+                if( checkShouldReplace( level, entity, mobFamily, spawnType ) )
+                    // Cancel spawn event if replacement is happening right away.
+                    event.setSpawnCancelled( true );
             }
             else {
                 level.getServer().execute( () -> checkShouldReplace( level, entity, mobFamily, spawnType ) );
@@ -94,8 +95,10 @@ public final class SpecialMobReplacer {
      * @param entity    The entity to consider replacing.
      * @param mobFamily The mob family to use for replacement.
      * @param spawnType The spawn type of the entity we are replacing.
+     * @return True if the original entity will be replaced right away. Returns false
+     * if the entity shouldn't be replaced, or if it should be replaced but later.
      */
-    private static void checkShouldReplace( Level level, Entity entity, MobFamily<?, ?> mobFamily, MobSpawnType spawnType ) {
+    private static boolean checkShouldReplace( Level level, Entity entity, MobFamily<?, ?> mobFamily, MobSpawnType spawnType ) {
         final BlockPos entityPos = BlockPos.containing( entity.position() );
         
         // FinalizeSpawn should never be called multiple times on an entity, but who knows.
@@ -107,11 +110,13 @@ public final class SpecialMobReplacer {
             
             if( shouldReplace( mobFamily, isSpecial ) ) {
                 TO_REPLACE.addLast( new MobReplacementEntry( mobFamily, isSpecial, spawnType, entity, level, entityPos ) );
+                return true;
             }
         }
         else {
             DELAYED_REPLACE.add( new DelayedMobReplacementEntry( mobFamily, spawnType, entity, level, entityPos ) );
         }
+        return false;
     }
     
     /**
