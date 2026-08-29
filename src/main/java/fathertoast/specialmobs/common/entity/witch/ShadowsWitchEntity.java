@@ -31,7 +31,7 @@ public class ShadowsWitchEntity extends _SpecialWitchEntity {
     public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
         bestiaryInfo.color( 0x000000 ).theme( BestiaryInfo.Theme.FOREST )
                 .uniqueTextureWithEyes()
-                .addExperience( 2 ).effectImmune( MobEffects.BLINDNESS, MobEffects.WITHER );
+                .addExperience( 2 ).effectImmune( MobEffects.BLINDNESS ).effectImmune( MobEffects.WITHER );
     }
     
     @SpecialMob.LanguageProvider

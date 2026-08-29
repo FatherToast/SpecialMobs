@@ -1,17 +1,21 @@
-package fathertoast.specialmobs.common.config;
+package fathertoast.specialmobs.client;
 
 import fathertoast.crust.api.config.common.AbstractConfigFile;
-import fathertoast.crust.api.config.common.ConfigManager;
 import fathertoast.crust.api.config.common.field.BooleanField;
+import fathertoast.specialmobs.common.config.Config;
 import net.minecraft.ChatFormatting;
 
 public class ReadMeConfig extends AbstractConfigFile {
     
+    public static final ReadMeConfig INSTANCE = new ReadMeConfig();
+    
     public final BooleanField secretMode;
     
     /** Builds the config spec that should be used for this config. */
-    protected ReadMeConfig( ConfigManager manager ) {
-        super( manager, "README", "This file contains helpful information about how to use the config files in this mod." );
+    private ReadMeConfig() {
+        super( Config.MANAGER, "README", true,
+                "This file contains helpful information about how to use the config files in this mod." );
+        
         SPEC.newLine( 2 );
         SPEC.comment( ChatFormatting.AQUA + "Terminology used in Special Mobs configs:" );
         

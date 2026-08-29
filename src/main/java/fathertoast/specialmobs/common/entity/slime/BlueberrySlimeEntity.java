@@ -1,8 +1,8 @@
 package fathertoast.specialmobs.common.entity.slime;
 
 import fathertoast.crust.api.config.common.ConfigManager;
-import fathertoast.crust.api.config.common.value.EnvironmentEntry;
-import fathertoast.crust.api.config.common.value.EnvironmentList;
+import fathertoast.crust.api.config.common.value.collection.value.DoubleValueCodec;
+import fathertoast.crust.api.config.common.value.environment.EnvironmentList;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
@@ -52,12 +52,13 @@ public class BlueberrySlimeEntity extends _SpecialSlimeEntity {
     
     @SpecialMob.ConfigSupplier
     public static SpeciesConfig createConfig( ConfigManager manager, MobFamily.Species<?> species ) {
-        SpeciesConfig.NEXT_NATURAL_SPAWN_CHANCE_EXCEPTIONS = new EnvironmentList(
-                EnvironmentEntry.builder( manager, 0.0F ).atNoMoonLight().build(),
-                EnvironmentEntry.builder( manager, 0.04F ).atMaxMoonLight().build(),
-                EnvironmentEntry.builder( manager, 0.01F ).belowHalfMoonLight().build(),
-                EnvironmentEntry.builder( manager, 0.02F ).atHalfMoonLight().build(),
-                EnvironmentEntry.builder( manager, 0.03F ).aboveHalfMoonLight().build() );
+        SpeciesConfig.NEXT_NATURAL_SPAWN_CHANCE_EXCEPTIONS = EnvironmentList.builder( DoubleValueCodec.PERCENT )
+                .entryBuilder( 0.0 ).atNoMoonLight().build()
+                .entryBuilder( 0.04 ).atMaxMoonLight().build()
+                .entryBuilder( 0.01 ).belowHalfMoonLight().build()
+                .entryBuilder( 0.02 ).atHalfMoonLight().build()
+                .entryBuilder( 0.03 ).aboveHalfMoonLight().build()
+                .build();
         return new SpeciesConfig( manager, species );
     }
     
@@ -67,8 +68,8 @@ public class BlueberrySlimeEntity extends _SpecialSlimeEntity {
                 BlueberrySlimeEntity::checkSpeciesSpawnRules );
     }
     
-    public static boolean checkSpeciesSpawnRules(EntityType<? extends BlueberrySlimeEntity> type, ServerLevelAccessor level,
-                                                 MobSpawnType spawnType, BlockPos pos, RandomSource random ) {
+    public static boolean checkSpeciesSpawnRules( EntityType<? extends BlueberrySlimeEntity> type, ServerLevelAccessor level,
+                                                  MobSpawnType spawnType, BlockPos pos, RandomSource random ) {
         final Holder<Biome> biome = level.getBiome( pos );
         if( biome.is( BiomeTags.IS_RIVER ) || biome.is( BiomeTags.IS_OCEAN ) ) {
             return NaturalSpawnManager.checkSpawnRulesWater( type, level, spawnType, pos, random );

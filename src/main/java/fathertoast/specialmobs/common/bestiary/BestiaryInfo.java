@@ -1,10 +1,12 @@
 package fathertoast.specialmobs.common.bestiary;
 
-import fathertoast.crust.api.config.common.ConfigManager;
 import fathertoast.crust.api.config.common.ConfigUtil;
-import fathertoast.crust.api.config.common.field.DoubleField;
-import fathertoast.crust.api.config.common.value.*;
-import fathertoast.specialmobs.common.config.Config;
+import fathertoast.crust.api.config.common.value.collection.AttributeOpList;
+import fathertoast.crust.api.config.common.value.collection.BlockStateSet;
+import fathertoast.crust.api.config.common.value.collection.RegistrySet;
+import fathertoast.crust.api.config.common.value.collection.value.IValueCodec;
+import fathertoast.crust.api.config.common.value.collection.value.IntValueCodec;
+import fathertoast.crust.api.config.common.value.environment.EnvironmentList;
 import fathertoast.specialmobs.common.core.SpecialMobs;
 import fathertoast.specialmobs.common.util.References;
 import net.minecraft.resources.ResourceLocation;
@@ -19,11 +21,9 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.common.Tags;
 import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.RegistryObject;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.function.Function;
 
 /**
@@ -34,104 +34,107 @@ import java.util.function.Function;
 public class BestiaryInfo {
     
     public enum DefaultWeight {
-        DEFAULT( 60.0 ),
-        DISABLED( 0.0 ),
-        LOWEST( DEFAULT.value / 8.0 ),
-        LOW( DEFAULT.value / 4.0 ),
-        HIGH( DEFAULT.value * 2.5 ),
-        HIGHEST( DEFAULT.value * 5.0 );
+        DEFAULT( 60 ),
+        DISABLED( 0 ),
+        LOWEST( DEFAULT.value / 8 ),
+        LOW( DEFAULT.value / 4 ),
+        HIGH( (int) (DEFAULT.value * 2.5) ),
+        HIGHEST( DEFAULT.value * 5 );
         
-        public final double value;
+        public final int value;
         
-        DefaultWeight( double v ) { value = v; }
+        DefaultWeight( int v ) { value = v; }
     }
     
     public enum Theme {
-        NONE( ( cfgManager ) -> new EnvironmentList() ),
-        FIRE( ( cfgManager ) -> new EnvironmentList(
-                EnvironmentEntry.builder( cfgManager, DefaultWeight.HIGHEST.value ).inUltraWarmDimension().build(),
-                EnvironmentEntry.builder( cfgManager, DefaultWeight.HIGHEST.value ).isHot().build(),
-                EnvironmentEntry.builder( cfgManager, DefaultWeight.HIGH.value ).isWarm().build(),
-                EnvironmentEntry.builder( cfgManager, DefaultWeight.LOWEST.value ).isFreezing().build(),
+        /** The default theme. Mob spawn weight will not vary by location or environment. */
+        NONE( codec -> EnvironmentList.builder( codec ).build() ),
+        
+        /** Fire theme. Mob spawn weight is higher in warm regions and lower or disabled in cold regions. */
+        FIRE( codec -> EnvironmentList.builder( codec )
+                .entryBuilder( DefaultWeight.HIGHEST.value ).inUltraWarmDimension().or().isHot().build()
+                .entryBuilder( DefaultWeight.HIGH.value ).isWarm().build()
+                .entryBuilder( DefaultWeight.DISABLED.value ).isFreezing().build()
                 // Regular frozen ocean is actually freezing, so already covered
-                EnvironmentEntry.builder( cfgManager, DefaultWeight.HIGHEST.value ).inBiome( Biomes.WARM_OCEAN ).build(),
-                EnvironmentEntry.builder( cfgManager, DefaultWeight.HIGH.value ).inBiome( Biomes.LUKEWARM_OCEAN ).build(),
-                EnvironmentEntry.builder( cfgManager, DefaultWeight.HIGH.value ).inBiome( Biomes.DEEP_LUKEWARM_OCEAN ).build(),
-                EnvironmentEntry.builder( cfgManager, DefaultWeight.LOW.value ).inBiome( Biomes.COLD_OCEAN ).build(),
-                EnvironmentEntry.builder( cfgManager, DefaultWeight.LOW.value ).inBiome( Biomes.DEEP_COLD_OCEAN ).build(),
-                EnvironmentEntry.builder( cfgManager, DefaultWeight.LOWEST.value ).inBiome( Biomes.DEEP_FROZEN_OCEAN ).build()
-        ) ),
-        ICE( ( cfgManager ) -> new EnvironmentList(
-                EnvironmentEntry.builder( cfgManager, DefaultWeight.LOWEST.value ).inUltraWarmDimension().build(),
-                EnvironmentEntry.builder( cfgManager, DefaultWeight.HIGHEST.value ).isFreezing().build(),
-                EnvironmentEntry.builder( cfgManager, DefaultWeight.LOW.value ).isWarm().build(),
-                EnvironmentEntry.builder( cfgManager, DefaultWeight.LOWEST.value ).isHot().build(),
+                .entryBuilder( DefaultWeight.HIGHEST.value ).inBiome( Biomes.WARM_OCEAN ).build()
+                .entryBuilder( DefaultWeight.HIGH.value ).inBiome( Biomes.LUKEWARM_OCEAN ).or().inBiome( Biomes.DEEP_LUKEWARM_OCEAN ).build()
+                .entryBuilder( DefaultWeight.LOW.value ).inBiome( Biomes.COLD_OCEAN ).or().inBiome( Biomes.DEEP_COLD_OCEAN ).build()
+                .entryBuilder( DefaultWeight.DISABLED.value ).inBiome( Biomes.DEEP_FROZEN_OCEAN ).build()
+                .build() ),
+        
+        /** Ice theme. Mob spawn weight is higher in cold regions and lower or disabled in warm regions. */
+        ICE( codec -> EnvironmentList.builder( codec )
+                .entryBuilder( DefaultWeight.DISABLED.value ).inUltraWarmDimension().build()
+                .entryBuilder( DefaultWeight.HIGHEST.value ).isFreezing().build()
+                .entryBuilder( DefaultWeight.LOW.value ).isWarm().build()
+                .entryBuilder( DefaultWeight.DISABLED.value ).isHot().build()
                 // Regular frozen ocean is actually freezing, so already covered
-                EnvironmentEntry.builder( cfgManager, DefaultWeight.HIGHEST.value ).inBiome( Biomes.DEEP_FROZEN_OCEAN ).build(),
-                EnvironmentEntry.builder( cfgManager, DefaultWeight.HIGH.value ).inBiome( Biomes.COLD_OCEAN ).build(),
-                EnvironmentEntry.builder( cfgManager, DefaultWeight.HIGH.value ).inBiome( Biomes.DEEP_COLD_OCEAN ).build(),
-                EnvironmentEntry.builder( cfgManager, DefaultWeight.LOW.value ).inBiome( Biomes.LUKEWARM_OCEAN ).build(),
-                EnvironmentEntry.builder( cfgManager, DefaultWeight.LOW.value ).inBiome( Biomes.DEEP_LUKEWARM_OCEAN ).build(),
-                EnvironmentEntry.builder( cfgManager, DefaultWeight.LOWEST.value ).inBiome( Biomes.WARM_OCEAN ).build()
-        ) ),
-        DESERT( ( cfgManager ) -> new EnvironmentList(
-                EnvironmentEntry.builder( cfgManager, DefaultWeight.HIGHEST.value ).inUltraWarmDimension().build(),
-                EnvironmentEntry.builder( cfgManager, DefaultWeight.HIGHEST.value ).inNaturalDimension().inDryBiome().build(),
-                EnvironmentEntry.builder( cfgManager, DefaultWeight.LOWEST.value ).inWaterBiome().build(),
-                EnvironmentEntry.builder( cfgManager, DefaultWeight.LOWEST.value ).inHumidBiome().build(),
-                EnvironmentEntry.builder( cfgManager, DefaultWeight.LOWEST.value ).isRaining().canSeeSky().build(),
-                EnvironmentEntry.builder( cfgManager, DefaultWeight.HIGH.value ).belowHalfMoonLight().build()
-        ) ),
-        WATER( ( cfgManager ) -> new EnvironmentList(
-                EnvironmentEntry.builder( cfgManager, DefaultWeight.LOWEST.value ).inUltraWarmDimension().build(),
-                EnvironmentEntry.builder( cfgManager, DefaultWeight.LOWEST.value ).inNaturalDimension().inDryBiome().build(),
-                EnvironmentEntry.builder( cfgManager, DefaultWeight.HIGHEST.value ).inWaterBiome().build(),
-                EnvironmentEntry.builder( cfgManager, DefaultWeight.HIGHEST.value ).inHumidBiome().build(),
-                EnvironmentEntry.builder( cfgManager, DefaultWeight.HIGHEST.value ).isRaining().canSeeSky().build(),
-                EnvironmentEntry.builder( cfgManager, DefaultWeight.HIGH.value ).aboveHalfMoonLight().build()
-        ) ),
-        FOREST( ( cfgManager ) -> new EnvironmentList(
-                EnvironmentEntry.builder( cfgManager, DefaultWeight.HIGHEST.value ).inBiome( BiomeTags.IS_TAIGA ).build(),
-                EnvironmentEntry.builder( cfgManager, DefaultWeight.HIGHEST.value ).inBiome( BiomeTags.IS_JUNGLE ).build(),
-                EnvironmentEntry.builder( cfgManager, DefaultWeight.HIGHEST.value ).inBiome( BiomeTags.IS_FOREST ).build(),
-                EnvironmentEntry.builder( cfgManager, DefaultWeight.HIGHEST.value ).inBiome( Tags.Biomes.IS_SWAMP ).build(),
-                EnvironmentEntry.builder( cfgManager, DefaultWeight.HIGHEST.value ).inBiome( Biomes.CRIMSON_FOREST ).build(),
-                EnvironmentEntry.builder( cfgManager, DefaultWeight.HIGH.value ).atMaxMoonLight().build()
-        ) ),
-        MOUNTAIN( ( cfgManager ) -> new EnvironmentList(
-                EnvironmentEntry.builder( cfgManager, DefaultWeight.HIGHEST.value ).inMountainBiome().build(),
-                EnvironmentEntry.builder( cfgManager, DefaultWeight.HIGHEST.value ).aboveMountainLevel().build(),
-                EnvironmentEntry.builder( cfgManager, DefaultWeight.HIGH.value ).atNoMoonLight().build(),
-                EnvironmentEntry.builder( cfgManager, DefaultWeight.LOW.value ).belowSeaLevel().build()
-        ) ),
-        STORM( ( cfgManager ) -> new EnvironmentList(
-                EnvironmentEntry.builder( cfgManager, DefaultWeight.HIGHEST.value ).isThundering().build(),
-                EnvironmentEntry.builder( cfgManager, DefaultWeight.HIGH.value ).isRaining().build(),
-                EnvironmentEntry.builder( cfgManager, DefaultWeight.LOW.value ).cannotSeeSky().build()
-        ) ),
-        TROPICAL( ( cfgManager ) -> new EnvironmentList(
+                .entryBuilder( DefaultWeight.HIGHEST.value ).inBiome( Biomes.DEEP_FROZEN_OCEAN ).build()
+                .entryBuilder( DefaultWeight.HIGH.value ).inBiome( Biomes.COLD_OCEAN ).or().inBiome( Biomes.DEEP_COLD_OCEAN ).build()
+                .entryBuilder( DefaultWeight.LOW.value ).inBiome( Biomes.LUKEWARM_OCEAN ).or().inBiome( Biomes.DEEP_LUKEWARM_OCEAN ).build()
+                .entryBuilder( DefaultWeight.LOWEST.value ).inBiome( Biomes.WARM_OCEAN ).build()
+                .build() ),
+        
+        /** Desert theme. Mob spawn weight is higher in dry regions and lower or disabled in wet regions. */
+        DESERT( codec -> EnvironmentList.builder( codec )
+                .entryBuilder( DefaultWeight.HIGHEST.value ).inUltraWarmDimension().or().inNaturalDimension().and().inDryBiome().build()
+                .entryBuilder( DefaultWeight.DISABLED.value ).inWaterBiome().or().inHumidBiome().or().isRaining().and().canSeeSky().build()
+                .entryBuilder( DefaultWeight.HIGH.value ).belowHalfMoonLight().build()
+                .build() ),
+        
+        /** Water theme. Mob spawn weight is higher in wet regions and lower or disabled in dry regions. */
+        WATER( codec -> EnvironmentList.builder( codec )
+                .entryBuilder( DefaultWeight.DISABLED.value ).inUltraWarmDimension().or().inNaturalDimension().and().inDryBiome().build()
+                .entryBuilder( DefaultWeight.HIGHEST.value ).inWaterBiome().or().inHumidBiome().or().isRaining().and().canSeeSky().build()
+                .entryBuilder( DefaultWeight.HIGH.value ).aboveHalfMoonLight().build()
+                .build() ),
+        
+        /** Forest theme. Mob spawn weight is higher in forests and during full moons. */
+        FOREST( codec -> EnvironmentList.builder( codec )
+                .entryBuilder( DefaultWeight.HIGHEST.value ).inBiome( BiomeTags.IS_TAIGA ).or().inBiome( BiomeTags.IS_JUNGLE ).or()
+                .inBiome( BiomeTags.IS_FOREST ).or().inBiome( Tags.Biomes.IS_SWAMP ).or().inBiome( Biomes.CRIMSON_FOREST ).build()
+                .entryBuilder( DefaultWeight.HIGH.value ).atMaxMoonLight().build()
+                .entryBuilder( DefaultWeight.LOWEST.value ).inDryBiome().build()
+                .build() ),
+        
+        /** Forest theme. Mob spawn weight is higher in mountain regions or high altitude and during new moons. */
+        MOUNTAIN( codec -> EnvironmentList.builder( codec )
+                .entryBuilder( DefaultWeight.HIGHEST.value ).inMountainBiome().or().aboveMountainLevel().build()
+                .entryBuilder( DefaultWeight.HIGH.value ).atNoMoonLight().build()
+                .entryBuilder( DefaultWeight.LOW.value ).belowSeaLevel().build()
+                .build() ),
+        
+        /** Storm theme. Mob spawn weight is higher during inclement weather and lower underground. */
+        STORM( codec -> EnvironmentList.builder( codec )
+                .entryBuilder( DefaultWeight.HIGHEST.value ).isThundering().build()
+                .entryBuilder( DefaultWeight.HIGH.value ).isRaining().build()
+                .entryBuilder( DefaultWeight.LOW.value ).cannotSeeSky().build()
+                .build() ),
+        
+        /** Tropical theme. Mob spawn weight is higher in tropical oceans and disabled in very cold regions. */
+        TROPICAL( codec -> EnvironmentList.builder( codec )
                 // All ocean biomes (except regular frozen ocean) have the same temp of 0.5, so we must call out specific biomes
-                EnvironmentEntry.builder( cfgManager, DefaultWeight.HIGHEST.value ).inBiome( Biomes.WARM_OCEAN ).build(),
-                EnvironmentEntry.builder( cfgManager, DefaultWeight.DISABLED.value ).isFreezing().build(),
-                EnvironmentEntry.builder( cfgManager, DefaultWeight.DISABLED.value ).inBiome( Biomes.DEEP_FROZEN_OCEAN ).build()
-        ) ),
-        FISHING( ( cfgManager ) -> new EnvironmentList(
-                EnvironmentEntry.builder( cfgManager, DefaultWeight.HIGHEST.value ).inWaterBiome().build(),
-                EnvironmentEntry.builder( cfgManager, DefaultWeight.HIGH.value ).atMaxMoonLight().build(),
-                EnvironmentEntry.builder( cfgManager, DefaultWeight.HIGH.value ).isRaining().notInDryBiome().build()
-        ) );
+                .entryBuilder( DefaultWeight.HIGHEST.value ).inBiome( Biomes.WARM_OCEAN ).build()
+                .entryBuilder( DefaultWeight.DISABLED.value ).isFreezing().or().inBiome( Biomes.DEEP_FROZEN_OCEAN ).build()
+                .build() ),
         
-        private final Function<ConfigManager, EnvironmentList> func;
-        private EnvironmentList value;
+        /** Fishing theme. Fish. */
+        FISHING( codec -> EnvironmentList.builder( codec )
+                .entryBuilder( DefaultWeight.HIGHEST.value ).inWaterBiome().build()
+                .entryBuilder( DefaultWeight.HIGH.value ).atMaxMoonLight().or().isRaining().and().notInDryBiome().build()
+                .build() );
         
-        Theme( Function<ConfigManager, EnvironmentList> func ) {
+        
+        private final Function<IValueCodec<Integer>, EnvironmentList<Integer>> func;
+        private EnvironmentList<Integer> value;
+        
+        Theme( Function<IValueCodec<Integer>, EnvironmentList<Integer>> func ) {
             this.func = func;
         }
         
-        public EnvironmentList getValue() {
+        public EnvironmentList<Integer> getValue() {
             if( value == null ) {
-                value = func.apply( Config.MANAGER );
-                value.setRange( DoubleField.Range.NON_NEGATIVE );
+                value = func.apply( IntValueCodec.NON_NEGATIVE );
             }
             return value;
         }
@@ -147,7 +150,7 @@ public class BestiaryInfo {
     /** The species theme; determines default environment weight exceptions. */
     public final Theme theme;
     /** The default species attribute differences compared to their vanilla counterpart. */
-    public final AttributeList defaultAttributes;
+    public final AttributeOpList defaultAttributes;
     
     /** The default texture. */
     public final ResourceLocation texture;
@@ -170,8 +173,8 @@ public class BestiaryInfo {
     public final boolean isDamagedByWater;
     public final boolean allowLeashing;
     public final boolean ignorePressurePlates;
-    public final RegistryEntryList<Block> immuneToStickyBlocks;
-    public final RegistryEntryList<MobEffect> immuneToPotions;
+    public final BlockStateSet immuneToStickyBlocks;
+    public final RegistrySet<MobEffect> immuneToPotions;
     public final double rangedAttackDamage;
     public final double rangedAttackSpread;
     public final double rangedWalkSpeed;
@@ -186,17 +189,17 @@ public class BestiaryInfo {
         return new Builder( species, typeBuilder );
     }
     
-    private BestiaryInfo( int eggColor, float scale, DefaultWeight weight, Theme spawnTheme, List<AttributeEntry> attributes,
+    private BestiaryInfo( int eggColor, float scale, DefaultWeight weight, Theme spawnTheme, AttributeOpList attributes,
                           ResourceLocation tex, ResourceLocation eyeTex, ResourceLocation ovrTex, ResourceLocation animTex,
                           int xp, int regen, double fallDmg, boolean fireImm, boolean burnImm, boolean drownImm, boolean pushImm,
-                          boolean waterDmg, boolean leash, boolean plateImm, Object[] blockImm, Object[] effectImm,
+                          boolean waterDmg, boolean leash, boolean plateImm, BlockStateSet blockImm, RegistrySet<MobEffect> effectImm,
                           double raDmg, double raVar, double raSpd, int raCD, int raMCD, double raRng ) {
         eggSpotsColor = eggColor;
         baseScale = scale;
         
         defaultWeight = weight;
         theme = spawnTheme;
-        defaultAttributes = new AttributeList( attributes );
+        defaultAttributes = attributes;
         
         texture = tex;
         eyesTexture = eyeTex;
@@ -213,8 +216,8 @@ public class BestiaryInfo {
         isDamagedByWater = waterDmg;
         allowLeashing = leash;
         ignorePressurePlates = plateImm;
-        immuneToStickyBlocks = new LazyRegistryEntryList<>( ForgeRegistries.BLOCKS, false, blockImm );
-        immuneToPotions = new LazyRegistryEntryList<>( ForgeRegistries.MOB_EFFECTS, false, effectImm );
+        immuneToStickyBlocks = blockImm;
+        immuneToPotions = effectImm;
         rangedAttackDamage = raDmg;
         rangedAttackSpread = raVar;
         rangedWalkSpeed = raSpd;
@@ -234,7 +237,7 @@ public class BestiaryInfo {
         private int eggSpotsColor;
         private DefaultWeight defaultWeight = DefaultWeight.DEFAULT;
         private Theme spawnTheme = Theme.NONE;
-        private final List<AttributeEntry> attributes = new ArrayList<>();
+        private final AttributeOpList.Builder<?> attributes = new AttributeOpList.Builder<>();
         
         // Fields inherited from vanilla replacement (technically also SM Data)
         private float baseScale = 1.0F;
@@ -254,8 +257,8 @@ public class BestiaryInfo {
         private boolean isDamagedByWater;
         private boolean allowLeashing;
         private boolean ignorePressurePlates;
-        private final ArrayList<Object> immuneToStickyBlocks = new ArrayList<>();
-        private final ArrayList<Object> immuneToPotions = new ArrayList<>();
+        private final BlockStateSet.Builder<?> immuneToStickyBlocks = new BlockStateSet.Builder<>();
+        private final RegistrySet.Builder<MobEffect, ?> immuneToPotions = new RegistrySet.Builder<>( ForgeRegistries.MOB_EFFECTS );
         private double rangedAttackDamage = -1.0;
         private double rangedAttackSpread = -1.0;
         private double rangedWalkSpeed = -1.0;
@@ -291,8 +294,8 @@ public class BestiaryInfo {
                 isDamagedByWater = parent.isDamagedByWater;
                 allowLeashing = parent.allowLeashing;
                 ignorePressurePlates = parent.ignorePressurePlates;
-                immuneToStickyBlocks.addAll( parent.immuneToStickyBlocks.getEntries() );
-                immuneToPotions.addAll( parent.immuneToPotions.getEntries() );
+                immuneToStickyBlocks.list.addAll( parent.immuneToStickyBlocks.getList() );
+                immuneToPotions.list.addAll( parent.immuneToPotions.getList() );
                 
                 setAllRangedStats( parent.rangedAttackDamage, parent.rangedAttackSpread, parent.rangedWalkSpeed,
                         parent.rangedAttackCooldown, parent.rangedAttackMaxCooldown, parent.rangedAttackMaxRange );
@@ -306,9 +309,9 @@ public class BestiaryInfo {
             if( experience < 0 )
                 throw new IllegalStateException( "Family " + owningSpecies.family.name + " has not set the base experience value!" );
             
-            return new BestiaryInfo( eggSpotsColor, baseScale, defaultWeight, spawnTheme, attributes, texture, eyesTexture, overlayTexture, animationTexture,
+            return new BestiaryInfo( eggSpotsColor, baseScale, defaultWeight, spawnTheme, attributes.build(), texture, eyesTexture, overlayTexture, animationTexture,
                     experience, healTime, fallDamageMultiplier, isImmuneToFire, isImmuneToBurning, canBreatheInWater, ignoreWaterPush, isDamagedByWater,
-                    allowLeashing, ignorePressurePlates, immuneToStickyBlocks.toArray(), immuneToPotions.toArray(),
+                    allowLeashing, ignorePressurePlates, immuneToStickyBlocks.build(), immuneToPotions.build(),
                     rangedAttackDamage, rangedAttackSpread, rangedWalkSpeed, rangedAttackCooldown, rangedAttackMaxCooldown, rangedAttackMaxRange );
         }
         
@@ -353,9 +356,9 @@ public class BestiaryInfo {
             return this;
         }
         
+        
         //--------------- Textures (Vanilla) ----------------
         // Selecting vanilla textures can have unexpected results with some resource packs
-        
         
         /** Sets the species default base, glowing eyes, and overlay textures. */
         @Deprecated( since = "3.1.14", forRemoval = true )
@@ -514,7 +517,7 @@ public class BestiaryInfo {
         //--------------- Creature Type Templates ----------------
         
         /** Sets the standard species stats implied by being undead. */
-        public Builder undead() { return drownImmune().effectImmune( MobEffects.REGENERATION, MobEffects.POISON ); }
+        public Builder undead() { return drownImmune().effectImmune( MobEffects.REGENERATION ).effectImmune( MobEffects.POISON ); }
         
         /** Sets the standard species stats implied by being a spider. */
         public Builder spider() { return webImmune().effectImmune( MobEffects.POISON ); }
@@ -604,21 +607,33 @@ public class BestiaryInfo {
         /** Sets the species as cobweb immune. */
         public Builder webImmune() { return stickyBlockImmune( Blocks.COBWEB ); }
         
-        /**
-         * Sets the species as immune to a specific list of sticky blocks.
-         * Acceptable argument types are {@code Block}, {@code RegistryObject<Block>}, {@code ResourceLocation}, or {@code String}.
-         */
-        public Builder stickyBlockImmune( Block... blocks ) {
-            immuneToStickyBlocks.addAll( Arrays.asList( blocks ) );
+        /** Sets the species as immune to a specific sticky block. */
+        public Builder stickyBlockImmune( Block block ) {
+            immuneToStickyBlocks.add( block );
             return this;
         }
         
-        /**
-         * Sets the species as immune to a specific list of effects.
-         * Acceptable argument types are {@code Effect}, {@code RegistryObject<Effect>}, {@code ResourceLocation}, or {@code String}.
-         */
-        public Builder effectImmune( Object... effects ) {
-            immuneToPotions.addAll( Arrays.asList( effects ) );
+        /** Sets the species as immune to a specific sticky block. */
+        public Builder stickyBlockImmune( RegistryObject<? extends Block> block ) {
+            immuneToStickyBlocks.add( block );
+            return this;
+        }
+        
+        /** Sets the species as immune to a specific mob effect. */
+        public Builder effectImmune( MobEffect effect ) {
+            immuneToPotions.add( effect );
+            return this;
+        }
+        
+        /** Sets the species as immune to a specific mob effect. */
+        public Builder effectImmune( RegistryObject<? extends MobEffect> effect ) {
+            immuneToPotions.add( effect );
+            return this;
+        }
+        
+        /** Sets the species as immune to a specific mob effect. */
+        public Builder effectImmune( ResourceLocation effect ) {
+            immuneToPotions.add( effect );
             return this;
         }
         
@@ -752,13 +767,13 @@ public class BestiaryInfo {
         public Builder addToAttribute( Attribute attribute, double value ) {
             if( attribute == Attributes.MOVEMENT_SPEED )
                 throw new IllegalArgumentException( "Do not add flat movement speed!" );
-            attributes.add( AttributeEntry.add( attribute, value ) );
+            attributes.putAdd( attribute, value );
             return this;
         }
         
         /** Adds a value multiplier to the base attribute. */
         public Builder multiplyAttribute( Attribute attribute, double value ) {
-            attributes.add( AttributeEntry.mult( attribute, value ) );
+            attributes.putMultiply( attribute, value );
             return this;
         }
     }

@@ -26,7 +26,7 @@ public class DoomCreeperEntity extends _SpecialCreeperEntity {
     public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
         bestiaryInfo.color( 0x494949 ).theme( BestiaryInfo.Theme.FOREST )
                 .uniqueTextureWithOverlay()
-                .addExperience( 1 ).effectImmune( MobEffects.HARM, MobEffects.WITHER );
+                .addExperience( 1 ).effectImmune( MobEffects.HARM ).effectImmune( MobEffects.WITHER );
     }
     
     @SpecialMob.LanguageProvider

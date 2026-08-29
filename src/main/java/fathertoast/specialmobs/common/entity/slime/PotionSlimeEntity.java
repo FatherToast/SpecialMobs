@@ -36,8 +36,6 @@ import net.minecraft.world.level.Level;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.Set;
 
 @SpecialMob
 public class PotionSlimeEntity extends _SpecialSlimeEntity {
@@ -119,17 +117,11 @@ public class PotionSlimeEntity extends _SpecialSlimeEntity {
     
     /** Sets the potion fill of this slime to a random effect based on config settings. */
     private void setRandomPotionFill() {
-        final Set<MobEffect> allowedPotions = getConfig().POTION.allowedPotions.get().getEntries();
-        if( !allowedPotions.isEmpty() ) {
-            final ArrayList<MobEffect> effects = new ArrayList<>( allowedPotions );
-            if( !Config.MAIN.GENERAL.enableNausea.get() ) effects.remove( MobEffects.CONFUSION );
-            
-            if( !effects.isEmpty() ) {
-                setPotionFill( effects.get( random.nextInt( effects.size() ) ) );
-                return;
-            }
+        MobEffect next = getConfig().POTION.potionChoices.next( random );
+        if( next == null || !Config.MAIN.GENERAL.enableNausea.get() && next.equals( MobEffects.CONFUSION ) ) {
+            setPotionFill( MobEffects.HARM );
         }
-        setPotionFill( null );
+        setPotionFill( next );
     }
     
     /** Sets the potion fill of this slime. */
@@ -163,7 +155,6 @@ public class PotionSlimeEntity extends _SpecialSlimeEntity {
         for( int i = 0; i < size * 8; i++ ) {
             final float angle = random.nextFloat() * 2.0F * (float) Math.PI;
             final float distance = (random.nextFloat() * 0.25F + 0.25F) * size;
-            // noinspection resource
             level().addParticle( getParticleType(),
                     getX() + Mth.sin( angle ) * distance,
                     getY(),

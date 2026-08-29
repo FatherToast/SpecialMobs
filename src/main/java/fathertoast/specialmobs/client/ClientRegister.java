@@ -58,6 +58,7 @@ public class ClientRegister {
     
     @SubscribeEvent
     public static void onClientSetup( FMLClientSetupEvent event ) {
+        ReadMeConfig.INSTANCE.SPEC.initialize();
         if( Config.MAIN.GENERAL.fancyFishingMobs.get() ) {
             event.enqueueWork( () -> ItemProperties.register( Items.FISHING_ROD,
                     ResourceLocation.withDefaultNamespace( "cast" ), new FishingRodItemPropertyGetter() ) );

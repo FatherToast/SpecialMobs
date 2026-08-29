@@ -1,34 +1,26 @@
 package fathertoast.specialmobs.common.entity;
 
+import fathertoast.crust.api.config.common.value.collection.BlockStateSet;
+import fathertoast.crust.api.config.common.value.collection.RegistrySet;
 import fathertoast.crust.api.lib.NBTHelper;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.config.Config;
 import fathertoast.specialmobs.common.config.species.SpeciesConfig;
-import fathertoast.specialmobs.common.core.SpecialMobs;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.StringTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Mob;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.pathfinder.BlockPathTypes;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.MobEffectEvent;
-import net.minecraftforge.registries.ForgeRegistries;
 
 import javax.annotation.Nullable;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
 
 import static fathertoast.specialmobs.common.util.References.*;
 
-@SuppressWarnings( "resource" )
 public class SpecialMobData<T extends Mob & ISpecialMob<T>> {
     
     /**
@@ -78,9 +70,9 @@ public class SpecialMobData<T extends Mob & ISpecialMob<T>> {
     /** Whether the entity does not trigger pressure plates. */
     private boolean ignorePressurePlates;
     /** Set of blocks that the entity cannot be stuck in. */
-    private final HashSet<Block> immuneToStickyBlocks = new HashSet<>();
+    private BlockStateSet immuneToStickyBlocks;
     /** Set of potions that cannot be applied to the entity. */
-    private final HashSet<MobEffect> immuneToPotions = new HashSet<>();
+    private RegistrySet<MobEffect> immuneToPotions;
     
     /** The damage the entity uses for its ranged attacks, when applicable. */
     private float rangedAttackDamage;
@@ -120,12 +112,12 @@ public class SpecialMobData<T extends Mob & ISpecialMob<T>> {
         entity.getEntityData().set( renderScale, nextScale() );
         
         final SpeciesConfig.General config = theEntity.getSpecies().config.GENERAL;
-        setRangedAttackDamage( config.rangedAttackDamage == null ? -1.0F : (float) config.rangedAttackDamage.get() );
-        setRangedAttackSpread( config.rangedAttackSpread == null ? -1.0F : (float) config.rangedAttackSpread.get() );
-        setRangedWalkSpeed( config.rangedWalkSpeed == null ? -1.0F : (float) config.rangedWalkSpeed.get() );
+        setRangedAttackDamage( config.rangedAttackDamage == null ? -1.0F : config.rangedAttackDamage.getFloat() );
+        setRangedAttackSpread( config.rangedAttackSpread == null ? -1.0F : config.rangedAttackSpread.getFloat() );
+        setRangedWalkSpeed( config.rangedWalkSpeed == null ? -1.0F : config.rangedWalkSpeed.getFloat() );
         setRangedAttackCooldown( config.rangedAttackCooldown == null ? -1 : config.rangedAttackCooldown.get() );
         setRangedAttackMaxCooldown( config.rangedAttackMaxCooldown == null ? -1 : config.rangedAttackMaxCooldown.get() );
-        setRangedAttackMaxRange( config.rangedAttackMaxRange == null ? -1.0F : (float) config.rangedAttackMaxRange.get() );
+        setRangedAttackMaxRange( config.rangedAttackMaxRange == null ? -1.0F : config.rangedAttackMaxRange.getFloat() );
     }
     
     public void initialize() {
@@ -137,7 +129,7 @@ public class SpecialMobData<T extends Mob & ISpecialMob<T>> {
         final SpeciesConfig.General config = theEntity.getSpecies().config.GENERAL;
         theEntity.setExperience( config.experience.get() );
         setRegenerationTime( config.healTime.get() );
-        setFallDamageMultiplier( (float) config.fallDamageMultiplier.get() );
+        setFallDamageMultiplier( config.fallDamageMultiplier.getFloat() );
         setImmuneToFire( config.isImmuneToFire.get() );
         setImmuneToBurning( config.isImmuneToBurning.get() );
         setCanBreatheInWater( config.canBreatheInWater.get() );
@@ -145,8 +137,8 @@ public class SpecialMobData<T extends Mob & ISpecialMob<T>> {
         setDamagedByWater( config.isDamagedByWater.get() );
         setAllowLeashing( config.allowLeashing.get() );
         setIgnorePressurePlates( config.ignorePressurePlates.get() );
-        addStickyBlockImmunity( config.immuneToStickyBlocks.get().getEntries() );
-        addPotionImmunity( config.immuneToPotions.get().getEntries() );
+        addStickyBlockImmunity( config.immuneToStickyBlocks.get() );
+        addPotionImmunity( config.immuneToPotions.get() );
     }
     
     //    /** Copies all of the data from another mob, optionally copying texture(s). */
@@ -193,9 +185,7 @@ public class SpecialMobData<T extends Mob & ISpecialMob<T>> {
     public ResourceLocation getTextureOverlay() { return theEntity.getSpecies().bestiaryInfo.overlayTexture; }
     
     @Nullable
-    public ResourceLocation getTextureAnimation() {
-        return theEntity.getSpecies().bestiaryInfo.animationTexture;
-    }
+    public ResourceLocation getTextureAnimation() { return theEntity.getSpecies().bestiaryInfo.animationTexture; }
     
     
     /** @return The render scale for the entity, including any applied random scaling. */
@@ -219,7 +209,6 @@ public class SpecialMobData<T extends Mob & ISpecialMob<T>> {
      * @return The height scale, including baby modifier if applicable. Used to calculate eye height for families that are not auto-scaled.
      * Note: Baby scale is derived from {@link net.minecraft.world.entity.monster.Zombie#getStandingEyeHeight(net.minecraft.world.entity.Pose, net.minecraft.world.entity.EntityDimensions)}.
      */
-    @SuppressWarnings( "JavadocReference" )
     public float getHeightScaleByAge() { return getHeightScale() * (theEntity.isBaby() ? 0.53448F : 1.0F); }
     
     /** @return The base render scale for the entity, which is a property of the mob species. */
@@ -314,11 +303,11 @@ public class SpecialMobData<T extends Mob & ISpecialMob<T>> {
      * @return True if the block is allowed to apply its stuck speed multiplier.
      */
     public boolean canBeStuckIn( @Nullable BlockState block ) {
-        return block != null && !immuneToStickyBlocks.contains( block.getBlock() );
+        return block != null && !immuneToStickyBlocks.contains( block );
     }
     
     /** @param blocks The sticky block(s) to grant immunity from. */
-    private void addStickyBlockImmunity( Collection<Block> blocks ) { immuneToStickyBlocks.addAll( blocks ); }
+    private void addStickyBlockImmunity( BlockStateSet blocks ) { immuneToStickyBlocks = blocks; }
     
     /**
      * Tests a potion effect to see if it is applicable to the entity.
@@ -337,7 +326,7 @@ public class SpecialMobData<T extends Mob & ISpecialMob<T>> {
     }
     
     /** @param effects The effect(s) to grant immunity from. */
-    private void addPotionImmunity( Collection<MobEffect> effects ) { immuneToPotions.addAll( effects ); }
+    private void addPotionImmunity( RegistrySet<MobEffect> effects ) { immuneToPotions = effects; }
     
     public float getRangedAttackDamage() { return rangedAttackDamage; }
     
@@ -388,20 +377,8 @@ public class SpecialMobData<T extends Mob & ISpecialMob<T>> {
         tag.putBoolean( TAG_DROWN_IMMUNE, canBreatheInWater() );
         tag.putBoolean( TAG_WATER_PUSH_IMMUNE, ignoreWaterPush() );
         tag.putBoolean( TAG_WATER_DAMAGE, isDamagedByWater() );
-        
-        final ListTag stickyBlocksTag = new ListTag();
-        for( Block block : immuneToStickyBlocks ) {
-            final ResourceLocation regKey = ForgeRegistries.BLOCKS.getKey( block );
-            if( regKey != null ) stickyBlocksTag.add( StringTag.valueOf( SpecialMobs.toString( regKey ) ) );
-        }
-        tag.put( TAG_STICKY_IMMUNE, stickyBlocksTag );
-        
-        final ListTag potionsTag = new ListTag();
-        for( MobEffect effect : immuneToPotions ) {
-            final ResourceLocation regKey = ForgeRegistries.MOB_EFFECTS.getKey( effect );
-            if( regKey != null ) potionsTag.add( StringTag.valueOf( SpecialMobs.toString( regKey ) ) );
-        }
-        tag.put( TAG_POTION_IMMUNE, potionsTag );
+        immuneToStickyBlocks.write( tag, TAG_STICKY_IMMUNE );
+        immuneToPotions.write( tag, TAG_POTION_IMMUNE );
         
         // Ranged attack stats (optional)
         if( getRangedAttackDamage() >= 0.0F )
@@ -460,22 +437,10 @@ public class SpecialMobData<T extends Mob & ISpecialMob<T>> {
             setIgnorePressurePlates( tag.getBoolean( TAG_TRAP_IMMUNE ) );
         }
         if( NBTHelper.containsList( tag, TAG_STICKY_IMMUNE ) ) {
-            final List<String> blockIds = NBTHelper.getStringList( tag, TAG_STICKY_IMMUNE );
-            immuneToStickyBlocks.clear();
-            for( String id : blockIds ) {
-                final Block block = ForgeRegistries.BLOCKS.getValue( ResourceLocation.tryParse( id ) );
-                if( block != null && !block.defaultBlockState().is( Blocks.AIR ) )
-                    immuneToStickyBlocks.add( block );
-            }
+            immuneToStickyBlocks.load( tag, TAG_STICKY_IMMUNE );
         }
         if( NBTHelper.containsList( tag, TAG_POTION_IMMUNE ) ) {
-            final List<String> mobEffectIds = NBTHelper.getStringList( tag, TAG_POTION_IMMUNE );
-            immuneToPotions.clear();
-            for( String id : mobEffectIds ) {
-                final MobEffect effect = ForgeRegistries.MOB_EFFECTS.getValue( ResourceLocation.tryParse( id ) );
-                if( effect != null )
-                    immuneToPotions.add( effect );
-            }
+            immuneToPotions.load( tag, TAG_POTION_IMMUNE );
         }
         
         // Ranged attack stats

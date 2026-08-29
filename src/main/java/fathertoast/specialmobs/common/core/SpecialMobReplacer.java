@@ -1,5 +1,6 @@
 package fathertoast.specialmobs.common.core;
 
+import fathertoast.crust.api.config.common.value.environment.EnvironmentContext;
 import fathertoast.crust.api.lib.EnvironmentHelper;
 import fathertoast.crust.api.lib.NBTHelper;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
@@ -177,7 +178,7 @@ public final class SpecialMobReplacer {
      */
     private static boolean shouldMakeNextSpecial( MobFamily<?, ?> mobFamily, Level level, BlockPos entityPos ) {
         try {
-            return level.random.nextDouble() < mobFamily.config.GENERAL.specialVariantChance.get( level, entityPos );
+            return mobFamily.config.GENERAL.specialVariantChance.rollChance( level.random, EnvironmentContext.withTarget( level, entityPos ) );
         }
         catch( Exception e ) {
             SpecialMobs.LOG.warn( "Could not get special variant chance for mob family '{}'! Is the family's config broken?", mobFamily.name );

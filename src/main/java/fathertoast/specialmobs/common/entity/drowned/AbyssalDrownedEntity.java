@@ -28,7 +28,7 @@ public class AbyssalDrownedEntity extends _SpecialDrownedEntity {
     public static void getBestiaryInfo( BestiaryInfo.Builder bestiaryInfo ) {
         bestiaryInfo.color( 0x223844 ).weight( BestiaryInfo.DefaultWeight.LOW )
                 .uniqueTexturesAll()
-                .addExperience( 2 ).effectImmune( CrustObjects.Effects.WEIGHT, MobEffects.LEVITATION )
+                .addExperience( 2 ).effectImmune( CrustObjects.Effects.WEIGHT ).effectImmune( MobEffects.LEVITATION )
                 .addToAttribute( Attributes.MAX_HEALTH, 20.0 )
                 .multiplyAttribute( Attributes.MOVEMENT_SPEED, 1.2 );
     }

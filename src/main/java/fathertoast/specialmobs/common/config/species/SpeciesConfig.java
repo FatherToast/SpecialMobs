@@ -4,13 +4,19 @@ import fathertoast.crust.api.config.common.AbstractConfigCategory;
 import fathertoast.crust.api.config.common.AbstractConfigFile;
 import fathertoast.crust.api.config.common.ConfigManager;
 import fathertoast.crust.api.config.common.ConfigUtil;
-import fathertoast.crust.api.config.common.field.*;
-import fathertoast.crust.api.config.common.value.EnvironmentList;
+import fathertoast.crust.api.config.common.field.BooleanField;
+import fathertoast.crust.api.config.common.field.DoubleField;
+import fathertoast.crust.api.config.common.field.EnvironmentListField;
+import fathertoast.crust.api.config.common.field.IntField;
+import fathertoast.crust.api.config.common.field.collection.AttributeOpListField;
+import fathertoast.crust.api.config.common.field.collection.BlockStateSetField;
+import fathertoast.crust.api.config.common.field.collection.RegistrySetField;
+import fathertoast.crust.api.config.common.value.collection.value.DoubleValueCodec;
+import fathertoast.crust.api.config.common.value.environment.EnvironmentList;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.config.family.FamilyConfig;
 import net.minecraft.world.effect.MobEffect;
-import net.minecraft.world.level.block.Block;
 
 /**
  * This is the base config for mob species. This may be extended to add categories specific to the species, but all
@@ -20,7 +26,7 @@ public class SpeciesConfig extends AbstractConfigFile {
     public static final String SPECIAL_DATA_SUBCAT = "special_data.";
     
     /** Set this field right before creating a new species config; this will then be set as a default value for that config. */
-    public static EnvironmentList NEXT_NATURAL_SPAWN_CHANCE_EXCEPTIONS;
+    public static EnvironmentList<Double> NEXT_NATURAL_SPAWN_CHANCE_EXCEPTIONS;
     
     protected static String fileName( MobFamily.Species<?> species ) {
         return (species.specialVariantName == null ? "_normal" : ConfigUtil.camelCaseToLowerUnderscore( species.specialVariantName ))
@@ -32,7 +38,7 @@ public class SpeciesConfig extends AbstractConfigFile {
     
     /** Builds the config spec that should be used for this config. */
     public SpeciesConfig( ConfigManager manager, MobFamily.Species<?> species ) {
-        super( manager, FamilyConfig.dir( species.family ) + "/" + fileName( species ),
+        super( manager, FamilyConfig.dir( species.family ) + "/" + fileName( species ), false,
                 "This config contains options that apply only to the " + species.getConfigNameSingular() + " species." );
         
         GENERAL = new General( this, species, species.getConfigName() );
@@ -44,7 +50,7 @@ public class SpeciesConfig extends AbstractConfigFile {
         
         public final DoubleField randomScaling;
         
-        public final AttributeListField attributeChanges;
+        public final AttributeOpListField attributeChanges;
         
         public final IntField experience;
         public final IntField healTime;
@@ -56,8 +62,8 @@ public class SpeciesConfig extends AbstractConfigFile {
         public final BooleanField isDamagedByWater;
         public final BooleanField allowLeashing;
         public final BooleanField ignorePressurePlates;
-        public final RegistryEntryListField<Block> immuneToStickyBlocks;
-        public final RegistryEntryListField<MobEffect> immuneToPotions;
+        public final BlockStateSetField immuneToStickyBlocks;
+        public final RegistrySetField<MobEffect> immuneToPotions;
         
         // These are at the end because they may or may not be present (not applicable for all families)
         public final DoubleField rangedAttackDamage;
@@ -76,7 +82,7 @@ public class SpeciesConfig extends AbstractConfigFile {
                     SPEC.define( new DoubleField( "natural_spawn_chance.base", 1.0, DoubleField.Range.PERCENT,
                             "The chance for " + speciesName + " to succeed at natural spawn attempts. Does not affect Mob Replacement.",
                             "Note: Most species do NOT naturally spawn - they must be added by a mod or data pack for this option to do anything." ) ),
-                    SPEC.define( new EnvironmentListField( "natural_spawn_chance.exceptions", getDefaultSpawnExceptions().setRange( DoubleField.Range.PERCENT ),
+                    SPEC.define( new EnvironmentListField<>( "natural_spawn_chance.exceptions", getDefaultSpawnExceptions(),
                             "The chance for " + speciesName + " to succeed at natural spawn attempts when specific environmental conditions are met." ) )
             );
             
@@ -89,7 +95,7 @@ public class SpeciesConfig extends AbstractConfigFile {
             
             SPEC.newLine();
             
-            attributeChanges = SPEC.define( new AttributeListField( "attributes", info.defaultAttributes,
+            attributeChanges = SPEC.define( new AttributeOpListField( "attributes", info.defaultAttributes,
                     "Attribute modifiers for " + speciesName + ". If no attribute changes are defined here, " +
                             speciesName + " will have the exact same attributes as their parent vanilla mob." ) );
             
@@ -118,9 +124,9 @@ public class SpeciesConfig extends AbstractConfigFile {
                     "If true, " + speciesName + " can be leashed. (Note: Leashed mobs can still attack you.)" ) );
             ignorePressurePlates = SPEC.define( new BooleanField( SPECIAL_DATA_SUBCAT + "immune_to_pressure_plates", info.ignorePressurePlates,
                     "If true, " + speciesName + " will not trigger pressure plates." ) );
-            immuneToStickyBlocks = SPEC.define( new LazyRegistryEntryListField<>( SPECIAL_DATA_SUBCAT + "immune_to_sticky_blocks", info.immuneToStickyBlocks,
-                    ConfigUtil.properCase( speciesName ) + " will not be 'trapped' in any blocks specified here (e.g. \"cobweb\" or \"sweet_berry_bush\")." ) );
-            immuneToPotions = SPEC.define( new LazyRegistryEntryListField<>( SPECIAL_DATA_SUBCAT + "immune_to_effects", info.immuneToPotions,
+            immuneToStickyBlocks = SPEC.define( new BlockStateSetField( SPECIAL_DATA_SUBCAT + "immune_to_sticky_blocks", info.immuneToStickyBlocks,
+                    ConfigUtil.properCase( speciesName ) + " will not be 'trapped' in any block states specified here (e.g. \"minecraft:cobweb\" or \"minecraft:sweet_berry_bush\")." ) );
+            immuneToPotions = SPEC.define( new RegistrySetField<>( SPECIAL_DATA_SUBCAT + "immune_to_effects", info.immuneToPotions,
                     ConfigUtil.properCase( speciesName ) + " cannot be inflicted with any effects specified here (e.g. \"instant_damage\" or \"regeneration\")." ) );
             
             if( hasNoRangedStats( info ) ) {
@@ -163,11 +169,14 @@ public class SpeciesConfig extends AbstractConfigFile {
         }
         
         /** @return The next default natural spawn chance exceptions to use. */
-        private static EnvironmentList getDefaultSpawnExceptions() {
-            if( NEXT_NATURAL_SPAWN_CHANCE_EXCEPTIONS == null ) return new EnvironmentList();
+        private static EnvironmentList<Double> getDefaultSpawnExceptions() {
+            if( NEXT_NATURAL_SPAWN_CHANCE_EXCEPTIONS == null )
+                return EnvironmentList.builder( DoubleValueCodec.PERCENT ).build();
             
             // A hacky way to have an extra optional constructor parameter without overloading EVERY SINGLE constructor
-            final EnvironmentList presetValue = NEXT_NATURAL_SPAWN_CHANCE_EXCEPTIONS;
+            final EnvironmentList<Double> presetValue = NEXT_NATURAL_SPAWN_CHANCE_EXCEPTIONS;
+            if( presetValue.codec() != DoubleValueCodec.PERCENT )
+                throw new IllegalArgumentException( "Natural spawn chance exceptions must use the 'percent' double value codec!" );
             NEXT_NATURAL_SPAWN_CHANCE_EXCEPTIONS = null;
             return presetValue;
         }

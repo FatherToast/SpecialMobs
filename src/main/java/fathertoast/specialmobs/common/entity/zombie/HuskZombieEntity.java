@@ -1,6 +1,7 @@
 package fathertoast.specialmobs.common.entity.zombie;
 
 import fathertoast.crust.api.config.common.ConfigManager;
+import fathertoast.crust.api.config.common.value.environment.EnvironmentContext;
 import fathertoast.crust.api.lib.LevelEventHelper;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
@@ -11,8 +12,6 @@ import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.event.NaturalSpawnManager;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
-import net.minecraft.client.renderer.entity.HuskRenderer;
-import net.minecraft.client.renderer.entity.StrayRenderer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
@@ -128,7 +127,7 @@ public class HuskZombieEntity extends _SpecialZombieEntity {
     @Override
     protected EntityType<? extends Zombie> getVariantConversionType() {
         // Select a random non-husk, non-water-sensitive zombie; defaults to a normal zombie
-        return getConfig().HUSK.convertVariantChance.rollChance( random, level(), blockPosition() ) ?
+        return getConfig().HUSK.convertVariantChance.rollChance( random, EnvironmentContext.withTarget( level(), blockPosition() ) ) ?
                 MobFamily.ZOMBIE.nextVariant( level(), blockPosition(), HUSK_CONVERSION_SELECTOR, _SpecialZombieEntity.SPECIES ).entityType.get() :
                 _SpecialZombieEntity.SPECIES.entityType.get();
     }

@@ -2,6 +2,7 @@ package fathertoast.specialmobs.common.bestiary;
 
 import fathertoast.crust.api.config.common.ConfigManager;
 import fathertoast.crust.api.config.common.ConfigUtil;
+import fathertoast.crust.api.config.common.value.environment.EnvironmentContext;
 import fathertoast.specialmobs.common.config.Config;
 import fathertoast.specialmobs.common.config.family.*;
 import fathertoast.specialmobs.common.config.species.SpeciesConfig;
@@ -136,7 +137,7 @@ public class MobFamily<T extends Mob, V extends FamilyConfig> {
     //--------------- Static Helper Methods ----------------
     
     /** Called during mod construction to initialize the bestiary. */
-    public static void initBestiary() { }
+    public static void initBestiary() {}
     
     /** @return A list of all families. */
     public static List<MobFamily<?, ?>> getAll() { return Collections.unmodifiableList( FAMILY_LIST ); }
@@ -209,7 +210,7 @@ public class MobFamily<T extends Mob, V extends FamilyConfig> {
     
     /** Pick a new species from this family, based on the location. */
     public Species<? extends T> nextVariant( Level level, @Nullable BlockPos pos, @Nullable Predicate<Species<?>> selector, Species<? extends T> fallback ) {
-        final Species<?> species = config.GENERAL.specialVariantList.next( level.random, level, pos, selector );
+        final Species<?> species = config.GENERAL.specialVariantList.next( level.random, new EnvironmentContext( level, pos ), selector );
         //noinspection unchecked
         return species == null ? fallback : (Species<? extends T>) species;
     }

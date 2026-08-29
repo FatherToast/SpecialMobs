@@ -6,8 +6,8 @@ import fathertoast.crust.api.config.common.ConfigManager;
 import fathertoast.crust.api.config.common.ConfigUtil;
 import fathertoast.crust.api.config.common.field.*;
 import fathertoast.crust.api.config.common.file.TomlHelper;
-import fathertoast.crust.api.config.common.value.EnvironmentEntry;
-import fathertoast.crust.api.config.common.value.EnvironmentList;
+import fathertoast.crust.api.config.common.value.collection.value.DoubleValueCodec;
+import fathertoast.crust.api.config.common.value.environment.EnvironmentList;
 import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.level.levelgen.structure.BuiltinStructures;
 
@@ -22,19 +22,19 @@ public class MainConfig extends AbstractConfigFile {
     
     /** Builds the config spec that should be used for this config. */
     MainConfig( ConfigManager manager, String fileName ) {
-        super( manager, fileName,
+        super( manager, fileName, false,
                 "This config contains options that apply to the mod as a whole, including some master " +
                         "settings toggles for convenience." );
         
         SPEC.fileOnlyNewLine();
-        SPEC.describeEnvironmentListPart1of2();
+        EnvironmentListField.describe1of2( SPEC );
         SPEC.fileOnlyNewLine();
         
         GENERAL = new General( this );
         NATURAL_SPAWNING = new NaturalSpawning( this );
         
         SPEC.fileOnlyNewLine();
-        SPEC.describeEnvironmentListPart2of2();
+        EnvironmentListField.describe2of2( SPEC );
         SPEC.fileOnlyNewLine();
     }
     
@@ -51,7 +51,7 @@ public class MainConfig extends AbstractConfigFile {
         public final BooleanField enableMobReplacement;
         public final BooleanField enableNaturalSpawning;
         
-        public final PredicateStringListField skippedSpawnTypes;
+        public final StringListField skippedSpawnTypes;
         
         public final BooleanField masterVanillaReplacement;
         public final DoubleField masterRandomScaling;
@@ -75,7 +75,7 @@ public class MainConfig extends AbstractConfigFile {
             
             SPEC.newLine();
             
-            skippedSpawnTypes = SPEC.define( new PredicateStringListField( "skipped_spawn_types", "MobSpawnType",
+            skippedSpawnTypes = SPEC.define( new StringListField( "skipped_spawn_types", "MobSpawnType",
                     makeDefaultSkippedSpawnTypes(), mobSpawnTypes::contains,
                     "A list of mob spawn types that the mob replacer should not process.",
                     "For example, listing \"spawner\" here will stop the mob replacer from processing mobs spawned from spawners.",
@@ -162,11 +162,11 @@ public class MainConfig extends AbstractConfigFile {
             caveSpiderSpawnChance = new DoubleField.EnvironmentSensitive(
                     SPEC.define( new DoubleField( "cave_spider_chance.base", 0.0, DoubleField.Range.PERCENT,
                             "The chance for added cave spider natural spawn attempts to succeed. Does not affect Mob Replacement." ) ),
-                    SPEC.define( new EnvironmentListField( "cave_spider_chance.exceptions", new EnvironmentList(
-                            EnvironmentEntry.builder( SPEC, 1.0F ).belowDiamondLevel().build(),
-                            EnvironmentEntry.builder( SPEC, 1.0F ).inStructure( BuiltinStructures.MINESHAFT ).build(),
-                            EnvironmentEntry.builder( SPEC, 0.33F ).belowSeaFloor().build() )
-                            .setRange( DoubleField.Range.PERCENT ),
+                    SPEC.define( new EnvironmentListField<>( "cave_spider_chance.exceptions",
+                            EnvironmentList.builder( DoubleValueCodec.PERCENT )
+                                    .entryBuilder( 1.0 ).inStructure( BuiltinStructures.MINESHAFT ).build()
+                                    .entryBuilder( 0.33 ).belowSeaFloor().build()
+                                    .build(),
                             "The chance for added cave spider natural spawn attempts to succeed when specific environmental conditions are met." ) )
             );
             

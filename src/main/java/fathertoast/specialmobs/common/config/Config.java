@@ -13,31 +13,13 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
  */
 public class Config {
     
-    public static ConfigManager MANAGER;
+    public static final ConfigManager MANAGER = ConfigManager.create( "SpecialMobs", SpecialMobs.MOD_ID );
     public static MainConfig MAIN;
-    public static ReadMeConfig README;
-    
-    
-    /*
-    static {
-        MANAGER = ConfigManager.create( "SpecialMobs", SpecialMobs.MOD_ID );
-        MAIN = new MainConfig( MANAGER, "main" );
-        README = new ReadMeConfig( MANAGER );
-        
-        README.SPEC.initialize();
-        MAIN.SPEC.initialize();
-        MobFamily.initBestiary(); // Just make sure this class gets loaded
-    }
-    
-     */
     
     /** Called from {@link SpecialMobs#SpecialMobs(FMLJavaModLoadingContext)} to load this class. */
     public static void initialize() {
-        MANAGER = ConfigManager.create( "SpecialMobs", SpecialMobs.MOD_ID );
         MAIN = new MainConfig( MANAGER, "main" );
-        README = new ReadMeConfig( MANAGER );
         
-        README.SPEC.initialize();
         MAIN.SPEC.initialize();
         MobFamily.initBestiary(); // Just make sure this class gets loaded
     }

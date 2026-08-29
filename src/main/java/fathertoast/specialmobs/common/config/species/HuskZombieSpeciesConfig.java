@@ -5,8 +5,8 @@ import fathertoast.crust.api.config.common.ConfigManager;
 import fathertoast.crust.api.config.common.ConfigUtil;
 import fathertoast.crust.api.config.common.field.DoubleField;
 import fathertoast.crust.api.config.common.field.EnvironmentListField;
-import fathertoast.crust.api.config.common.value.EnvironmentEntry;
-import fathertoast.crust.api.config.common.value.EnvironmentList;
+import fathertoast.crust.api.config.common.value.collection.value.DoubleValueCodec;
+import fathertoast.crust.api.config.common.value.environment.EnvironmentList;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 
 
@@ -32,8 +32,10 @@ public class HuskZombieSpeciesConfig extends ZombieSpeciesConfig {
             convertVariantChance = new DoubleField.EnvironmentSensitive(
                     SPEC.define( new DoubleField( "special_variant_chance.base", 0.33, DoubleField.Range.PERCENT,
                             "The chance for " + speciesName + " to convert to a special zombie variant when drowned." ) ),
-                    SPEC.define( new EnvironmentListField( "special_variant_chance.exceptions", new EnvironmentList(
-                            EnvironmentEntry.builder( SPEC, 0.66F ).atMaxMoonLight().build() ).setRange( DoubleField.Range.PERCENT ),
+                    SPEC.define( new EnvironmentListField<>( "special_variant_chance.exceptions",
+                            EnvironmentList.builder( DoubleValueCodec.PERCENT )
+                                    .entryBuilder( 0.66 ).atMaxMoonLight().build()
+                                    .build(),
                             "The chance for " + speciesName + " to convert to a special zombie variant when drowned while specific environmental conditions are met." ) )
             );
         }

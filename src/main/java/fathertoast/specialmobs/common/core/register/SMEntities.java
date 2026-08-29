@@ -1,6 +1,6 @@
 package fathertoast.specialmobs.common.core.register;
 
-import fathertoast.crust.api.config.common.value.ConfigDrivenAttributeModifierMap;
+import fathertoast.crust.api.config.common.value.ConfigDrivenAttributeSupplier;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.core.SpecialMobs;
 import fathertoast.specialmobs.common.entity.misc.MobBoat;
@@ -54,7 +54,7 @@ public class SMEntities {
     public static void createAttributes( EntityAttributeCreationEvent event ) {
         // Bestiary-generated entities
         for( MobFamily.Species<?> species : MobFamily.getAllSpecies() ) {
-            event.put( species.entityType.get(), new ConfigDrivenAttributeModifierMap(
+            event.put( species.entityType.get(), new ConfigDrivenAttributeSupplier(
                     species.config.GENERAL.attributeChanges, AnnotationHelper.createAttributes( species ) ) );
         }
     }

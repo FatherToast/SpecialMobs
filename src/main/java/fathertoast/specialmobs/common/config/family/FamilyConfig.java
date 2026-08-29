@@ -4,14 +4,13 @@ import fathertoast.crust.api.config.common.AbstractConfigCategory;
 import fathertoast.crust.api.config.common.AbstractConfigFile;
 import fathertoast.crust.api.config.common.ConfigManager;
 import fathertoast.crust.api.config.common.ConfigUtil;
-import fathertoast.crust.api.config.common.field.BooleanField;
-import fathertoast.crust.api.config.common.field.DoubleField;
-import fathertoast.crust.api.config.common.field.EnvironmentListField;
+import fathertoast.crust.api.config.common.field.*;
 import fathertoast.crust.api.config.common.file.TomlHelper;
-import fathertoast.crust.api.config.common.value.EnvironmentEntry;
-import fathertoast.crust.api.config.common.value.EnvironmentList;
+import fathertoast.crust.api.config.common.value.collection.value.DoubleValueCodec;
+import fathertoast.crust.api.config.common.value.environment.EnvironmentList;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -40,18 +39,18 @@ public class FamilyConfig extends AbstractConfigFile {
     
     /** Builds the config spec that should be used for this config. */
     public FamilyConfig( ConfigManager manager, MobFamily<?, ?> family, double variantChance ) {
-        super( manager, ConfigUtil.noSpaces( family.configName ) + "/" + fileName( family ),
+        super( manager, ConfigUtil.noSpaces( family.configName ) + "/" + fileName( family ), false,
                 "This config contains options that apply to the family of " + family.configName + " as a whole; " +
                         "that is, the vanilla replacement and all special variants." );
         
         SPEC.fileOnlyNewLine();
-        SPEC.describeEnvironmentListPart1of2();
+        EnvironmentListField.describe1of2( SPEC );
         SPEC.fileOnlyNewLine();
         
         GENERAL = new General( this, family, variantChance );
         
         SPEC.fileOnlyNewLine();
-        SPEC.describeEnvironmentListPart2of2();
+        EnvironmentListField.describe2of2( SPEC );
         SPEC.fileOnlyNewLine();
     }
     
@@ -63,7 +62,7 @@ public class FamilyConfig extends AbstractConfigFile {
         
         public final DoubleField.EnvironmentSensitive specialVariantChance;
         
-        public final DoubleField.EnvironmentSensitiveWeightedList<MobFamily.Species<?>> specialVariantList;
+        public final EnvironmentSensitiveWeightedList<MobFamily.Species<?>> specialVariantList;
         
         General( FamilyConfig parent, MobFamily<?, ?> family, double variantChance ) {
             super( parent, "general",
@@ -85,46 +84,44 @@ public class FamilyConfig extends AbstractConfigFile {
             specialVariantChance = new DoubleField.EnvironmentSensitive(
                     SPEC.define( new DoubleField( "special_variant_chance.base", variantChance, DoubleField.Range.PERCENT,
                             "The chance for " + family.configName + " to spawn as special variants." ) ),
-                    SPEC.define( new EnvironmentListField( "special_variant_chance.exceptions", new EnvironmentList(
-                            EnvironmentEntry.builder( SPEC, (float) variantChance * 0.5F ).beforeDays( 5 ).build(), // Also skips first night's full moon
-                            EnvironmentEntry.builder( SPEC, (float) variantChance * 2.0F ).atMaxMoonLight().aboveDifficulty( 0.5F ).build(),
-                            EnvironmentEntry.builder( SPEC, (float) variantChance * 1.5F ).atMaxMoonLight().build(),
-                            EnvironmentEntry.builder( SPEC, (float) variantChance * 1.5F ).aboveDifficulty( 0.5F ).build() )
-                            .setRange( DoubleField.Range.PERCENT ),
+                    SPEC.define( new EnvironmentListField<>( "special_variant_chance.exceptions",
+                            EnvironmentList.builder( DoubleValueCodec.PERCENT )
+                                    .entryBuilder( variantChance * 0.5 ).beforeDays( 5 ).build() // Also skips first night's full moon
+                                    .entryBuilder( variantChance * 2.0 ).atMaxMoonLight().and().aboveDifficulty( 0.5F ).build()
+                                    .entryBuilder( variantChance * 1.5 ).atMaxMoonLight().build()
+                                    .entryBuilder( variantChance * 1.5 ).aboveDifficulty( 0.5F ).build()
+                                    .build(),
                             "The chance for " + family.configName + " to spawn as special variants when specific environmental conditions are met." ) )
             );
             
             SPEC.newLine();
             
             List<String> comment;
-            final DoubleField[] baseWeights = new DoubleField[family.variants.length];
-            final EnvironmentListField[] weightExceptions = new EnvironmentListField[family.variants.length];
+            List<IntField> baseWeights = new ArrayList<>( family.variants.length );
+            List<EnvironmentListField<Integer>> weightExceptions = new ArrayList<>( family.variants.length );
             
             comment = TomlHelper.newComment(
-                    "The weight of each " + ConfigUtil.camelCaseToLowerSpace( family.name ) + " species to be chosen as the replacement when " +
-                            family.configName + " spawn as special variants. Higher weight is more common." );
-            comment.add( TomlHelper.multiFieldInfo( DoubleField.Range.NON_NEGATIVE ) );
+                    "The weight of each " + ConfigUtil.camelCaseToLowerSpace( family.name ) + " species to " +
+                            "be chosen as the replacement when " + family.configName + " spawn as special variants, " +
+                            "along with exceptions which modify that weight when specific environmental conditions are " +
+                            "met. Higher weight is more common." );
+            comment.add( TomlHelper.multiFieldInfo( IntField.Range.NON_NEGATIVE ) );
             SPEC.comment( comment );
             for( int i = 0; i < family.variants.length; i++ ) {
-                baseWeights[i] = SPEC.define( new DoubleField(
-                        "weight." + ConfigUtil.camelCaseToLowerUnderscore( family.variants[i].specialVariantName ) + ".base",
-                        family.variants[i].bestiaryInfo.defaultWeight.value, DoubleField.Range.NON_NEGATIVE, (String[]) null ) );
+                baseWeights.add( SPEC.define( new IntField( "weight." +
+                        ConfigUtil.camelCaseToLowerUnderscore( family.variants[i].specialVariantName ) + ".base",
+                        family.variants[i].bestiaryInfo.defaultWeight.value, IntField.Range.NON_NEGATIVE, (String[]) null ) ) );
+                weightExceptions.add( SPEC.define( new EnvironmentListField<>( "weight." +
+                        ConfigUtil.camelCaseToLowerUnderscore( family.variants[i].specialVariantName ) + ".exceptions",
+                        family.variants[i].bestiaryInfo.theme.getValue(), (String[]) null ) ) );
             }
             
-            SPEC.newLine();
-            
-            comment = TomlHelper.newComment(
-                    "The weight of each " + ConfigUtil.camelCaseToLowerSpace( family.name ) + " species to be chosen as the replacement when " +
-                            family.configName + " spawn as special variants when specific environmental conditions are met. Higher weight is more common." );
-            comment.add( TomlHelper.multiFieldInfo( DoubleField.Range.NON_NEGATIVE ) );
-            SPEC.comment( comment );
-            for( int i = 0; i < family.variants.length; i++ ) {
-                weightExceptions[i] = SPEC.define( new EnvironmentListField(
-                        "weight." + ConfigUtil.camelCaseToLowerUnderscore( family.variants[i].specialVariantName ) + ".exceptions",
-                        family.variants[i].bestiaryInfo.theme.getValue(), (String[]) null ) );
-            }
-            
-            specialVariantList = new DoubleField.EnvironmentSensitiveWeightedList<>( family.variants, baseWeights, weightExceptions );
+            specialVariantList = new EnvironmentSensitiveWeightedList<>( family.variants, tempOof( baseWeights ), tempOof( weightExceptions ) );
         }
+    }
+    
+    //TODO remove with next Crust update
+    private static <T> T[] tempOof( List<T> list, T... bonk ) {
+        return list.toArray( list.toArray( bonk ) );
     }
 }
