@@ -34,7 +34,6 @@ import net.minecraftforge.event.entity.EntityTeleportEvent;
 import java.util.List;
 
 @SpecialMob
-@SuppressWarnings( "resource" )
 public class IcyEndermanEntity extends _SpecialEndermanEntity {
     
     //--------------- Static Special Mob Hooks ----------------

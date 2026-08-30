@@ -23,7 +23,6 @@ import net.minecraft.world.phys.Vec3;
 import java.util.List;
 
 @SpecialMob
-@SuppressWarnings( "resource" )
 public class ImplodingCreeperEntity extends _SpecialCreeperEntity {
     
     //--------------- Static Special Mob Hooks ----------------

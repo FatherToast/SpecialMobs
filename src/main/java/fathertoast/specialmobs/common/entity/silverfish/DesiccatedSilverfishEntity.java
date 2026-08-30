@@ -34,7 +34,6 @@ import java.util.ArrayDeque;
 import java.util.Queue;
 
 @SpecialMob
-@SuppressWarnings( "resource" )
 public class DesiccatedSilverfishEntity extends _SpecialSilverfishEntity {
     
     //--------------- Static Special Mob Hooks ----------------

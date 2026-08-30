@@ -24,7 +24,6 @@ import net.minecraftforge.event.ForgeEventFactory;
 import javax.annotation.Nullable;
 
 @SpecialMob
-@SuppressWarnings( "resource" )
 public class QueenGhastEntity extends _SpecialGhastEntity {
     
     //--------------- Static Special Mob Hooks ----------------

@@ -47,7 +47,6 @@ import java.util.UUID;
 import java.util.function.Predicate;
 
 @SpecialMob
-@SuppressWarnings( "resource" )
 public class EnderCreeperEntity extends _SpecialCreeperEntity implements NeutralMob {
     
     //--------------- Static Special Mob Hooks ----------------

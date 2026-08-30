@@ -22,7 +22,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import java.util.List;
 
 @SpecialMob
-@SuppressWarnings( "resource" )
 public class DarkCreeperEntity extends _SpecialCreeperEntity {
     
     //--------------- Static Special Mob Hooks ----------------

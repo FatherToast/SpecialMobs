@@ -42,7 +42,6 @@ import net.minecraftforge.event.ForgeEventFactory;
 import java.util.List;
 
 @SpecialMob
-@SuppressWarnings( "resource" )
 public class SnowCreeperEntity extends _SpecialCreeperEntity {
     
     //--------------- Static Special Mob Hooks ----------------

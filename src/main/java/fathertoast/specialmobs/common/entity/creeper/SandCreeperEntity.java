@@ -29,7 +29,6 @@ import net.minecraft.world.level.storage.ServerLevelData;
 import java.util.List;
 
 @SpecialMob
-@SuppressWarnings( "resource" )
 public class SandCreeperEntity extends _SpecialCreeperEntity {
     
     //--------------- Static Special Mob Hooks ----------------
