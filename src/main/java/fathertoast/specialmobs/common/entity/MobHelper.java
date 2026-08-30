@@ -51,7 +51,6 @@ import net.minecraftforge.fluids.FluidType;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 
-@SuppressWarnings( { "JavadocReference", "resource" } )
 public final class MobHelper {
     
     /** Pool of effects to choose from for plague-type mobs to apply on hit. Duration is a multiplier. */

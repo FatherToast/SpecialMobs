@@ -28,16 +28,7 @@ import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityDimensions;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.MobSpawnType;
-import net.minecraft.world.entity.MobType;
-import net.minecraft.world.entity.Pose;
-import net.minecraft.world.entity.SpawnGroupData;
+import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
@@ -122,12 +113,12 @@ public class _SpecialWitchEntity extends Witch implements ISpecialMob<_SpecialWi
     }
     
     /** Override to change this entity's AI goals. */
-    protected void registerVariantGoals() { }
+    protected void registerVariantGoals() {}
     
     /** Override to change starting equipment or stats. */
     @SuppressWarnings( "unused" )
     public void finalizeVariantSpawn( ServerLevelAccessor level, DifficultyInstance difficulty, @Nullable MobSpawnType spawnType,
-                                      @Nullable SpawnGroupData groupData ) { }
+                                      @Nullable SpawnGroupData groupData ) {}
     
     /** Called when this entity successfully damages a target to apply on-hit effects. */
     @Override
@@ -138,7 +129,7 @@ public class _SpecialWitchEntity extends Witch implements ISpecialMob<_SpecialWi
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @SuppressWarnings( "unused" ) // Not normally used for witches
-    protected void onVariantAttack( LivingEntity target ) { }
+    protected void onVariantAttack( LivingEntity target ) {}
     
     /** Called to attack the target with a ranged attack. */
     @Override
@@ -191,7 +182,10 @@ public class _SpecialWitchEntity extends Witch implements ISpecialMob<_SpecialWi
             potion = makeSplashPotion( Potions.SLOWNESS );
         }
         else if( target.getHealth() >= 8.0F && !target.hasEffect( MobEffects.POISON ) ) {
-            potion = makeSplashPotion( Potions.POISON );
+            double duration = MobFamily.WITCH.config.WITCHES.poisonDuration.get();
+            potion = duration > 0.0 && duration != 1.0 ? makeSplashPotion( Collections.singletonList(
+                    new MobEffectInstance( MobEffects.POISON, (int) (900 * duration), 0 ) ) ) :
+                    makeSplashPotion( Potions.POISON );
         }
         else if( distance <= 3.0F && !target.hasEffect( MobEffects.WEAKNESS ) && random.nextFloat() < 0.25F ) {
             potion = makeSplashPotion( Potions.WEAKNESS );
@@ -219,6 +213,7 @@ public class _SpecialWitchEntity extends Witch implements ISpecialMob<_SpecialWi
     
     /** Called each tick while this witch is capable of using a potion on itself. */
     protected void tryUsingPotion() {
+        //noinspection deprecation
         if( random.nextFloat() < 0.15F && isEyeInFluid( FluidTags.WATER ) && !hasEffect( MobEffects.WATER_BREATHING ) ) {
             usePotion( makePotion( Potions.WATER_BREATHING ) );
         }
@@ -240,13 +235,13 @@ public class _SpecialWitchEntity extends Witch implements ISpecialMob<_SpecialWi
     }
     
     /** Override to add additional potions this witch can drink if none of the base potions are chosen. */
-    protected void tryVariantUsingPotion() { }
+    protected void tryVariantUsingPotion() {}
     
     /** Override to save data to this entity's NBT data. */
-    public void addVariantSaveData( CompoundTag saveTag ) { }
+    public void addVariantSaveData( CompoundTag saveTag ) {}
     
     /** Override to load data from this entity's NBT data. */
-    public void readVariantSaveData( CompoundTag saveTag ) { }
+    public void readVariantSaveData( CompoundTag saveTag ) {}
     
     
     //--------------- Family-Specific Implementations ----------------
@@ -286,7 +281,7 @@ public class _SpecialWitchEntity extends Witch implements ISpecialMob<_SpecialWi
     
     /** Called to update this entity's attack AI based on NBT data. */
     public void recalculateAttackGoal() {
-        if( level() != null && !level().isClientSide ) {
+        if( !level().isClientSide ) {
             AIHelper.removeGoals( goalSelector, RangedAttackGoal.class );
             goalSelector.addGoal( 2, new RangedAttackGoal( this, getSpecialData().getRangedWalkSpeed(),
                     getSpecialData().getRangedAttackCooldown(), getSpecialData().getRangedAttackMaxRange() ) );

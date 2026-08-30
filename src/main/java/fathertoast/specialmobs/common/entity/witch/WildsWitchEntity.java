@@ -14,6 +14,7 @@ import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.DamageTypeTags;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -24,11 +25,11 @@ import net.minecraft.world.item.alchemy.PotionUtils;
 import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
-import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.event.ForgeEventFactory;
 
 import javax.annotation.Nullable;
+import java.util.Collections;
 
 @SpecialMob
 public class WildsWitchEntity extends _SpecialWitchEntity {
@@ -108,14 +109,21 @@ public class WildsWitchEntity extends _SpecialWitchEntity {
             return ItemStack.EMPTY;
         }
         if( !target.hasEffect( MobEffects.POISON ) ) {
-            return makeSplashPotion( Potions.STRONG_POISON );
+            return makeSplashPoison();
         }
         // Save the spiders
         final Potion originalType = PotionUtils.getPotion( originalPotion );
         if( originalType == Potions.HARMING || originalType == Potions.STRONG_HARMING ) {
-            return makeSplashPotion( Potions.STRONG_POISON );
+            return makeSplashPoison();
         }
         return originalPotion;
+    }
+    
+    private ItemStack makeSplashPoison() {
+        double duration = MobFamily.WITCH.config.WITCHES.poisonDuration.get();
+        return duration > 0.0 && duration != 1.0 ? makeSplashPotion( Collections.singletonList(
+                new MobEffectInstance( MobEffects.POISON, (int) (432 * duration), 1 ) ) ) :
+                makeSplashPotion( Potions.STRONG_POISON );
     }
     
     /** Helper method to simplify spawning babies. */
