@@ -8,12 +8,9 @@ import fathertoast.crust.api.config.common.field.*;
 import fathertoast.crust.api.config.common.file.TomlHelper;
 import fathertoast.crust.api.config.common.value.collection.value.DoubleValueCodec;
 import fathertoast.crust.api.config.common.value.environment.EnvironmentList;
-import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.level.levelgen.structure.BuiltinStructures;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 public class MainConfig extends AbstractConfigFile {
     
@@ -39,14 +36,6 @@ public class MainConfig extends AbstractConfigFile {
     }
     
     public static class General extends AbstractConfigCategory<MainConfig> {
-        
-        public static final List<String> mobSpawnTypes = new ArrayList<>();
-        
-        static {
-            for( MobSpawnType type : MobSpawnType.values() ) {
-                mobSpawnTypes.add( type.name().toLowerCase( Locale.ROOT ) );
-            }
-        }
         
         public final BooleanField enableMobReplacement;
         public final BooleanField enableNaturalSpawning;
@@ -76,10 +65,10 @@ public class MainConfig extends AbstractConfigFile {
             SPEC.newLine();
             
             skippedSpawnTypes = SPEC.define( new StringListField( "skipped_spawn_types", "MobSpawnType",
-                    makeDefaultSkippedSpawnTypes(), mobSpawnTypes::contains,
+                    makeDefaultSkippedSpawnTypes(), SpawnType::isValid,
                     "A list of mob spawn types that the mob replacer should not process.",
                     "For example, listing \"spawner\" here will stop the mob replacer from processing mobs spawned from spawners.",
-                    "Valid types are as follows: " + TomlHelper.literalList( mobSpawnTypes ) ) );
+                    "Valid types: " + TomlHelper.toLiteralList( (Object[]) SpawnType.values() ) ) );
             
             SPEC.newLine();
             
@@ -112,9 +101,7 @@ public class MainConfig extends AbstractConfigFile {
         
         private List<String> makeDefaultSkippedSpawnTypes() {
             return List.of(
-                    MobSpawnType.STRUCTURE.name().toLowerCase( Locale.ROOT ),
-                    MobSpawnType.BUCKET.name().toLowerCase( Locale.ROOT ),
-                    MobSpawnType.CHUNK_GENERATION.name().toLowerCase( Locale.ROOT )
+                    SpawnType.CHUNK_GENERATION.toString(), SpawnType.STRUCTURE.toString(), SpawnType.BUCKET.toString()
             );
         }
     }

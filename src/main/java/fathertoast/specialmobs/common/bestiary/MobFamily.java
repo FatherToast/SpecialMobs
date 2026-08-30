@@ -12,7 +12,6 @@ import fathertoast.specialmobs.common.util.AnnotationHelper;
 import fathertoast.specialmobs.common.util.References;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.monster.*;
@@ -147,7 +146,7 @@ public class MobFamily<T extends Mob, V extends FamilyConfig> {
     
     /** @return The family of mobs that can replace the passed entity; returns null if the entity is not replaceable. */
     @Nullable
-    public static MobFamily<?, ?> getReplacementFamily( Entity entity ) { return TYPE_TO_FAMILY_MAP.get( entity.getType() ); }
+    public static MobFamily<?, ?> getReplacementFamily( Mob mob ) { return TYPE_TO_FAMILY_MAP.get( mob.getType() ); }
     
     
     //--------------- Family Instance Implementations ----------------

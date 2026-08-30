@@ -28,6 +28,7 @@ public class SpecialMobs {
      *       + = incomplete new feature, ? = feature to consider adding)
      *  - general
      *      - mob replacer
+     *      + alternate spawn method
      *      - environment-sensitive configs
      *  - natural spawning
      *      - copied spawns
@@ -95,6 +96,7 @@ public class SpecialMobs {
      *      - witches
      *          - ability to equip held items (wonky)
      *          - use splash speed instead of regular
+     *          ? nerf poison potions, cuz like, damn, yo
      *      - ghasts
      *          - melee attack AI
      *          - remove vertical targeting restriction
@@ -116,15 +118,11 @@ public class SpecialMobs {
     /** Logger instance for the mod. */
     public static final Logger LOG = LogManager.getLogger( MOD_ID );
     
-    /** Our mod's packet handler; takes care of networking and sending messages. */
-    @SuppressWarnings( "FieldCanBeLocal" )
-    private final PacketHandler packetHandler = new PacketHandler();
-    
     public SpecialMobs( FMLJavaModLoadingContext context ) {
         // Load config on main thread
         ModLoadingStage.CONSTRUCT.getDeferredWorkQueue().enqueueWork( context.getContainer(), Config::initialize );
         
-        packetHandler.registerMessages();
+        new PacketHandler().registerMessages();
         
         final IEventBus modEventBus = context.getModEventBus();
         

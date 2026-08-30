@@ -15,6 +15,7 @@ import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.compat.ryoamic.RyoamicCompat;
 import fathertoast.specialmobs.common.config.Config;
 import fathertoast.specialmobs.common.core.SpecialMobs;
+import fathertoast.specialmobs.common.core.register.SMBlocks;
 import fathertoast.specialmobs.common.core.register.SMEntities;
 import fathertoast.specialmobs.common.entity.blaze.ArmoredBlazeEntity;
 import fathertoast.specialmobs.common.entity.creeper.EnderCreeperEntity;
@@ -45,16 +46,18 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.projectile.ItemSupplier;
 import net.minecraft.world.entity.vehicle.Boat;
+import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.Items;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.EntityRenderersEvent;
+import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.registries.RegistryObject;
 
 @Mod.EventBusSubscriber( value = Dist.CLIENT, modid = SpecialMobs.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD )
-public class ClientRegister {
+public final class ClientRegister {
     
     @SubscribeEvent
     public static void onClientSetup( FMLClientSetupEvent event ) {
@@ -69,6 +72,12 @@ public class ClientRegister {
         ClientConfigUtil.registerConfigButtonAsEditScreen();
     }
     
+    @SubscribeEvent
+    public static void buildCreativeContents( BuildCreativeModeTabContentsEvent event ) {
+        if( event.getTabKey() == CreativeModeTabs.FUNCTIONAL_BLOCKS ) {
+            SMBlocks.INFESTED_CORAL.forEach( event::accept );
+        }
+    }
     
     @SubscribeEvent
     public static void registerLayerDefs( EntityRenderersEvent.RegisterLayerDefinitions event ) {
@@ -105,7 +114,6 @@ public class ClientRegister {
             }
         }
     }
-    
     
     @SubscribeEvent
     public static void registerEntityRenderers( EntityRenderersEvent.RegisterRenderers event ) {
@@ -157,15 +165,15 @@ public class ClientRegister {
         registerRenderer( event, SMEntities.MOB_BOAT, MobBoatRenderer::new );
     }
     
-    @SuppressWarnings( "unchecked" )
     private static <T extends Mob, E extends LivingEntity> void registerFamilyRenderers( EntityRenderersEvent.RegisterRenderers event, MobFamily<T, ?> family, EntityRendererProvider<E> renderFactory ) {
+        //noinspection unchecked
         event.registerEntityRenderer( family.vanillaReplacement.entityType.get(), (EntityRendererProvider<T>) renderFactory );
         for( MobFamily.Species<? extends T> species : family.variants )
             registerSpeciesRenderer( event, species, renderFactory );
     }
     
-    @SuppressWarnings( "unchecked" )
     private static <T extends Mob, E extends LivingEntity> void registerSpeciesRenderer( EntityRenderersEvent.RegisterRenderers event, MobFamily.Species<T> species, EntityRendererProvider<E> renderFactory ) {
+        //noinspection unchecked
         registerRenderer( event, species.entityType, (EntityRendererProvider<T>) renderFactory );
     }
     
@@ -173,7 +181,6 @@ public class ClientRegister {
         event.registerEntityRenderer( entityType.get(), renderFactory );
     }
     
-    @SuppressWarnings( "SameParameterValue" )
     private static <T extends Entity & ItemSupplier>
     void registerSpriteRenderer( EntityRenderersEvent.RegisterRenderers event, RegistryObject<EntityType<T>> entityType, float scale, boolean fullBright ) {
         event.registerEntityRenderer( entityType.get(), ( context ) ->
