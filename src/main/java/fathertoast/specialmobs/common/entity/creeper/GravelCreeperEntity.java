@@ -19,7 +19,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 
 @SpecialMob
-@SuppressWarnings( "resource" )
 public class GravelCreeperEntity extends _SpecialCreeperEntity {
     
     //--------------- Static Special Mob Hooks ----------------
@@ -81,6 +80,7 @@ public class GravelCreeperEntity extends _SpecialCreeperEntity {
             gravel.time = 1; // Prevent the entity from instantly dying
             gravel.dropItem = false;
             gravel.fallDistance = 3.0F;
+            gravel.setHurtsEntities( 2.0F, 20 );
             
             final float speed = (throwPower * 0.7F + random.nextFloat() * throwPower) / 20.0F;
             final float pitch = random.nextFloat() * (float) Math.PI;
