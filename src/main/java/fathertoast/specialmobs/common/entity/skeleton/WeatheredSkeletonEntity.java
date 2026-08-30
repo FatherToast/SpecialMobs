@@ -8,7 +8,7 @@ import fathertoast.specialmobs.common.config.species.SkeletonSpeciesConfig;
 import fathertoast.specialmobs.common.config.species.SpeciesConfig;
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.util.References;
-import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
+import fathertoast.crust.api.datagen.loot.LootTableBuilder;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.*;
@@ -69,7 +69,7 @@ public class WeatheredSkeletonEntity extends _SpecialSkeletonEntity {
     
     /** Override to change starting equipment or stats. */
     public void finalizeVariantSpawn( ServerLevelAccessor level, DifficultyInstance difficulty, @Nullable MobSpawnType spawnType,
-                                     @Nullable SpawnGroupData groupData ) {
+                                      @Nullable SpawnGroupData groupData ) {
         if( getItemBySlot( EquipmentSlot.MAINHAND ).getItem() == Items.IRON_SWORD ) {
             setItemSlot( EquipmentSlot.MAINHAND, new ItemStack( Items.GOLDEN_SWORD ) );
             

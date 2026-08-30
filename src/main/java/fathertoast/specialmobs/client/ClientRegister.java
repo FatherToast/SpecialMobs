@@ -37,6 +37,8 @@ import net.minecraft.client.model.PiglinModel;
 import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.model.geom.builders.CubeDeformation;
 import net.minecraft.client.model.geom.builders.LayerDefinition;
+import net.minecraft.client.renderer.ItemBlockRenderTypes;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.ThrownItemRenderer;
 import net.minecraft.client.renderer.item.ItemProperties;
@@ -67,10 +69,15 @@ public final class ClientRegister {
             event.enqueueWork( () -> ItemProperties.register( Items.FISHING_ROD,
                     ResourceLocation.withDefaultNamespace( "cast" ), new FishingRodItemPropertyGetter() ) );
         }
+        
         RyoamicCompat.init();
         
         // Tell Forge to open the config editor when our mod's "Config" button is clicked in the Mods screen
+        //noinspection removal
         ClientConfigUtil.registerConfigButtonAsEditScreen();
+        
+        //noinspection removal There seems to be no simple way to copy vanilla models and inject Forge's render type
+        ItemBlockRenderTypes.setRenderLayer( SMBlocks.MELTING_ICE.get(), RenderType.translucent() );
     }
     
     @SubscribeEvent

@@ -30,8 +30,11 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.entity.projectile.Arrow;
 import net.minecraft.world.item.*;
+import net.minecraft.world.item.alchemy.Potion;
+import net.minecraft.world.item.alchemy.PotionUtils;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.FrostWalkerEnchantment;
+import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -50,6 +53,7 @@ import net.minecraftforge.fluids.FluidType;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
+import java.util.Collection;
 
 public final class MobHelper {
     
@@ -328,33 +332,35 @@ public final class MobHelper {
         applyEffectFromTemplate( target, WITCH_EFFECTS[random.nextInt( WITCH_EFFECTS.length - (includePoison ? 0 : 1) )] );
     }
     
-    /** Applies a potion effect to the target with default duration. */
-    public static void applyEffect( LivingEntity target, MobEffect effect ) { applyEffect( target, effect, 1, 1.0F ); }
-    
-    /** Applies a potion effect to the target with default duration and a specified level (amplifier + 1). */
-    public static void applyEffect( LivingEntity target, MobEffect effect, int level ) {
-        applyEffect( target, effect, level, 1.0F );
+    /** Applies a potion effect to the target using the default duration and no amplifier. */
+    public static void applyEffect( LivingEntity target, MobEffect effect ) {
+        applyEffect( target, effect, 0, 1.0F );
     }
     
-    /** Applies a potion effect to the target with default duration and a specified level (amplifier + 1). */
+    /** Applies a potion effect to the target using the default duration and a specified amplifier. */
+    public static void applyEffect( LivingEntity target, MobEffect effect, int amplifier ) {
+        applyEffect( target, effect, amplifier, 1.0F );
+    }
+    
+    /** Applies a potion effect to the target using a specified duration multiplier and no amplifier. */
     public static void applyEffect( LivingEntity target, MobEffect effect, float durationMulti ) {
-        applyEffect( target, effect, 1, durationMulti );
+        applyEffect( target, effect, 0, durationMulti );
     }
     
-    /** Applies a potion effect to the target with default duration and a specified level (amplifier + 1). */
-    public static void applyEffect( LivingEntity target, MobEffect effect, int level, float durationMulti ) {
-        applyEffect( target, effect, level, effect.isInstantenous() ? 1 :
+    /** Applies a potion effect to the target using a specified duration multiplier and amplifier. */
+    public static void applyEffect( LivingEntity target, MobEffect effect, int amplifier, float durationMulti ) {
+        applyEffect( target, effect, amplifier, effect.isInstantenous() ? 1 :
                 (int) (MobHelper.defaultEffectDuration( target.level().getDifficulty() ) * durationMulti) );
     }
     
-    /** Applies a potion effect to the target with a specified level (amplifier + 1) and duration. */
+    /** Applies a potion effect to the target using a specified duration and no amplifier. */
     public static void applyDurationEffect( LivingEntity target, MobEffect effect, int duration ) {
-        applyEffect( target, effect, 1, duration );
+        applyEffect( target, effect, 0, duration );
     }
     
-    /** Applies a potion effect to the target with a specified level (amplifier + 1) and duration. */
-    public static void applyEffect( LivingEntity target, MobEffect effect, int level, int duration ) {
-        target.addEffect( new MobEffectInstance( effect, duration, level - 1 ) );
+    /** Applies a potion effect to the target using a specified duration and amplifier. */
+    public static void applyEffect( LivingEntity target, MobEffect effect, int amplifier, int duration ) {
+        target.addEffect( new MobEffectInstance( effect, duration, amplifier ) );
     }
     
     /** Applies a potion effect to the target based on a template effect. The template's duration is used as a multiplier. */
@@ -368,51 +374,57 @@ public final class MobHelper {
                 baseDuration * template.getDuration(), template.getAmplifier() ) );
     }
     
-    /** Applies a random 'plague' potion effect to the arrow. */
+    /** @return The arrow, with a random 'plague' potion effect applied. */
     public static AbstractArrow tipPlagueArrow( AbstractArrow arrow, RandomSource random ) {
         return tipArrowFromTemplate( arrow, PLAGUE_EFFECTS[random.nextInt( PLAGUE_EFFECTS.length -
                 (Config.MAIN.GENERAL.enableNausea.get() ? 0 : 1) )] );
     }
     
-    //    /** Applies a random 'witch spider' potion effect to the arrow, optionally including poison in the effect pool. */
-    //    public static AbstractArrowEntity tipWitchSpiderArrow( AbstractArrowEntity arrow, Random random, boolean includePoison ) {
+    //    /** @return The arrow, with a random 'witch spider' potion effect applied, optionally including poison in the effect pool. */
+    //    public static AbstractArrow tipWitchSpiderArrow( AbstractArrow arrow, RandomSource random, boolean includePoison ) {
     //        return tipArrowFromTemplate( arrow, WITCH_EFFECTS[random.nextInt( WITCH_EFFECTS.length - (includePoison ? 0 : 1) )] );
     //    }
     
-    /** Applies a potion effect to the arrow with default duration. */
+    /** @return The arrow, with a potion effect applied using the default duration and no amplifier. */
     public static AbstractArrow tipArrow( AbstractArrow arrow, MobEffect effect ) {
-        return tipArrow( arrow, effect, 1, 1.0F );
+        return tipArrow( arrow, effect, 0, 1.0F );
     }
     
-    /** Applies a potion effect to the arrow with default duration and a specified level (amplifier + 1). */
-    public static AbstractArrow tipArrow( AbstractArrow arrow, MobEffect effect, int level ) {
-        return tipArrow( arrow, effect, level, 1.0F );
+    /** @return The arrow, with a potion effect applied using the default duration and a specified amplifier. */
+    public static AbstractArrow tipArrow( AbstractArrow arrow, MobEffect effect, int amplifier ) {
+        return tipArrow( arrow, effect, amplifier, 1.0F );
     }
     
-    /** Applies a potion effect to the arrow with default duration and a specified level (amplifier + 1). */
+    /** @return The arrow, with a potion effect applied using a specified duration multiplier and no amplifier. */
     public static AbstractArrow tipArrow( AbstractArrow arrow, MobEffect effect, float durationMulti ) {
-        return tipArrow( arrow, effect, 1, durationMulti );
+        return tipArrow( arrow, effect, 0, durationMulti );
     }
     
-    /** Applies a potion effect to the arrow with default duration and a specified level (amplifier + 1). */
-    public static AbstractArrow tipArrow( AbstractArrow arrow, MobEffect effect, int level, float durationMulti ) {
-        return tipArrow( arrow, effect, level, effect.isInstantenous() ? 1 :
+    /** @return The arrow, with a potion effect applied using a specified duration multiplier and amplifier. */
+    public static AbstractArrow tipArrow( AbstractArrow arrow, MobEffect effect, int amplifier, float durationMulti ) {
+        return tipArrow( arrow, effect, amplifier, effect.isInstantenous() ? 1 :
                 (int) (MobHelper.defaultEffectDuration( arrow.level().getDifficulty() ) * durationMulti) );
     }
     
-    /** Applies a potion effect to the arrow with a specified level (amplifier + 1) and duration. */
-    public static AbstractArrow tipArrow( AbstractArrow arrow, MobEffect effect, int level, int duration ) {
-        if( arrow instanceof Arrow arrow1 )
-            arrow1.addEffect( new MobEffectInstance( effect, duration, level - 1 ) );
+    /** @return The arrow, with a potion effect applied using a specified duration and amplifier. */
+    public static AbstractArrow tipArrow( AbstractArrow arrow, MobEffect effect, int amplifier, int duration ) {
+        if( arrow instanceof Arrow a )
+            a.addEffect( new MobEffectInstance( effect, duration, amplifier ) );
         return arrow;
     }
     
-    /** Applies a potion effect to the arrow based on a template effect. The template's duration is used as a multiplier. */
+    /**
+     * @return The arrow, with a potion effect applied based on a template effect.
+     * The template's duration is used as a multiplier.
+     */
     public static AbstractArrow tipArrowFromTemplate( AbstractArrow arrow, MobEffectInstance template ) {
         return tipArrowFromTemplate( arrow, template, MobHelper.defaultEffectDuration( arrow.level().getDifficulty() ) );
     }
     
-    /** Applies a potion effect to the arrow based on a template effect. The template's duration is used as a multiplier. */
+    /**
+     * @return The arrow, with a potion effect applied based on a template effect.
+     * The template's duration is used as a multiplier.
+     */
     public static AbstractArrow tipArrowFromTemplate( AbstractArrow arrow, MobEffectInstance template, int baseDuration ) {
         if( arrow instanceof Arrow arrow1 )
             arrow1.addEffect( new MobEffectInstance( template.getEffect(), template.getEffect().isInstantenous() ? 1 :
@@ -420,41 +432,57 @@ public final class MobHelper {
         return arrow;
     }
     
+    /** @return A new potion item with standard effects. */
+    public static ItemStack makePotion( ItemLike potionItem, Potion type ) {
+        return PotionUtils.setPotion( new ItemStack( potionItem ), type );
+    }
+    
+    /** @return A new potion item with custom effects. */
+    public static ItemStack makePotion( ItemLike potionItem, int color, Collection<MobEffectInstance> effects ) {
+        return setCustomPotionColor( PotionUtils.setCustomEffects(
+                new ItemStack( potionItem ), effects ), color );
+    }
+    
+    /** Applies the custom potion color to an item and returns that item for convenience. */
+    public static ItemStack setCustomPotionColor( ItemStack potion, int color ) {
+        potion.getOrCreateTag().putInt( PotionUtils.TAG_CUSTOM_POTION_COLOR, color );
+        return potion;
+    }
+    
     /**
-     * Creates a new trident ItemStack and writes the desired potion effect to it,
+     * Creates a new trident item and writes the desired potion effect to it,
      * which applies the effect on ranged attack.
      */
-    public static ItemStack tridentWithEffect( MobEffect effect, int level, int duration ) {
+    public static ItemStack tridentWithEffect( MobEffect effect, int amplifier, int duration ) {
         ItemStack trident = new ItemStack( Items.TRIDENT );
         CompoundTag stackTag = trident.getOrCreateTag();
         CompoundTag modTag = new CompoundTag();
         CompoundTag effectTag = new CompoundTag();
         
-        MobEffectInstance instance = new MobEffectInstance( effect, duration, level - 1 );
+        MobEffectInstance instance = new MobEffectInstance( effect, duration, amplifier );
         
         instance.save( effectTag );
-        modTag.put( "TridentEffect", effectTag );
+        modTag.put( References.TAG_TRIDENT_EFFECT, effectTag );
         stackTag.put( References.TAG_SPECIAL_MOB_DATA, modTag );
         
         return trident;
     }
     
     /**
-     * Checks the given trident ItemStack for ranged potion effect and
+     * Checks the given trident item for ranged potion effect and
      * returns it if it exists.
      * <br>
      * Also returns null if the item is not {@link Items#TRIDENT}.
      */
     @Nullable
-    public static MobEffectInstance getTridentEffect( ItemStack tridentStack ) {
-        if( tridentStack.getItem() != Items.TRIDENT ) return null;
+    public static MobEffectInstance getTridentEffect( ItemStack trident ) {
+        if( trident.getItem() != Items.TRIDENT ) return null;
         
-        if( tridentStack.hasTag() && NBTHelper.containsCompound( tridentStack.getOrCreateTag(), References.TAG_SPECIAL_MOB_DATA ) ) {
-            // noinspection ConstantConditions
-            CompoundTag modTag = tridentStack.getTag().getCompound( References.TAG_SPECIAL_MOB_DATA );
+        if( trident.hasTag() && NBTHelper.containsCompound( trident.getOrCreateTag(), References.TAG_SPECIAL_MOB_DATA ) ) {
+            CompoundTag modTag = trident.getOrCreateTag().getCompound( References.TAG_SPECIAL_MOB_DATA );
             
-            if( NBTHelper.containsCompound( modTag, "TridentEffect" ) ) {
-                return MobEffectInstance.load( modTag.getCompound( "TridentEffect" ) );
+            if( NBTHelper.containsCompound( modTag, References.TAG_TRIDENT_EFFECT ) ) {
+                return MobEffectInstance.load( modTag.getCompound( References.TAG_TRIDENT_EFFECT ) );
             }
         }
         return null;

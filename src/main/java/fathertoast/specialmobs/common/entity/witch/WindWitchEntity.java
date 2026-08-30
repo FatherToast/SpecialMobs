@@ -8,7 +8,7 @@ import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.entity.ai.AIHelper;
 import fathertoast.specialmobs.common.entity.ai.FluidPathNavigator;
 import fathertoast.specialmobs.common.util.References;
-import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
+import fathertoast.crust.api.datagen.loot.LootTableBuilder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -192,6 +192,7 @@ public class WindWitchEntity extends _SpecialWitchEntity {
         while( pos.getY() > 0 ) {
             // Allow wind witch to teleport on top of water
             final BlockState block = level().getBlockState( pos );
+            //noinspection deprecation No replacement method?
             if( block.blocksMotion() || block.getFluidState().is( FluidTags.WATER ) ) {
                 
                 final EntityTeleportEvent.EnderEntity event = ForgeEventFactory.onEnderTeleport( this, x, y + 1, z );

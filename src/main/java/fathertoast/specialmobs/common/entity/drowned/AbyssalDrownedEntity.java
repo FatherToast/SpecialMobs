@@ -8,7 +8,7 @@ import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.entity.ai.AIHelper;
 import fathertoast.specialmobs.common.entity.ai.goal.AmphibiousGoToWaterGoal;
 import fathertoast.specialmobs.common.util.References;
-import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
+import fathertoast.crust.api.datagen.loot.LootTableBuilder;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -72,6 +72,6 @@ public class AbyssalDrownedEntity extends _SpecialDrownedEntity {
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override
     protected void onVariantAttack( LivingEntity target ) {
-        MobHelper.applyEffect( target, CrustObjects.Effects.WEIGHT.get(), 2 );
+        MobHelper.applyEffect( target, CrustObjects.Effects.WEIGHT.get(), 1 );
     }
 }

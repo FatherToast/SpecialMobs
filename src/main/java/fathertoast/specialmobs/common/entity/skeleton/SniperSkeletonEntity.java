@@ -8,7 +8,7 @@ import fathertoast.specialmobs.common.compat.crust.SMCrustPlugin;
 import fathertoast.specialmobs.common.config.species.SkeletonSpeciesConfig;
 import fathertoast.specialmobs.common.config.species.SpeciesConfig;
 import fathertoast.specialmobs.common.util.References;
-import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
+import fathertoast.crust.api.datagen.loot.LootTableBuilder;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.EntityType;
@@ -73,7 +73,7 @@ public class SniperSkeletonEntity extends _SpecialSkeletonEntity {
     
     /** Called to attack the target with a ranged attack. */
     @Override
-    public void performRangedAttack(LivingEntity target, float damageMulti ) {
+    public void performRangedAttack( LivingEntity target, float damageMulti ) {
         final double g = 0.05; // Gravitational acceleration for AbstractArrowEntity
         final float v = 1.6F;
         
@@ -99,7 +99,7 @@ public class SniperSkeletonEntity extends _SpecialSkeletonEntity {
         final double vH = Math.cos( angle );
         
         final ItemStack arrowItem = getProjectile( getItemInHand( ProjectileUtil.getWeaponHoldingHand(
-                this, item -> item instanceof BowItem) ) );
+                this, item -> item instanceof BowItem ) ) );
         AbstractArrow arrow = getArrow( arrowItem, damageMulti );
         if( getMainHandItem().getItem() instanceof BowItem )
             arrow = ((BowItem) getMainHandItem().getItem()).customArrow( arrow );

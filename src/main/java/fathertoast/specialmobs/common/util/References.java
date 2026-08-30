@@ -91,6 +91,7 @@ public final class References {
     
     // Projectiles
     public static final String TAG_KNOCKBACK = "Knockback";
+    public static final String TAG_TRIDENT_EFFECT = "TridentEffect";
     
     // Creepers
     public static final String TAG_SUPERCHARGED = "Supercharged";

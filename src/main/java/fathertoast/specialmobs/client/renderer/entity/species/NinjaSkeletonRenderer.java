@@ -20,31 +20,37 @@ public class NinjaSkeletonRenderer extends SpecialSkeletonRenderer {
     
     private final BlockRenderDispatcher blockRenderer;
     
-    public NinjaSkeletonRenderer(EntityRendererProvider.Context context, ModelLayerLocation layerLocation ) {
+    public NinjaSkeletonRenderer( EntityRendererProvider.Context context, ModelLayerLocation layerLocation ) {
         super( context, layerLocation );
         blockRenderer = Minecraft.getInstance().getBlockRenderer();
     }
     
     @Override
-    public void render(AbstractSkeleton entity, float rotation, float partialTicks,
-                       PoseStack poseStack, MultiBufferSource buffer, int packedLight ) {
+    public void render( AbstractSkeleton entity, float rotation, float partialTicks,
+                        PoseStack poseStack, MultiBufferSource buffer, int packedLight ) {
         
         INinja ninja = (INinja) entity;
         final BlockState disguiseBlock = ninja.getHiddenDragon();
         
         if( disguiseBlock == null ) {
-            super.render( entity, rotation, partialTicks, poseStack, buffer, packedLight );
+            super.render( entity, rotation, partialTicks,
+                    poseStack, buffer, packedLight );
         }
         else {
             shadowRadius = 0.0F;
-            renderBlockDisguise( disguiseBlock, entity.blockPosition(), entity.level(), poseStack, buffer, entity.getRandom() );
+            renderBlockDisguise( disguiseBlock, entity.blockPosition(), entity.level(),
+                    poseStack, buffer, entity.getRandom() );
         }
     }
     
-    private void renderBlockDisguise( BlockState block, BlockPos pos, LevelReader displayReader, PoseStack poseStack, MultiBufferSource buffer, RandomSource random ) {
+    private void renderBlockDisguise( BlockState block, BlockPos pos, LevelReader displayReader,
+                                      PoseStack poseStack, MultiBufferSource buffer, RandomSource random ) {
         poseStack.pushPose();
         poseStack.translate( -0.5, 0.0, -0.5 );
-        blockRenderer.renderBatched( block, pos, displayReader, poseStack, buffer.getBuffer( RenderType.cutout() ), false, random, ModelData.EMPTY, null );
+        //noinspection DataFlowIssue RenderType param is truly nullable, but incorrectly annotated by Forge
+        blockRenderer.renderBatched( block, pos, displayReader, poseStack,
+                buffer.getBuffer( RenderType.cutout() ), false, random,
+                ModelData.EMPTY, null );
         poseStack.popPose();
     }
 }

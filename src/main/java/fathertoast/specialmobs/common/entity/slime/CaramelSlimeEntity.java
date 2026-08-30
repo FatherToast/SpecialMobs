@@ -5,7 +5,7 @@ import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.core.register.SMDamageTypes;
 import fathertoast.specialmobs.common.util.References;
-import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
+import fathertoast.crust.api.datagen.loot.LootTableBuilder;
 import net.minecraft.core.particles.ItemParticleOption;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
@@ -57,7 +57,7 @@ public class CaramelSlimeEntity extends _SpecialSlimeEntity {
     
     
     //--------------- Variant-Specific Implementations ----------------
-
+    
     private int grabTime;
     
     public CaramelSlimeEntity( EntityType<? extends _SpecialSlimeEntity> entityType, Level level ) { super( entityType, level ); }

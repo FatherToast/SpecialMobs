@@ -1,11 +1,11 @@
 package fathertoast.specialmobs.common.entity.witch;
 
+import fathertoast.crust.api.datagen.loot.LootTableBuilder;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.util.References;
-import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
@@ -74,7 +74,7 @@ public class DominationWitchEntity extends _SpecialWitchEntity {
             return makeSplashPotion( Potions.WEAKNESS );
         }
         else if( distance > 5.0F && !target.hasEffect( MobEffects.LEVITATION ) && random.nextFloat() < 0.5F ) {
-            return makeSplashPotion( LEVITATION_EFFECTS );
+            return makeSplashPotion( MobEffects.LEVITATION.getColor(), LEVITATION_EFFECTS );
         }
         return originalPotion;
     }

@@ -8,7 +8,7 @@ import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.config.species.SkeletonSpeciesConfig;
 import fathertoast.specialmobs.common.config.species.SpeciesConfig;
 import fathertoast.specialmobs.common.util.References;
-import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
+import fathertoast.crust.api.datagen.loot.LootTableBuilder;
 import net.minecraft.tags.EntityTypeTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.Mth;
@@ -97,14 +97,13 @@ public class SpitfireSkeletonEntity extends _SpecialSkeletonEntity {
             
             final SmallFireball fireball = new SmallFireball( level(), this, dX, dY, dZ );
             fireball.setPos( fireball.getX(), getEyeY() - 0.1, fireball.getZ() );
-            // noinspection resource
             level().addFreshEntity( fireball );
         }
     }
     
     /** Sets this entity as a baby. */
     @Override
-    public void setBaby( boolean value ) { }
+    public void setBaby( boolean value ) {}
     
     /** @return True if this entity is a baby. */
     @Override

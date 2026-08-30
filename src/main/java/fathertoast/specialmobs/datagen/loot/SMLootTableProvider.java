@@ -23,7 +23,7 @@ import java.util.stream.Stream;
 
 public class SMLootTableProvider extends LootTableProvider {
     
-    public SMLootTableProvider( PackOutput output ) { super( output, Set.of(), List.of( new SubProviderEntry( EntitySubProvider::new, LootContextParamSets.ENTITY )) ); }
+    public SMLootTableProvider( PackOutput output ) { super( output, Set.of(), List.of( new SubProviderEntry( EntitySubProvider::new, LootContextParamSets.ENTITY ) ) ); }
     
     /** Validates this mod's loot tables. */
     @Override
@@ -35,13 +35,11 @@ public class SMLootTableProvider extends LootTableProvider {
     
     /** Provides all entity loot tables for this mod. */
     public static class EntitySubProvider extends EntityLootSubProvider {
-        protected EntitySubProvider( ) {
-            super( FeatureFlags.REGISTRY.allFlags() );
-        }
-
+        protected EntitySubProvider() { super( FeatureFlags.REGISTRY.allFlags() ); }
+        
         // Pull this protected field out into the Court of Public Opinion.
         public static final EntityPredicate.Builder ENTITY_ON_FIRE = EntityLootSubProvider.ENTITY_ON_FIRE;
-
+        
         /** Builds all loot tables for this provider. */
         @Override
         public void generate() {
@@ -49,7 +47,7 @@ public class SMLootTableProvider extends LootTableProvider {
             for( MobFamily.Species<?> species : MobFamily.getAllSpecies() )
                 add( species.entityType.get(), AnnotationHelper.buildLootTable( species ).toLootTable() );
         }
-
+        
         /** Supplies the entity types this loot table provider will be used for. */
         @Override
         protected Stream<EntityType<?>> getKnownEntityTypes() {

@@ -5,7 +5,7 @@ import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.util.ExplosionHelper;
 import fathertoast.specialmobs.common.util.References;
-import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
+import fathertoast.crust.api.datagen.loot.LootTableBuilder;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LightningBolt;
@@ -64,5 +64,5 @@ public class LightningEndermanEntity extends _SpecialEndermanEntity {
     
     /** Called when this entity is struck by lightning. */
     @Override
-    public void thunderHit( ServerLevel level, LightningBolt lightningBolt ) { }
+    public void thunderHit( ServerLevel level, LightningBolt lightningBolt ) {}
 }

@@ -89,7 +89,7 @@ public class BugSpitEntity extends Projectile {
     public void onAddedToWorld() {
         super.onAddedToWorld();
         
-        if( level() != null && level().isClientSide() ) {
+        if( level().isClientSide() ) {
             final Vec3 v = getDeltaMovement();
             for( int i = 0; i < 7; i++ ) {
                 final double multi = 0.4 + 0.1 * i;

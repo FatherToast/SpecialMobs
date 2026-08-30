@@ -8,7 +8,7 @@ import fathertoast.specialmobs.common.config.species.SilverfishSpeciesConfig;
 import fathertoast.specialmobs.common.config.species.SpeciesConfig;
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.util.References;
-import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
+import fathertoast.crust.api.datagen.loot.LootTableBuilder;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -69,6 +69,6 @@ public class AlbinoSilverfishEntity extends _SpecialSilverfishEntity {
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override
     protected void onVariantAttack( LivingEntity target ) {
-        MobHelper.applyEffect( target, MobEffects.MOVEMENT_SLOWDOWN, 2 );
+        MobHelper.applyEffect( target, MobEffects.MOVEMENT_SLOWDOWN, 1 );
     }
 }

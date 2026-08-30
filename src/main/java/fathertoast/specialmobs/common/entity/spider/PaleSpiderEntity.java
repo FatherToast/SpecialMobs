@@ -5,14 +5,13 @@ import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.util.References;
-import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
+import fathertoast.crust.api.datagen.loot.LootTableBuilder;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
-
 
 @SpecialMob
 public class PaleSpiderEntity extends _SpecialSpiderEntity {
@@ -63,6 +62,6 @@ public class PaleSpiderEntity extends _SpecialSpiderEntity {
     @Override
     protected void onVariantAttack( LivingEntity target ) {
         MobHelper.applyEffect( target, MobEffects.WEAKNESS );
-        MobHelper.applyEffect( target, MobEffects.DIG_SLOWDOWN, 3 );
+        MobHelper.applyEffect( target, MobEffects.DIG_SLOWDOWN, 2 );
     }
 }

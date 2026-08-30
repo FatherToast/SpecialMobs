@@ -14,7 +14,7 @@ import fathertoast.specialmobs.common.entity.ai.FluidPathNavigator;
 import fathertoast.specialmobs.common.entity.skeleton.StraySkeletonEntity;
 import fathertoast.specialmobs.common.util.ExplosionHelper;
 import fathertoast.specialmobs.common.util.References;
-import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
+import fathertoast.crust.api.datagen.loot.LootTableBuilder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.tags.BlockTags;
@@ -168,6 +168,7 @@ public class SnowCreeperEntity extends _SpecialCreeperEntity {
                             final BlockState block = level().getBlockState( pos );
                             if( block.is( Blocks.FROSTED_ICE ) || block.getBlock() == Blocks.WATER && block.getValue( LiquidBlock.LEVEL ) == 0 ) {
                                 final BlockState blockAbove = level().getBlockState( pos.above() );
+                                //noinspection deprecation No replacement method?
                                 if( !blockAbove.blocksMotion() && !blockAbove.getFluidState().is( FluidTags.WATER ) &&
                                         MobHelper.placeBlock( this, pos, MeltingIceBlock.getState( level(), pos ) ) ) {
                                     MeltingIceBlock.scheduleFirstTick( level(), pos, random );

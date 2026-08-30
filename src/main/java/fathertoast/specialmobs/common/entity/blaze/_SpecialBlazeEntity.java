@@ -17,7 +17,7 @@ import fathertoast.specialmobs.common.entity.ai.goal.SpecialBlazeAttackGoal;
 import fathertoast.specialmobs.common.entity.ai.goal.SpecialHurtByTargetGoal;
 import fathertoast.specialmobs.common.event.NaturalSpawnManager;
 import fathertoast.specialmobs.common.util.References;
-import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
+import fathertoast.crust.api.datagen.loot.LootTableBuilder;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -114,12 +114,12 @@ public class _SpecialBlazeEntity extends Blaze implements RangedAttackMob, ISpec
     }
     
     /** Override to change this entity's AI goals. */
-    protected void registerVariantGoals() { }
+    protected void registerVariantGoals() {}
     
     /** Override to change starting equipment or stats. */
     @SuppressWarnings( "unused" )
     public void finalizeVariantSpawn( ServerLevelAccessor level, DifficultyInstance difficulty, @Nullable MobSpawnType spawnType,
-                                      @Nullable SpawnGroupData groupData ) { }
+                                      @Nullable SpawnGroupData groupData ) {}
     
     /** Called when this entity successfully damages a target to apply on-hit effects. */
     @Override
@@ -129,7 +129,7 @@ public class _SpecialBlazeEntity extends Blaze implements RangedAttackMob, ISpec
     }
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
-    protected void onVariantAttack( LivingEntity target ) { }
+    protected void onVariantAttack( LivingEntity target ) {}
     
     /** Called to attack the target with a ranged attack. */
     @Override
@@ -147,10 +147,10 @@ public class _SpecialBlazeEntity extends Blaze implements RangedAttackMob, ISpec
     }
     
     /** Override to save data to this entity's NBT data. */
-    public void addVariantSaveData( CompoundTag saveTag ) { }
+    public void addVariantSaveData( CompoundTag saveTag ) {}
     
     /** Override to load data from this entity's NBT data. */
-    public void readVariantSaveData( CompoundTag saveTag ) { }
+    public void readVariantSaveData( CompoundTag saveTag ) {}
     
     
     //--------------- Family-Specific Implementations ----------------
@@ -213,6 +213,7 @@ public class _SpecialBlazeEntity extends Blaze implements RangedAttackMob, ISpec
     }
     
     /** Called on spawn to initialize properties based on the world, difficulty, and the group it spawns with. */
+    @SuppressWarnings( "deprecation" )
     @Nullable
     @Override
     public final SpawnGroupData finalizeSpawn( ServerLevelAccessor level, DifficultyInstance difficulty, MobSpawnType spawnType,
@@ -284,10 +285,12 @@ public class _SpecialBlazeEntity extends Blaze implements RangedAttackMob, ISpec
     public boolean isIgnoringBlockTriggers() { return getSpecialData().ignorePressurePlates(); }
     
     /** @return True if this entity can breathe underwater. */
+    @SuppressWarnings( "deprecation" )
     @Override
     public boolean canBreatheUnderwater() { return getSpecialData().canBreatheInWater(); }
     
     /** @return True if this entity can be pushed by (flowing) fluids. */
+    @SuppressWarnings( "deprecation" )
     @Override
     public boolean isPushedByFluid() { return !getSpecialData().ignoreWaterPush(); }
     

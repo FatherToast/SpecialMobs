@@ -6,7 +6,7 @@ import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.entity.drowned.GiantDrownedEntity;
 import fathertoast.specialmobs.common.util.References;
-import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
+import fathertoast.crust.api.datagen.loot.LootTableBuilder;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -60,12 +60,12 @@ public class GiantZombieEntity extends _SpecialZombieEntity {
     public GiantZombieEntity( EntityType<? extends _SpecialZombieEntity> entityType, Level level ) {
         super( entityType, level );
     }
-
+    
     @Override
     public float getStepHeight() {
         return 1.0F;
     }
-
+    
     /** Override to change the entity this converts to when drowned. */
     @Override
     protected EntityType<? extends Zombie> getVariantConversionType() { return GiantDrownedEntity.SPECIES.entityType.get(); }
@@ -85,7 +85,7 @@ public class GiantZombieEntity extends _SpecialZombieEntity {
     
     /** Sets this entity as a baby. */
     @Override
-    public void setBaby( boolean value ) { }
+    public void setBaby( boolean value ) {}
     
     /** @return True if this entity is a baby. */
     @Override

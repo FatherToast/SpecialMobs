@@ -7,7 +7,7 @@ import fathertoast.specialmobs.common.core.register.SMTags;
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.util.ExplosionHelper;
 import fathertoast.specialmobs.common.util.References;
-import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
+import fathertoast.crust.api.datagen.loot.LootTableBuilder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.tags.EntityTypeTags;
@@ -53,12 +53,12 @@ public class FlameEndermanEntity extends _SpecialEndermanEntity {
         loot.addCommonDrop( "common", Items.FIRE_CHARGE );
         loot.addUncommonDrop( "uncommon", Items.COAL );
     }
-
+    
     @SpecialMob.EntityTagProvider
     public static List<TagKey<EntityType<?>>> getEntityTags() {
         return List.of( SMTags.EntityTypes.ENDERMEN, EntityTypeTags.FREEZE_HURTS_EXTRA_TYPES );
     }
-
+    
     @SpecialMob.Factory
     public static EntityType.EntityFactory<FlameEndermanEntity> getVariantFactory() { return FlameEndermanEntity::new; }
     

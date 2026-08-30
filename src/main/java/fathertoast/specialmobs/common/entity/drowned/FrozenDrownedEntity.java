@@ -7,7 +7,7 @@ import fathertoast.specialmobs.common.block.MeltingIceBlock;
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.util.ExplosionHelper;
 import fathertoast.specialmobs.common.util.References;
-import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
+import fathertoast.crust.api.datagen.loot.LootTableBuilder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
@@ -76,18 +76,18 @@ public class FrozenDrownedEntity extends _SpecialDrownedEntity {
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override
     protected void onVariantAttack( LivingEntity target ) {
-        MobHelper.applyEffect( target, MobEffects.MOVEMENT_SLOWDOWN, 2 );
+        MobHelper.applyEffect( target, MobEffects.MOVEMENT_SLOWDOWN, 1 );
     }
-
+    
     /**
      * Called from {@link _SpecialDrownedEntity#performRangedAttack(LivingEntity, float)}.<br>
      * Override this if a custom trident stack is needed.
      */
     @Override
     protected ItemStack getTridentForRanged() {
-        return MobHelper.tridentWithEffect( MobEffects.MOVEMENT_SLOWDOWN, 2, MobHelper.defaultEffectDuration( level().getDifficulty() ) );
+        return MobHelper.tridentWithEffect( MobEffects.MOVEMENT_SLOWDOWN, 1, MobHelper.defaultEffectDuration( level().getDifficulty() ) );
     }
-
+    
     /** Called each tick to update this entity's movement. */
     @Override
     public void aiStep() {

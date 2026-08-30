@@ -5,7 +5,7 @@ import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.util.ExplosionHelper;
 import fathertoast.specialmobs.common.util.References;
-import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
+import fathertoast.crust.api.datagen.loot.LootTableBuilder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -82,7 +82,7 @@ public class JoltBlazeEntity extends _SpecialBlazeEntity {
     
     /** @return Attempts to damage this entity; returns true if the hit was successful. */
     @Override
-    public boolean hurt(DamageSource source, float amount ) {
+    public boolean hurt( DamageSource source, float amount ) {
         if( isInvulnerableTo( source ) || fireImmune() && source.is( DamageTypeTags.IS_FIRE ) ) return false;
         
         if( source.is( DamageTypeTags.IS_PROJECTILE ) ) {
@@ -94,7 +94,7 @@ public class JoltBlazeEntity extends _SpecialBlazeEntity {
         
         final boolean success = super.hurt( source, amount );
         if( !level().isClientSide() && getHealth() > 0.0F ) {
-            if( source.getEntity() instanceof LivingEntity) {
+            if( source.getEntity() instanceof LivingEntity ) {
                 for( int i = 0; i < 16; i++ ) {
                     if( teleport() ) break;
                 }
@@ -108,7 +108,7 @@ public class JoltBlazeEntity extends _SpecialBlazeEntity {
     
     /** Called when this entity is struck by lightning. */
     @Override
-    public void thunderHit( ServerLevel level, LightningBolt lightningBolt ) { }
+    public void thunderHit( ServerLevel level, LightningBolt lightningBolt ) {}
     
     /** @return Teleports this "enderman" to a random nearby position; returns true if successful. */
     protected boolean teleport() {
@@ -138,11 +138,13 @@ public class JoltBlazeEntity extends _SpecialBlazeEntity {
     protected boolean teleport( double x, double y, double z ) {
         final BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos( x, y, z );
         
+        //noinspection deprecation No replacement method?
         while( pos.getY() > 0 && !level().getBlockState( pos ).blocksMotion() ) {
             pos.move( Direction.DOWN );
         }
         
         final BlockState block = level().getBlockState( pos );
+        //noinspection deprecation No replacement method?
         if( !block.blocksMotion() || block.getFluidState().is( FluidTags.WATER ) ) return false;
         
         EntityTeleportEvent.EnderEntity event = ForgeEventFactory.onEnderTeleport( this, x, y, z );

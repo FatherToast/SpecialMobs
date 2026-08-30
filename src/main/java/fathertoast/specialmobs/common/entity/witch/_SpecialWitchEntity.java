@@ -1,5 +1,6 @@
 package fathertoast.specialmobs.common.entity.witch;
 
+import fathertoast.crust.api.datagen.loot.LootTableBuilder;
 import fathertoast.crust.api.lib.NBTHelper;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
@@ -12,7 +13,6 @@ import fathertoast.specialmobs.common.entity.SpecialMobData;
 import fathertoast.specialmobs.common.entity.ai.AIHelper;
 import fathertoast.specialmobs.common.event.NaturalSpawnManager;
 import fathertoast.specialmobs.common.util.References;
-import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -44,7 +44,6 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.alchemy.Potion;
 import net.minecraft.world.item.alchemy.PotionUtils;
 import net.minecraft.world.item.alchemy.Potions;
-import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
@@ -183,7 +182,7 @@ public class _SpecialWitchEntity extends Witch implements ISpecialMob<_SpecialWi
         }
         else if( target.getHealth() >= 8.0F && !target.hasEffect( MobEffects.POISON ) ) {
             double duration = MobFamily.WITCH.config.WITCHES.poisonDuration.get();
-            potion = duration > 0.0 && duration != 1.0 ? makeSplashPotion( Collections.singletonList(
+            potion = duration > 0.0 && duration != 1.0 ? makeSplashPotion( MobEffects.POISON.getColor(), Collections.singletonList(
                     new MobEffectInstance( MobEffects.POISON, (int) (900 * duration), 0 ) ) ) :
                     makeSplashPotion( Potions.POISON );
         }
@@ -368,34 +367,24 @@ public class _SpecialWitchEntity extends Witch implements ISpecialMob<_SpecialWi
     }
     
     /** @return A new regular potion with standard effects. */
-    public ItemStack makePotion( Potion type ) { return newPotion( Items.POTION, type ); }
+    public ItemStack makePotion( Potion type ) { return MobHelper.makePotion( Items.POTION, type ); }
     
     /** @return A new regular potion with custom effects. */
     @SuppressWarnings( "unused" )
-    public ItemStack makePotion( Collection<MobEffectInstance> effects ) { return newPotion( Items.POTION, effects ); }
+    public ItemStack makePotion( int color, Collection<MobEffectInstance> effects ) { return MobHelper.makePotion( Items.POTION, color, effects ); }
     
     /** @return A new splash potion with standard effects. */
-    public ItemStack makeSplashPotion( Potion type ) { return newPotion( Items.SPLASH_POTION, type ); }
+    public ItemStack makeSplashPotion( Potion type ) { return MobHelper.makePotion( Items.SPLASH_POTION, type ); }
     
     /** @return A new splash potion on self with custom effects. */
-    public ItemStack makeSplashPotion( Collection<MobEffectInstance> effects ) { return newPotion( Items.SPLASH_POTION, effects ); }
+    public ItemStack makeSplashPotion( int color, Collection<MobEffectInstance> effects ) { return MobHelper.makePotion( Items.SPLASH_POTION, color, effects ); }
     
     /** @return A new lingering splash potion with standard effects. */
-    public ItemStack makeLingeringPotion( Potion type ) { return newPotion( Items.LINGERING_POTION, type ); }
+    public ItemStack makeLingeringPotion( Potion type ) { return MobHelper.makePotion( Items.LINGERING_POTION, type ); }
     
     /** @return A new lingering splash potion with custom effects. */
     @SuppressWarnings( "unused" )
-    public ItemStack makeLingeringPotion( Collection<MobEffectInstance> effects ) { return newPotion( Items.LINGERING_POTION, effects ); }
-    
-    /** @return A new potion with standard effects. */
-    private ItemStack newPotion( ItemLike item, Potion type ) {
-        return PotionUtils.setPotion( new ItemStack( item ), type );
-    }
-    
-    /** @return A new potion with custom effects. */
-    private ItemStack newPotion( ItemLike item, Collection<MobEffectInstance> effects ) {
-        return PotionUtils.setCustomEffects( new ItemStack( item ), effects );
-    }
+    public ItemStack makeLingeringPotion( int color, Collection<MobEffectInstance> effects ) { return MobHelper.makePotion( Items.LINGERING_POTION, color, effects ); }
     
     
     //--------------- ISpecialMob Implementation ----------------
@@ -518,10 +507,12 @@ public class _SpecialWitchEntity extends Witch implements ISpecialMob<_SpecialWi
     public boolean isIgnoringBlockTriggers() { return getSpecialData().ignorePressurePlates(); }
     
     /** @return True if this entity can breathe underwater. */
+    @SuppressWarnings( "deprecation" )
     @Override
     public boolean canBreatheUnderwater() { return getSpecialData().canBreatheInWater(); }
     
     /** @return True if this entity can be pushed by (flowing) fluids. */
+    @SuppressWarnings( "deprecation" )
     @Override
     public boolean isPushedByFluid() { return !getSpecialData().ignoreWaterPush(); }
     

@@ -24,6 +24,7 @@ import net.minecraft.world.entity.vehicle.Boat;
 import org.joml.Quaternionf;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 public class MobBoatRenderer extends EntityRenderer<MobBoat> {
@@ -33,9 +34,10 @@ public class MobBoatRenderer extends EntityRenderer<MobBoat> {
     public MobBoatRenderer( EntityRendererProvider.Context context ) {
         super( context );
         shadowRadius = 0.8F;
-        boatResources = Stream.of( Boat.Type.values() ).collect( ImmutableMap.toImmutableMap( ( type ) -> type, ( t ) -> {
-            return Pair.of( ResourceLocation.tryParse( getTextureLocation( t ) ), createBoatModel( context, t ) );
-        } ) );
+        boatResources = Stream.of( Boat.Type.values() ).collect( ImmutableMap.toImmutableMap(
+                type -> type, type -> Pair.of(
+                        ResourceLocation.tryParse( getTextureLocation( Objects.requireNonNull( type ) ) ),
+                        createBoatModel( context, type ) ) ) );
     }
     
     private ListModel<MobBoat> createBoatModel( EntityRendererProvider.Context context, Boat.Type type ) {

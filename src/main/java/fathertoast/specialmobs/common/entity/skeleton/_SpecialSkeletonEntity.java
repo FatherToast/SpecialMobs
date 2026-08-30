@@ -12,7 +12,7 @@ import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.entity.SpecialMobData;
 import fathertoast.specialmobs.common.event.NaturalSpawnManager;
 import fathertoast.specialmobs.common.util.References;
-import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
+import fathertoast.crust.api.datagen.loot.LootTableBuilder;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -119,14 +119,14 @@ public class _SpecialSkeletonEntity extends AbstractSkeleton implements ISpecial
     }
     
     /** Override to change this entity's AI goals. */
-    protected void registerVariantGoals() { }
+    protected void registerVariantGoals() {}
     
     /** Override to change this entity's attack goal priority. */
     protected int getVariantAttackPriority() { return 4; }
     
     /** Override to change starting equipment or stats. */
     public void finalizeVariantSpawn( ServerLevelAccessor level, DifficultyInstance difficulty, @Nullable MobSpawnType spawnType,
-                                      @Nullable SpawnGroupData groupData ) { }
+                                      @Nullable SpawnGroupData groupData ) {}
     
     /** Called to attack the target with a ranged attack. */
     @Override
@@ -168,13 +168,13 @@ public class _SpecialSkeletonEntity extends AbstractSkeleton implements ISpecial
     }
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
-    protected void onVariantAttack( LivingEntity target ) { }
+    protected void onVariantAttack( LivingEntity target ) {}
     
     /** Override to save data to this entity's NBT data. */
-    public void addVariantSaveData( @SuppressWarnings( "unused" ) CompoundTag saveTag ) { }
+    public void addVariantSaveData( @SuppressWarnings( "unused" ) CompoundTag saveTag ) {}
     
     /** Override to load data from this entity's NBT data. */
-    public void readVariantSaveData( @SuppressWarnings( "unused" ) CompoundTag saveTag ) { }
+    public void readVariantSaveData( @SuppressWarnings( "unused" ) CompoundTag saveTag ) {}
     
     
     //--------------- Family-Specific Implementations ----------------
@@ -201,7 +201,7 @@ public class _SpecialSkeletonEntity extends AbstractSkeleton implements ISpecial
     /** Called to set this entity's attack AI based on current equipment. */
     @Override
     public void reassessWeaponGoal() {
-        if( level() != null && !level().isClientSide ) {
+        if( !level().isClientSide ) {
             if( currentAttackAI != null ) goalSelector.removeGoal( currentAttackAI );
             
             final SpecialMobData<_SpecialSkeletonEntity> data = getSpecialData();
@@ -262,7 +262,7 @@ public class _SpecialSkeletonEntity extends AbstractSkeleton implements ISpecial
     @Override
     public void setBaby( boolean value ) {
         getEntityData().set( IS_BABY, value );
-        if( level() != null && !level().isClientSide ) {
+        if( !level().isClientSide ) {
             final AttributeInstance attributeInstance = getAttribute( Attributes.MOVEMENT_SPEED );
             //noinspection ConstantConditions
             attributeInstance.removeModifier( References.BABY_SPEED_BOOST );
@@ -415,10 +415,12 @@ public class _SpecialSkeletonEntity extends AbstractSkeleton implements ISpecial
     public boolean isIgnoringBlockTriggers() { return getSpecialData().ignorePressurePlates(); }
     
     /** @return True if this entity can breathe underwater. */
+    @SuppressWarnings( "deprecation" )
     @Override
     public boolean canBreatheUnderwater() { return getSpecialData().canBreatheInWater(); }
     
     /** @return True if this entity can be pushed by (flowing) fluids. */
+    @SuppressWarnings( "deprecation" )
     @Override
     public boolean isPushedByFluid() { return !getSpecialData().ignoreWaterPush(); }
     

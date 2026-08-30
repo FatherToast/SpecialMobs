@@ -1,3 +1,10 @@
+1.20.1-4.2.0 "Blaze Edition"
+    - Added config option to nerf witches' splash poison potion (enabled by default).
+    - All added items now show up in the creative inventory.
+    - Fixed special silverfish not spawning from silverfish blocks.
+    - Fixed gravel creepers' gravel failing to apply hit damage.
+    - Fixed creepers creating infinite-potion-duration effect clouds.
+    - Fixed melting ice not being translucent.
 1.20.1-4.1.25
     - Fixed immediate mob replacement checks always canceling original spawns.
 1.20.1-4.1.24

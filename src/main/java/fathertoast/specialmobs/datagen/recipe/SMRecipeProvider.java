@@ -25,6 +25,7 @@ import slimeknights.tconstruct.library.recipe.TinkerRecipeTypes;
 import slimeknights.tconstruct.library.recipe.entitymelting.EntityMeltingRecipeBuilder;
 
 import javax.annotation.Nullable;
+import java.util.Objects;
 import java.util.function.Consumer;
 
 public class SMRecipeProvider extends RecipeProvider {
@@ -82,13 +83,15 @@ public class SMRecipeProvider extends RecipeProvider {
         ConditionalRecipe.builder()
                 .addCondition( new ModLoadedCondition( modId ) )
                 .addRecipe( conditionalSaver -> recipe.save( conditionalSaver, recipeId ) )
-                .generateAdvancement( ResourceLocation.fromNamespaceAndPath( recipeId.getNamespace(), "recipes/" + category.getFolderName() + "/" + recipeId.getPath() ) )
+                .generateAdvancement( ResourceLocation.fromNamespaceAndPath( recipeId.getNamespace(), "recipes/" +
+                        category.getFolderName() + "/" + recipeId.getPath() ) )
                 .build( saver, recipeId );
     }
     
     /** Helper method for generating conditional recipes that utilize special recipe builders from Tinker's. */
     private static void tinkersRecipe( AbstractRecipeBuilder<?> recipe, RegistryObject<?> recipeType, Consumer<FinishedRecipe> saver, String recipeName ) {
-        ResourceLocation recipeId = SpecialMobs.rl( "conditional/" + Namespaces.T_CONSTRUCT + "/" + recipeType.getId().getPath() + "/" + recipeName );
+        ResourceLocation recipeId = SpecialMobs.rl( "conditional/" + Namespaces.T_CONSTRUCT + "/" +
+                Objects.requireNonNull( recipeType.getId() ).getPath() + "/" + recipeName );
         
         ConditionalRecipe.builder()
                 .addCondition( new ModLoadedCondition( Namespaces.T_CONSTRUCT ) )
@@ -109,7 +112,7 @@ public class SMRecipeProvider extends RecipeProvider {
     }
     
     static class Namespaces {
-        
+        @SuppressWarnings( "SpellCheckingInspection" )
         public static final String T_CONSTRUCT = "tconstruct";
     }
 }

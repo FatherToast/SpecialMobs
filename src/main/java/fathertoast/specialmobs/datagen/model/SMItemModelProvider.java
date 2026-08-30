@@ -14,7 +14,7 @@ import java.util.Objects;
 
 public class SMItemModelProvider extends ItemModelProvider {
     
-    public SMItemModelProvider(PackOutput output, ExistingFileHelper existingFileHelper ) {
+    public SMItemModelProvider( PackOutput output, ExistingFileHelper existingFileHelper ) {
         super( output, SpecialMobs.MOD_ID, existingFileHelper );
     }
     
@@ -23,7 +23,7 @@ public class SMItemModelProvider extends ItemModelProvider {
         // Bestiary-generated spawn egg models
         final ResourceLocation spawnEggParent = modLoc( ITEM_FOLDER + "/template_sm_spawn_egg" );
         for( MobFamily.Species<?> species : MobFamily.getAllSpecies() ) {
-            withExistingParent( species.spawnEgg.getId().getPath(), spawnEggParent );
+            withExistingParent( Objects.requireNonNull( species.spawnEgg.getId() ).getPath(), spawnEggParent );
         }
         
         // Simple items

@@ -5,7 +5,7 @@ import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.util.References;
-import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
+import fathertoast.crust.api.datagen.loot.LootTableBuilder;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffects;
@@ -80,7 +80,7 @@ public class VampireZombifiedPiglinEntity extends _SpecialZombifiedPiglinEntity 
     /** Override to modify this entity's ranged attack projectile. */
     @Override
     protected AbstractArrow getVariantArrow( AbstractArrow arrow, ItemStack arrowItem, float damageMulti ) {
-        return MobHelper.tipArrow( arrow, MobEffects.HARM, 2 );
+        return MobHelper.tipArrow( arrow, MobEffects.HARM, 1 );
     }
     
     /** @return Attempts to damage this entity; returns true if the hit was successful. */

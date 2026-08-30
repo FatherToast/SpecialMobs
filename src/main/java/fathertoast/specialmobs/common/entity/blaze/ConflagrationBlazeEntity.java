@@ -7,7 +7,7 @@ import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.core.register.SMTags;
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.util.References;
-import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
+import fathertoast.crust.api.datagen.loot.LootTableBuilder;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.util.Mth;
@@ -101,7 +101,7 @@ public class ConflagrationBlazeEntity extends _SpecialBlazeEntity {
     
     /** Recalculates the modifiers associated with this entity's feeding level counters. */
     private void updateFeedingLevels() {
-        if( level() != null && !level().isClientSide ) {
+        if( !level().isClientSide ) {
             final int cooldownReduction = Mth.floor( getConfig().GENERAL.rangedAttackCooldown.get() * growthLevel * 0.1 );
             getSpecialData().setRangedAttackCooldown( getConfig().GENERAL.rangedAttackCooldown.get() - cooldownReduction );
             getSpecialData().setRangedAttackMaxCooldown( getConfig().GENERAL.rangedAttackMaxCooldown.get() - cooldownReduction );

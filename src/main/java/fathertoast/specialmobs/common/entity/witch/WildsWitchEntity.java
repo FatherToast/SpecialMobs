@@ -10,7 +10,7 @@ import fathertoast.specialmobs.common.config.species.WildsWitchSpeciesConfig;
 import fathertoast.specialmobs.common.entity.spider.BabySpiderEntity;
 import fathertoast.specialmobs.common.entity.spider._SpecialSpiderEntity;
 import fathertoast.specialmobs.common.util.References;
-import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
+import fathertoast.crust.api.datagen.loot.LootTableBuilder;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.DamageTypeTags;
@@ -121,9 +121,9 @@ public class WildsWitchEntity extends _SpecialWitchEntity {
     
     private ItemStack makeSplashPoison() {
         double duration = MobFamily.WITCH.config.WITCHES.poisonDuration.get();
-        return duration > 0.0 && duration != 1.0 ? makeSplashPotion( Collections.singletonList(
-                new MobEffectInstance( MobEffects.POISON, (int) (432 * duration), 1 ) ) ) :
-                makeSplashPotion( Potions.STRONG_POISON );
+        return duration > 0.0 && duration != 1.0 ? makeSplashPotion( MobEffects.POISON.getColor(),
+                Collections.singletonList( new MobEffectInstance( MobEffects.POISON,
+                        (int) (432 * duration), 1 ) ) ) : makeSplashPotion( Potions.STRONG_POISON );
     }
     
     /** Helper method to simplify spawning babies. */

@@ -55,7 +55,8 @@ public class MeltingIceBlock extends IceBlock {
         int solidNeighbors = 0;
         final BlockPos.MutableBlockPos neighborPos = new BlockPos.MutableBlockPos();
         for( Direction direction : Direction.Plane.HORIZONTAL ) {
-            if( level.getBlockState( neighborPos.setWithOffset( pos, direction ) ).isSolid() ) { //TODO: Check if this is correct
+            //noinspection deprecation
+            if( level.getBlockState( neighborPos.setWithOffset( pos, direction ) ).isSolid() ) {
                 solidNeighbors++;
             }
         }
@@ -82,8 +83,7 @@ public class MeltingIceBlock extends IceBlock {
     public static final BooleanProperty HAS_WATER = BooleanProperty.create( "has_water" );
     
     public MeltingIceBlock() {
-        super( BlockBehaviour.Properties.copy( Blocks.ICE ).sound( SoundType.GLASS ).noOcclusion()
-                .randomTicks().friction( 0.98F ).strength( 0.5F ) );
+        super( BlockBehaviour.Properties.copy( Blocks.FROSTED_ICE ) );
         registerDefaultState( stateDefinition.any().setValue( AGE, 0 ).setValue( HAS_WATER, true ) );
     }
     

@@ -10,10 +10,10 @@ import fathertoast.specialmobs.common.config.species.SpeciesConfig;
 import fathertoast.specialmobs.common.entity.ai.IAngler;
 import fathertoast.specialmobs.common.entity.ai.goal.AnglerGoal;
 import fathertoast.specialmobs.common.util.References;
-import fathertoast.specialmobs.datagen.loot.LootEntryItemBuilder;
-import fathertoast.specialmobs.datagen.loot.LootHelper;
-import fathertoast.specialmobs.datagen.loot.LootPoolBuilder;
-import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
+import fathertoast.crust.api.datagen.loot.LootEntryItemBuilder;
+import fathertoast.crust.api.datagen.loot.LootHelper;
+import fathertoast.crust.api.datagen.loot.LootPoolBuilder;
+import fathertoast.crust.api.datagen.loot.LootTableBuilder;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -97,7 +97,7 @@ public class FishingDrownedEntity extends _SpecialDrownedEntity implements IAngl
     /** Override to change starting equipment or stats. */
     @Override
     public void finalizeVariantSpawn( ServerLevelAccessor level, DifficultyInstance difficulty, @Nullable MobSpawnType spawnType,
-                                     @Nullable SpawnGroupData groupData ) {
+                                      @Nullable SpawnGroupData groupData ) {
         setItemSlot( EquipmentSlot.MAINHAND, new ItemStack( Items.FISHING_ROD ) );
         if( getItemBySlot( EquipmentSlot.FEET ).isEmpty() ) {
             ItemStack booties = new ItemStack( Items.LEATHER_BOOTS );

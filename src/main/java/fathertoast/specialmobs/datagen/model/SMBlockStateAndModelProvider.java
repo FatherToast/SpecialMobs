@@ -36,7 +36,7 @@ public class SMBlockStateAndModelProvider extends BlockStateProvider {
             builder.partialState().with( MeltingIceBlock.AGE, age ).modelForState().modelFile( models().getExistingFile(
                     mcLoc( ModelProvider.BLOCK_FOLDER + "/" + name + "_" + age ) ) ).addModel();
         }
-        itemModels().withExistingParent( SMBlocks.MELTING_ICE.getId().getPath(),
+        itemModels().withExistingParent( Objects.requireNonNull( SMBlocks.MELTING_ICE.getId() ).getPath(),
                         mcLoc( ModelProvider.BLOCK_FOLDER + "/" + name + "_0" ) )
                 .renderType( R_TRANSLUCENT );
         

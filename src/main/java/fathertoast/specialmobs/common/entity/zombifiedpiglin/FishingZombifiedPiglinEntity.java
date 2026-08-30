@@ -11,10 +11,10 @@ import fathertoast.specialmobs.common.entity.ai.AIHelper;
 import fathertoast.specialmobs.common.entity.ai.IAngler;
 import fathertoast.specialmobs.common.entity.ai.goal.AnglerGoal;
 import fathertoast.specialmobs.common.util.References;
-import fathertoast.specialmobs.datagen.loot.LootEntryItemBuilder;
-import fathertoast.specialmobs.datagen.loot.LootHelper;
-import fathertoast.specialmobs.datagen.loot.LootPoolBuilder;
-import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
+import fathertoast.crust.api.datagen.loot.LootEntryItemBuilder;
+import fathertoast.crust.api.datagen.loot.LootHelper;
+import fathertoast.crust.api.datagen.loot.LootPoolBuilder;
+import fathertoast.crust.api.datagen.loot.LootTableBuilder;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -99,12 +99,12 @@ public class FishingZombifiedPiglinEntity extends _SpecialZombifiedPiglinEntity 
     
     /** Called to set this entity's attack AI based on current equipment. */
     @Override
-    public void reassessWeaponGoal() { } // Disable bow use
+    public void reassessWeaponGoal() {} // Disable bow use
     
     /** Override to change starting equipment or stats. */
     @Override
     public void finalizeVariantSpawn( ServerLevelAccessor level, DifficultyInstance difficulty, @Nullable MobSpawnType spawnReason,
-                                     @Nullable SpawnGroupData groupData ) {
+                                      @Nullable SpawnGroupData groupData ) {
         setItemSlot( EquipmentSlot.MAINHAND, new ItemStack( Items.FISHING_ROD ) );
         if( getItemBySlot( EquipmentSlot.FEET ).isEmpty() ) {
             ItemStack booties = new ItemStack( Items.LEATHER_BOOTS );
