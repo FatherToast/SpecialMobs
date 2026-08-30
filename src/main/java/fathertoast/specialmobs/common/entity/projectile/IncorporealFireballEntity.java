@@ -1,9 +1,10 @@
 package fathertoast.specialmobs.common.entity.projectile;
 
+import fathertoast.crust.api.entity.IPlayerVelocityWatcher;
+import fathertoast.specialmobs.common.compat.crust.SMCrustPlugin;
 import fathertoast.specialmobs.common.core.register.SMEntities;
 import fathertoast.specialmobs.common.core.register.SMItems;
 import fathertoast.specialmobs.common.entity.ghast.CorporealShiftGhastEntity;
-import fathertoast.specialmobs.common.event.PlayerVelocityWatcher;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.FriendlyByteBuf;
@@ -118,7 +119,7 @@ public class IncorporealFireballEntity extends AbstractHurtingProjectile impleme
             Entity target = hitResult.getEntity();
             
             if( target instanceof Player player ) {
-                if( PlayerVelocityWatcher.get( player ).isMoving() ) {
+                if( SMCrustPlugin.getVelocityWatcher().get( player ).isMoving() ) {
                     explode();
                     return;
                 }

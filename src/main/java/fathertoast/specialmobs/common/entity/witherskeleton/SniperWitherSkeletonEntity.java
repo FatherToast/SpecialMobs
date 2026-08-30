@@ -4,9 +4,9 @@ import fathertoast.crust.api.config.common.ConfigManager;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
+import fathertoast.specialmobs.common.compat.crust.SMCrustPlugin;
 import fathertoast.specialmobs.common.config.species.SkeletonSpeciesConfig;
 import fathertoast.specialmobs.common.config.species.SpeciesConfig;
-import fathertoast.specialmobs.common.event.PlayerVelocityWatcher;
 import fathertoast.specialmobs.common.util.References;
 import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
 import net.minecraft.sounds.SoundEvents;
@@ -81,7 +81,7 @@ public class SniperWitherSkeletonEntity extends _SpecialWitherSkeletonEntity {
         final double dist = distanceTo( target );
         final double arcFactor = dist * 0.012;
         final float ticksToTarget = (float) (dist / v * (1.0 + arcFactor * arcFactor * arcFactor));
-        final Vec3 targetV = PlayerVelocityWatcher.getVelocity( target );
+        final Vec3 targetV = SMCrustPlugin.getVelocityWatcher().getVelocity( target );
         
         final double dX = target.getX() + targetV.x * ticksToTarget - getX();
         final double dY = target.getY( 0.5 ) - getEyeY() + 0.1;
