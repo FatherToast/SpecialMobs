@@ -80,7 +80,7 @@ public class GravelCreeperEntity extends _SpecialCreeperEntity {
             gravel.time = 1; // Prevent the entity from instantly dying
             gravel.dropItem = false;
             gravel.fallDistance = 3.0F;
-            gravel.setHurtsEntities( 2.0F, 20 );
+            gravel.setHurtsEntities( throwPower / 3.0F, (int) (explosionPower * 3.334F) + 10 );
             
             final float speed = (throwPower * 0.7F + random.nextFloat() * throwPower) / 20.0F;
             final float pitch = random.nextFloat() * (float) Math.PI;

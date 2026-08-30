@@ -103,12 +103,12 @@ public class _SpecialCreeperEntity extends Creeper implements IExplodingMob, ISp
     }
     
     /** Override to change this entity's AI goals. */
-    protected void registerVariantGoals() { }
+    protected void registerVariantGoals() {}
     
     /** Override to change starting equipment or stats. */
     @SuppressWarnings( "unused" )
     public void finalizeVariantSpawn( ServerLevelAccessor level, DifficultyInstance difficulty, @Nullable MobSpawnType spawnType,
-                                      @Nullable SpawnGroupData groupData ) { }
+                                      @Nullable SpawnGroupData groupData ) {}
     
     /** Called when this entity successfully damages a target to apply on-hit effects. */
     @Override
@@ -119,7 +119,7 @@ public class _SpecialCreeperEntity extends Creeper implements IExplodingMob, ISp
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @SuppressWarnings( "unused" ) // Not normally used for creepers
-    protected void onVariantAttack( LivingEntity target ) { }
+    protected void onVariantAttack( LivingEntity target ) {}
     
     /** Called to perform this creeper's explosion 'attack'. */
     @Override
@@ -154,27 +154,37 @@ public class _SpecialCreeperEntity extends Creeper implements IExplodingMob, ISp
             potionCloud.setDuration( potionCloud.getDuration() / 2 );
             potionCloud.setRadiusPerTick( -potionCloud.getRadius() / (float) potionCloud.getDuration() );
             for( MobEffectInstance effect : effects ) {
-                potionCloud.addEffect( new MobEffectInstance( effect ) );
+                potionCloud.addEffect( effect.isInfiniteDuration() ? copyWithDuration( effect, 600 ) :
+                        effect.getDuration() > 1200 ? copyWithDuration( effect, 1200 ) :
+                                new MobEffectInstance( effect ) );
             }
             modifyVariantLingeringCloud( potionCloud );
             level().addFreshEntity( potionCloud );
         }
     }
     
+    private static MobEffectInstance copyWithDuration( MobEffectInstance effect, int duration ) {
+        MobEffectInstance newEffect = new MobEffectInstance( effect.getEffect(), duration,
+                effect.getAmplifier(), effect.isAmbient(), effect.isVisible(),
+                effect.showIcon(), null, effect.getFactorData() );
+        newEffect.setCurativeItems( new ArrayList<>( effect.getCurativeItems() ) );
+        return newEffect;
+    }
+    
     /**
      * Override to change effects applied by the lingering cloud left by this creeper's explosion.
      * If this list is empty, the lingering cloud is not created.
      */
-    protected void modifyVariantLingeringCloudEffects( List<MobEffectInstance> potions ) { }
+    protected void modifyVariantLingeringCloudEffects( List<MobEffectInstance> potions ) {}
     
     /** Override to change stats of the lingering cloud left by this creeper's explosion. */
-    protected void modifyVariantLingeringCloud( AreaEffectCloud potionCloud ) { }
+    protected void modifyVariantLingeringCloud( AreaEffectCloud potionCloud ) {}
     
     /** Override to save data to this entity's NBT data. */
-    public void addVariantSaveData( CompoundTag saveTag ) { }
+    public void addVariantSaveData( CompoundTag saveTag ) {}
     
     /** Override to load data from this entity's NBT data. */
-    public void readVariantSaveData( CompoundTag saveTag ) { }
+    public void readVariantSaveData( CompoundTag saveTag ) {}
     
     
     //--------------- Family-Specific Implementations ----------------
