@@ -17,6 +17,7 @@ import fathertoast.specialmobs.common.config.Config;
 import fathertoast.specialmobs.common.core.SpecialMobs;
 import fathertoast.specialmobs.common.core.register.SMBlocks;
 import fathertoast.specialmobs.common.core.register.SMEntities;
+import fathertoast.specialmobs.common.core.register.SMItems;
 import fathertoast.specialmobs.common.entity.blaze.ArmoredBlazeEntity;
 import fathertoast.specialmobs.common.entity.creeper.EnderCreeperEntity;
 import fathertoast.specialmobs.common.entity.creeper.ImplodingCreeperEntity;
@@ -76,6 +77,11 @@ public final class ClientRegister {
     public static void buildCreativeContents( BuildCreativeModeTabContentsEvent event ) {
         if( event.getTabKey() == CreativeModeTabs.FUNCTIONAL_BLOCKS ) {
             SMBlocks.INFESTED_CORAL.forEach( event::accept );
+        }
+        else if( event.getTabKey() == CreativeModeTabs.TOOLS_AND_UTILITIES ) {
+            event.accept( SMItems.SYRINGE );
+            event.accept( SMItems.INCORPOREAL_FIREBALL );
+            event.accept( SMItems.SLAB_FIREBALL );
         }
     }
     
