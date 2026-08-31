@@ -15,7 +15,7 @@ import java.util.List;
 public class MainConfig extends AbstractConfigFile {
     
     public final General GENERAL;
-    public final NaturalSpawning NATURAL_SPAWNING;
+    public final AddedSpawns ADDED_SPAWNS;
     
     /** Builds the config spec that should be used for this config. */
     MainConfig( ConfigManager manager, String fileName ) {
@@ -28,7 +28,7 @@ public class MainConfig extends AbstractConfigFile {
         SPEC.fileOnlyNewLine();
         
         GENERAL = new General( this );
-        NATURAL_SPAWNING = new NaturalSpawning( this );
+        ADDED_SPAWNS = new AddedSpawns( this );
         
         SPEC.fileOnlyNewLine();
         EnvironmentListField.describe2of2( SPEC );
@@ -38,8 +38,6 @@ public class MainConfig extends AbstractConfigFile {
     public static class General extends AbstractConfigCategory<MainConfig> {
         
         public final BooleanField enableMobReplacement;
-        public final BooleanField enableNaturalSpawning;
-        
         public final StringListField skippedSpawnTypes;
         
         public final BooleanField masterVanillaReplacement;
@@ -59,11 +57,6 @@ public class MainConfig extends AbstractConfigFile {
                     "Whether the Mob Replacer is enabled. This 'hijacks' vanilla mob spawns to use as its own.",
                     "The Mob Replacer is the traditional spawn method for Special Mobs which allows everything that spawns " +
                             "valid vanilla mobs (e.g. dungeon spawners) to spawn this mod's mobs based on your configs instead." ) );
-            enableNaturalSpawning = SPEC.define( new BooleanField( "enable_added_natural_spawning", true,
-                    "Whether the natural spawning category (see below) is enabled." ) );
-            
-            SPEC.newLine();
-            
             skippedSpawnTypes = SPEC.define( new StringListField( "skipped_spawn_types", "MobSpawnType",
                     makeDefaultSkippedSpawnTypes(), SpawnType::isValid,
                     "A list of mob spawn types that the mob replacer should not process.",
@@ -106,10 +99,14 @@ public class MainConfig extends AbstractConfigFile {
         }
     }
     
-    public static class NaturalSpawning extends AbstractConfigCategory<MainConfig> {
+    public static class AddedSpawns extends AbstractConfigCategory<MainConfig> {
+        
+        public final BooleanField enableAddedSpawns;
         
         public final DoubleField caveSpiderSpawnMultiplier;
         public final DoubleField.EnvironmentSensitive caveSpiderSpawnChance;
+        
+        public final DoubleField enderCreeperSpawnMultiplier;
         
         public final IntField drowningCreeperOceanWeight;
         public final IntField drowningCreeperRiverWeight;
@@ -130,22 +127,31 @@ public class MainConfig extends AbstractConfigFile {
         public final IntField fireZombieNetherWeight;
         public final IntField fireSpiderNetherWeight;
         
-        public final DoubleField enderCreeperSpawnMultiplier;
+        public final IntField doomCreeperSoulSandValleyWeight;
+        public final IntField skeletonCreeperSoulSandValleyWeight;
+        public final IntField undeadWitchSoulSandValleyWeight;
         
-        NaturalSpawning( MainConfig parent ) {
-            super( parent, "natural_spawning",
+        AddedSpawns( MainConfig parent ) {
+            super( parent, "added_spawns",
                     "Options to customize the additional natural monster spawning from this mod. " +
-                            "Most changes to options in this category require the game to be restarted to take effect." );
+                            "Most changes to options in this category require the world/server to be restarted to take effect.",
+                    "Note: The primary spawn method for Special Mobs is the 'mob replacer', not natural spawns. These " +
+                            "added natural spawns either introduce vanilla mobs to locations they don't normally spawn " +
+                            "(which will then get mob-replaced) or add specific Special Mobs species to places that " +
+                            "wouldn't make sense for their vanilla mobs to spawn (e.g., aquatic variants of ground mobs)." );
+            
+            enableAddedSpawns = SPEC.define( new BooleanField( "enable_added_spawns", true,
+                    "Whether this category is enabled." ) );
             
             SPEC.increaseIndent();
             SPEC.subcategory( "general_spawns",
-                    "Added natural spawns derived from existing spawns." );
+                    "Added natural spawns derived from existing spawns (in all biomes)." );
             
             caveSpiderSpawnMultiplier = SPEC.define( new DoubleField( "cave_spider_spawn_multiplier", 0.5, DoubleField.Range.NON_NEGATIVE,
                     "Option to add vanilla cave spiders as natural spawns. These spawns will be added to all biomes " +
                             "that can spawn regular spiders. Cave spider spawn weight is the same as the spider spawn weight, " +
                             "multiplied by this value. When set to 0, the added cave spider spawn feature is completely disabled. " +
-                            "Finer tuning can be done with the spawn chances below." ), RestartNote.GAME_PARTIAL );
+                            "Finer tuning can be done with the spawn chances below." ), RestartNote.WORLD );
             caveSpiderSpawnChance = new DoubleField.EnvironmentSensitive(
                     SPEC.define( new DoubleField( "cave_spider_chance.base", 0.0, DoubleField.Range.PERCENT,
                             "The chance for added cave spider natural spawn attempts to succeed. Does not affect Mob Replacement." ) ),
@@ -165,7 +171,8 @@ public class MainConfig extends AbstractConfigFile {
                             "multiplied by this value. When set to 0, the added ender creeper spawn feature is completely disabled. " +
                             "Finer tuning can be done with the natural spawn chances in the species config file." ), RestartNote.WORLD );
             
-            SPEC.subcategory( "water_spawns" );
+            SPEC.subcategory( "water_spawns",
+                    "Added natural ocean/river spawns for aquatic variants of land-based mobs." );
             
             drowningCreeperOceanWeight = SPEC.define( new IntField( "drowning_creeper_weight.ocean", 1, IntField.Range.NON_NEGATIVE,
                     "Option to add drowning creepers as natural spawns to oceans.",
@@ -198,7 +205,8 @@ public class MainConfig extends AbstractConfigFile {
                             "spawn feature is completely disabled. Finer tuning can be done with the natural spawn chances " +
                             "in the species config file." ), RestartNote.WORLD );
             
-            SPEC.subcategory( "nether_spawns" );
+            SPEC.subcategory( "nether_spawns",
+                    "Added natural Nether spawns for rare Nether mobs and fire/Nether-themed variants of overworld mobs." );
             
             witherSkeletonNetherWeight = SPEC.define( new IntField( "wither_skeleton_weight.nether", 2, IntField.Range.NON_NEGATIVE,
                     "Option to add vanilla wither skeletons as natural spawns to the Nether (except for soul sand valley " +
@@ -211,20 +219,31 @@ public class MainConfig extends AbstractConfigFile {
             
             blazeNetherWeight = SPEC.define( new IntField( "blaze_weight.nether", 1, IntField.Range.NON_NEGATIVE,
                     "Option to add vanilla blazes as natural spawns to the Nether (except for soul sand valley, " +
-                            "warped forest, and basalt deltas biomes). When set to 0, the added blaze spawn feature is completely disabled." ), RestartNote.WORLD );
+                            "warped forest, and basalt deltas biomes). When set to 0, this added spawn feature is completely disabled." ), RestartNote.WORLD );
             blazeBasaltDeltasWeight = SPEC.define( new IntField( "blaze_weight.basalt_deltas", 20, IntField.Range.NON_NEGATIVE,
                     "Option to add vanilla blazes as natural spawns to the basalt deltas biome. When set to 0, " +
-                            "the added blaze spawn feature is completely disabled." ), RestartNote.WORLD );
+                            "this added spawn feature is completely disabled." ), RestartNote.WORLD );
             
             SPEC.newLine();
             
             fireCreeperNetherWeight = SPEC.define( new IntField( "fire_creeper_weight.nether", 1, IntField.Range.NON_NEGATIVE,
                     "Option to add fire creepers, zombies, and spiders as natural spawns to the Nether (except for " +
-                            "soul sand valley and warped forest biomes). When set to 0, that added spawn feature is completely disabled. " +
+                            "soul sand valley and warped forest biomes). When set to 0, the added spawn feature is completely disabled. " +
                             "Finer tuning can be done with the natural spawn chances in the species config files." ), RestartNote.WORLD );
             fireZombieNetherWeight = SPEC.define( new IntField( "fire_zombie_weight.nether", 1, IntField.Range.NON_NEGATIVE,
                     (String[]) null ) );
             fireSpiderNetherWeight = SPEC.define( new IntField( "fire_spider_weight.nether", 1, IntField.Range.NON_NEGATIVE,
+                    (String[]) null ) );
+            
+            SPEC.newLine();
+            
+            doomCreeperSoulSandValleyWeight = SPEC.define( new IntField( "doom_creeper.soul_sand_valley", 1, IntField.Range.NON_NEGATIVE,
+                    "Option to add doom creepers, skeleton creepers, and liches (undead witches) as natural spawns to the " +
+                            "soul sand valley biome. When set to 0, the added spawn feature is completely disabled. " +
+                            "Finer tuning can be done with the natural spawn chances in the species config files." ), RestartNote.WORLD );
+            skeletonCreeperSoulSandValleyWeight = SPEC.define( new IntField( "skeleton_creeper.soul_sand_valley", 1, IntField.Range.NON_NEGATIVE,
+                    (String[]) null ) );
+            undeadWitchSoulSandValleyWeight = SPEC.define( new IntField( "lich.soul_sand_valley", 1, IntField.Range.NON_NEGATIVE,
                     (String[]) null ) );
             
             SPEC.decreaseIndent();

@@ -21,8 +21,9 @@ import java.util.function.Supplier;
 /**
  * The items added by this mod.
  * <p>
- * Note that the vast majority of items are spawn eggs, which are registered by and stored in
- * the bestiary through the {@link MobFamily.Species}.
+ * Note that the vast majority of items are spawn eggs, which are registered by and stored in the bestiary
+ * through the {@link MobFamily.Species}; a specific species is typically accessed through its entity class's
+ * static field annotated with {@link fathertoast.specialmobs.common.bestiary.SpecialMob.SpeciesReference}.
  */
 public class SMItems {
     

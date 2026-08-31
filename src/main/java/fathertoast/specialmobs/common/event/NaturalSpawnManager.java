@@ -21,14 +21,12 @@ public final class NaturalSpawnManager {
      * Holder for the SpawnPlacementRegisterEvent when it is fired. Temporarily stored as a field to
      * avoid passing the event around as an argument in a bazillion methods.
      */
-    private static SpawnPlacementRegisterEvent registerEvent = null;
+    private static SpawnPlacementRegisterEvent registerEvent;
     
     //--------------- Spawn Placement Registration ----------------
     
     /** Sets the natural spawn placement rules for entity types. */
     public static void registerSpawnPlacements( SpawnPlacementRegisterEvent event ) {
-        if( !Config.MAIN.GENERAL.enableNaturalSpawning.get() ) return;
-        
         registerEvent = event;
         
         // Bestiary-generated entities
@@ -37,15 +35,10 @@ public final class NaturalSpawnManager {
         }
         
         // Additional entries
-        if( Config.MAIN.NATURAL_SPAWNING.caveSpiderSpawnMultiplier.get() > 0.0 ) {
-            try {
-                event.register( EntityType.CAVE_SPIDER, SpawnPlacements.Type.ON_GROUND,
-                        Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, NaturalSpawnManager::checkSpawnRulesCaveSpider, SpawnPlacementRegisterEvent.Operation.AND );
-            }
-            catch( IllegalStateException ex ) {
-                // Overwriting the vanilla entry with our own throws this exception, but we can just ignore it :^)
-            }
-        }
+        event.register( EntityType.CAVE_SPIDER, SpawnPlacements.Type.ON_GROUND,
+                Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, NaturalSpawnManager::checkSpawnRulesCaveSpider,
+                SpawnPlacementRegisterEvent.Operation.REPLACE );
+        
         registerEvent = null;
     }
     
@@ -109,7 +102,7 @@ public final class NaturalSpawnManager {
     public static boolean checkSpawnRulesCaveSpider( EntityType<CaveSpider> type, ServerLevelAccessor levelAccessor,
                                                      MobSpawnType spawnType, BlockPos pos, RandomSource random ) {
         if( spawnType == MobSpawnType.NATURAL && levelAccessor instanceof Level level &&
-                !Config.MAIN.NATURAL_SPAWNING.caveSpiderSpawnChance.rollChance( random, EnvironmentContext.withTarget( level, pos ) ) ) {
+                !Config.MAIN.ADDED_SPAWNS.caveSpiderSpawnChance.rollChance( random, EnvironmentContext.withTarget( level, pos ) ) ) {
             return false;
         }
         return Monster.checkMonsterSpawnRules( type, levelAccessor, spawnType, pos, random );
