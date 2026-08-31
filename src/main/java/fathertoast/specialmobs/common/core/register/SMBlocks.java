@@ -9,6 +9,9 @@ import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.FireBlock;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
@@ -23,6 +26,10 @@ public class SMBlocks {
     public static final DeferredRegister<Block> REGISTRY = DeferredRegister.create( ForgeRegistries.BLOCKS, SpecialMobs.MOD_ID );
     
     public static final RegistryObject<Block> MELTING_ICE = registerTechnicalBlock( "melting_ice", MeltingIceBlock::new );
+    public static final RegistryObject<Block> SLAB_FIRE = registerTechnicalBlock( "slab_fire",
+            () -> new FireBlock( BlockBehaviour.Properties.copy( Blocks.FIRE ) ) );
+    public static final RegistryObject<Block> SOUL_SLAB_FIRE = registerTechnicalBlock( "soul_slab_fire",
+            () -> new FireBlock( BlockBehaviour.Properties.copy( Blocks.SOUL_FIRE ) ) );
     
     public static final List<RegistryObject<Block>> INFESTED_CORAL;
     

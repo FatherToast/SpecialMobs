@@ -40,6 +40,9 @@ public class SMBlockStateAndModelProvider extends BlockStateProvider {
                         mcLoc( ModelProvider.BLOCK_FOLDER + "/" + name + "_0" ) )
                 .renderType( R_TRANSLUCENT );
         
+        // Slab fire
+        
+        
         // Infested coral
         for( UnderwaterSilverfishBlock.Type type : UnderwaterSilverfishBlock.Type.values() ) {
             name = blockName( type.hostBlock() );
