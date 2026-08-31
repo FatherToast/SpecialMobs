@@ -1,6 +1,7 @@
 package fathertoast.specialmobs.common.core.register;
 
 import fathertoast.specialmobs.common.block.MeltingIceBlock;
+import fathertoast.specialmobs.common.block.SlabFireBlock;
 import fathertoast.specialmobs.common.block.UnderwaterSilverfishBlock;
 import fathertoast.specialmobs.common.core.SpecialMobs;
 import net.minecraft.resources.ResourceKey;
@@ -9,9 +10,6 @@ import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.FireBlock;
-import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
@@ -26,12 +24,9 @@ public class SMBlocks {
     public static final DeferredRegister<Block> REGISTRY = DeferredRegister.create( ForgeRegistries.BLOCKS, SpecialMobs.MOD_ID );
     
     public static final RegistryObject<Block> MELTING_ICE = registerTechnicalBlock( "melting_ice", MeltingIceBlock::new );
-    public static final RegistryObject<Block> SLAB_FIRE = registerTechnicalBlock( "slab_fire",
-            () -> new FireBlock( BlockBehaviour.Properties.copy( Blocks.FIRE ) ) );
-    public static final RegistryObject<Block> SOUL_SLAB_FIRE = registerTechnicalBlock( "soul_slab_fire",
-            () -> new FireBlock( BlockBehaviour.Properties.copy( Blocks.SOUL_FIRE ) ) );
     
     public static final List<RegistryObject<Block>> INFESTED_CORAL;
+    public static final List<RegistryObject<Block>> SLAB_FIRES;
     
     static {
         final ArrayList<RegistryObject<Block>> infestedCoral = new ArrayList<>();
@@ -40,6 +35,13 @@ public class SMBlocks {
         }
         infestedCoral.trimToSize();
         INFESTED_CORAL = Collections.unmodifiableList( infestedCoral );
+        
+        final ArrayList<RegistryObject<Block>> slabFires = new ArrayList<>();
+        for( SlabFireBlock.Type type : SlabFireBlock.Type.values() ) {
+            slabFires.add( registerBlock( type.blockId(), type::blockSupplier, CreativeModeTabs.COLORED_BLOCKS ) );
+        }
+        slabFires.trimToSize();
+        SLAB_FIRES = Collections.unmodifiableList( slabFires );
     }
     
     /** Registers a block and a simple BlockItem for it. */
