@@ -5,7 +5,7 @@ import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.config.species.SpeciesConfig;
-import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
+import fathertoast.crust.api.datagen.loot.LootTableBuilder;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -27,7 +27,6 @@ import java.util.List;
 /**
  * Provides helper methods to handle annotation processing through reflection.
  */
-@SuppressWarnings( "SameParameterValue" )
 public final class AnnotationHelper {
     
     //--------------- PRETTY HELPER METHODS ----------------
@@ -139,7 +138,6 @@ public final class AnnotationHelper {
         }
     }
     
-    @SuppressWarnings( "unchecked" )
     @Nullable
     public static List<TagKey<EntityType<?>>> getEntityTags( Class<? extends LivingEntity> entityClass ) {
         try {
@@ -149,6 +147,7 @@ public final class AnnotationHelper {
                 Object ret = method.invoke( null );
                 
                 if( ret != null )
+                    //noinspection unchecked
                     return (List<TagKey<EntityType<?>>>) ret;
             }
             return null;

@@ -7,7 +7,7 @@ import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.entity.ai.AIHelper;
 import fathertoast.specialmobs.common.entity.ai.FluidPathNavigator;
 import fathertoast.specialmobs.common.util.References;
-import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
+import fathertoast.crust.api.datagen.loot.LootTableBuilder;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;

@@ -9,7 +9,7 @@ import fathertoast.specialmobs.common.config.species.SpeciesConfig;
 import fathertoast.specialmobs.common.config.species.UndeadWitchSpeciesConfig;
 import fathertoast.specialmobs.common.entity.skeleton._SpecialSkeletonEntity;
 import fathertoast.specialmobs.common.util.References;
-import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
+import fathertoast.crust.api.datagen.loot.LootTableBuilder;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.*;
@@ -116,7 +116,7 @@ public class UndeadWitchEntity extends _SpecialWitchEntity {
     
     /** @return True if there are any skeletons near this entity. */
     private boolean isNearSkeletons() {
-        return level().getEntitiesOfClass( AbstractSkeleton.class, getBoundingBox().inflate( 11.0 ) ).size() > 0;
+        return !level().getEntitiesOfClass( AbstractSkeleton.class, getBoundingBox().inflate( 11.0 ) ).isEmpty();
     }
     
     /** @return This entity's creature type. */

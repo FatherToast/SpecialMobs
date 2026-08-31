@@ -14,6 +14,7 @@ public class SMBiomeMods {
     public static final DeferredRegister<Codec<? extends BiomeModifier>> REGISTRY = DeferredRegister.create( ForgeRegistries.Keys.BIOME_MODIFIER_SERIALIZERS, SpecialMobs.MOD_ID );
     
     
-    public static final RegistryObject<Codec<NaturalAddSpawnModifier>> NATURAL_ADD_SPAWN = REGISTRY.register( "natural_add_spawn", () -> NaturalAddSpawnModifier.CODEC );
+    @SuppressWarnings( "unused" )
+    public static final RegistryObject<Codec<NaturalAddSpawnModifier>> NATURAL_ADD_SPAWN = REGISTRY
+            .register( "natural_add_spawn", () -> NaturalAddSpawnModifier.CODEC );
 }
-

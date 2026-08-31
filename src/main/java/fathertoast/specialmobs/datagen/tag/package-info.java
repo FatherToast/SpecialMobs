@@ -1,6 +1,6 @@
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-package fathertoast.specialmobs.common.mob_effect;
+package fathertoast.specialmobs.datagen.tag;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
 

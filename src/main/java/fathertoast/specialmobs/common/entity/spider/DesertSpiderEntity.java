@@ -7,7 +7,7 @@ import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.config.Config;
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.util.References;
-import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
+import fathertoast.crust.api.datagen.loot.LootTableBuilder;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -68,7 +68,7 @@ public class DesertSpiderEntity extends _SpecialSpiderEntity {
         if( Config.MAIN.GENERAL.enableNausea.get() ) MobHelper.applyEffect( target, MobEffects.CONFUSION );
         MobHelper.applyEffect( target, MobEffects.BLINDNESS );
         MobHelper.removeNightVision( target );
-        MobHelper.applyEffect( target, MobEffects.MOVEMENT_SLOWDOWN, 2 );
-        MobHelper.applyEffect( target, CrustObjects.Effects.VULNERABILITY.get(), 2 );
+        MobHelper.applyEffect( target, MobEffects.MOVEMENT_SLOWDOWN, 1 );
+        MobHelper.applyEffect( target, CrustObjects.Effects.VULNERABILITY.get(), 1 );
     }
 }

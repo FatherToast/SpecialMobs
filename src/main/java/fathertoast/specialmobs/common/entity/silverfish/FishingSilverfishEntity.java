@@ -13,9 +13,9 @@ import fathertoast.specialmobs.common.entity.ai.goal.AmphibiousSwimUpGoal;
 import fathertoast.specialmobs.common.entity.ai.goal.AnglerGoal;
 import fathertoast.specialmobs.common.entity.ai.goal.PassiveRangedAttackGoal;
 import fathertoast.specialmobs.common.util.References;
-import fathertoast.specialmobs.datagen.loot.LootEntryItemBuilder;
-import fathertoast.specialmobs.datagen.loot.LootPoolBuilder;
-import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
+import fathertoast.crust.api.datagen.loot.LootEntryItemBuilder;
+import fathertoast.crust.api.datagen.loot.LootPoolBuilder;
+import fathertoast.crust.api.datagen.loot.LootTableBuilder;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.FloatGoal;
@@ -92,7 +92,7 @@ public class FishingSilverfishEntity extends AmphibiousSilverfishEntity implemen
     
     /** Sets this angler's line as out (or in). */
     @Override
-    public void setLineOut( boolean value ) { }
+    public void setLineOut( boolean value ) {}
     
     /** @return Whether this angler's line is out. */
     @Override

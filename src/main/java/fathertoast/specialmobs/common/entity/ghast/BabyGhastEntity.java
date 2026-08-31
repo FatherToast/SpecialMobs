@@ -4,7 +4,7 @@ import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.util.References;
-import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
+import fathertoast.crust.api.datagen.loot.LootTableBuilder;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -55,6 +55,7 @@ public class BabyGhastEntity extends _SpecialGhastEntity {
     public BabyGhastEntity( EntityType<? extends _SpecialGhastEntity> entityType, Level level ) { super( entityType, level ); }
     
     /** @return The sound this entity makes idly. */
+    @SuppressWarnings( "DataFlowIssue" )
     @Override
     protected SoundEvent getAmbientSound() { return null; } // There could be a lot of these, need to be less annoying
 }

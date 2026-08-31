@@ -14,7 +14,7 @@ import fathertoast.specialmobs.common.entity.ai.AIHelper;
 import fathertoast.specialmobs.common.entity.ai.goal.SpecialHurtByTargetGoal;
 import fathertoast.specialmobs.common.event.NaturalSpawnManager;
 import fathertoast.specialmobs.common.util.References;
-import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
+import fathertoast.crust.api.datagen.loot.LootTableBuilder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -87,7 +87,7 @@ public class _SpecialZombifiedPiglinEntity extends ZombifiedPiglin implements Ra
     }
     
     public static boolean checkFamilySpawnRules( EntityType<? extends ZombifiedPiglin> type, ServerLevelAccessor level,
-                                                MobSpawnType reason, BlockPos pos, RandomSource random ) {
+                                                 MobSpawnType reason, BlockPos pos, RandomSource random ) {
         //noinspection unchecked
         return ZombifiedPiglin.checkZombifiedPiglinSpawnRules( (EntityType<ZombifiedPiglin>) type, level, reason, pos, random ) &&
                 NaturalSpawnManager.checkSpawnRulesConfigured( type, level, reason, pos, random );
@@ -105,7 +105,7 @@ public class _SpecialZombifiedPiglinEntity extends ZombifiedPiglin implements Ra
     public static void addBaseLoot( LootTableBuilder loot ) {
         loot.addLootTable( "main", EntityType.ZOMBIFIED_PIGLIN.getDefaultLootTable() );
     }
-
+    
     @SpecialMob.EntityTagProvider
     public static List<TagKey<EntityType<?>>> getEntityTags() {
         return Collections.singletonList( SMTags.EntityTypes.ZOMBIFIED_PIGLINS );
@@ -116,7 +116,7 @@ public class _SpecialZombifiedPiglinEntity extends ZombifiedPiglin implements Ra
     
     
     //--------------- Variant-Specific Breakouts ----------------
-
+    
     /** Called in the MobEntity.class constructor to initialize AI goals. */
     @Override
     protected void registerGoals() {
@@ -128,20 +128,20 @@ public class _SpecialZombifiedPiglinEntity extends ZombifiedPiglin implements Ra
     }
     
     /** Override to change this entity's AI goals. */
-    protected void registerVariantGoals() { }
+    protected void registerVariantGoals() {}
     
     /** Override to change this entity's attack goal priority. */
     protected int getVariantAttackPriority() { return 2; }
     
     /** Override to change starting equipment or stats. */
     public void finalizeVariantSpawn( ServerLevelAccessor level, DifficultyInstance difficulty, @Nullable MobSpawnType spawnType,
-                                      @Nullable SpawnGroupData groupData ) { }
+                                      @Nullable SpawnGroupData groupData ) {}
     
     /** Called to attack the target with a ranged attack. */
     @Override
     public void performRangedAttack( LivingEntity target, float damageMulti ) {
         final ItemStack arrowItem = getProjectile( getItemInHand( ProjectileUtil.getWeaponHoldingHand(
-                this, item -> item instanceof BowItem) ) );
+                this, item -> item instanceof BowItem ) ) );
         AbstractArrow arrow = getArrow( arrowItem, damageMulti );
         if( getMainHandItem().getItem() instanceof BowItem )
             arrow = ((BowItem) getMainHandItem().getItem()).customArrow( arrow );
@@ -176,13 +176,13 @@ public class _SpecialZombifiedPiglinEntity extends ZombifiedPiglin implements Ra
     }
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
-    protected void onVariantAttack( LivingEntity target ) { }
+    protected void onVariantAttack( LivingEntity target ) {}
     
     /** Override to save data to this entity's NBT data. */
-    public void addVariantSaveData( @SuppressWarnings( "unused" ) CompoundTag saveTag ) { }
+    public void addVariantSaveData( @SuppressWarnings( "unused" ) CompoundTag saveTag ) {}
     
     /** Override to load data from this entity's NBT data. */
-    public void readVariantSaveData( @SuppressWarnings( "unused" ) CompoundTag saveTag ) { }
+    public void readVariantSaveData( @SuppressWarnings( "unused" ) CompoundTag saveTag ) {}
     
     
     //--------------- Family-Specific Implementations ----------------
@@ -216,7 +216,7 @@ public class _SpecialZombifiedPiglinEntity extends ZombifiedPiglin implements Ra
     
     /** Called to set this entity's attack AI based on current equipment. */
     public void reassessWeaponGoal() {
-        if( level() != null && !level().isClientSide ) {
+        if( !level().isClientSide ) {
             if( currentAttackAI != null ) goalSelector.removeGoal( currentAttackAI );
             
             final SpecialMobData<_SpecialZombifiedPiglinEntity> data = getSpecialData();
@@ -271,7 +271,7 @@ public class _SpecialZombifiedPiglinEntity extends ZombifiedPiglin implements Ra
     @Nullable
     @Override
     public final SpawnGroupData finalizeSpawn( ServerLevelAccessor level, DifficultyInstance difficulty, MobSpawnType spawnType,
-                                                  @Nullable SpawnGroupData groupData, @Nullable CompoundTag eggTag ) {
+                                               @Nullable SpawnGroupData groupData, @Nullable CompoundTag eggTag ) {
         return MobHelper.finalizeSpawn( this, level, difficulty, spawnType,
                 super.finalizeSpawn( level, difficulty, spawnType, groupData, eggTag ) );
     }
@@ -351,10 +351,12 @@ public class _SpecialZombifiedPiglinEntity extends ZombifiedPiglin implements Ra
     public boolean isIgnoringBlockTriggers() { return getSpecialData().ignorePressurePlates(); }
     
     /** @return True if this entity can breathe underwater. */
+    @SuppressWarnings( "deprecation" )
     @Override
     public boolean canBreatheUnderwater() { return getSpecialData().canBreatheInWater(); }
     
     /** @return True if this entity can be pushed by (flowing) fluids. */
+    @SuppressWarnings( "deprecation" )
     @Override
     public boolean isPushedByFluid() { return !getSpecialData().ignoreWaterPush(); }
     

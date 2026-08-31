@@ -7,7 +7,7 @@ import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.entity.ai.AIHelper;
 import fathertoast.specialmobs.common.entity.drowned.FrozenDrownedEntity;
 import fathertoast.specialmobs.common.util.References;
-import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
+import fathertoast.crust.api.datagen.loot.LootTableBuilder;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -85,7 +85,7 @@ public class FrozenZombieEntity extends _SpecialZombieEntity {
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override
     protected void onVariantAttack( LivingEntity target ) {
-        MobHelper.applyEffect( target, MobEffects.MOVEMENT_SLOWDOWN, 2 );
+        MobHelper.applyEffect( target, MobEffects.MOVEMENT_SLOWDOWN, 1 );
     }
     
     /** Override to modify this entity's ranged attack projectile. */

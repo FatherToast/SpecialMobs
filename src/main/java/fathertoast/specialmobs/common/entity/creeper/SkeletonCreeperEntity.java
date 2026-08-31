@@ -7,7 +7,7 @@ import fathertoast.specialmobs.common.entity.ai.AIHelper;
 import fathertoast.specialmobs.common.entity.projectile.BoneShrapnelEntity;
 import fathertoast.specialmobs.common.util.ExplosionHelper;
 import fathertoast.specialmobs.common.util.References;
-import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
+import fathertoast.crust.api.datagen.loot.LootTableBuilder;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.EntityType;
@@ -21,7 +21,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 
 @SpecialMob
-@SuppressWarnings( "resource" )
 public class SkeletonCreeperEntity extends _SpecialCreeperEntity {
     
     //--------------- Static Special Mob Hooks ----------------
@@ -94,7 +93,7 @@ public class SkeletonCreeperEntity extends _SpecialCreeperEntity {
                     Mth.sin( yaw ) * speed );
             shrapnel.shoot( velocity.x, velocity.y, velocity.z, (float) velocity.length(), 0.0F );
             
-            shrapnel.life += pitch * 6.0F;
+            shrapnel.life += (int) (pitch * 6.0F);
             level().addFreshEntity( shrapnel );
         }
         spawnAnim();

@@ -9,7 +9,7 @@ import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.entity.ai.AIHelper;
 import fathertoast.specialmobs.common.entity.ai.FluidPathNavigator;
 import fathertoast.specialmobs.common.util.References;
-import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
+import fathertoast.crust.api.datagen.loot.LootTableBuilder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -34,7 +34,6 @@ import net.minecraftforge.event.entity.EntityTeleportEvent;
 import java.util.List;
 
 @SpecialMob
-@SuppressWarnings( "resource" )
 public class IcyEndermanEntity extends _SpecialEndermanEntity {
     
     //--------------- Static Special Mob Hooks ----------------
@@ -87,8 +86,8 @@ public class IcyEndermanEntity extends _SpecialEndermanEntity {
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override
     protected void onVariantAttack( LivingEntity target ) {
-        MobHelper.applyEffect( target, MobEffects.MOVEMENT_SLOWDOWN, 5, 0.5F );
-        MobHelper.applyEffect( target, MobEffects.DIG_SLOWDOWN, 3 );
+        MobHelper.applyEffect( target, MobEffects.MOVEMENT_SLOWDOWN, 4, 0.5F );
+        MobHelper.applyEffect( target, MobEffects.DIG_SLOWDOWN, 2 );
     }
     
     /** Override to change this entity's AI goals. */

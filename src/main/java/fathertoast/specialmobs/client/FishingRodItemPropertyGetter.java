@@ -8,17 +8,16 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.FishingRodItem;
 import net.minecraft.world.item.ItemStack;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
  * Item property getter override that allows the fishing rod item animation to function for any entity implementing IAngler.
  */
-@SuppressWarnings("deprecation")
+@SuppressWarnings( "deprecation" )
 public class FishingRodItemPropertyGetter implements ItemPropertyFunction {
     
     @Override
-    public float call(@Nonnull ItemStack stack, @Nullable ClientLevel level, @Nullable LivingEntity entity, int seed ) {
+    public float call( ItemStack stack, @Nullable ClientLevel level, @Nullable LivingEntity entity, int seed ) {
         if( entity == null ) return 0.0F;
         
         boolean inMainHand = entity.getMainHandItem() == stack;

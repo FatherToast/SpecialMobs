@@ -5,7 +5,7 @@ import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.util.References;
-import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
+import fathertoast.crust.api.datagen.loot.LootTableBuilder;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.*;
@@ -64,7 +64,7 @@ public class BruteZombifiedPiglinEntity extends _SpecialZombifiedPiglinEntity {
     /** Override to change starting equipment or stats. */
     @Override
     public void finalizeVariantSpawn( ServerLevelAccessor level, DifficultyInstance difficulty, @Nullable MobSpawnType spawnType,
-                                     @Nullable SpawnGroupData groupData ) {
+                                      @Nullable SpawnGroupData groupData ) {
         // A reference to the vanilla piglin brutes
         if( getItemBySlot( EquipmentSlot.MAINHAND ).getItem() == Items.GOLDEN_SWORD ) {
             setItemSlot( EquipmentSlot.MAINHAND, new ItemStack( Items.GOLDEN_AXE ) );

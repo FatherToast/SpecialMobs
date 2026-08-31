@@ -3,9 +3,8 @@ package fathertoast.specialmobs.common.entity.skeleton;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
-import fathertoast.specialmobs.common.core.register.SMTags;
 import fathertoast.specialmobs.common.util.References;
-import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
+import fathertoast.crust.api.datagen.loot.LootTableBuilder;
 import net.minecraft.tags.EntityTypeTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EntityType;
@@ -44,7 +43,7 @@ public class FireSkeletonEntity extends _SpecialSkeletonEntity {
         loot.addCommonDrop( "common", Items.FIRE_CHARGE );
         loot.addUncommonDrop( "uncommon", Items.COAL );
     }
-
+    
     @SpecialMob.EntityTagProvider
     public static List<TagKey<EntityType<?>>> getEntityTags() {
         return List.of( EntityTypeTags.SKELETONS, EntityTypeTags.FREEZE_HURTS_EXTRA_TYPES );

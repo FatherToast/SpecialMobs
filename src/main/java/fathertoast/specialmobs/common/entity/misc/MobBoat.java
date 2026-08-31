@@ -53,7 +53,6 @@ import java.util.List;
 /**
  * Copy of {@link Boat} with some changes to allow mobs to control it.
  */
-@SuppressWarnings( "resource" )
 public class MobBoat extends Entity implements IEntityAdditionalSpawnData {
     
     private static final EntityDataAccessor<Integer> DATA_ID_HURT = SynchedEntityData.defineId( MobBoat.class, EntityDataSerializers.INT );

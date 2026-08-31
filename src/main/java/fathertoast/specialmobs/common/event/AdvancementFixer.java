@@ -114,7 +114,6 @@ public class AdvancementFixer {
         LivingEntity livingEntity = event.getEntity();
         DamageSource source = event.getSource();
         
-        // noinspection resource
         if( !livingEntity.level().isClientSide && source.getEntity() instanceof ServerPlayer player ) {
             if( livingEntity instanceof ISpecialMob<?> ) {
                 Advancement killAllMob = getFromId( KILL_ALL_MOBS_ADV );
@@ -130,7 +129,6 @@ public class AdvancementFixer {
      * as it is a bit awkward to try and modify its criteria.
      */
     private <T extends LivingEntity & ISpecialMob<?>> void maybeGrantKillAllMobs( T dead, ServerPlayer player, DamageSource damageSource, Advancement advancement ) {
-        // noinspection resource
         if( damageSource.getEntity() instanceof Player && !dead.level().isClientSide ) {
             for( EntityType<?> type : dead.getSpecies().family.replaceableTypes ) {
                 player.getAdvancements().award( advancement, Objects.requireNonNull( ForgeRegistries.ENTITY_TYPES.getKey( type ) ).toString() );

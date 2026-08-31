@@ -8,7 +8,7 @@ import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.entity.ai.AIHelper;
 import fathertoast.specialmobs.common.entity.ai.FluidPathNavigator;
 import fathertoast.specialmobs.common.util.References;
-import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
+import fathertoast.crust.api.datagen.loot.LootTableBuilder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
@@ -27,9 +27,7 @@ import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.pathfinder.BlockPathTypes;
 import net.minecraftforge.common.ForgeMod;
 
-import java.util.Collections;
 import java.util.List;
-
 
 @SpecialMob
 public class FrozenSlimeEntity extends _SpecialSlimeEntity {
@@ -59,7 +57,7 @@ public class FrozenSlimeEntity extends _SpecialSlimeEntity {
         loot.addCommonDrop( "common", Blocks.ICE );
         loot.addRareDrop( "rare", Blocks.BLUE_ICE );
     }
-
+    
     @SpecialMob.EntityTagProvider
     public static List<TagKey<EntityType<?>>> getEntityTags() {
         return List.of( SMTags.EntityTypes.SLIMES, EntityTypeTags.FREEZE_IMMUNE_ENTITY_TYPES );
@@ -104,7 +102,7 @@ public class FrozenSlimeEntity extends _SpecialSlimeEntity {
     
     /** @return A new path navigator for this entity to use. */
     @Override
-    protected PathNavigation createNavigation(Level level ) {
+    protected PathNavigation createNavigation( Level level ) {
         return new FluidPathNavigator( this, level, true, false );
     }
     
@@ -130,7 +128,7 @@ public class FrozenSlimeEntity extends _SpecialSlimeEntity {
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override
     protected void onVariantAttack( LivingEntity target ) {
-        MobHelper.applyEffect( target, MobEffects.MOVEMENT_SLOWDOWN, 4, 0.5F );
+        MobHelper.applyEffect( target, MobEffects.MOVEMENT_SLOWDOWN, 3, 0.5F );
     }
     
     /** Override to load data from this entity's NBT data. */

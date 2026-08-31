@@ -5,7 +5,7 @@ import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.util.References;
-import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
+import fathertoast.crust.api.datagen.loot.LootTableBuilder;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -52,7 +52,7 @@ public class PaleCaveSpiderEntity extends _SpecialCaveSpiderEntity {
     
     //--------------- Variant-Specific Implementations ----------------
     
-    public PaleCaveSpiderEntity(EntityType<? extends _SpecialCaveSpiderEntity> entityType, Level level ) { super( entityType, level ); }
+    public PaleCaveSpiderEntity( EntityType<? extends _SpecialCaveSpiderEntity> entityType, Level level ) { super( entityType, level ); }
     
     /** Override to change the color of this entity's spit attack. */
     @Override
@@ -62,6 +62,6 @@ public class PaleCaveSpiderEntity extends _SpecialCaveSpiderEntity {
     @Override
     protected void onVariantAttack( LivingEntity target ) {
         MobHelper.applyEffect( target, MobEffects.WEAKNESS );
-        MobHelper.applyEffect( target, MobEffects.DIG_SLOWDOWN, 3 );
+        MobHelper.applyEffect( target, MobEffects.DIG_SLOWDOWN, 2 );
     }
 }

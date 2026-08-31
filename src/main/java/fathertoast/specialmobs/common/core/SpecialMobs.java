@@ -96,7 +96,7 @@ public class SpecialMobs {
      *      - witches
      *          - ability to equip held items (wonky)
      *          - use splash speed instead of regular
-     *          ? nerf poison potions, cuz like, damn, yo
+     *          - nerf poison potions, cuz like, damn, yo
      *      - ghasts
      *          - melee attack AI
      *          - remove vertical targeting restriction
@@ -130,7 +130,6 @@ public class SpecialMobs {
         SMItems.REGISTRY.register( modEventBus );
         SMCreativeTabs.REGISTRY.register( modEventBus );
         SMEntities.REGISTRY.register( modEventBus );
-        SMEffects.REGISTRY.register( modEventBus );
         SMSounds.REGISTRY.register( modEventBus );
         SMBiomeMods.REGISTRY.register( modEventBus );
         

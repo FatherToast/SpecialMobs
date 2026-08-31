@@ -14,6 +14,13 @@ import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 
+/**
+ * The entity types added by this mod.
+ * <p>
+ * Note that the vast majority of entity types are registered by and stored in the bestiary through the
+ * {@link MobFamily.Species}; a specific species is typically accessed through its entity class's static
+ * field annotated with {@link fathertoast.specialmobs.common.bestiary.SpecialMob.SpeciesReference}.
+ */
 public class SMEntities {
     
     public static final DeferredRegister<EntityType<?>> REGISTRY = DeferredRegister.create( ForgeRegistries.ENTITY_TYPES, SpecialMobs.MOD_ID );

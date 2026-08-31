@@ -3,11 +3,10 @@ package fathertoast.specialmobs.common.entity.skeleton;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
-import fathertoast.specialmobs.common.core.register.SMTags;
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.event.NaturalSpawnManager;
 import fathertoast.specialmobs.common.util.References;
-import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
+import fathertoast.crust.api.datagen.loot.LootTableBuilder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
@@ -26,7 +25,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
 
-import java.util.Collections;
 import java.util.List;
 
 @SpecialMob
@@ -57,8 +55,8 @@ public class StraySkeletonEntity extends _SpecialSkeletonEntity {
      *
      * @see net.minecraft.world.entity.monster.Stray#checkStraySpawnRules(EntityType, ServerLevelAccessor, MobSpawnType, BlockPos, RandomSource)
      */
-    public static boolean checkSpeciesSpawnRules(EntityType<? extends StraySkeletonEntity> type, ServerLevelAccessor level,
-                                                 MobSpawnType spawnType, BlockPos pos, RandomSource random ) {
+    public static boolean checkSpeciesSpawnRules( EntityType<? extends StraySkeletonEntity> type, ServerLevelAccessor level,
+                                                  MobSpawnType spawnType, BlockPos pos, RandomSource random ) {
         return NaturalSpawnManager.checkSpawnRulesDefault( type, level, spawnType, pos, random ) &&
                 (spawnType == MobSpawnType.SPAWNER || level.canSeeSky( pos ));
     }
@@ -73,12 +71,12 @@ public class StraySkeletonEntity extends _SpecialSkeletonEntity {
     public static void buildLootTable( LootTableBuilder loot ) {
         loot.addLootTable( "main", EntityType.STRAY.getDefaultLootTable() );
     }
-
+    
     @SpecialMob.EntityTagProvider
     public static List<TagKey<EntityType<?>>> getEntityTags() {
         return List.of( EntityTypeTags.SKELETONS, EntityTypeTags.FREEZE_IMMUNE_ENTITY_TYPES );
     }
-
+    
     @SpecialMob.Factory
     public static EntityType.EntityFactory<StraySkeletonEntity> getVariantFactory() { return StraySkeletonEntity::new; }
     

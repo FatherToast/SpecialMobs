@@ -9,7 +9,7 @@ import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.entity.ai.AIHelper;
 import fathertoast.specialmobs.common.entity.ai.FluidPathNavigator;
 import fathertoast.specialmobs.common.util.References;
-import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
+import fathertoast.crust.api.datagen.loot.LootTableBuilder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -34,7 +34,6 @@ import net.minecraft.world.level.pathfinder.BlockPathTypes;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.ForgeMod;
 
-import java.util.Collections;
 import java.util.List;
 
 @SpecialMob
@@ -69,12 +68,12 @@ public class IceWitchEntity extends _SpecialWitchEntity {
     
     @SpecialMob.Factory
     public static EntityType.EntityFactory<IceWitchEntity> getVariantFactory() { return IceWitchEntity::new; }
-
+    
     @SpecialMob.EntityTagProvider
     public static List<TagKey<EntityType<?>>> getEntityTags() {
         return List.of( SMTags.EntityTypes.WITCHES, EntityTypeTags.FREEZE_IMMUNE_ENTITY_TYPES );
     }
-
+    
     /** @return This entity's mob species. */
     @SpecialMob.SpeciesSupplier
     @Override

@@ -5,7 +5,7 @@ import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.util.References;
-import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
+import fathertoast.crust.api.datagen.loot.LootTableBuilder;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -58,12 +58,12 @@ public class GiantZombifiedPiglinEntity extends _SpecialZombifiedPiglinEntity {
     public GiantZombifiedPiglinEntity( EntityType<? extends _SpecialZombifiedPiglinEntity> entityType, Level level ) {
         super( entityType, level );
     }
-
+    
     @Override
     public float getStepHeight() {
         return 1.0F;
     }
-
+    
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override
     protected void onVariantAttack( LivingEntity target ) {
@@ -79,7 +79,7 @@ public class GiantZombifiedPiglinEntity extends _SpecialZombifiedPiglinEntity {
     
     /** Sets this entity as a baby. */
     @Override
-    public void setBaby( boolean value ) { }
+    public void setBaby( boolean value ) {}
     
     /** @return True if this entity is a baby. */
     @Override

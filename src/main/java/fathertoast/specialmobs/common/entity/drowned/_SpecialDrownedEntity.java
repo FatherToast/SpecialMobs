@@ -16,7 +16,7 @@ import fathertoast.specialmobs.common.entity.ai.goal.SpecialHurtByTargetGoal;
 import fathertoast.specialmobs.common.entity.ai.goal.SpecialTridentAttackGoal;
 import fathertoast.specialmobs.common.event.NaturalSpawnManager;
 import fathertoast.specialmobs.common.util.References;
-import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
+import fathertoast.crust.api.datagen.loot.LootTableBuilder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -47,7 +47,6 @@ import net.minecraft.world.level.pathfinder.BlockPathTypes;
 import net.minecraft.world.phys.Vec3;
 
 import javax.annotation.Nullable;
-import java.util.Collections;
 import java.util.List;
 
 @SpecialMob
@@ -87,7 +86,7 @@ public class _SpecialDrownedEntity extends Drowned implements ISpecialMob<_Speci
     }
     
     public static boolean checkFamilySpawnRules( EntityType<? extends Drowned> type, ServerLevelAccessor world,
-                                                MobSpawnType spawnType, BlockPos pos, RandomSource random ) {
+                                                 MobSpawnType spawnType, BlockPos pos, RandomSource random ) {
         //noinspection unchecked
         return Drowned.checkDrownedSpawnRules( (EntityType<Drowned>) type, world, spawnType, pos, random ) &&
                 NaturalSpawnManager.checkSpawnRulesConfigured( type, world, spawnType, pos, random );
@@ -104,7 +103,7 @@ public class _SpecialDrownedEntity extends Drowned implements ISpecialMob<_Speci
     public static void addBaseLoot( LootTableBuilder loot ) {
         loot.addLootTable( "main", EntityType.DROWNED.getDefaultLootTable() );
     }
-
+    
     @SpecialMob.EntityTagProvider
     public static List<TagKey<EntityType<?>>> getEntityTags() {
         return List.of( SMTags.EntityTypes.DROWNED, EntityTypeTags.AXOLOTL_ALWAYS_HOSTILES );
@@ -133,11 +132,11 @@ public class _SpecialDrownedEntity extends Drowned implements ISpecialMob<_Speci
     }
     
     /** Override to change this entity's AI goals. */
-    protected void registerVariantGoals() { }
+    protected void registerVariantGoals() {}
     
     /** Override to change starting equipment or stats. */
     public void finalizeVariantSpawn( ServerLevelAccessor level, DifficultyInstance difficulty, @Nullable MobSpawnType spawnType,
-                                      @Nullable SpawnGroupData groupData ) { }
+                                      @Nullable SpawnGroupData groupData ) {}
     
     /** Called when this entity successfully damages a target to apply on-hit effects. */
     @Override
@@ -147,14 +146,14 @@ public class _SpecialDrownedEntity extends Drowned implements ISpecialMob<_Speci
     }
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
-    protected void onVariantAttack( LivingEntity target ) { }
+    protected void onVariantAttack( LivingEntity target ) {}
     
     /** Override to save data to this entity's NBT data. */
-    public void addVariantSaveData( CompoundTag saveTag ) { }
+    public void addVariantSaveData( CompoundTag saveTag ) {}
     
     /** Override to load data from this entity's NBT data. */
-    public void readVariantSaveData( CompoundTag saveTag ) { }
-
+    public void readVariantSaveData( CompoundTag saveTag ) {}
+    
     /**
      * Called from {@link _SpecialDrownedEntity#performRangedAttack(LivingEntity, float)}.<br>
      * Override this if a custom trident stack is needed.
@@ -184,7 +183,7 @@ public class _SpecialDrownedEntity extends Drowned implements ISpecialMob<_Speci
     
     /** Called to update this entity's attack AI based on NBT data. */
     public void recalculateAttackGoal() {
-        if( level() != null && !level().isClientSide ) {
+        if( !level().isClientSide ) {
             AIHelper.removeGoals( goalSelector, SpecialTridentAttackGoal.class );
             if( getSpecialData().getRangedAttackMaxRange() > 0.0F ) {
                 goalSelector.addGoal( 2, new SpecialTridentAttackGoal( this, getSpecialData().getRangedWalkSpeed(),
@@ -197,7 +196,7 @@ public class _SpecialDrownedEntity extends Drowned implements ISpecialMob<_Speci
     @Override
     public void performRangedAttack( LivingEntity target, float damageMulti ) {
         final ThrownTrident trident = new ThrownTrident( level(), this, getTridentForRanged() );
-
+        
         final double dX = target.getX() - getX();
         final double dY = target.getY( 0.3333 ) - trident.getY();
         final double dZ = target.getZ() - getZ();
@@ -280,10 +279,9 @@ public class _SpecialDrownedEntity extends Drowned implements ISpecialMob<_Speci
     }
     
     /** Called on spawn to initialize properties based on the world, difficulty, and the group it spawns with. */
-    @Nullable
     @Override
     public final SpawnGroupData finalizeSpawn( ServerLevelAccessor level, DifficultyInstance difficulty, MobSpawnType spawnType,
-                                                  @Nullable SpawnGroupData groupData, @Nullable CompoundTag eggTag ) {
+                                               @Nullable SpawnGroupData groupData, @Nullable CompoundTag eggTag ) {
         return MobHelper.finalizeSpawn( this, level, difficulty, spawnType,
                 super.finalizeSpawn( level, difficulty, spawnType, groupData, eggTag ) );
     }
@@ -369,6 +367,7 @@ public class _SpecialDrownedEntity extends Drowned implements ISpecialMob<_Speci
     public boolean isIgnoringBlockTriggers() { return getSpecialData().ignorePressurePlates(); }
     
     /** @return True if this entity can breathe underwater. */
+    @SuppressWarnings( "deprecation" )
     @Override
     public boolean canBreatheUnderwater() { return getSpecialData().canBreatheInWater(); }
     

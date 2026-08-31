@@ -9,7 +9,7 @@ import fathertoast.specialmobs.common.config.species.SpeciesConfig;
 import fathertoast.specialmobs.common.core.SpecialMobs;
 import fathertoast.specialmobs.common.entity.ai.AIHelper;
 import fathertoast.specialmobs.common.util.References;
-import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
+import fathertoast.crust.api.datagen.loot.LootTableBuilder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
@@ -47,7 +47,6 @@ import java.util.UUID;
 import java.util.function.Predicate;
 
 @SpecialMob
-@SuppressWarnings( "resource" )
 public class EnderCreeperEntity extends _SpecialCreeperEntity implements NeutralMob {
     
     //--------------- Static Special Mob Hooks ----------------
@@ -235,7 +234,7 @@ public class EnderCreeperEntity extends _SpecialCreeperEntity implements Neutral
     @Override
     protected void customServerAiStep() {
         if( level().isDay() && tickCount >= targetChangeTime + 600 ) {
-            final float brightness = getLightLevelDependentMagicValue();
+            @SuppressWarnings( "deprecation" ) final float brightness = getLightLevelDependentMagicValue();
             if( brightness > 0.5F && level().canSeeSky( blockPosition() ) && random.nextFloat() * 30.0F < (brightness - 0.4F) * 2.0F ) {
                 setTarget( null );
                 teleport();
@@ -292,11 +291,13 @@ public class EnderCreeperEntity extends _SpecialCreeperEntity implements Neutral
     protected boolean teleport( double x, double y, double z ) {
         final BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos( x, y, z );
         
+        //noinspection deprecation No replacement method?
         while( pos.getY() > 0 && !level().getBlockState( pos ).blocksMotion() ) {
             pos.move( Direction.DOWN );
         }
         
         final BlockState block = level().getBlockState( pos );
+        //noinspection deprecation No replacement method?
         if( !block.blocksMotion() || block.getFluidState().is( FluidTags.WATER ) ) return false;
         
         EntityTeleportEvent.EnderEntity event = ForgeEventFactory.onEnderTeleport( this, x, y, z );

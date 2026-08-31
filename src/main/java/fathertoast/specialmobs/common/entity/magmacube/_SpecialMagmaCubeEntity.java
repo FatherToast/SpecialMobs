@@ -9,7 +9,7 @@ import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.entity.SpecialMobData;
 import fathertoast.specialmobs.common.event.NaturalSpawnManager;
 import fathertoast.specialmobs.common.util.References;
-import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
+import fathertoast.crust.api.datagen.loot.LootTableBuilder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -35,7 +35,6 @@ import net.minecraft.world.level.pathfinder.BlockPathTypes;
 import net.minecraft.world.phys.Vec3;
 
 import javax.annotation.Nullable;
-import java.util.Collections;
 import java.util.List;
 
 @SpecialMob
@@ -63,8 +62,8 @@ public class _SpecialMagmaCubeEntity extends MagmaCube implements ISpecialMob<_S
         NaturalSpawnManager.registerSpawnPlacement( species, _SpecialMagmaCubeEntity::checkFamilySpawnRules );
     }
     
-    public static boolean checkFamilySpawnRules(EntityType<? extends MagmaCube> type, ServerLevelAccessor level,
-                                                MobSpawnType spawnType, BlockPos pos, RandomSource random ) {
+    public static boolean checkFamilySpawnRules( EntityType<? extends MagmaCube> type, ServerLevelAccessor level,
+                                                 MobSpawnType spawnType, BlockPos pos, RandomSource random ) {
         //noinspection unchecked
         return MagmaCube.checkMagmaCubeSpawnRules( (EntityType<MagmaCube>) type, level, spawnType, pos, random ) &&
                 NaturalSpawnManager.checkSpawnRulesConfigured( type, level, spawnType, pos, random );
@@ -82,7 +81,7 @@ public class _SpecialMagmaCubeEntity extends MagmaCube implements ISpecialMob<_S
     public static void addBaseLoot( LootTableBuilder loot ) {
         loot.addLootTable( "main", EntityType.MAGMA_CUBE.getDefaultLootTable() );
     }
-
+    
     @SpecialMob.EntityTagProvider
     public static List<TagKey<EntityType<?>>> getEntityTags() {
         return List.of( SMTags.EntityTypes.MAGMA_CUBES, EntityTypeTags.FROG_FOOD, EntityTypeTags.FREEZE_HURTS_EXTRA_TYPES );
@@ -102,12 +101,12 @@ public class _SpecialMagmaCubeEntity extends MagmaCube implements ISpecialMob<_S
     }
     
     /** Override to change this entity's AI goals. */
-    protected void registerVariantGoals() { }
+    protected void registerVariantGoals() {}
     
     /** Override to change starting equipment or stats. */
     @SuppressWarnings( "unused" )
     public void finalizeVariantSpawn( ServerLevelAccessor level, DifficultyInstance difficulty, @Nullable MobSpawnType spawnType,
-                                     @Nullable SpawnGroupData groupData ) { }
+                                      @Nullable SpawnGroupData groupData ) {}
     
     /** Called when this entity successfully damages a target to apply on-hit effects. */
     @Override
@@ -117,13 +116,13 @@ public class _SpecialMagmaCubeEntity extends MagmaCube implements ISpecialMob<_S
     }
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
-    protected void onVariantAttack( LivingEntity target ) { }
+    protected void onVariantAttack( LivingEntity target ) {}
     
     /** Override to save data to this entity's NBT data. */
-    public void addVariantSaveData( CompoundTag saveTag ) { }
+    public void addVariantSaveData( CompoundTag saveTag ) {}
     
     /** Override to load data from this entity's NBT data. */
-    public void readVariantSaveData( CompoundTag saveTag ) { }
+    public void readVariantSaveData( CompoundTag saveTag ) {}
     
     
     //--------------- Family-Specific Implementations ----------------
@@ -136,7 +135,7 @@ public class _SpecialMagmaCubeEntity extends MagmaCube implements ISpecialMob<_S
     
     private static ListTag getAttributeSnapshot() {
         if( magmaCubeAttributeSnapshot == null )
-            magmaCubeAttributeSnapshot = new AttributeMap( createAttributes( ).build( ) ).save( );
+            magmaCubeAttributeSnapshot = new AttributeMap( createAttributes().build() ).save();
         return magmaCubeAttributeSnapshot;
     }
     
@@ -165,7 +164,7 @@ public class _SpecialMagmaCubeEntity extends MagmaCube implements ISpecialMob<_S
         if( resetHealth ) setHealth( getMaxHealth() );
         setExperience( getExperience() ); // Update for new size
     }
-
+    
     //--------------- ISpecialMob Implementation ----------------
     
     private SpecialMobData<_SpecialMagmaCubeEntity> specialData;
@@ -206,7 +205,7 @@ public class _SpecialMagmaCubeEntity extends MagmaCube implements ISpecialMob<_S
     @Nullable
     @Override
     public final SpawnGroupData finalizeSpawn( ServerLevelAccessor level, DifficultyInstance difficulty, MobSpawnType spawnType,
-                                                  @Nullable SpawnGroupData groupData, @Nullable CompoundTag eggTag ) {
+                                               @Nullable SpawnGroupData groupData, @Nullable CompoundTag eggTag ) {
         return MobHelper.finalizeSpawn( this, level, difficulty, spawnType,
                 super.finalizeSpawn( level, difficulty, spawnType, groupData, eggTag ) );
     }
@@ -265,7 +264,7 @@ public class _SpecialMagmaCubeEntity extends MagmaCube implements ISpecialMob<_S
     
     /** @return Called when this mob falls. Calculates and applies fall damage. Returns false if canceled. */
     @Override
-    public boolean causeFallDamage(float distance, float damageMultiplier, DamageSource damageSource ) {
+    public boolean causeFallDamage( float distance, float damageMultiplier, DamageSource damageSource ) {
         // Shrink the fall distance a bit depending on size to make sure the
         // larger magma cubes doesn't take fall damage just from jumping.
         float modifiedDistance = getSize() == 1 ? distance : Math.max( 0.0F, distance - getSize() );
@@ -277,10 +276,12 @@ public class _SpecialMagmaCubeEntity extends MagmaCube implements ISpecialMob<_S
     public boolean isIgnoringBlockTriggers() { return getSpecialData().ignorePressurePlates(); }
     
     /** @return True if this entity can breathe underwater. */
+    @SuppressWarnings( "deprecation" )
     @Override
     public boolean canBreatheUnderwater() { return getSpecialData().canBreatheInWater(); }
     
     /** @return True if this entity can be pushed by (flowing) fluids. */
+    @SuppressWarnings( "deprecation" )
     @Override
     public boolean isPushedByFluid() { return !getSpecialData().ignoreWaterPush(); }
     

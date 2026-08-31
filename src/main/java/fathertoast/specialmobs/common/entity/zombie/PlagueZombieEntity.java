@@ -6,7 +6,7 @@ import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.entity.drowned.PlagueDrownedEntity;
 import fathertoast.specialmobs.common.util.References;
-import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
+import fathertoast.crust.api.datagen.loot.LootTableBuilder;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -71,7 +71,7 @@ public class PlagueZombieEntity extends _SpecialZombieEntity {
     
     /** Override to modify this entity's ranged attack projectile. */
     @Override
-    protected AbstractArrow getVariantArrow(AbstractArrow arrow, ItemStack arrowItem, float damageMulti ) {
+    protected AbstractArrow getVariantArrow( AbstractArrow arrow, ItemStack arrowItem, float damageMulti ) {
         return MobHelper.tipPlagueArrow( arrow, random );
     }
 }

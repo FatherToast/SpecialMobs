@@ -5,7 +5,7 @@ import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.core.register.SMTags;
 import fathertoast.specialmobs.common.util.References;
-import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
+import fathertoast.crust.api.datagen.loot.LootTableBuilder;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.EntityTypeTags;
@@ -47,7 +47,7 @@ public class FireZombieEntity extends _SpecialZombieEntity {
         loot.addCommonDrop( "common", Items.FIRE_CHARGE );
         loot.addUncommonDrop( "uncommon", Items.COAL );
     }
-
+    
     @SpecialMob.EntityTagProvider
     public static List<TagKey<EntityType<?>>> getEntityTags() {
         return List.of( SMTags.EntityTypes.ZOMBIES, EntityTypeTags.FREEZE_HURTS_EXTRA_TYPES );

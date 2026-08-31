@@ -1,3 +1,12 @@
+1.20.1-4.2.0 "Blaze Edition"
+    - Added config option to nerf witches' splash poison potion (enabled by default).
+    - Added natural soul sand valley spawns for doom creepers, skeleton creepers, and liches.
+    - All added items now show up in the creative inventory.
+    - Fixed special silverfish not spawning from silverfish blocks.
+    - Fixed cave spider spawn chance not applying (cave spiders will correctly no longer spawn on the surface by default).
+    - Fixed gravel creepers' gravel failing to apply hit damage.
+    - Fixed creepers creating infinite-potion-duration effect clouds.
+    - Fixed melting ice not being translucent.
 1.20.1-4.1.25
     - Fixed immediate mob replacement checks always canceling original spawns.
 1.20.1-4.1.24

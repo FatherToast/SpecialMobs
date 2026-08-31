@@ -9,7 +9,7 @@ import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.config.species.BlazeSpeciesConfig;
 import fathertoast.specialmobs.common.config.species.SpeciesConfig;
 import fathertoast.specialmobs.common.util.References;
-import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
+import fathertoast.crust.api.datagen.loot.LootTableBuilder;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.EntityType;
@@ -83,7 +83,6 @@ public class HellfireBlazeEntity extends _SpecialBlazeEntity {
         
         final Fireball fireball = new LargeFireball( level(), this, dX, dY, dZ, explosionPower );
         fireball.setPos( fireball.getX(), getY( 0.5 ) + 0.5, fireball.getZ() );
-        // noinspection resource
         level().addFreshEntity( fireball );
     }
     

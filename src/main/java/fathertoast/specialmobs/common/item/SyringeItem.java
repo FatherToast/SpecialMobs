@@ -46,10 +46,10 @@ public class SyringeItem extends Item {
                 return InteractionResultHolder.pass( usedItem );
             }
             else {
-                MobHelper.applyEffect( player, MobEffects.MOVEMENT_SPEED, 3, 300 );
-                MobHelper.applyEffect( player, MobEffects.DOLPHINS_GRACE, 1, 300 );
+                MobHelper.applyEffect( player, MobEffects.MOVEMENT_SPEED, 2, 300 );
+                MobHelper.applyEffect( player, MobEffects.DOLPHINS_GRACE, 0, 300 );
                 if( Config.MAIN.GENERAL.enableNausea.get() )
-                    MobHelper.applyEffect( player, MobEffects.CONFUSION, 1, 200 );
+                    MobHelper.applyEffect( player, MobEffects.CONFUSION, 0, 200 );
                 
                 level.playSound( null, player.getX(), player.getY(), player.getZ(), SoundEvents.BEE_STING, SoundSource.PLAYERS, 0.9F, 1.0F );
                 usedItem.hurtAndBreak( 1, player, ( entity ) -> entity.broadcastBreakEvent( hand ) );

@@ -6,13 +6,13 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 
 public class ClientWork {
-
+    
     public static void handleUpdateBoatInputs( S2CUpdateBoatInputs message ) {
         ClientLevel level = Minecraft.getInstance().level;
-
-        if ( level.getEntity( message.entityId ) instanceof MobBoat boat ) {
-            boat.setInput( message.left, message.right, message.forward, message.backward );
-            boat.setPaddleState( message.right && !message.left || message.forward, message.left && !message.right || message.forward );
+        
+        if( level != null && level.getEntity( message.entityId() ) instanceof MobBoat boat ) {
+            boat.setInput( message.left(), message.right(), message.forward(), message.backward() );
+            boat.setPaddleState( message.right() && !message.left() || message.forward(), message.left() && !message.right() || message.forward() );
         }
     }
 }

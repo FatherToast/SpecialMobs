@@ -17,6 +17,7 @@ import fathertoast.specialmobs.common.config.Config;
 import fathertoast.specialmobs.common.core.SpecialMobs;
 import fathertoast.specialmobs.common.core.register.SMBlocks;
 import fathertoast.specialmobs.common.core.register.SMEntities;
+import fathertoast.specialmobs.common.core.register.SMItems;
 import fathertoast.specialmobs.common.entity.blaze.ArmoredBlazeEntity;
 import fathertoast.specialmobs.common.entity.creeper.EnderCreeperEntity;
 import fathertoast.specialmobs.common.entity.creeper.ImplodingCreeperEntity;
@@ -36,6 +37,8 @@ import net.minecraft.client.model.PiglinModel;
 import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.model.geom.builders.CubeDeformation;
 import net.minecraft.client.model.geom.builders.LayerDefinition;
+import net.minecraft.client.renderer.ItemBlockRenderTypes;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.ThrownItemRenderer;
 import net.minecraft.client.renderer.item.ItemProperties;
@@ -66,16 +69,26 @@ public final class ClientRegister {
             event.enqueueWork( () -> ItemProperties.register( Items.FISHING_ROD,
                     ResourceLocation.withDefaultNamespace( "cast" ), new FishingRodItemPropertyGetter() ) );
         }
+        
         RyoamicCompat.init();
         
         // Tell Forge to open the config editor when our mod's "Config" button is clicked in the Mods screen
+        //noinspection removal
         ClientConfigUtil.registerConfigButtonAsEditScreen();
+        
+        //noinspection removal There seems to be no simple way to copy vanilla models and inject Forge's render type
+        ItemBlockRenderTypes.setRenderLayer( SMBlocks.MELTING_ICE.get(), RenderType.translucent() );
     }
     
     @SubscribeEvent
     public static void buildCreativeContents( BuildCreativeModeTabContentsEvent event ) {
         if( event.getTabKey() == CreativeModeTabs.FUNCTIONAL_BLOCKS ) {
             SMBlocks.INFESTED_CORAL.forEach( event::accept );
+        }
+        else if( event.getTabKey() == CreativeModeTabs.TOOLS_AND_UTILITIES ) {
+            event.accept( SMItems.SYRINGE );
+            event.accept( SMItems.INCORPOREAL_FIREBALL );
+            event.accept( SMItems.SLAB_FIREBALL );
         }
     }
     

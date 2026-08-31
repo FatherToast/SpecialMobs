@@ -7,7 +7,7 @@ import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.config.species.SpeciesConfig;
 import fathertoast.specialmobs.common.config.species.ZombieSpeciesConfig;
 import fathertoast.specialmobs.common.util.References;
-import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
+import fathertoast.crust.api.datagen.loot.LootTableBuilder;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -73,7 +73,7 @@ public class KnightZombifiedPiglinEntity extends _SpecialZombifiedPiglinEntity {
     /** Override to change starting equipment or stats. */
     @Override
     public void finalizeVariantSpawn( ServerLevelAccessor level, DifficultyInstance difficulty, @Nullable MobSpawnType spawnType,
-                                     @Nullable SpawnGroupData groupData ) {
+                                      @Nullable SpawnGroupData groupData ) {
         setItemSlot( EquipmentSlot.HEAD, new ItemStack( Items.GOLDEN_HELMET ) );
         setItemSlot( EquipmentSlot.CHEST, new ItemStack( Items.GOLDEN_CHESTPLATE ) );
         setItemSlot( EquipmentSlot.LEGS, new ItemStack( Items.GOLDEN_LEGGINGS ) );

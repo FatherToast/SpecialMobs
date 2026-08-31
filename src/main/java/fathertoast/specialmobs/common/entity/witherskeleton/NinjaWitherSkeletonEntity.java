@@ -10,7 +10,7 @@ import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.entity.ai.INinja;
 import fathertoast.specialmobs.common.entity.ai.goal.NinjaGoal;
 import fathertoast.specialmobs.common.util.References;
-import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
+import fathertoast.crust.api.datagen.loot.LootTableBuilder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -93,7 +93,7 @@ public class NinjaWitherSkeletonEntity extends _SpecialWitherSkeletonEntity impl
     /** Override to change starting equipment or stats. */
     @Override
     public void finalizeVariantSpawn( ServerLevelAccessor level, DifficultyInstance difficulty, @Nullable MobSpawnType spawnType,
-                                     @Nullable SpawnGroupData groupData ) {
+                                      @Nullable SpawnGroupData groupData ) {
         setCanPickUpLoot( true );
     }
     
@@ -113,7 +113,7 @@ public class NinjaWitherSkeletonEntity extends _SpecialWitherSkeletonEntity impl
     
     /** @return Interacts (right click) with this entity and returns the result. */
     @Override
-    public InteractionResult mobInteract(Player player, InteractionHand hand ) {
+    public InteractionResult mobInteract( Player player, InteractionHand hand ) {
         // Attack if the player tries to right click the "block"
         if( !level().isClientSide() && getHiddenDragon() != null ) revealTo( player, true );
         return super.mobInteract( player, hand );
@@ -143,9 +143,10 @@ public class NinjaWitherSkeletonEntity extends _SpecialWitherSkeletonEntity impl
     
     /** Plays an appropriate step sound for this entity based on the floor block. */
     @Override
-    protected void playStepSound( BlockPos pos, BlockState state ) { } // Disable
+    protected void playStepSound( BlockPos pos, BlockState state ) {} // Disable
     
     /** @return The sound this entity makes idly. */
+    @SuppressWarnings( "DataFlowIssue" )
     @Override
     protected SoundEvent getAmbientSound() { return isCrouchingTiger() ? null : super.getAmbientSound(); }
     

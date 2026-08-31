@@ -14,7 +14,7 @@ import java.util.Objects;
 
 public class SMItemModelProvider extends ItemModelProvider {
     
-    public SMItemModelProvider(PackOutput output, ExistingFileHelper existingFileHelper ) {
+    public SMItemModelProvider( PackOutput output, ExistingFileHelper existingFileHelper ) {
         super( output, SpecialMobs.MOD_ID, existingFileHelper );
     }
     

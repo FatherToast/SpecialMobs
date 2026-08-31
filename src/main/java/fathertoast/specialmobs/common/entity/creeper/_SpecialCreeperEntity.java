@@ -15,7 +15,7 @@ import fathertoast.specialmobs.common.entity.ai.IExplodingMob;
 import fathertoast.specialmobs.common.event.NaturalSpawnManager;
 import fathertoast.specialmobs.common.util.ExplosionHelper;
 import fathertoast.specialmobs.common.util.References;
-import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
+import fathertoast.crust.api.datagen.loot.LootTableBuilder;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -361,6 +361,7 @@ public class _SpecialCreeperEntity extends Creeper implements IExplodingMob, ISp
     }
     
     /** Called on spawn to initialize properties based on the world, difficulty, and the group it spawns with. */
+    @SuppressWarnings( "deprecation" )
     @Nullable
     @Override
     public final SpawnGroupData finalizeSpawn( ServerLevelAccessor level, DifficultyInstance difficulty, MobSpawnType spawnType,
@@ -435,10 +436,12 @@ public class _SpecialCreeperEntity extends Creeper implements IExplodingMob, ISp
     public boolean isIgnoringBlockTriggers() { return getSpecialData().ignorePressurePlates(); }
     
     /** @return True if this entity can breathe underwater. */
+    @SuppressWarnings( "deprecation" )
     @Override
     public boolean canBreatheUnderwater() { return getSpecialData().canBreatheInWater(); }
     
     /** @return True if this entity can be pushed by (flowing) fluids. */
+    @SuppressWarnings( "deprecation" )
     @Override
     public boolean isPushedByFluid() { return !getSpecialData().ignoreWaterPush(); }
     

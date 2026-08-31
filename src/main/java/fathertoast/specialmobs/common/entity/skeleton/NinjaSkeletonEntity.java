@@ -10,7 +10,7 @@ import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.entity.ai.INinja;
 import fathertoast.specialmobs.common.entity.ai.goal.NinjaGoal;
 import fathertoast.specialmobs.common.util.References;
-import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
+import fathertoast.crust.api.datagen.loot.LootTableBuilder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -93,7 +93,7 @@ public class NinjaSkeletonEntity extends _SpecialSkeletonEntity implements INinj
     /** Override to change starting equipment or stats. */
     @Override
     public void finalizeVariantSpawn( ServerLevelAccessor level, DifficultyInstance difficulty, @Nullable MobSpawnType spawnType,
-                                     @Nullable SpawnGroupData groupData ) {
+                                      @Nullable SpawnGroupData groupData ) {
         setCanPickUpLoot( true );
     }
     
@@ -143,9 +143,10 @@ public class NinjaSkeletonEntity extends _SpecialSkeletonEntity implements INinj
     
     /** Plays an appropriate step sound for this entity based on the floor block. */
     @Override
-    protected void playStepSound( BlockPos pos, BlockState state ) { } // Disable
+    protected void playStepSound( BlockPos pos, BlockState state ) {} // Disable
     
     /** @return The sound this entity makes idly. */
+    @SuppressWarnings( "DataFlowIssue" )
     @Override
     protected SoundEvent getAmbientSound() { return isCrouchingTiger() ? null : super.getAmbientSound(); }
     
@@ -158,7 +159,7 @@ public class NinjaSkeletonEntity extends _SpecialSkeletonEntity implements INinj
     /** Sets this entity's movement. */
     @Override
     public void setDeltaMovement( Vec3 vec ) { if( !isCrouchingTiger() ) super.setDeltaMovement( vec ); }
-
+    
     /** Returns true if this entity should push and be pushed by other entities when colliding. */
     @Override
     public boolean isPushable() { return super.isPushable() && !isCrouchingTiger(); }

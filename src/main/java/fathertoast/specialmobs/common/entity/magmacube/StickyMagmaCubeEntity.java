@@ -5,7 +5,7 @@ import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.core.register.SMDamageTypes;
 import fathertoast.specialmobs.common.util.References;
-import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
+import fathertoast.crust.api.datagen.loot.LootTableBuilder;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -53,7 +53,7 @@ public class StickyMagmaCubeEntity extends _SpecialMagmaCubeEntity {
     
     
     //--------------- Variant-Specific Implementations ----------------
-
+    
     private int grabTime;
     
     public StickyMagmaCubeEntity( EntityType<? extends _SpecialMagmaCubeEntity> entityType, Level level ) { super( entityType, level ); }

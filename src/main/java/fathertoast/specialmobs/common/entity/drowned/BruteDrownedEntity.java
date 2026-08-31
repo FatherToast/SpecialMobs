@@ -5,7 +5,7 @@ import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.util.References;
-import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
+import fathertoast.crust.api.datagen.loot.LootTableBuilder;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -53,11 +53,11 @@ public class BruteDrownedEntity extends _SpecialDrownedEntity {
     
     //--------------- Variant-Specific Implementations ----------------
     
-    public BruteDrownedEntity( EntityType<? extends _SpecialDrownedEntity> entityType, Level level) { super( entityType, level ); }
+    public BruteDrownedEntity( EntityType<? extends _SpecialDrownedEntity> entityType, Level level ) { super( entityType, level ); }
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
     @Override
-    protected void onVariantAttack(LivingEntity target ) {
+    protected void onVariantAttack( LivingEntity target ) {
         MobHelper.causeLifeLoss( target, 2.0F );
         MobHelper.knockback( this, target, 2.0F, 1.0F );
     }

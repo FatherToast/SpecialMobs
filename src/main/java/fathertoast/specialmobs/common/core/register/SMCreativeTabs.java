@@ -1,7 +1,6 @@
 package fathertoast.specialmobs.common.core.register;
 
 import fathertoast.specialmobs.common.core.SpecialMobs;
-import fathertoast.specialmobs.common.core.register.util.CreativeTabRegObj;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
@@ -18,15 +17,15 @@ public class SMCreativeTabs {
     public static final DeferredRegister<CreativeModeTab> REGISTRY = DeferredRegister.create( Registries.CREATIVE_MODE_TAB, SpecialMobs.MOD_ID );
     
     
-    public static final CreativeTabRegObj EGGS_TAB = register( "all", () -> CreativeModeTab.builder()
+    public static final RegObj EGGS_TAB = register( "all", () -> CreativeModeTab.builder()
             .icon( () -> new ItemStack( Items.CREEPER_SPAWN_EGG ) )
             .title( Component.translatable( "itemGroup.magical_relics.spawn_eggs" ) )
             .build() );
     
     
-    private static CreativeTabRegObj register( String name, Supplier<CreativeModeTab> supplier ) {
+    private static RegObj register( String name, Supplier<CreativeModeTab> supplier ) {
         RegistryObject<CreativeModeTab> regObj = REGISTRY.register( name, supplier );
-        return new CreativeTabRegObj( regObj, ResourceKey.create( Registries.CREATIVE_MODE_TAB, SpecialMobs.rl( name ) ) );
+        return new RegObj( regObj, ResourceKey.create( Registries.CREATIVE_MODE_TAB, SpecialMobs.rl( name ) ) );
     }
     
     
@@ -36,11 +35,17 @@ public class SMCreativeTabs {
                 event.accept( item.get() );
             }
         }
-        else if( event.getTabKey() == EGGS_TAB.getKey() ) {
+        else if( event.getTabKey() == EGGS_TAB.key() ) {
             for( RegistryObject<Item> item : SMItems.REGISTRY.getEntries() ) {
                 if( item.get() instanceof ForgeSpawnEggItem )
                     event.accept( item.get() );
             }
         }
+    }
+    
+    
+    public record RegObj( RegistryObject<CreativeModeTab> regObj, ResourceKey<CreativeModeTab> key ) {
+        @SuppressWarnings( "unused" )
+        public CreativeModeTab getTab() { return regObj.get(); }
     }
 }

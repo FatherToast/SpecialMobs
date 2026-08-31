@@ -7,7 +7,7 @@ import fathertoast.crust.api.config.common.field.DoubleField;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 
 /**
- * This is the base species config for zombies, drowned, and zombified piglins.
+ * This is the base species config for zombies and zombified piglins.
  */
 public class ZombieSpeciesConfig extends SpeciesConfig {
     

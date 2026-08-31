@@ -3,7 +3,6 @@ package fathertoast.specialmobs.client.renderer.entity.layers;
 import com.mojang.blaze3d.vertex.PoseStack;
 import fathertoast.crust.api.lib.CrustMath;
 import fathertoast.specialmobs.common.entity.ISpecialMob;
-import fathertoast.specialmobs.common.util.References;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.RenderLayerParent;

@@ -5,7 +5,7 @@ import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.util.ExplosionHelper;
 import fathertoast.specialmobs.common.util.References;
-import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
+import fathertoast.crust.api.datagen.loot.LootTableBuilder;
 import net.minecraft.core.particles.ItemParticleOption;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
@@ -75,7 +75,7 @@ public class LemonSlimeEntity extends _SpecialSlimeEntity {
     
     /** Called when this entity is struck by lightning. */
     @Override
-    public void thunderHit( ServerLevel level, LightningBolt lightningBolt ) { }
+    public void thunderHit( ServerLevel level, LightningBolt lightningBolt ) {}
     
     private static final ParticleOptions JUMP_PARTICLE = new ItemParticleOption( ParticleTypes.ITEM, Items.YELLOW_DYE.getDefaultInstance() );
     

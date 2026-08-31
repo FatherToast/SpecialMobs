@@ -6,7 +6,7 @@ import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.util.References;
-import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
+import fathertoast.crust.api.datagen.loot.LootTableBuilder;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.EntityType;
@@ -105,7 +105,7 @@ public class HungrySpiderEntity extends _SpecialSpiderEntity {
     
     /** Recalculates the modifiers associated with this entity's feeding level counters. */
     private void updateFeedingLevels() {
-        if( level() != null && !level().isClientSide ) {
+        if( !level().isClientSide ) {
             final AttributeInstance health = getAttribute( Attributes.MAX_HEALTH );
             final AttributeInstance damage = getAttribute( Attributes.ATTACK_DAMAGE );
             //noinspection ConstantConditions

@@ -9,7 +9,7 @@ import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.entity.SpecialMobData;
 import fathertoast.specialmobs.common.event.NaturalSpawnManager;
 import fathertoast.specialmobs.common.util.References;
-import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
+import fathertoast.crust.api.datagen.loot.LootTableBuilder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -36,7 +36,6 @@ import net.minecraft.world.level.pathfinder.BlockPathTypes;
 import net.minecraft.world.phys.Vec3;
 
 import javax.annotation.Nullable;
-import java.util.Collections;
 import java.util.List;
 
 @SpecialMob
@@ -64,8 +63,8 @@ public class _SpecialSlimeEntity extends Slime implements ISpecialMob<_SpecialSl
         NaturalSpawnManager.registerSpawnPlacement( species, _SpecialSlimeEntity::checkFamilySpawnRules );
     }
     
-    public static boolean checkFamilySpawnRules(EntityType<? extends Slime> type, ServerLevelAccessor level,
-                                                MobSpawnType spawnType, BlockPos pos, RandomSource random ) {
+    public static boolean checkFamilySpawnRules( EntityType<? extends Slime> type, ServerLevelAccessor level,
+                                                 MobSpawnType spawnType, BlockPos pos, RandomSource random ) {
         //noinspection unchecked
         return Slime.checkSlimeSpawnRules( (EntityType<Slime>) type, level, spawnType, pos, random ) &&
                 NaturalSpawnManager.checkSpawnRulesConfigured( type, level, spawnType, pos, random );
@@ -82,7 +81,7 @@ public class _SpecialSlimeEntity extends Slime implements ISpecialMob<_SpecialSl
     public static void addBaseLoot( LootTableBuilder loot ) {
         loot.addLootTable( "main", EntityType.SLIME.getDefaultLootTable() );
     }
-
+    
     @SpecialMob.EntityTagProvider
     public static List<TagKey<EntityType<?>>> getEntityTags() {
         return List.of( SMTags.EntityTypes.SLIMES, EntityTypeTags.FROG_FOOD );
@@ -102,28 +101,28 @@ public class _SpecialSlimeEntity extends Slime implements ISpecialMob<_SpecialSl
     }
     
     /** Override to change this entity's AI goals. */
-    protected void registerVariantGoals() { }
+    protected void registerVariantGoals() {}
     
     /** Override to change starting equipment or stats. */
     @SuppressWarnings( "unused" )
     public void finalizeVariantSpawn( ServerLevelAccessor level, DifficultyInstance difficulty, @Nullable MobSpawnType spawnType,
-                                      @Nullable SpawnGroupData groupData ) { }
+                                      @Nullable SpawnGroupData groupData ) {}
     
     /** Called when this entity successfully damages a target to apply on-hit effects. */
     @Override
-    public void doEnchantDamageEffects(LivingEntity attacker, Entity target ) {
+    public void doEnchantDamageEffects( LivingEntity attacker, Entity target ) {
         if( target instanceof LivingEntity ) onVariantAttack( (LivingEntity) target );
         super.doEnchantDamageEffects( attacker, target );
     }
     
     /** Override to apply effects when this entity hits a target with a melee attack. */
-    protected void onVariantAttack( LivingEntity target ) { }
+    protected void onVariantAttack( LivingEntity target ) {}
     
     /** Override to save data to this entity's NBT data. */
-    public void addVariantSaveData( CompoundTag saveTag ) { }
+    public void addVariantSaveData( CompoundTag saveTag ) {}
     
     /** Override to load data from this entity's NBT data. */
-    public void readVariantSaveData( CompoundTag saveTag ) { }
+    public void readVariantSaveData( CompoundTag saveTag ) {}
     
     
     //--------------- Family-Specific Implementations ----------------
@@ -213,7 +212,7 @@ public class _SpecialSlimeEntity extends Slime implements ISpecialMob<_SpecialSl
     @Nullable
     @Override
     public final SpawnGroupData finalizeSpawn( ServerLevelAccessor level, DifficultyInstance difficulty, MobSpawnType spawnReason,
-                                                  @Nullable SpawnGroupData groupData, @Nullable CompoundTag eggTag ) {
+                                               @Nullable SpawnGroupData groupData, @Nullable CompoundTag eggTag ) {
         return MobHelper.finalizeSpawn( this, level, difficulty, spawnReason,
                 super.finalizeSpawn( level, difficulty, spawnReason, groupData, eggTag ) );
     }
@@ -272,7 +271,7 @@ public class _SpecialSlimeEntity extends Slime implements ISpecialMob<_SpecialSl
     
     /** @return Called when this mob falls. Calculates and applies fall damage. Returns false if canceled. */
     @Override
-    public boolean causeFallDamage(float distance, float damageMultiplier, DamageSource damageSource ) {
+    public boolean causeFallDamage( float distance, float damageMultiplier, DamageSource damageSource ) {
         return super.causeFallDamage( distance, damageMultiplier * getSpecialData().getFallDamageMultiplier(), damageSource );
     }
     
@@ -281,10 +280,12 @@ public class _SpecialSlimeEntity extends Slime implements ISpecialMob<_SpecialSl
     public boolean isIgnoringBlockTriggers() { return getSpecialData().ignorePressurePlates(); }
     
     /** @return True if this entity can breathe underwater. */
+    @SuppressWarnings( "deprecation" )
     @Override
     public boolean canBreatheUnderwater() { return getSpecialData().canBreatheInWater(); }
     
     /** @return True if this entity can be pushed by (flowing) fluids. */
+    @SuppressWarnings( "deprecation" )
     @Override
     public boolean isPushedByFluid() { return !getSpecialData().ignoreWaterPush(); }
     

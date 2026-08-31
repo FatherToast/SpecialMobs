@@ -7,9 +7,9 @@ import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.entity.ai.AIHelper;
 import fathertoast.specialmobs.common.entity.ai.FluidPathNavigator;
 import fathertoast.specialmobs.common.util.References;
-import fathertoast.specialmobs.datagen.loot.LootEntryItemBuilder;
-import fathertoast.specialmobs.datagen.loot.LootPoolBuilder;
-import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
+import fathertoast.crust.api.datagen.loot.LootEntryItemBuilder;
+import fathertoast.crust.api.datagen.loot.LootPoolBuilder;
+import fathertoast.crust.api.datagen.loot.LootTableBuilder;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.world.entity.EntityType;
@@ -78,10 +78,10 @@ public class WaterCaveSpiderEntity extends _SpecialCaveSpiderEntity {
     
     /** @return A new path navigator for this entity to use. */
     @Override
-    protected PathNavigation createNavigation(Level level ) {
+    protected PathNavigation createNavigation( Level level ) {
         return new FluidPathNavigator( this, level, true, false );
     }
-
+    
     /** @return Whether this entity can stand on a particular type of fluid. */
     @Override
     public boolean canStandOnFluid( FluidState fluid ) { return fluid.is( FluidTags.WATER ); }

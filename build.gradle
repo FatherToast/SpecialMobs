@@ -99,17 +99,17 @@ dependencies {
     implementation fg.deobf("curse.maven:jade-324717:${jade_version}")
 
     // Tinker's Construct
-    implementation fg.deobf("curse.maven:tc-74072:${tc_version}")
-    implementation fg.deobf("curse.maven:mantle-74924:${mantle_version}")
+    compileOnly fg.deobf("curse.maven:tc-74072:${tc_version}")
+    compileOnly fg.deobf("curse.maven:mantle-74924:${mantle_version}")
 
     // Pam's HarvestCraft
-    runtimeOnly fg.deobf("curse.maven:harvestcraft_crops-361385:${hvcraft_cr_version}")
-    runtimeOnly fg.deobf("curse.maven:harvestcraft_foodcore-372534:${hvcraft_fc_version}")
+    compileOnly fg.deobf("curse.maven:harvestcraft_crops-361385:${hvcraft_cr_version}")
+    compileOnly fg.deobf("curse.maven:harvestcraft_foodcore-372534:${hvcraft_fc_version}")
 
     // Ryomic Lights - NOTE: remove Ryoamic from runtime mods when testing dedi server. Will crash!
-    implementation fg.deobf("curse.maven:ryoamiclights-913587:${ryoamic_version}")
+    compileOnly fg.deobf("curse.maven:ryoamiclights-913587:${ryoamic_version}")
     compileOnly "curse.maven:ryoamiclights_src-913587:${ryoamic_src_version}"
-    implementation fg.deobf("curse.maven:obsidianui-684718:${obsidianui_version}")
+    compileOnly fg.deobf("curse.maven:obsidianui-684718:${obsidianui_version}")
 
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 }

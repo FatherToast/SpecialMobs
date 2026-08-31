@@ -7,7 +7,7 @@ import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.config.species.SkeletonSpeciesConfig;
 import fathertoast.specialmobs.common.config.species.SpeciesConfig;
 import fathertoast.specialmobs.common.util.References;
-import fathertoast.specialmobs.datagen.loot.LootTableBuilder;
+import fathertoast.crust.api.datagen.loot.LootTableBuilder;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -72,7 +72,7 @@ public class KnightWitherSkeletonEntity extends _SpecialWitherSkeletonEntity {
     /** Override to change starting equipment or stats. */
     @Override
     public void finalizeVariantSpawn( ServerLevelAccessor level, DifficultyInstance difficulty, @Nullable MobSpawnType spawnType,
-                                     @Nullable SpawnGroupData groupData ) {
+                                      @Nullable SpawnGroupData groupData ) {
         if( getItemBySlot( EquipmentSlot.MAINHAND ).getItem() == Items.STONE_SWORD ) {
             setItemSlot( EquipmentSlot.MAINHAND, new ItemStack( Items.IRON_SWORD ) );
         }

@@ -1,5 +1,6 @@
 package fathertoast.specialmobs.common.core.register;
 
+import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.core.SpecialMobs;
 import fathertoast.specialmobs.common.item.IncorporealFireChargeItem;
 import fathertoast.specialmobs.common.item.SlabFireChargeItem;
@@ -14,8 +15,16 @@ import net.minecraftforge.registries.RegistryObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Supplier;
 
+/**
+ * The items added by this mod.
+ * <p>
+ * Note that the vast majority of items are spawn eggs, which are registered by and stored in the bestiary
+ * through the {@link MobFamily.Species}; a specific species is typically accessed through its entity class's
+ * static field annotated with {@link fathertoast.specialmobs.common.bestiary.SpecialMob.SpeciesReference}.
+ */
 public class SMItems {
     
     public static final DeferredRegister<Item> REGISTRY = DeferredRegister.create( ForgeRegistries.ITEMS, SpecialMobs.MOD_ID );
@@ -30,7 +39,7 @@ public class SMItems {
     /** Registers an entity type's spawn egg item to the deferred register. */
     public static <T extends Mob> RegistryObject<ForgeSpawnEggItem> registerSpawnEgg(
             RegistryObject<EntityType<T>> entityType, int eggBaseColor, int eggSpotsColor ) {
-        final String name = entityType.getId().getPath() + "_spawn_egg";
+        final String name = Objects.requireNonNull( entityType.getId() ).getPath() + "_spawn_egg";
         return REGISTRY.register( name, () ->
                 new ForgeSpawnEggItem( entityType, eggBaseColor, eggSpotsColor, new Item.Properties() )
         );
