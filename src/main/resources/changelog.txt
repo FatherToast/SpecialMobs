@@ -1,4 +1,6 @@
 1.20.1-4.2.0 "Blaze Edition"
+    - Minimum required Crust version is now 5.
+    - Added option to use natural spawns instead of the Mob Replacer for natural spawns.
     - Added config option to nerf witches' splash poison potion (enabled by default).
     - Added natural soul sand valley spawns for doom creepers, skeleton creepers, and liches.
     - All added items now show up in the creative inventory.

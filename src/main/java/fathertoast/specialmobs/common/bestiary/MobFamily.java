@@ -146,7 +146,11 @@ public class MobFamily<T extends Mob, V extends FamilyConfig> {
     
     /** @return The family of mobs that can replace the passed entity; returns null if the entity is not replaceable. */
     @Nullable
-    public static MobFamily<?, ?> getReplacementFamily( Mob mob ) { return TYPE_TO_FAMILY_MAP.get( mob.getType() ); }
+    public static MobFamily<?, ?> getReplacementFamily( Mob mob ) { return getReplacementFamily( mob.getType() ); }
+    
+    /** @return The family of mobs that can replace the passed entity type; returns null if the entity is not replaceable. */
+    @Nullable
+    public static MobFamily<?, ?> getReplacementFamily( EntityType<?> entityType ) { return TYPE_TO_FAMILY_MAP.get( entityType ); }
     
     
     //--------------- Family Instance Implementations ----------------

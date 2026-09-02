@@ -11,6 +11,7 @@ import fathertoast.crust.api.config.common.value.environment.EnvironmentList;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -63,6 +64,7 @@ public class FamilyConfig extends AbstractConfigFile {
         public final DoubleField.EnvironmentSensitive specialVariantChance;
         
         public final EnvironmentSensitiveWeightedList<MobFamily.Species<?>> specialVariantList;
+        public final List<IntField> specialVariantWeights;
         
         General( FamilyConfig parent, MobFamily<?, ?> family, double variantChance ) {
             super( parent, "general",
@@ -110,13 +112,14 @@ public class FamilyConfig extends AbstractConfigFile {
             for( int i = 0; i < family.variants.length; i++ ) {
                 baseWeights.add( SPEC.define( new IntField( "weight." +
                         ConfigUtil.camelCaseToLowerUnderscore( family.variants[i].specialVariantName ) + ".base",
-                        family.variants[i].bestiaryInfo.defaultWeight.value, IntField.Range.NON_NEGATIVE, (String[]) null ) ) );
+                        family.variants[i].bestiaryInfo.defaultWeight.weight, IntField.Range.NON_NEGATIVE, (String[]) null ) ) );
                 weightExceptions.add( SPEC.define( new EnvironmentListField<>( "weight." +
                         ConfigUtil.camelCaseToLowerUnderscore( family.variants[i].specialVariantName ) + ".exceptions",
-                        family.variants[i].bestiaryInfo.theme.getValue(), (String[]) null ) ) );
+                        family.variants[i].bestiaryInfo.theme.getWeightExceptions(), (String[]) null ) ) );
             }
             
             specialVariantList = new EnvironmentSensitiveWeightedList<>( family.variants, tempOof( baseWeights ), tempOof( weightExceptions ) );
+            specialVariantWeights = Collections.unmodifiableList( baseWeights );
         }
     }
     
