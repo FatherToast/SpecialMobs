@@ -40,6 +40,9 @@ public class MainConfig extends AbstractConfigFile {
         public final BooleanField enableMobReplacement;
         public final StringListField skippedSpawnTypes;
         
+        public final BooleanField useNaturalSpawner;
+        public final IntField naturalSpawnFactor;
+        
         public final BooleanField masterVanillaReplacement;
         public final DoubleField masterRandomScaling;
         
@@ -62,6 +65,20 @@ public class MainConfig extends AbstractConfigFile {
                     "A list of mob spawn types that the mob replacer should not process.",
                     "For example, listing \"spawner\" here will stop the mob replacer from processing mobs spawned from spawners.",
                     "Valid types: " + TomlHelper.toLiteralList( (Object[]) SpawnType.values() ) ) );
+            
+            SPEC.newLine();
+            
+            useNaturalSpawner = SPEC.define( new BooleanField( "use_natural_spawner", false,
+                    "Whether natural spawning is enabled. This is an alternative to using the Mob Replacer above " +
+                            "for natural spawns and forces the Mob Replacer to skip all \"natural\" spawns when enabled.",
+                    "This overhauls all spawns in all biomes that have replaceable mobs and may or may not have accurate " +
+                            "results. This tries to follow your configured base weights and ignores weight exceptions; " +
+                            "finer tuning can still be done based on environment/biome through each species' natural " +
+                            "spawn chance setting." ), RestartNote.WORLD );
+            naturalSpawnFactor = SPEC.define( new IntField( "natural_spawn_factor", 200, IntField.Range.POSITIVE,
+                    "If natural spawning is enabled, this is a factor applied to all spawn weights in all " +
+                            "biomes that have replaceable mobs. Higher values allow more precision in spawn chances, but " +
+                            "if this is too large and you have too many spawn entries, the game's spawn logic will break." ), RestartNote.WORLD );
             
             SPEC.newLine();
             

@@ -36,15 +36,32 @@ public class BestiaryInfo {
     public enum DefaultWeight {
         DEFAULT( 60 ),
         DISABLED( 0 ),
-        LOWEST( DEFAULT.value / 8 ),
-        LOW( DEFAULT.value / 4 ),
-        HIGH( (int) (DEFAULT.value * 2.5) ),
-        HIGHEST( DEFAULT.value * 5 );
+        LOWEST( DEFAULT.weight / 8 ),
+        LOW( DEFAULT.weight / 4 ),
+        HIGH( (int) (DEFAULT.weight * 2.5) ),
+        HIGHEST( DEFAULT.weight * 5 );
         
-        public final int value;
+        public final int weight;
         
-        DefaultWeight( int v ) { value = v; }
+        DefaultWeight( int wt ) { weight = wt; }
     }
+    
+    //    public enum DefaultWeight {
+    //        DEFAULT( 60, 1.0 ),
+    //        DISABLED( 0, 0.0 ),
+    //        LOWEST( DEFAULT.weight / 8, 0.05 ),
+    //        LOW( DEFAULT.weight / 4, 0.25 ),
+    //        HIGH( (int) (DEFAULT.weight * 2.5), 0.65 ),
+    //        HIGHEST( DEFAULT.weight * 5, 1.0 );
+    //
+    //        public final int weight;
+    //        public final double spawnChance;
+    //
+    //        DefaultWeight( int wt, double ch ) {
+    //            weight = wt;
+    //            spawnChance = ch;
+    //        }
+    //    }
     
     public enum Theme {
         /** The default theme. Mob spawn weight will not vary by location or environment. */
@@ -52,92 +69,102 @@ public class BestiaryInfo {
         
         /** Fire theme. Mob spawn weight is higher in warm regions and lower or disabled in cold regions. */
         FIRE( codec -> EnvironmentList.builder( codec )
-                .entryBuilder( DefaultWeight.HIGHEST.value ).inUltraWarmDimension().or().isHot().build()
-                .entryBuilder( DefaultWeight.HIGH.value ).isWarm().build()
-                .entryBuilder( DefaultWeight.DISABLED.value ).isFreezing().build()
+                .entryBuilder( DefaultWeight.HIGHEST.weight ).inUltraWarmDimension().or().isHot().build()
+                .entryBuilder( DefaultWeight.HIGH.weight ).isWarm().build()
+                .entryBuilder( DefaultWeight.DISABLED.weight ).isFreezing().build()
                 // Regular frozen ocean is actually freezing, so already covered
-                .entryBuilder( DefaultWeight.HIGHEST.value ).inBiome( Biomes.WARM_OCEAN ).build()
-                .entryBuilder( DefaultWeight.HIGH.value ).inBiome( Biomes.LUKEWARM_OCEAN ).or().inBiome( Biomes.DEEP_LUKEWARM_OCEAN ).build()
-                .entryBuilder( DefaultWeight.LOW.value ).inBiome( Biomes.COLD_OCEAN ).or().inBiome( Biomes.DEEP_COLD_OCEAN ).build()
-                .entryBuilder( DefaultWeight.DISABLED.value ).inBiome( Biomes.DEEP_FROZEN_OCEAN ).build()
+                .entryBuilder( DefaultWeight.HIGHEST.weight ).inBiome( Biomes.WARM_OCEAN ).build()
+                .entryBuilder( DefaultWeight.HIGH.weight ).inBiome( Biomes.LUKEWARM_OCEAN ).or().inBiome( Biomes.DEEP_LUKEWARM_OCEAN ).build()
+                .entryBuilder( DefaultWeight.LOW.weight ).inBiome( Biomes.COLD_OCEAN ).or().inBiome( Biomes.DEEP_COLD_OCEAN ).build()
+                .entryBuilder( DefaultWeight.DISABLED.weight ).inBiome( Biomes.DEEP_FROZEN_OCEAN ).build()
                 .build() ),
         
         /** Ice theme. Mob spawn weight is higher in cold regions and lower or disabled in warm regions. */
         ICE( codec -> EnvironmentList.builder( codec )
-                .entryBuilder( DefaultWeight.DISABLED.value ).inUltraWarmDimension().build()
-                .entryBuilder( DefaultWeight.HIGHEST.value ).isFreezing().build()
-                .entryBuilder( DefaultWeight.LOW.value ).isWarm().build()
-                .entryBuilder( DefaultWeight.DISABLED.value ).isHot().build()
+                .entryBuilder( DefaultWeight.DISABLED.weight ).inUltraWarmDimension().build()
+                .entryBuilder( DefaultWeight.HIGHEST.weight ).isFreezing().build()
+                .entryBuilder( DefaultWeight.LOW.weight ).isWarm().build()
+                .entryBuilder( DefaultWeight.DISABLED.weight ).isHot().build()
                 // Regular frozen ocean is actually freezing, so already covered
-                .entryBuilder( DefaultWeight.HIGHEST.value ).inBiome( Biomes.DEEP_FROZEN_OCEAN ).build()
-                .entryBuilder( DefaultWeight.HIGH.value ).inBiome( Biomes.COLD_OCEAN ).or().inBiome( Biomes.DEEP_COLD_OCEAN ).build()
-                .entryBuilder( DefaultWeight.LOW.value ).inBiome( Biomes.LUKEWARM_OCEAN ).or().inBiome( Biomes.DEEP_LUKEWARM_OCEAN ).build()
-                .entryBuilder( DefaultWeight.LOWEST.value ).inBiome( Biomes.WARM_OCEAN ).build()
+                .entryBuilder( DefaultWeight.HIGHEST.weight ).inBiome( Biomes.DEEP_FROZEN_OCEAN ).build()
+                .entryBuilder( DefaultWeight.HIGH.weight ).inBiome( Biomes.COLD_OCEAN ).or().inBiome( Biomes.DEEP_COLD_OCEAN ).build()
+                .entryBuilder( DefaultWeight.LOW.weight ).inBiome( Biomes.LUKEWARM_OCEAN ).or().inBiome( Biomes.DEEP_LUKEWARM_OCEAN ).build()
+                .entryBuilder( DefaultWeight.LOWEST.weight ).inBiome( Biomes.WARM_OCEAN ).build()
                 .build() ),
         
         /** Desert theme. Mob spawn weight is higher in dry regions and lower or disabled in wet regions. */
         DESERT( codec -> EnvironmentList.builder( codec )
-                .entryBuilder( DefaultWeight.HIGHEST.value ).inUltraWarmDimension().or().inNaturalDimension().and().inDryBiome().build()
-                .entryBuilder( DefaultWeight.DISABLED.value ).inWaterBiome().or().inHumidBiome().or().isRaining().and().canSeeSky().build()
-                .entryBuilder( DefaultWeight.HIGH.value ).belowHalfMoonLight().build()
+                .entryBuilder( DefaultWeight.HIGHEST.weight ).inUltraWarmDimension().or().inNaturalDimension().and().inDryBiome().build()
+                .entryBuilder( DefaultWeight.DISABLED.weight ).inWaterBiome().or().inHumidBiome().or().isRaining().and().canSeeSky().build()
+                .entryBuilder( DefaultWeight.HIGH.weight ).belowHalfMoonLight().build()
                 .build() ),
         
         /** Water theme. Mob spawn weight is higher in wet regions and lower or disabled in dry regions. */
         WATER( codec -> EnvironmentList.builder( codec )
-                .entryBuilder( DefaultWeight.DISABLED.value ).inUltraWarmDimension().or().inNaturalDimension().and().inDryBiome().build()
-                .entryBuilder( DefaultWeight.HIGHEST.value ).inWaterBiome().or().inHumidBiome().or().isRaining().and().canSeeSky().build()
-                .entryBuilder( DefaultWeight.HIGH.value ).aboveHalfMoonLight().build()
+                .entryBuilder( DefaultWeight.DISABLED.weight ).inUltraWarmDimension().or().inNaturalDimension().and().inDryBiome().build()
+                .entryBuilder( DefaultWeight.HIGHEST.weight ).inWaterBiome().or().inHumidBiome().or().isRaining().and().canSeeSky().build()
+                .entryBuilder( DefaultWeight.HIGH.weight ).aboveHalfMoonLight().build()
                 .build() ),
         
         /** Forest theme. Mob spawn weight is higher in forests and during full moons. */
         FOREST( codec -> EnvironmentList.builder( codec )
-                .entryBuilder( DefaultWeight.HIGHEST.value ).inBiome( BiomeTags.IS_TAIGA ).or().inBiome( BiomeTags.IS_JUNGLE ).or()
+                .entryBuilder( DefaultWeight.HIGHEST.weight ).inBiome( BiomeTags.IS_TAIGA ).or().inBiome( BiomeTags.IS_JUNGLE ).or()
                 .inBiome( BiomeTags.IS_FOREST ).or().inBiome( Tags.Biomes.IS_SWAMP ).or().inBiome( Biomes.CRIMSON_FOREST ).build()
-                .entryBuilder( DefaultWeight.HIGH.value ).atMaxMoonLight().build()
-                .entryBuilder( DefaultWeight.LOWEST.value ).inDryBiome().build()
+                .entryBuilder( DefaultWeight.HIGH.weight ).atMaxMoonLight().build()
+                .entryBuilder( DefaultWeight.LOWEST.weight ).inDryBiome().build()
                 .build() ),
         
         /** Forest theme. Mob spawn weight is higher in mountain regions or high altitude and during new moons. */
         MOUNTAIN( codec -> EnvironmentList.builder( codec )
-                .entryBuilder( DefaultWeight.HIGHEST.value ).inMountainBiome().or().aboveMountainLevel().build()
-                .entryBuilder( DefaultWeight.HIGH.value ).atNoMoonLight().build()
-                .entryBuilder( DefaultWeight.LOW.value ).belowSeaLevel().build()
+                .entryBuilder( DefaultWeight.HIGHEST.weight ).inMountainBiome().or().aboveMountainLevel().build()
+                .entryBuilder( DefaultWeight.HIGH.weight ).atNoMoonLight().build()
+                .entryBuilder( DefaultWeight.LOW.weight ).belowSeaLevel().build()
                 .build() ),
         
         /** Storm theme. Mob spawn weight is higher during inclement weather and lower underground. */
         STORM( codec -> EnvironmentList.builder( codec )
-                .entryBuilder( DefaultWeight.HIGHEST.value ).isThundering().build()
-                .entryBuilder( DefaultWeight.HIGH.value ).isRaining().build()
-                .entryBuilder( DefaultWeight.LOW.value ).cannotSeeSky().build()
+                .entryBuilder( DefaultWeight.HIGHEST.weight ).isThundering().build()
+                .entryBuilder( DefaultWeight.HIGH.weight ).isRaining().build()
+                .entryBuilder( DefaultWeight.LOW.weight ).cannotSeeSky().build()
                 .build() ),
         
         /** Tropical theme. Mob spawn weight is higher in tropical oceans and disabled in very cold regions. */
         TROPICAL( codec -> EnvironmentList.builder( codec )
                 // All ocean biomes (except regular frozen ocean) have the same temp of 0.5, so we must call out specific biomes
-                .entryBuilder( DefaultWeight.HIGHEST.value ).inBiome( Biomes.WARM_OCEAN ).build()
-                .entryBuilder( DefaultWeight.DISABLED.value ).isFreezing().or().inBiome( Biomes.DEEP_FROZEN_OCEAN ).build()
+                .entryBuilder( DefaultWeight.HIGHEST.weight ).inBiome( Biomes.WARM_OCEAN ).build()
+                .entryBuilder( DefaultWeight.DISABLED.weight ).isFreezing().or().inBiome( Biomes.DEEP_FROZEN_OCEAN ).build()
                 .build() ),
         
         /** Fishing theme. Fish. */
         FISHING( codec -> EnvironmentList.builder( codec )
-                .entryBuilder( DefaultWeight.HIGHEST.value ).inWaterBiome().build()
-                .entryBuilder( DefaultWeight.HIGH.value ).atMaxMoonLight().or().isRaining().and().notInDryBiome().build()
+                .entryBuilder( DefaultWeight.HIGHEST.weight ).inWaterBiome().build()
+                .entryBuilder( DefaultWeight.HIGH.weight ).atMaxMoonLight().or().isRaining().and().notInDryBiome().build()
                 .build() );
         
         
-        private final Function<IValueCodec<Integer>, EnvironmentList<Integer>> func;
-        private EnvironmentList<Integer> value;
+        private final Function<IValueCodec<Integer>, EnvironmentList<Integer>> weightFunc;
+        private EnvironmentList<Integer> weightEx;
         
-        Theme( Function<IValueCodec<Integer>, EnvironmentList<Integer>> func ) {
-            this.func = func;
+        Theme( Function<IValueCodec<Integer>, EnvironmentList<Integer>> weight ) { weightFunc = weight; }
+        
+        public EnvironmentList<Integer> getWeightExceptions() {
+            if( weightEx == null ) weightEx = weightFunc.apply( IntValueCodec.NON_NEGATIVE );
+            return weightEx;
         }
         
-        public EnvironmentList<Integer> getValue() {
-            if( value == null ) {
-                value = func.apply( IntValueCodec.NON_NEGATIVE );
-            }
-            return value;
-        }
+        //        private final Function<IValueCodec<Double>, EnvironmentList<Double>> chanceFunc;
+        //        private EnvironmentList<Double> chanceEx;
+        
+        //        Theme( Function<IValueCodec<Integer>, EnvironmentList<Integer>> weight,
+        //               Function<IValueCodec<Double>, EnvironmentList<Double>> chance ) {
+        //            weightFunc = weight;
+        //            chanceFunc = chance;
+        //        }
+        
+        //        public EnvironmentList<Double> getSpawnChanceExceptions() {
+        //            if( chanceEx == null ) chanceEx = chanceFunc.apply( DoubleValueCodec.PERCENT );
+        //            return chanceEx;
+        //        }
     }
     
     /** The spot color for spawn eggs of this species. The base color is determined by the family. */

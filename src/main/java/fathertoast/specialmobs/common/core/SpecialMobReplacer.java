@@ -95,7 +95,8 @@ public final class SpecialMobReplacer {
         final SpawnType spawnType = SpawnType.fromVanilla( event.getSpawnType() );
         
         // Check if the spawn type is one that should be skipped.
-        if( spawnType == null || Config.MAIN.GENERAL.skippedSpawnTypes.get().contains( spawnType.toString() ) ) return;
+        if( spawnType == null || Config.MAIN.GENERAL.useNaturalSpawner.get() && spawnType == SpawnType.NATURAL ||
+                Config.MAIN.GENERAL.skippedSpawnTypes.get().contains( spawnType.toString() ) ) return;
         
         final Mob mob = event.getEntity();
         final MobFamily<?, ?> mobFamily = getReplacingMobFamily( mob );

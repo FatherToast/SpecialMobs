@@ -81,7 +81,7 @@ public class SpeciesConfig extends AbstractConfigFile {
             naturalSpawnChance = new DoubleField.EnvironmentSensitive(
                     SPEC.define( new DoubleField( "natural_spawn_chance.base", 1.0, DoubleField.Range.PERCENT,
                             "The chance for " + speciesName + " to succeed at natural spawn attempts. Does not affect Mob Replacement.",
-                            "Note: Most species do NOT naturally spawn - they must be added by a mod or data pack for this option to do anything." ) ),
+                            "Note: Most species do NOT naturally spawn unless you swap natural spawning on in the main config or add spawns through a mod or data pack." ) ),
                     SPEC.define( new EnvironmentListField<>( "natural_spawn_chance.exceptions", getDefaultSpawnExceptions(),
                             "The chance for " + speciesName + " to succeed at natural spawn attempts when specific environmental conditions are met." ) )
             );
