@@ -1,25 +1,28 @@
+.gradle/
+build/
+out/
+classes/
+
 # eclipse
-bin
 *.launch
-.settings
-.metadata
+
+# idea
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# vscode
+.settings/
+.vscode/
+bin/
 .classpath
 .project
 
-# idea
-out
-*.ipr
-*.iws
-*.iml
-.idea
+# macos
+*.DS_Store
 
-# gradle
-build
-.gradle
-
-# other
-eclipse
-run
-
-# Files from Forge MDK
-forge*changelog.txt
+# fabric
+run/*
+# Remove the following line to remove server.properties from your project.
+!server.properties

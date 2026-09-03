@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "id": "specialmobs",
+  "version": "${version}",
+  "name": "Special Mobs",
+  "description": "Adds variants to the vanilla mobs to make them more interesting and challenging.",
+  "authors": [
+    "FatherToast",
+    "Sarinsa"
+  ],
+  "contact": {
+    "homepage": "https://discord.gg/GFTzTdX",
+    "sources": "https://github.com/FatherToast/SpecialMobs"
+  },
+  "license": "MIT",
+  "icon": "banner.png",
+
+  "environment": "*",
+  "entrypoints": {
+    "stationapi:event_bus": [
+      "toast.specialmobs.common.core.SpecialMobs",
+      "toast.specialmobs.common.core.SMEntities"
+    ],
+    "stationapi:event_bus_client": [
+    ],
+    "stationapi:event_bus_server": [
+    ]
+  },
+  "mixins": [
+    "specialmobs.mixins.json"
+  ],
+
+  "depends": {
+    "minecraft": "1.0.0-beta.7.3"
+  }
+}
