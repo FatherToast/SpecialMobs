@@ -3,6 +3,9 @@ package fathertoast.specialmobs.common.entity.creeper;
 import fathertoast.crust.api.config.common.ConfigManager;
 import fathertoast.crust.api.config.common.value.collection.value.DoubleValueCodec;
 import fathertoast.crust.api.config.common.value.environment.EnvironmentList;
+import fathertoast.crust.api.datagen.loot.LootEntryItemBuilder;
+import fathertoast.crust.api.datagen.loot.LootPoolBuilder;
+import fathertoast.crust.api.datagen.loot.LootTableBuilder;
 import fathertoast.crust.api.lib.NBTHelper;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
@@ -19,9 +22,6 @@ import fathertoast.specialmobs.common.entity.ai.goal.AmphibiousSwimUpGoal;
 import fathertoast.specialmobs.common.event.NaturalSpawnManager;
 import fathertoast.specialmobs.common.util.ExplosionHelper;
 import fathertoast.specialmobs.common.util.References;
-import fathertoast.crust.api.datagen.loot.LootEntryItemBuilder;
-import fathertoast.crust.api.datagen.loot.LootPoolBuilder;
-import fathertoast.crust.api.datagen.loot.LootTableBuilder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.nbt.CompoundTag;
@@ -161,7 +161,7 @@ public class DrowningCreeperEntity extends _SpecialCreeperEntity implements IAmp
         final ExplosionHelper explosion = new ExplosionHelper( this,
                 explosionMode == Explosion.BlockInteraction.KEEP ? explosionPower : 1.0F, explosionMode, false );
         if( !explosion.initializeExplosion() ) return;
-        explosion.finalizeExplosion();
+        explosion.finalizeExplosion( false );
         
         if( explosionMode == Explosion.BlockInteraction.KEEP ) return;
         

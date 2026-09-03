@@ -15,7 +15,10 @@ import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LightLayer;
-import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.IceBlock;
+import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
@@ -48,25 +51,6 @@ public class MeltingIceBlock extends IceBlock {
         level.scheduleTick( pos, SMBlocks.MELTING_ICE.get(), Mth.nextInt( random, 60, 120 ) );
     }
     
-    /** Called after each melt logic tick to schedule the next tick. */
-    private void scheduleTick( Level level, BlockPos pos, RandomSource random ) {
-        final int darkness = 15 - getLight( level, pos );
-        
-        int solidNeighbors = 0;
-        final BlockPos.MutableBlockPos neighborPos = new BlockPos.MutableBlockPos();
-        for( Direction direction : Direction.Plane.HORIZONTAL ) {
-            //noinspection deprecation
-            if( level.getBlockState( neighborPos.setWithOffset( pos, direction ) ).isSolid() ) {
-                solidNeighbors++;
-            }
-        }
-        
-        // The 'neutral' state is 0 block light and 0 solid neighbors - this gives the same tick rate as frosted ice (1-2s)
-        // Max delay is same as the default 'first tick' delay (3-6s)
-        final int delay = 5 + darkness + 10 * solidNeighbors;
-        level.scheduleTick( pos, this, Mth.nextInt( random, delay, delay << 1 ) );
-    }
-    
     /** @return The light level touching this block (0-15). We use this method because the block is solid. */
     private static int getLight( Level level, BlockPos pos ) {
         int highestLight = 0;
@@ -85,6 +69,26 @@ public class MeltingIceBlock extends IceBlock {
     public MeltingIceBlock() {
         super( BlockBehaviour.Properties.copy( Blocks.FROSTED_ICE ) );
         registerDefaultState( stateDefinition.any().setValue( AGE, 0 ).setValue( HAS_WATER, true ) );
+    }
+    
+    
+    /** Called after each melt logic tick to schedule the next tick. */
+    private void scheduleTick( Level level, BlockPos pos, RandomSource random ) {
+        final int darkness = 15 - getLight( level, pos );
+        
+        int solidNeighbors = 0;
+        final BlockPos.MutableBlockPos neighborPos = new BlockPos.MutableBlockPos();
+        for( Direction direction : Direction.Plane.HORIZONTAL ) {
+            //noinspection deprecation
+            if( level.getBlockState( neighborPos.setWithOffset( pos, direction ) ).isSolid() ) {
+                solidNeighbors++;
+            }
+        }
+        
+        // The 'neutral' state is 0 block light and 0 solid neighbors - this gives the same tick rate as frosted ice (1-2s)
+        // Max delay is same as the default 'first tick' delay (3-6s)
+        final int delay = 5 + darkness + 10 * solidNeighbors;
+        level.scheduleTick( pos, this, Mth.nextInt( random, delay, delay << 1 ) );
     }
     
     @Override

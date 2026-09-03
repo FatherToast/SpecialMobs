@@ -1,0 +1,42 @@
+{
+  "render_type": "cutout",
+  "ambientocclusion": false,
+  "textures": {
+    "particle": "#fire"
+  },
+  "elements": [
+    {
+      "from": [
+        0,
+        0,
+        0.01
+      ],
+      "to": [
+        16,
+        11.4,
+        0.01
+      ],
+      "shade": false,
+      "faces": {
+        "south": {
+          "uv": [
+            0,
+            0,
+            16,
+            8
+          ],
+          "texture": "#fire"
+        },
+        "north": {
+          "uv": [
+            0,
+            0,
+            16,
+            8
+          ],
+          "texture": "#fire"
+        }
+      }
+    }
+  ]
+}

@@ -1,12 +1,12 @@
 package fathertoast.specialmobs.common.entity.projectile;
 
-import fathertoast.crust.api.entity.IPlayerVelocityWatcher;
+import fathertoast.crust.api.lib.NBTHelper;
 import fathertoast.specialmobs.common.compat.crust.SMCrustPlugin;
 import fathertoast.specialmobs.common.core.register.SMEntities;
 import fathertoast.specialmobs.common.core.register.SMItems;
 import fathertoast.specialmobs.common.entity.ghast.CorporealShiftGhastEntity;
+import fathertoast.specialmobs.common.util.ExplosionHelper;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
@@ -26,12 +26,15 @@ import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.entity.IEntityAdditionalSpawnData;
-import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.network.NetworkHooks;
 
 import javax.annotation.Nullable;
 
+@SuppressWarnings( "resource" )
 public class IncorporealFireballEntity extends AbstractHurtingProjectile implements IEntityAdditionalSpawnData, ItemSupplier {
+    
+    public static final String TAG_EXPLOSION_POWER = "ExplosionPower";
+    public static final String TAG_TARGET_ID = "TargetId";
     
     public int explosionPower = 1;
     private boolean shouldExplode = false;
@@ -52,9 +55,8 @@ public class IncorporealFireballEntity extends AbstractHurtingProjectile impleme
     
     public IncorporealFireballEntity( Level level, @Nullable Player owner, @Nullable LivingEntity target, double x, double y, double z ) {
         this( SMEntities.INCORPOREAL_FIREBALL.get(), level );
-        setPos( x, y, z );
         this.target = target;
-        
+        setPos( x, y, z );
         moveTo( x, y, z, getYRot(), getXRot() );
         reapplyPosition();
         double d = Mth.sqrt( (float) (x * x + y * y + z * z) );
@@ -64,7 +66,6 @@ public class IncorporealFireballEntity extends AbstractHurtingProjectile impleme
             yPower = y / d * 0.1D;
             zPower = z / d * 0.1D;
         }
-        
         if( owner != null ) {
             setOwner( owner );
             setRot( owner.getYRot(), owner.getXRot() );
@@ -75,17 +76,18 @@ public class IncorporealFireballEntity extends AbstractHurtingProjectile impleme
     @Override
     public void tick() {
         super.tick();
-        
         // Fizzle out and die when the target is dead or lost,
         // or else the fireball goes bonkers.
         if( target == null || !target.isAlive() ) {
             playSound( SoundEvents.FIRE_EXTINGUISH, 1.0F, 1.0F );
-            
             if( !level().isClientSide ) discard();
             return;
         }
         // Follow target
-        Vec3 vec3 = new Vec3( target.getX() - this.getX(), (target.getY() + (target.getEyeHeight() / 2)) - this.getY(), target.getZ() - this.getZ() );
+        Vec3 vec3 = new Vec3(
+                target.getX() - getX(),
+                (target.getY() + (target.getEyeHeight() / 2)) - getY(),
+                target.getZ() - getZ() );
         setDeltaMovement( vec3.normalize().scale( 0.5 ) );
         
         // Boof
@@ -93,10 +95,10 @@ public class IncorporealFireballEntity extends AbstractHurtingProjectile impleme
     }
     
     private void explode() {
-        boolean mobGrief = ForgeEventFactory.getMobGriefingEvent( level(), getOwner() );
-        Level.ExplosionInteraction mode = mobGrief ? Level.ExplosionInteraction.MOB : Level.ExplosionInteraction.NONE;
+        final ExplosionHelper explosion = new ExplosionHelper( this, explosionPower, true, true );
+        if( !explosion.initializeExplosion() ) return;
+        explosion.finalizeExplosion( false );
         
-        level().explode( null, this.getX(), this.getY(), this.getZ(), (float) explosionPower, mobGrief, mode );
         target = null;
         discard();
     }
@@ -115,7 +117,7 @@ public class IncorporealFireballEntity extends AbstractHurtingProjectile impleme
     protected void onHitEntity( EntityHitResult hitResult ) {
         super.onHitEntity( hitResult );
         
-        if( !this.level().isClientSide ) {
+        if( !level().isClientSide ) {
             Entity target = hitResult.getEntity();
             
             if( target instanceof Player player ) {
@@ -150,21 +152,21 @@ public class IncorporealFireballEntity extends AbstractHurtingProjectile impleme
     }
     
     @Override
-    public void addAdditionalSaveData( CompoundTag compoundTag ) {
-        super.addAdditionalSaveData( compoundTag );
-        compoundTag.putInt( "ExplosionPower", explosionPower );
-        compoundTag.putInt( "TargetId", target == null ? -1 : target.getId() );
+    public void addAdditionalSaveData( CompoundTag saveTag ) {
+        super.addAdditionalSaveData( saveTag );
+        saveTag.putInt( TAG_EXPLOSION_POWER, explosionPower );
+        saveTag.putInt( TAG_TARGET_ID, target == null ? -1 : target.getId() );
     }
     
     @Override
-    public void readAdditionalSaveData( CompoundTag compoundTag ) {
-        super.readAdditionalSaveData( compoundTag );
-        if( compoundTag.contains( "ExplosionPower", Tag.TAG_ANY_NUMERIC ) ) {
-            explosionPower = compoundTag.getInt( "ExplosionPower" );
-        }
+    public void readAdditionalSaveData( CompoundTag saveTag ) {
+        super.readAdditionalSaveData( saveTag );
         
-        if( compoundTag.contains( "TargetId", Tag.TAG_ANY_NUMERIC ) ) {
-            Entity entity = level().getEntity( compoundTag.getInt( "TargetId" ) );
+        if( NBTHelper.containsNumber( saveTag, TAG_EXPLOSION_POWER ) )
+            explosionPower = saveTag.getInt( TAG_EXPLOSION_POWER );
+        
+        if( NBTHelper.containsNumber( saveTag, TAG_TARGET_ID ) ) {
+            Entity entity = level().getEntity( saveTag.getInt( TAG_TARGET_ID ) );
             
             if( entity instanceof LivingEntity ) {
                 target = (LivingEntity) entity;

@@ -1,5 +1,6 @@
 package fathertoast.specialmobs.common.util;
 
+import fathertoast.specialmobs.common.block.SlabFireBlock;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.protocol.game.ClientboundExplodePacket;
 import net.minecraft.server.level.ServerLevel;
@@ -40,6 +41,7 @@ public class ExplosionHelper {
         Explosion.BlockInteraction explosionMode = damageBlocks ? getMode( entity ) : Explosion.BlockInteraction.KEEP;
         Level.ExplosionInteraction interaction = explosionMode == Explosion.BlockInteraction.KEEP ?
                 Level.ExplosionInteraction.NONE : Level.ExplosionInteraction.MOB;
+        // noinspection resource
         return entity.level().explode( entity, x, y, z, power, fiery, interaction );
     }
     
@@ -67,7 +69,7 @@ public class ExplosionHelper {
      * To fully execute the explosion, you must manually call initializeExplosion() and then finalizeExplosion().
      *
      * @see #initializeExplosion()
-     * @see #finalizeExplosion()
+     * @see #finalizeExplosion(boolean)
      */
     public ExplosionHelper( Entity entity, float power, boolean damageBlocks, boolean fiery ) {
         this( entity, entity.getX(), entity.getY(), entity.getZ(), power, damageBlocks, fiery );
@@ -80,7 +82,7 @@ public class ExplosionHelper {
      * To fully execute the explosion, you must manually call initializeExplosion() and then finalizeExplosion().
      *
      * @see #initializeExplosion()
-     * @see #finalizeExplosion()
+     * @see #finalizeExplosion(boolean)
      */
     public ExplosionHelper( Entity entity, float power, Explosion.BlockInteraction explosionMode, boolean fiery ) {
         this( entity, entity.getX(), entity.getY(), entity.getZ(), power, explosionMode, fiery );
@@ -93,7 +95,7 @@ public class ExplosionHelper {
      * To fully execute the explosion, you must manually call initializeExplosion() and then finalizeExplosion().
      *
      * @see #initializeExplosion()
-     * @see #finalizeExplosion()
+     * @see #finalizeExplosion(boolean)
      */
     public ExplosionHelper( Entity entity, double x, double y, double z, float power, boolean damageBlocks, boolean fiery ) {
         this( entity, x, y, z, power, damageBlocks ? getMode( entity ) : Explosion.BlockInteraction.KEEP, fiery );
@@ -106,7 +108,7 @@ public class ExplosionHelper {
      * To fully execute the explosion, you must manually call initializeExplosion() and then finalizeExplosion().
      *
      * @see #initializeExplosion()
-     * @see #finalizeExplosion()
+     * @see #finalizeExplosion(boolean)
      */
     public ExplosionHelper( Entity entity, double x, double y, double z, float power, Explosion.BlockInteraction explosionMode, boolean fiery ) {
         source = entity;
@@ -171,7 +173,7 @@ public class ExplosionHelper {
      * @return True if the explosion should continue to finalization, or false if its start event was canceled.
      */
     public boolean initializeExplosion() {
-        if( net.minecraftforge.event.ForgeEventFactory.onExplosionStart( level, explosion ) ) return false;
+        if( ForgeEventFactory.onExplosionStart( level, explosion ) ) return false;
         explosion.explode();
         return true;
     }
@@ -179,13 +181,28 @@ public class ExplosionHelper {
     /**
      * Runs the second and last part of explosion logic. This step breaks all hit blocks and places fire blocks
      * (if these capabilities are enabled) and notifies players that the explosion happened.
+     *
+     * @param slab If true, any fire blocks placed will be slab fires instead, if possible.
      */
-    public void finalizeExplosion() {
+    public void finalizeExplosion( boolean slab ) {
         if( level instanceof ServerLevel serverLevel ) {
+            // Stop vanilla fire placement if slab is true
+            if( slab ) explosion.fire = false;
+            
             // Handle server-side explosion logic
             explosion.finalizeExplosion( false );
             if( mode == Explosion.BlockInteraction.KEEP ) {
                 explosion.clearToBlow();
+            }
+            // If slab is true, place slab fires under the same conditions
+            // vanilla would place normal fire.
+            if( slab ) {
+                for( BlockPos pos : explosion.getToBlow() ) {
+                    if( explosion.random.nextInt( 3 ) == 0 && level.getBlockState( pos ).isAir()
+                            && level.getBlockState( pos.below() ).isSolidRender( level, pos.below() ) ) {
+                        level.setBlockAndUpdate( pos, SlabFireBlock.getState( level, pos ) );
+                    }
+                }
             }
             final Vec3 pos = getPos();
             for( ServerPlayer player : serverLevel.players() ) {

@@ -1,12 +1,12 @@
 package fathertoast.specialmobs.common.entity.creeper;
 
+import fathertoast.crust.api.datagen.loot.LootTableBuilder;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.entity.MobHelper;
 import fathertoast.specialmobs.common.util.ExplosionHelper;
 import fathertoast.specialmobs.common.util.References;
-import fathertoast.crust.api.datagen.loot.LootTableBuilder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -65,7 +65,7 @@ public class DirtCreeperEntity extends _SpecialCreeperEntity {
         final Explosion.BlockInteraction explosionMode = ExplosionHelper.getMode( this );
         final ExplosionHelper explosion = new ExplosionHelper( this, explosionPower, false, false );
         if( !explosion.initializeExplosion() ) return;
-        explosion.finalizeExplosion();
+        explosion.finalizeExplosion( false );
         
         if( explosionMode == Explosion.BlockInteraction.KEEP ) return;
         

@@ -68,7 +68,7 @@ public class GravelCreeperEntity extends _SpecialCreeperEntity {
         final Explosion.BlockInteraction explosionMode = ExplosionHelper.getMode( this );
         final ExplosionHelper explosion = new ExplosionHelper( this, explosionPower, explosionMode, false );
         if( !explosion.initializeExplosion() ) return;
-        explosion.finalizeExplosion();
+        explosion.finalizeExplosion( false );
         
         if( explosionMode == Explosion.BlockInteraction.KEEP || level().isClientSide() ) return;
         

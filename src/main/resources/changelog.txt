@@ -7,6 +7,7 @@
     - Fixed gravel creepers' gravel failing to apply hit damage.
     - Fixed creepers creating infinite-potion-duration effect clouds.
     - Fixed melting ice not being translucent.
+    - Added slab fire.
 1.20.1-4.1.25
     - Fixed immediate mob replacement checks always canceling original spawns.
 1.20.1-4.1.24

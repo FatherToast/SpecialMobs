@@ -1,11 +1,11 @@
 package fathertoast.specialmobs.common.entity.creeper;
 
+import fathertoast.crust.api.datagen.loot.LootTableBuilder;
 import fathertoast.specialmobs.common.bestiary.BestiaryInfo;
 import fathertoast.specialmobs.common.bestiary.MobFamily;
 import fathertoast.specialmobs.common.bestiary.SpecialMob;
 import fathertoast.specialmobs.common.util.ExplosionHelper;
 import fathertoast.specialmobs.common.util.References;
-import fathertoast.crust.api.datagen.loot.LootTableBuilder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -91,13 +91,10 @@ public class DarkCreeperEntity extends _SpecialCreeperEntity {
                 }
             }
         }
-        
-        explosion.finalizeExplosion();
+        explosion.finalizeExplosion( false );
         
         // Move the time forward to next night if powered
         if( isPowered() && level() instanceof ServerLevel serverLevel ) {
-            ;
-            
             // Days are 24k ticks long; find how far along we are in the current day (0-23,999)
             long time = serverLevel.getDayTime();
             final int dayTime = (int) (time % 24_000L);

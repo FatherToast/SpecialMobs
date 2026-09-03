@@ -95,7 +95,7 @@ public class SandCreeperEntity extends _SpecialCreeperEntity {
         
         final ExplosionHelper explosion = new ExplosionHelper( this, explosionPower, explosionMode, false );
         if( !explosion.initializeExplosion() ) return;
-        explosion.finalizeExplosion();
+        explosion.finalizeExplosion( false );
         
         // Clear weather
         if( isPowered() && level().getLevelData() instanceof ServerLevelData serverData ) {

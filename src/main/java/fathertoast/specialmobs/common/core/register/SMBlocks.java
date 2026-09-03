@@ -35,7 +35,7 @@ public class SMBlocks {
         
         final ArrayList<RegistryObject<Block>> slabFires = new ArrayList<>();
         for( SlabFireBlock.Type type : SlabFireBlock.Type.values() ) {
-            slabFires.add( registerBlock( type.blockId(), type::blockSupplier, CreativeModeTabs.COLORED_BLOCKS ) );
+            slabFires.add( registerBlockNoItem( type.blockId(), type::blockSupplier ) );
         }
         slabFires.trimToSize();
         SLAB_FIRES = Collections.unmodifiableList( slabFires );

@@ -144,7 +144,7 @@ public class SnowCreeperEntity extends _SpecialCreeperEntity {
         final ExplosionHelper explosion = new ExplosionHelper( this,
                 explosionMode == Explosion.BlockInteraction.KEEP ? explosionPower : 2.0F, false, false );
         if( !explosion.initializeExplosion() ) return;
-        explosion.finalizeExplosion();
+        explosion.finalizeExplosion( false );
         
         final int radius = (int) Math.floor( explosionPower );
         final BlockPos center = BlockPos.containing( explosion.getPos() );
