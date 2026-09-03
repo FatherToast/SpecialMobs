@@ -1,7 +1,5 @@
 package fathertoast.specialmobs.datagen.model;
 
-import com.google.common.collect.ImmutableMultimap;
-import com.google.common.collect.Multimap;
 import fathertoast.specialmobs.common.block.MeltingIceBlock;
 import fathertoast.specialmobs.common.block.SlabFireBlock;
 import fathertoast.specialmobs.common.block.UnderwaterSilverfishBlock;
@@ -14,7 +12,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraftforge.client.model.generators.*;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -108,12 +105,7 @@ public class SMBlockStateAndModelProvider extends BlockStateProvider {
                         .texture( TextureSlot.FIRE.getId(), TextureMapping.fire1( parentBlock ).get( TextureSlot.FIRE ) )
                         .renderType( CUTOUT ) };
         
-        
         final MultiPartBlockStateBuilder builder = getMultipartBuilder( slabFireBlock );
-        final Multimap<Property<?>, Boolean> defaultProps = ImmutableMultimap.of(
-                BlockStateProperties.NORTH, false, BlockStateProperties.EAST, false, BlockStateProperties.SOUTH,
-                false, BlockStateProperties.WEST, false, BlockStateProperties.UP, false
-        );
         
         // Floor models are applied if the fire is "standing" on a block
         builder.part().modelFile( floorModels[0] ).nextModel().modelFile( floorModels[1] ).addModel()
